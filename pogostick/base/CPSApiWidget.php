@@ -1,4 +1,4 @@
-<?php
+<?php                               
 /**
  * CPSApiWidget class file.
  *
