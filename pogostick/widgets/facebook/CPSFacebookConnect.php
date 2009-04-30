@@ -1,4 +1,4 @@
-<?php
+<?php    
 /**
  * CPSFacebookConnect class file.
  *
