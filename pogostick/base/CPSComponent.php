@@ -35,7 +35,7 @@ class CPSComponent extends CApplicationComponent
 
 		$this->attachBehaviors(
         	array(
-        		'psComponent' => 'application.extensions.pogostick.behaviors.CPSComponentBehavior',
+        		'psComponent' => 'pogostick.behaviors.CPSComponentBehavior',
         	)
         );
 	}

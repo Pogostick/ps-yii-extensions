@@ -34,7 +34,7 @@ class CPSApiComponent extends CPSComponent
 
 		$this->attachBehaviors(
 			array(
-        		'psApi' => 'application.extensions.pogostick.behaviors.CPSApiBehavior',
+        		'psApi' => 'pogostick.behaviors.CPSApiBehavior',
         	)
 		);
 

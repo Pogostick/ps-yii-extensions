@@ -1,4 +1,4 @@
-<?php                               
+<?php
 /**
  * CPSApiWidget class file.
  *
@@ -41,7 +41,7 @@ abstract class CPSApiWidget extends CPSWidget
 		//	Attache our api behavior
 		$this->attachBehaviors(
         	array(
-        		'psApi' => 'application.extensions.pogostick.behaviors.CPSApiBehavior',
+        		'psApi' => 'pogostick.behaviors.CPSApiBehavior',
         	)
         );
 	}
