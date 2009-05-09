@@ -135,7 +135,7 @@ class CPSjqGridWidget extends CPSWidget
 	*
 	* @param string $sId
 	*/
-	protected function registerClientScripts()
+	public function registerClientScripts()
 	{
 		//	Daddy...
 		$_oCS = parent::registerClientScripts();

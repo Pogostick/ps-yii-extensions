@@ -22,42 +22,35 @@
 abstract class CPSApiWidget extends CPSWidget
 {
 	//********************************************************************************
-	//* Methods
+	//* Yii Override Methods
 	//********************************************************************************
 
 	/**
-	* Attach behaviors during construction...
-	*
-	* @param CBaseController $oOwner
-	*/
-	public function __construct( $oOwner = null )
-	{
-		//	Log
-		$this->psLog( '{class} constructor called' );
-
-		//	Call daddy...
-		parent::__construct( $oOwner );
-
-		//	Attache our api behavior
-		$this->attachBehaviors(
-        	array(
-        		'psApi' => 'pogostick.behaviors.CPSApiBehavior',
-        	)
-        );
-	}
-
-	/**
-	* Yii widget init
+	* Constructor
 	*
 	*/
-	public function init()
+	public function __construct( $oOwner = null, &$oParent )
 	{
 		//	Call daddy
-		parent::init();
+		$this->setParent( parent::__construct( $oOwner, $this ) );
 
-		//	Get the id/name of this widget
-		list( $this->name, $this->id ) = $this->resolveNameID();
+		//	Attach our api behavior
+		$this->attachBehavior( $this->m_sInternalName, 'pogostick.behaviors.CPSApiBehavior' );
+
+		//	Save my parent
+		$this->setParent( $oParent );
+
+		//	Log it and check for issues...
+		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $this->getInternalName() );
 	}
+
+	//********************************************************************************
+	//* Yii Overrides
+	//********************************************************************************
+
+	//********************************************************************************
+	//* Private Methods
+	//********************************************************************************
 
 	/**
 	* Creates an array for requestMap

@@ -1,4 +1,4 @@
-<?php     
+<?php
 /**
  * CPSApiBehavior class file.
  *
@@ -45,17 +45,20 @@ class CPSApiBehavior extends CPSComponentBehavior
 	* Constructor
 	*
 	*/
-	public function __construct()
+	public function __construct( $arClassOptions = null, &$oParent = null )
 	{
-		//	Log
-		Yii::log( 'constructed psApiBehavior object for [' . get_parent_class() . ']' );
-
 		//	Call daddy...
-		parent::__construct();
+		parent::__construct( $arClassOptions, $this );
 
 		//	Add ours...
-		$this->addOptions( self::getBaseOptions() );
-    }
+		$this->setOptions( self::getBaseOptions() );
+
+		//	Set parent
+		$this->setParent( $oParent );
+
+		//	Log it and check for issues...
+		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
+	}
 
 	/**
 	* Allows for single behaviors
@@ -145,7 +148,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 	 * @param function|array $oReadCallback The callback function to call after the body has been read. Accepts function reference or array( object, method )
 	 * @return mixed The data returned from the HTTP request or null for no data
 	 */
-	protected function makeHttpRequest( $sUrl, $sQueryString = null, $sMethod = 'GET', $sUserAgent = null, $iTimeOut = 60, $oHeaderCallback = null, $oReaderCallback = null )
+	public function makeHttpRequest( $sUrl, $sQueryString = null, $sMethod = 'GET', $sUserAgent = null, $iTimeOut = 60, $oHeaderCallback = null, $oReaderCallback = null )
 	{
 		//	Our user-agent string
 		$_sAgent = ( null != $sUserAgent ) ? $sUserAgent : 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506; InfoPath.3)';
@@ -191,13 +194,13 @@ class CPSApiBehavior extends CPSComponentBehavior
 	/**
 	* Adds to the requestMap array
 	*
-	* @param string $sLabel
-	* @param string $sParamName
+	* @param string $sLabel The "friendly" name for consumers
+	* @param string $sParamName The name of the API variable, if null, $sLabel
 	* @param bool $bRequired
 	* @param array $arOptions
 	* @param string $sApiName
 	* @param string $sSubApiName
-	* @return array
+	* @return bool True if operation succeeded
 	* @see makeMapItem
 	* @see makeMapArray
 	*/
@@ -207,34 +210,29 @@ class CPSApiBehavior extends CPSComponentBehavior
 		static $_sLastApiName;
 		static $_sLastSubApiName;
 
-		//	Get our requestMap array...
-		$_arReqMap =& $this->getOption( 'requestMap' );
-
 		//	Set up statics so next call can omit those parameters.
-		if ( $sApiName != $_sLastApiName && null != $sApiName )
+		if ( null != $sApiName && $sApiName != $_sLastApiName )
 			$_sLastApiName = $sApiName;
 
-		if ( $sSubApiName != $_sLastSubApiName && null != $sSubApiName )
+		if (  null != $sSubApiName && $sSubApiName != $_sLastSubApiName )
 			$_sLastSubApiName = $sSubApiName;
 
 		//	Build the options
 		$_arTemp = array( 'name' => ( null != $sParamName ) ? $sParamName : $sLabel, 'required' => $bRequired );
 
-		//	Add on supplied options
+		//	Add on any supplied options
 		if ( null != $arOptions )
 			$_arTemp = array_merge( $_arTemp, $arOptions );
 
-		//	Get array item ready for insertion
-		if ( null != $_sLastApiName && null != $_sLastSubApiName )
-			$_arReqMap[ $_sLastApiName ][ $_sLastApiName ] = $_arTemp;
-		else if ( null != $_sLastApiName && null == $_sLastSubApiName )
-			$_arFinal[ $sLabel ] = $_arTemp;
-		else
-			$_arFinal = $_arTemp;
+		//	Add the mapping...
+		if ( null == $_sLastApiName && null == $_sLastSubApiName )
+			return false;
 
-		$_arReqMap[ $_sLastApiName ] = $_arFinal;
+		//	Add mapping...
+		$_arOptions =& $this->getOptions();
+		$_arOptions[ 'requestMap' ][ $_sLastApiName ][ $_sLastSubApiName ][ $sLabel ] = $_arTemp;
 
-		return $_arFinal;
+		return true;
 	}
 
 	/**
@@ -245,7 +243,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 	* @returns array Returns the constructed array item ready to insert into your requestMap
 	* @see makeMapItem
 	*/
-	protected function makeMapArray( $sApiName, $sSubApiName = null, array $arMap, $bSetRequestMap = true )
+	public function makeMapArray( $sApiName, $sSubApiName = null, array $arMap, $bSetRequestMap = true )
 	{
 		$_arFinal = array();
 
@@ -279,7 +277,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 	* @param array $arTargetArray If supplied, will insert into array
 	* @returns array Returns the constructed array item ready to insert into your requestMap
 	*/
-	protected function makeMapItem( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, array $arTargetArray = null )
+	public function makeMapItem( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, array $arTargetArray = null )
 	{
 		//	Build default settings
 		$_arMapOptions = array( 'name' => ( null != $sParamName ) ? $sParamName : $sLabel, 'required' => $bRequired );

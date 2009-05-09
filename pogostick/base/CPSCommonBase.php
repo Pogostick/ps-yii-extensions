@@ -58,15 +58,6 @@ class CPSCommonBase
 	 */
 	public static function genericGet( $oObject, $oParent = null, $oEvent = null, $sName )
 	{
-		//	Direct getter method...
-		$_sGetter = 'get' . $sName;
-		if ( method_exists( $oObject, $_sGetter ) )
-			return $oObject->{$_sGetter}();
-
-		//	Are you my daddy?
-		if ( $oParent )
-			try { return $oParent->__get( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $oEvent = $_ex; }
-
 		//	Check behavior getter methods...
 		return self::getBehaviorProperty( $oObject, $sName );
 
@@ -187,6 +178,12 @@ class CPSCommonBase
 				if ( $_oBehave->hasOption( $sName ) )
 					return $_oBehave;
 			}
+		}
+		else if ( $oComponent instanceof CPSComponentBehavior )
+		{
+			//	Check options
+			if ( $oComponent->hasOption( $sName ) )
+				return $oComponent;
 		}
 
 		return null;

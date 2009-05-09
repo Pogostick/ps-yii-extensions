@@ -25,16 +25,27 @@ class CPSWidgetBehavior extends CPSComponentBehavior
 	//* Member Variables
 	//********************************************************************************
 
-	public function __construct( $arClassOptions = null )
-	{
-		//	Log
-		Yii::log( 'constructed CPSWidgetBehavior object for [' . get_parent_class() . ']' );
+	protected $m_oParent = null;
 
-		parent::__construct();
+	//********************************************************************************
+	//* Constructor
+	//********************************************************************************
+
+	public function __construct( &$oParent = null )
+	{
+		//	Call daddy
+		$this->setParent( parent::__construct( $this ) );
 
 		//	Add our settings to this
-		$this->addOptions( self::getBaseOptions() );
+		$this->setOptions( self::getBaseOptions() );
+
+		//	Log it and check for issues...
+		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
 	}
+
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
 
 	/**
 	* Allows for single behaviors

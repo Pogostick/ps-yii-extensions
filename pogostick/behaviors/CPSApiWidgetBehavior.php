@@ -20,31 +20,26 @@
 class CPSApiWidgetBehavior extends CPSApiBehavior
 {
 	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Member Variables
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Member Variables
+	//* Public Methods
 	//********************************************************************************
 
 	/***
 	* Constructor
 	*
 	*/
-	public function __construct()
+	public function __construct( $arClassOptions = null, &$oParent = null )
 	{
-		//	Log
-		Yii::log( 'constructed psApiWidgetBehavior object for [' . get_parent_class() . ']' );
-
 		//	Call daddy...
-		parent::__construct();
+		parent::__construct( $arClassOptions, $this );
 
 		//	Add ours...
-		$this->addOptions( self::getBaseOptions() );
+		$this->setOptions( self::getBaseOptions() );
+
+		//	Set parent
+		$this->setParent( $this );
+
+		//	Log it and check for issues...
+		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
     }
 
 	/**
@@ -198,7 +193,7 @@ class CPSApiWidgetBehavior extends CPSApiBehavior
 	* @see makeMapItem
 	* @see makeMapArray
 	*/
-	protected function addRequestMapping( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, $sApiName = null, $sSubApiName = null )
+	protected function OLD____addRequestMapping( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, $sApiName = null, $sSubApiName = null )
 	{
 		//	Save for next call
 		static $_sLastApiName;

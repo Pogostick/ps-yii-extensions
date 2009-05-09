@@ -15,7 +15,7 @@
  * @filesource
  * @package psYiiExtensions
  * @subpackage Base
- * @since 1.0.4
+ * @since 1.0.0
  */
 class CPSApiComponent extends CPSComponent
 {
@@ -24,23 +24,31 @@ class CPSApiComponent extends CPSComponent
 	//********************************************************************************
 
 	/**
-	* Constructors
+	* Constructor
 	*
 	*/
-	public function __construct()
+	public function __construct( &$oParent )
 	{
-		//	Log
-		Yii::trace( Yii::t( 'psApiComponent', 'constructed psApiComponent object for [' . get_parent_class() . ']' ) );
+		//	Call daddy...
+		parent::__construct( $this );
 
-		$this->attachBehaviors(
-			array(
-        		'psApi' => 'pogostick.behaviors.CPSApiBehavior',
-        	)
-		);
+		//	Attach our default behavior
+		$this->attachBehavior( $this->m_sInternalName, 'pogostick.behaviors.CPSApiBehavior' );
 
-		//	Call daddy
-		parent::__construct();
+		//	Save references
+		$this->setParent( $oParent );
+
+		//	Log it and check for issues...
+		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $this->getInternalName() );
 	}
+
+	//********************************************************************************
+	//* Yii Overrides
+	//********************************************************************************
+
+	//********************************************************************************
+	//* Private Methods
+	//********************************************************************************
 
 	/**
 	* Makes the actual HTTP request based on settings
@@ -59,7 +67,7 @@ class CPSApiComponent extends CPSComponent
 			$_arRequestData = array_merge( $_arRequestData, $arRequestData );
 
 		//	Check subtype...
-		if ( ! empty( $sSubType ) && is_array( $this->requestMap ) )
+		if ( ! empty( $sSubType ) && is_array( $this->requestMap[ $this->apiToUse ] ) )
 		{
 			if ( ! array_key_exists( $sSubType, $this->requestMap[ $this->apiToUse ] ) )
 			{

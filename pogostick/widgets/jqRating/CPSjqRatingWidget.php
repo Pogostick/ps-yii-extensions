@@ -286,7 +286,7 @@ class CPSjqRatingWidget extends CPSWidget
 			unset( $_arOptions[ 'ajaxCallback' ] );
 
 		$_oWidget = Yii::app()->controller->widget(
-			'pogostick.jqRating.CPSjqRatingWidget',
+			'pogostick.widgets.jqRating.CPSjqRatingWidget',
 			$_arOptions
 		);
 

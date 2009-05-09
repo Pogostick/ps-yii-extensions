@@ -17,30 +17,42 @@
  * @filesource
  * @package psYiiExtensions
  * @subpackage Widgets
- * @since 1.0.3
+ * @since 1.0.0
  */
 class CPSgApiWidget extends CPSApiWidget
 {
+	//********************************************************************************
+	//* Constructor
+	//********************************************************************************
+
 	/**
 	* Constructor
 	*
 	*/
-	public function __construct()
+	public function __construct( &$oParent )
 	{
-		//	Log
-		Yii::log( 'constructed CPSgApiWidget object for [' . get_parent_class() . ']' );
-
-		parent::__construct();
+		//	Daddy...
+		$this->setParent( parent::__construct( null, $this ) );
 
 		//	Our object settings
-		$this->addOption( 'apisToLoad',
+		$this->setOption( 'apisToLoad',
 			array(
 				'value' => array(),
 				'type' => 'array',
 				'valid' => array( 'maps', 'search', 'feeds', 'language', 'gdata', 'earth', 'visualization' ),
 			)
 		);
+
+		//	Get internal name
+		$this->createInternalName();
+
+		//	Log it and check for issues...
+		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
 	}
+
+	//********************************************************************************
+	//* Yii Overrides
+	//********************************************************************************
 
 	public function run()
 	{
@@ -51,6 +63,8 @@ class CPSgApiWidget extends CPSApiWidget
 
 	protected function generateJavascript()
 	{
+		$this->script = '';
+
 //		foreach ( $this->apisToLoad as $_sApi => $_sVersion )
 //			$this->script .= "google.load(\"{$_sApi}\", \"{$_sVersion}\");";
 

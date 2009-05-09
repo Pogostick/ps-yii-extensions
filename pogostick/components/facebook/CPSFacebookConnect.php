@@ -1,4 +1,4 @@
-<?php    
+<?php
 /**
  * CPSFacebookConnect class file.
  *
@@ -15,24 +15,20 @@
  * @version SVN $Id$
  * @filesource
  * @package psYiiExtensions
- * @subpackage Widgets
- * @since 1.0.4
+ * @subpackage Components
+ * @since 1.0.0
  */
 class CPSFacebookConnect extends CPSApiWidget
 {
 	/**
-	* Our constructor
+	* Our init function
 	*
 	*/
-	public function init()
+	public function __construct()
 	{
-		parent::init();
+		parent::__construct();
 
-		$this->validOptions = array(
-			'appId' => array( 'type' => 'string' ),
-			'callbackUrl' => array( 'type' => 'string', 'required' => true ),
-			'xdrUrl' => array( 'type' => 'string', 'required' => true ),
-		);
+		$this->setOptions( array( 'appId' => null, 'callbackUrl' => null, 'xdrUrl' => null ) );
 	}
 
 	/***
@@ -47,8 +43,9 @@ class CPSFacebookConnect extends CPSApiWidget
 
 	protected function generateJavascript()
 	{
+		$_sUrl = $this->getOption( 'xdrUrl' );
 		$_sOut =<<<JSCRIPT
-FB.init('{$this->apiKey}', '{$this->xdrUrl}' );
+FB.init('{$this->apiKey}', '{$_sUrl}' );
 FB.ensureInit(
 	function()
 	{
@@ -72,8 +69,8 @@ JSCRIPT;
 	public function registerClientScripts()
 	{
 		$_oCS = parent::registerClientScripts();
-		$_oCS->registerScriptFile( 'http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php', CClientScript::POS_HEAD );
 
+		$_oCS->registerScriptFile( 'http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php', CClientScript::POS_HEAD );
 		$_oCS->registerScript( 'Yii.' . __CLASS__ . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
 	}
 }
