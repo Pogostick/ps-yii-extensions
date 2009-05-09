@@ -49,7 +49,6 @@ class CPSComponentBehavior extends CBehavior
 
 	protected $m_sInternalName;
 	protected $m_sNamePrefix;
-	protected $m_oParent = null;
 
 	//********************************************************************************
 	//* Property Accessors
@@ -60,9 +59,6 @@ class CPSComponentBehavior extends CBehavior
 
 	public function getNamePrefix() { return( $this->m_sNamePrefix ); }
 	public function setNamePrefix( $sValue ) { $this->m_sNamePrefix = $sValue; }
-
-	public function &getParent() { return $this->m_oParent; }
-	public function setParent( &$oParent ) { $this->m_oParent =& $oParent; }
 
 	public function getValidPattern() { return( $this->m_arValidPattern ); }
 	public function setValidPattern( $arValue ) { $this->m_arValidPattern = $arValue; }
@@ -75,7 +71,7 @@ class CPSComponentBehavior extends CBehavior
 	* Constructor
 	*
 	*/
-	public function __construct( &$oParent = null )
+	public function __construct()
 	{
 		//	build our option manager...
 		$this->m_oOptions = new CPSOptionManager( $this );
@@ -85,9 +81,6 @@ class CPSComponentBehavior extends CBehavior
 
 		//	Get our name...
 		$this->createInternalName();
-
-		//	Get parent...
-		$this->setParent( $oParent );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
@@ -400,7 +393,7 @@ class CPSComponentBehavior extends CBehavior
 	 * @see __call
 	 * @return mixed The method return value
 	 */
-	public function __call( $sName, $arParams )
+	public function OLD__call( $sName, $arParams )
 	{
 		//	Try parent first... cache exception
 		try { return parent::__call( $sName, $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }

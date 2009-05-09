@@ -27,16 +27,13 @@ class CPSApiWidgetBehavior extends CPSApiBehavior
 	* Constructor
 	*
 	*/
-	public function __construct( $arClassOptions = null, &$oParent = null )
+	public function __construct( $arClassOptions = null )
 	{
 		//	Call daddy...
-		parent::__construct( $arClassOptions, $this );
+		parent::__construct( $arClassOptions );
 
 		//	Add ours...
 		$this->setOptions( self::getBaseOptions() );
-
-		//	Set parent
-		$this->setParent( $this );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );

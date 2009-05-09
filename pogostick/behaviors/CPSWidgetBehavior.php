@@ -22,19 +22,13 @@
 class CPSWidgetBehavior extends CPSComponentBehavior
 {
 	//********************************************************************************
-	//* Member Variables
-	//********************************************************************************
-
-	protected $m_oParent = null;
-
-	//********************************************************************************
 	//* Constructor
 	//********************************************************************************
 
-	public function __construct( &$oParent = null )
+	public function __construct()
 	{
 		//	Call daddy
-		$this->setParent( parent::__construct( $this ) );
+		parent::__construct();
 
 		//	Add our settings to this
 		$this->setOptions( self::getBaseOptions() );
@@ -44,7 +38,7 @@ class CPSWidgetBehavior extends CPSComponentBehavior
 	}
 
 	//********************************************************************************
-	//* Public Methods
+	//* Private Methods
 	//********************************************************************************
 
 	/**

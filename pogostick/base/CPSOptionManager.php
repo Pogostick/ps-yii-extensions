@@ -57,12 +57,6 @@ class CPSOptionManager
 	* @var string
 	*/
 	protected $m_sInternalName = null;
-	/**
-	* A reference to my parent
-	*
-	* @var mixed
-	*/
-	protected $m_oParent = null;
 
 	//********************************************************************************
 	//* Public methods...
@@ -72,13 +66,10 @@ class CPSOptionManager
 	* Constructor
 	*
 	*/
-	public function __construct( &$oParent )
+	public function __construct()
 	{
 		//	Create our name
 		$this->setInternalName( 'psOptionManager' );
-
-		//	Set our parent
-		$this->m_oParent =& $oParent;
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $this->getInternalName() );

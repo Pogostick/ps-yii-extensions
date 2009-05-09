@@ -29,10 +29,10 @@ class CPSgApiWidget extends CPSApiWidget
 	* Constructor
 	*
 	*/
-	public function __construct( &$oParent )
+	public function __construct()
 	{
 		//	Daddy...
-		$this->setParent( parent::__construct( null, $this ) );
+		parent::__construct();
 
 		//	Our object settings
 		$this->setOption( 'apisToLoad',

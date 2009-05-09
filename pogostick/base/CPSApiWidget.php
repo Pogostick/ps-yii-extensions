@@ -29,24 +29,17 @@ abstract class CPSApiWidget extends CPSWidget
 	* Constructor
 	*
 	*/
-	public function __construct( $oOwner = null, &$oParent )
+	public function __construct( $oOwner = null )
 	{
 		//	Call daddy
-		$this->setParent( parent::__construct( $oOwner, $this ) );
+		parent::__construct( $oOwner );
 
 		//	Attach our api behavior
 		$this->attachBehavior( $this->m_sInternalName, 'pogostick.behaviors.CPSApiBehavior' );
 
-		//	Save my parent
-		$this->setParent( $oParent );
-
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $this->getInternalName() );
 	}
-
-	//********************************************************************************
-	//* Yii Overrides
-	//********************************************************************************
 
 	//********************************************************************************
 	//* Private Methods

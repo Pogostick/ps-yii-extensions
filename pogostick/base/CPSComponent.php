@@ -29,7 +29,6 @@ class CPSComponent extends CApplicationComponent
 	protected $m_sNamePrefix;
 	protected $m_bHasBehaviors = false;
 	protected $m_arBehaviors = null;
-	protected $m_oParent = null;
 
 	//********************************************************************************
 	//* Property Accessors
@@ -46,9 +45,6 @@ class CPSComponent extends CApplicationComponent
 
 	public function getBehaviors() { return( $this->m_arBehaviors ); }
 
-	public function &getParent() { return $this->m_oParent; }
-	public function setParent( &$oParent ) { $this->m_oParent =& $oParent; }
-
 	public function &hasBehaviorMethod( $sMethodName ) { return CPSCommonBase::hasBehaviorMethod( $this, $sMethodName ); }
 	public function &hasBehaviorProperty( $sName ) { return CPSCommonBase::hasBehaviorProperty( $this, $sName ); }
 	public function getBehaviorProperty( $sName ) { return CPSCommonBase::getBehaviorProperty( $this, $sName); }
@@ -62,19 +58,16 @@ class CPSComponent extends CApplicationComponent
 	* Constructor
 	*
 	*/
-	public function __construct( &$oParent )
+	public function __construct()
 	{
 		//	Create our internal name
 		$this->createInternalName();
 
-		//	Attach our default behavior
-		$this->attachBehavior( $this->m_sInternalName, 'pogostick.behaviors.CPSComponentBehavior' );
-
 		//	Import behaviors
 		Yii::import( 'pogostick.behaviors.CPSComponentBehavior' );
 
-		//	Set parent
-		$this->setParent( $oParent );
+		//	Attach our default behavior
+		$this->attachBehavior( $this->m_sInternalName, 'pogostick.behaviors.CPSComponentBehavior' );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $this->getInternalName() );
@@ -195,15 +188,10 @@ class CPSComponent extends CApplicationComponent
 	 */
 	public function __get( $sName )
 	{
-		//	Direct getter method...
-		$_sGetter = 'get' . $sName;
-		if ( method_exists( $this, $_sGetter ) )
-			return $this->{$_sGetter}();
-
 		//	Try daddy...
 		try { return parent::__get( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
-		//	Now us...
+		//	Check behavior properties
 		return $this->getBehaviorProperty( $sName );
 	}
 
@@ -228,13 +216,10 @@ class CPSComponent extends CApplicationComponent
 	 */
 	public function __set( $sName, $oValue )
 	{
-		//	Direct setter method...
-		$_sGetter = 'set' . $sName;
-		if ( method_exists( $this, $_sSetter ) )
-			return $this->{$_sSetter}();
-
+		//	Let parent take a stab. He'll check getter/setters and behavior methods
 		try { return parent::__set( $sName, $oValue ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
+		//	Check behavior properties
 		return $this->setBehaviorProperty( $sName, $oValue );
 	}
 

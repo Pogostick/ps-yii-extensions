@@ -27,7 +27,7 @@ class CPSApiComponent extends CPSComponent
 	* Constructor
 	*
 	*/
-	public function __construct( &$oParent )
+	public function __construct()
 	{
 		//	Call daddy...
 		parent::__construct( $this );
@@ -35,16 +35,9 @@ class CPSApiComponent extends CPSComponent
 		//	Attach our default behavior
 		$this->attachBehavior( $this->m_sInternalName, 'pogostick.behaviors.CPSApiBehavior' );
 
-		//	Save references
-		$this->setParent( $oParent );
-
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $this->getInternalName() );
 	}
-
-	//********************************************************************************
-	//* Yii Overrides
-	//********************************************************************************
 
 	//********************************************************************************
 	//* Private Methods

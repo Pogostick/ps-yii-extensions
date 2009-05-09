@@ -28,14 +28,10 @@ class CPSWidget extends CInputWidget
 	protected $m_sNamePrefix;
 	protected $m_bHasBehaviors = false;
 	protected $m_arBehaviors = null;
-	protected $m_oParent = null;
 
 	//********************************************************************************
 	//* Property Accessors
 	//********************************************************************************
-
-	public function &getParent() { return $this->m_oParent; }
-	public function setParent( &$oParent ) { $this->m_oParent =& $oParent; }
 
 	public function getInternalName() { return( $this->m_sInternalName ); }
 	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
@@ -65,7 +61,7 @@ class CPSWidget extends CInputWidget
 	public function __construct( $oOwner = null )
 	{
 		//	Call daddy...
-		$this->setParent( parent::__construct( $oOwner ) );
+		parent::__construct( $oOwner );
 
 		//	Import behaviors
 		Yii::import( 'pogostick.behaviors.CPSComponentBehavior' );
@@ -207,6 +203,10 @@ class CPSWidget extends CInputWidget
 	//* Magic Methods
 	//********************************************************************************
 
+	//********************************************************************************
+	//* Magic Methods
+	//********************************************************************************
+
 	/**
 	 * Returns a property value, an event handler list or a behavior based on its name.
 	 * Do not call this method. This is a PHP magic method that we override
@@ -235,7 +235,7 @@ class CPSWidget extends CInputWidget
 		//	Try daddy...
 		try { return parent::__get( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
-		//	Now us...
+		//	Check behavior properties
 		return $this->getBehaviorProperty( $sName );
 	}
 
@@ -260,10 +260,10 @@ class CPSWidget extends CInputWidget
 	 */
 	public function __set( $sName, $oValue )
 	{
-		//	Try daddy...
+		//	Let parent take a stab. He'll check getter/setters and behavior methods
 		try { return parent::__set( $sName, $oValue ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
-		//	Look in our behavior properties
+		//	Check behavior properties
 		return $this->setBehaviorProperty( $sName, $oValue );
 	}
 

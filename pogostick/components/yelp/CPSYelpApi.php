@@ -32,15 +32,6 @@ class CPSYelpApi extends CPSApiComponent
 	//* Public Methods
 	//********************************************************************************
 
-	public function __construct( &$oParent = null )
-	{
-		//	Call daddy...
-		parent::__construct( $oParent );
-
-		//	Set parent
-		$this->setParent( $oParent );
-	}
-
 	//********************************************************************************
 	//* Yii Overrides
 	//********************************************************************************
