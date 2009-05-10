@@ -44,23 +44,51 @@ class CPSComponentBehavior extends CBehavior
 	* @var array
 	* @see setValidPattern
 	* @see getValidPattern
+	* @todo Implement pattern recognition
 	*/
 	protected $m_arPatterns = null;
-
+	/**
+	* The internal name of the component. Used as the name of the behavior when attaching.
+	*
+	* In order to facilitate option separation, this value is used along with the prefix delimiter by the internal option
+	* manager to distinguish between owners. During construction, it is set to the name of
+	* the class, and includes special behavior for Pogostick classes. Example: CPSComponent
+	* becomes psComponent. Use or override (@link setInternalName) to change the name at
+	* runtime.
+	*
+	* @var string
+	* @see setInternalName
+	* @see $m_sPrefixDelimiter
+	*/
 	protected $m_sInternalName;
-	protected $m_sNamePrefix;
+	/**
+	* The delimiter to use for prefixes. This must contain only characters that are not allowed
+	* in variable names (i.e. '::', '||', '.', etc.). Defaults to '::'. There is no length limit,
+	* but 2 works out. There is really no need to ever change this unless you have a strong dislike
+	* of the '::' characters.
+	*
+	* @var string
+	*/
+	protected static $m_sPrefixDelimiter = '::';
 
 	//********************************************************************************
 	//* Property Accessors
 	//********************************************************************************
 
-	public function getInternalName() { return( $this->m_sInternalName ); }
+	/**
+	* Getters for member variables
+	*
+	*/
+	public function getInternalName() { return $this->m_sInternalName; }
+	public function getNamePrefix() { return $this->m_sInternalName . $this->m_sPrefixDelimiter; }
+	public function getPrefixDelimiter() { return $this->m_sPrefixDelimiter; }
+	public function getValidPattern() { return $this->m_arValidPattern; }
+
+	/**
+	* Setters for member variables
+	*
+	*/
 	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
-
-	public function getNamePrefix() { return( $this->m_sNamePrefix ); }
-	public function setNamePrefix( $sValue ) { $this->m_sNamePrefix = $sValue; }
-
-	public function getValidPattern() { return( $this->m_arValidPattern ); }
 	public function setValidPattern( $arValue ) { $this->m_arValidPattern = $arValue; }
 
 	//********************************************************************************
@@ -73,55 +101,29 @@ class CPSComponentBehavior extends CBehavior
 	*/
 	public function __construct()
 	{
+		//	Get our name...
+		$_sName = CPSCommonBase::createInternalName( $this );
+
 		//	build our option manager...
-		$this->m_oOptions = new CPSOptionManager( $this );
+		$this->m_oOptions = new CPSOptionManager();
 
 		//	Set up our base settings
 		$this->setOptions( self::getBaseOptions() );
 
-		//	Get our name...
-		$this->createInternalName();
-
 		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
+		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
 	}
 
-	/**
-	* Creates the internal name of the widget. Use (@link setInternalName) to change.
-	* @see setInternalName
-	*/
-	public function createInternalName()
-	{
-		//	Create our internal name
-		$_sClass = get_class( $this );
-
-		//	Set names
-		if ( false !== strpos( $_sClass, 'CPS', 0 ) )
-			$this->m_sInternalName = $_sClass = str_replace( 'CPS', 'ps', $_sClass );
-		else
-			$this->m_sInternalName = $_sClass;
-
-		$this->m_sNamePrefix = $this->m_sInternalName . '::';
-	}
+	//********************************************************************************
+	//* Property Access Methods
+	//********************************************************************************
 
 	/**
-	* Easier on the eyes
+	* Sets the default (@link $m_sPrefixDelimiter). Defaults to '::'.
 	*
+	* @param string $sValue
 	*/
-	private function getBaseOptions()
-	{
-		return(
-			array(
-				'baseUrl' => array( 'value' => '', 'type' => 'string' ),
-				'checkOptions' => array( 'value' => true, 'type' => 'boolean' ),
-				'validOptions' => array( 'value' => array(), 'type' => 'array' ),
-				'options' => array( 'value' => array(), 'type' => 'array' ),
-				'checkCallbacks' => array( 'value' => true, 'type' => 'boolean' ),
-				'validCallbacks' => array( 'value' => array(), 'type' => 'array' ),
-				'callbacks' => array( 'value' => array(), 'type' => 'array' ),
-			)
-		);
-	}
+	public function setPrefixDelimiter( $sValue ) { $this->m_sPrefixDelimiter = $sValue; }
 
 	/**
 	* Returns a reference to the entire reference array
@@ -187,6 +189,25 @@ class CPSComponentBehavior extends CBehavior
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
+
+	/**
+	* Easier on the eyes
+	*
+	*/
+	private function getBaseOptions()
+	{
+		return(
+			array(
+				'baseUrl' => array( 'value' => '', 'type' => 'string' ),
+				'checkOptions' => array( 'value' => true, 'type' => 'boolean' ),
+				'validOptions' => array( 'value' => array(), 'type' => 'array' ),
+				'options' => array( 'value' => array(), 'type' => 'array' ),
+				'checkCallbacks' => array( 'value' => true, 'type' => 'boolean' ),
+				'validCallbacks' => array( 'value' => array(), 'type' => 'array' ),
+				'callbacks' => array( 'value' => array(), 'type' => 'array' ),
+			)
+		);
+	}
 
 	/**
     * Check the options against the valid ones
@@ -349,6 +370,9 @@ class CPSComponentBehavior extends CBehavior
 	 */
 	public function __get( $sName )
 	{
+		if ( in_array( $sName, array_keys( get_class_vars( get_class( $this ) ) ) ) )
+			return $this->{$sName};
+
 		//	Try daddy...
 		try { return parent::__get( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 

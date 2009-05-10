@@ -36,7 +36,7 @@ class CPSApiComponent extends CPSComponent
 		$this->attachBehavior( $this->m_sInternalName, 'pogostick.behaviors.CPSApiBehavior' );
 
 		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $this->getInternalName() );
+		CPSCommonBase::writeLog( Yii::t( $this->m_sInternalName, '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $this->m_sInternalName );
 	}
 
 	//********************************************************************************

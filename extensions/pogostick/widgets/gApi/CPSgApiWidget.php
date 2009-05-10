@@ -43,9 +43,6 @@ class CPSgApiWidget extends CPSApiWidget
 			)
 		);
 
-		//	Get internal name
-		$this->createInternalName();
-
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
 	}

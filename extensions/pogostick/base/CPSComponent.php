@@ -9,7 +9,8 @@
  */
 
 /**
- * The CPSComponent is the base class for all Pogostick components for Yii.
+ * CPSComponent is the base class for all Pogostick components for Yii.
+ *
  * They contain special functionality to call behavior methods without the need for chaining.
  *
  * @author Jerry Ablan <jablan@pogostick.com>
@@ -25,26 +26,73 @@ class CPSComponent extends CApplicationComponent
 	//* Member variables
 	//********************************************************************************
 
+	/**
+	* The internal name of the component. Used as the name of the behavior when attaching.
+	*
+	* In order to facilitate option separation, this value is used along with the prefix delimiter by the internal option
+	* manager to distinguish between owners. During construction, it is set to the name of
+	* the class, and includes special behavior for Pogostick classes. Example: CPSComponent
+	* becomes psComponent. Use or override (@link setInternalName) to change the name at
+	* runtime.
+	*
+	* @var string
+	* @see setInternalName
+	* @see $m_sPrefixDelimiter
+	*/
 	protected $m_sInternalName;
-	protected $m_sNamePrefix;
+	/**
+	* The delimiter to use for prefixes. This must contain only characters that are not allowed
+	* in variable names (i.e. '::', '||', '.', etc.). Defaults to '::'. There is no length limit,
+	* but 2 works out. There is really no need to ever change this unless you have a strong dislike
+	* of the '::' characters.
+	*
+	* @var string
+	*/
+	protected $m_sPrefixDelimiter = '::';
+	/**
+	* As behaviors are added to the object, this is set to true to quickly determine if the
+	* component does in fact contain behaviors.
+	*
+	* @var bool
+	*/
 	protected $m_bHasBehaviors = false;
+	/**
+	* A private array containing all the attached behaviors information of this component.
+	*
+	* @var array
+	*/
 	protected $m_arBehaviors = null;
 
 	//********************************************************************************
 	//* Property Accessors
 	//********************************************************************************
 
-	public function getInternalName() { return( $this->m_sInternalName ); }
+	/**
+	* Getters for internal members
+	*/
+	public function getInternalName() { return $this->m_sInternalName; }
+	public function getNamePrefix() { return $this->m_sInternalName . $this->m_sPrefixDelimiter; }
+	public function getPrefixDelimiter() { return $this->m_sPrefixDelimiter; }
+	public function getHasBehaviors() { return $this->m_bHasBehaviors; }
+
+	/**
+	* Setters for internal members
+	*/
 	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
-
-	public function getNamePrefix() { return( $this->m_sNamePrefix ); }
-	public function setNamePrefix( $sValue ) { $this->m_sNamePrefix = $sValue; }
-
-	public function getHasBehaviors() { return( $this->m_bHasBehaviors ); }
+	protected function setPrefixDelimiter( $sValue ) { $this->m_sPrefixDelimiter = $sValue; }
 	public function setHasBehaviors( $bValue ) { $this->m_bHasBehaviors = $bValue; }
 
+	/**
+	* Retrieves the behaviors attached to this component
+	*
+	* @returns array
+	*/
 	public function getBehaviors() { return( $this->m_arBehaviors ); }
 
+	/**
+	* Convenience functions to access the behavior assets
+	*
+	*/
 	public function &hasBehaviorMethod( $sMethodName ) { return CPSCommonBase::hasBehaviorMethod( $this, $sMethodName ); }
 	public function &hasBehaviorProperty( $sName ) { return CPSCommonBase::hasBehaviorProperty( $this, $sName ); }
 	public function getBehaviorProperty( $sName ) { return CPSCommonBase::getBehaviorProperty( $this, $sName); }
@@ -60,40 +108,42 @@ class CPSComponent extends CApplicationComponent
 	*/
 	public function __construct()
 	{
-		//	Create our internal name
-		$this->createInternalName();
-
-		//	Import behaviors
+		//	Import our preset behaviors
 		Yii::import( 'pogostick.behaviors.CPSComponentBehavior' );
 
+		//	Create our internal name
+		$_sName = CPSCommonBase::createInternalName( $this );
+
 		//	Attach our default behavior
-		$this->attachBehavior( $this->m_sInternalName, 'pogostick.behaviors.CPSComponentBehavior' );
+		$this->attachBehavior( $_sName, 'pogostick.behaviors.CPSComponentBehavior' );
 
 		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $this->getInternalName() );
-	}
-
-	/**
-	* Creates the internal name of the widget. Use (@link setInternalName) to change.
-	* @see setInternalName
-	*/
-	public function createInternalName()
-	{
-		//	Create our internal name
-		$_sClass = get_class( $this );
-
-		//	Set names
-		if ( false !== strpos( $_sClass, 'CPS', 0 ) )
-			$this->m_sInternalName = $_sClass = str_replace( 'CPS', 'ps', $_sClass );
-		else
-			$this->m_sInternalName = $_sClass;
-
-		$this->m_sNamePrefix = $this->m_sInternalName . '::';
+		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
 	}
 
 	//********************************************************************************
 	//* Yii Overrides
 	//********************************************************************************
+
+	/**
+	 * Attaches a list of behaviors to the component.
+	 * Each behavior is indexed by its name and should be an instance of
+	 * {@link IBehavior}, a string specifying the behavior class, or an
+	 * array of the following structure:
+	 * <code>
+	 * array(
+	 *     'class'=>'path.to.BehaviorClass',
+	 *     'property1'=>'value1',
+	 *     'property2'=>'value2',
+	 * )
+	 * </code>
+	 * @param array list of behaviors to be attached to the component
+	 */
+	public function attachBehaviors( $arBehaviors )
+	{
+		foreach( $arBehaviors as $_sName => $_oBehave )
+			$this->attachBehavior( $_sName, $_oBehave );
+	}
 
 	/**
 	 * Attaches a behavior to this component.
@@ -137,26 +187,6 @@ class CPSComponent extends CApplicationComponent
 		}
 
 		return $_oObject;
-	}
-
-	/**
-	 * Attaches a list of behaviors to the component.
-	 * Each behavior is indexed by its name and should be an instance of
-	 * {@link IBehavior}, a string specifying the behavior class, or an
-	 * array of the following structure:
-	 * <code>
-	 * array(
-	 *     'class'=>'path.to.BehaviorClass',
-	 *     'property1'=>'value1',
-	 *     'property2'=>'value2',
-	 * )
-	 * </code>
-	 * @param array list of behaviors to be attached to the component
-	 */
-	public function attachBehaviors( $arBehaviors )
-	{
-		foreach( $arBehaviors as $_sName => $_oBehave )
-			$this->attachBehavior( $_sName, $_oBehave );
 	}
 
 	//********************************************************************************

@@ -27,6 +27,26 @@ class CPSCommonBase
 	//* Public Methods
 	//********************************************************************************
 
+	/**
+	* Creates the internal name of a component/widget. Use (@link setInternalName) to change.
+	*
+	* @param CPSWidget|CPSComponent The
+	*/
+	public static function createInternalName( &$oComponent )
+	{
+		//	Get the class...
+		$_sClass = get_class( $oComponent );
+
+		//	Set names (with a little Pogostick magic!)
+		$_sIntName = ( false !== strpos( $_sClass, 'CPS', 0 ) ) ? str_replace( 'CPS', 'ps', $_sClass ) : $_sClass;
+
+		//	Set the names inside the object
+		$oComponent->setInternalName( $_sIntName );
+
+		//	Return internal name
+		return $_sIntName;
+	}
+
 	//********************************************************************************
 	//* Magic Method Stubs
 	//********************************************************************************
@@ -204,7 +224,7 @@ class CPSCommonBase
 	{
 		//	Do we have that somewhere?
 		if ( $_oBehave = $oComponent->hasBehaviorProperty( $sName ) )
-			return $_oBehave[ '_object' ]->getOption( $oComponent->namePrefix . $sName );
+			return $_oBehave[ '_object' ]->getOption( $oComponent->getNamePrefix() . $sName );
 
 		//	This exception can be ignored upstream...
 		throw new CException( Yii::t( 'yii', 'Behavior Property "{class}.{property}" is not defined.', array( '{class}' => get_class( $oComponent ), '{property}' => $sName ) ) );
@@ -226,7 +246,7 @@ class CPSCommonBase
 		//	If a behavior contains
 		if ( $_oBehave = self::hasBehaviorProperty( $oComponent, $sName ) )
 		{
-			$_oBehave[ '_object' ]->setOption( $oComponent->namePrefix . $sName, $oValue );
+			$_oBehave[ '_object' ]->setOption( $oComponent->getNamePrefix() . $sName, $oValue );
 			return;
 		}
 

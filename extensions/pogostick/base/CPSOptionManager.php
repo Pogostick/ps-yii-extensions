@@ -26,12 +26,12 @@
  * )
  * </code>
  *
+ * @access public
  * @author Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
  * @filesource
  * @package psYiiExtensions
  * @subpackage Base
- * @since 1.0.0
  */
 class CPSOptionManager
 {
@@ -50,13 +50,22 @@ class CPSOptionManager
 	*
 	* @staticvar array
 	*/
-	public static $m_arOptions = array();
+	private static $m_arOptions = array();
 	/**
 	* My internal tag for option filtering
 	*
 	* @var string
 	*/
 	protected $m_sInternalName = null;
+	/**
+	* The delimiter to use for prefixes. This must contain only characters that are not allowed
+	* in variable names (i.e. '::', '||', '.', etc.). Defaults to '::'. There is no length limit,
+	* but 2 works out. There is really no need to ever change this unless you have a strong dislike
+	* of the '::' characters.
+	*
+	* @var string
+	*/
+	protected $m_sPrefixDelimiter = '::';
 
 	//********************************************************************************
 	//* Public methods...
@@ -69,10 +78,33 @@ class CPSOptionManager
 	public function __construct()
 	{
 		//	Create our name
-		$this->setInternalName( 'psOptionManager' );
+		$_sName = CPSCommonBase::createInternalName( $this );
 
 		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $this->getInternalName() );
+		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $_sName );
+	}
+
+	/**
+	* Sets option manager metadata. Metadata keys must begin with an underscore ('_').
+	* If not provided, one will be added.
+	*
+	* @param string|array $oName
+	* @param mixed $oValue
+	*/
+	public function setMetaData( $oName, $oValue = null )
+	{
+		$_arTemp = $oName;
+
+		if ( ! is_array( $oName ) )
+			$_arTemp = array( $oName => $oValue );
+
+		foreach ( $_arTemp as $_sKey => $_oValue )
+		{
+			if ( false === strpos( $_sKey, '_' ) )
+				$_sKey .= '_' . $_sKey;
+
+			$this->setOption( $_sKey, $_oValue );
+		}
 	}
 
 	//********************************************************************************
@@ -80,41 +112,48 @@ class CPSOptionManager
 	//********************************************************************************
 
 	/**
-	* Getter
+	* Getters for member variables
 	*
-	* @returns string
 	*/
 	public function getInternalName() { return $this->m_sInternalName; }
+	public function getNamePrefix() { return $this->m_m_sInternalName . $this->m_sPrefixDelimiter; }
+	public function getPrefixDelimiter() { return $this->m_sPrefixDelimiter; }
+	public function getValidPattern() { return $this->m_arValidPattern; }
 
 	/**
-	* Setter
+	* Setters for member variables
 	*
-	* @param string $sValue
 	*/
 	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
+	protected function setPrefixDelimiter( $sValue ) { $this->m_sPrefixDelimiter = $sValue; }
 
 	/**
-	* Returns a reference to the entire reference array
+	* Returns a reference to the entire option array
 	*
 	* @returns array A reference to the internal options array
 	* @see getOption
+	* @see setOptions
 	*/
 	public function &getOptions() { return self::$m_arOptions; }
 
 	/**
 	* Add bulk options to the manager.
 	*
-	* @param array $arOptions An array containing option_key => value pairs to put into option array. The parameter $arOptions is merged with the existing options array. Existing option values are overwritten or added.
+	* @param array $arOptions An array containing option_key => value pairs to put into
+	* option array. The parameter $arOptions is merged with the existing options array.
+	* Existing option values are overwritten or added.
+	*
 	* <code>
 	* $this->setOptions( array( 'option_x' => array( 'value' => '1', 'valid' => array( 'x', 'y', 'z' ) );
 	* </code>
-	* @returns null
+	*
 	* @see getOptions
+	* @see setOption
 	*/
 	public function setOptions( array $arOptions )
 	{
-		//	Merge the supplied options
-		self::$m_arOptions = array_merge( self::$m_arOptions, $arOptions );
+		foreach ( $arOptions as $_sKey => $_oValue )
+			$this->setOption( $_sKey, $_oValue );
 
 		//	Sort the array
 		ksort( self::$m_arOptions );
@@ -126,19 +165,13 @@ class CPSOptionManager
 	* @param string $sKey
 	* @return mixed
 	* @see getOptions
+	* @see setOption
 	*/
 	public function &getOption( $sKey )
 	{
-		//	Fix up the key if it's directed
-		if ( false !== ( $_iPos = strpos( $sKey, '::' ) ) )
-		{
-			$_sName = substr( $sKey, 0, $_iPos );
-			$sKey = substr( $sKey, $_iPos + 2 );
-
-			//	If option doesn't belong to me, boogie...
-			if ( $this->m_sInternalName != $_sName )
-				return null;
-		}
+		//	Validate the key
+		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
+			return null;
 
 		return ( isset( self::$m_arOptions[ $sKey ] ) ) ? self::$m_arOptions[ $sKey ] : self::$m_arOptions[ $sKey ] = null;
 	}
@@ -153,22 +186,38 @@ class CPSOptionManager
 	*/
 	public function setOption( $sKey, $oValue )
 	{
-		//	Fix up the key if it's directed
-		if ( false !== ( $_iPos = strpos( $sKey, '::' ) ) )
-		{
-			$_sName = substr( $sKey, 0, $_iPos );
-			$sKey = substr( $sKey, $_iPos + 2 );
-
-			//	If option doesn't belong to me, boogie...
-			if ( $this->m_sInternalName != $_sName )
-				return null;
-		}
+		//	Validate the key
+		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
+			return null;
 
 		//	Set the option...
 		self::$m_arOptions[ $sKey ] = $oValue;
 
 		//	Sort the array
 		ksort( self::$m_arOptions );
+	}
+
+	/**
+	* Ensures that provided key belongs to this behavior.
+	*
+	* @param string $sKey
+	* @returns null|string
+	*/
+	public function validateKey( $sKey )
+	{
+		//	Fix up the key if it's directed
+		if ( false !== ( $_iPos = strpos( $sKey, $this->m_sPrefixDelimiter ) ) )
+		{
+			$_sName = substr( $sKey, 0, $_iPos );
+			$sKey = substr( $sKey, $_iPos + strlen( $this->m_sPrefixDelimiter ) );
+
+			//	If option doesn't belong to me, boogie...
+			if ( $this->m_sInternalName != $_sName )
+				return null;
+		}
+
+		//	Return validated key
+		return $sKey;
 	}
 
 	public function checkOption( $sKey, $oValue, array &$arResults = null )
