@@ -189,6 +189,7 @@ class CPSOptionManager
 	* @param array $arOptions An array containing option_key => value pairs to put into
 	* option array. The parameter $arOptions is merged with the existing options array.
 	* Existing option values are overwritten or added.
+	* @param bool $bAdd Indicates that this option setting is a creation one (i.e. addOptions() analog)
 	*
 	* <code>
 	* $this->setOptions( array( 'option_x' => array( 'value' => '1', 'valid' => array( 'x', 'y', 'z' ) );
@@ -197,11 +198,11 @@ class CPSOptionManager
 	* @see getOptions
 	* @see setOption
 	*/
-	public function setOptions( array $arOptions )
+	public function setOptions( array $arOptions, $bAdd = true )
 	{
 		foreach ( $arOptions as $_sKey => $_oValue )
 			if ( $_sKey = $this->validateKey( $_sKey ) )
-				$this->setOption( $_sKey, $_oValue );
+				$this->setOption( $_sKey, $_oValue, $bAdd );
 
 		//	Sort the array
 		ksort( self::$m_arOptions );
@@ -217,14 +218,14 @@ class CPSOptionManager
 	*/
 	public function &getOption( $sKey )
 	{
+		//	Validate the key
+		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
+			return null;
+
 		//	Not a private option? Check if it's in the array as private and kajigger the key...
 		if ( ! $this->hasOption( $sKey ) && false === strpos( $sKey, '_', strlen( $sKey ) - 1 ) )
 			if ( isset( self::$m_arOptions[ $sKey . '_' ] ) )
 				$sKey .= '_';
-
-		//	Validate the key
-		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
-			return null;
 
 		return ( isset( self::$m_arOptions[ $sKey ][ '_value' ] ) ) ? self::$m_arOptions[ $sKey ][ '_value' ] : self::$m_arOptions[ $sKey ][ '_value' ] = array();
 	}
@@ -234,23 +235,33 @@ class CPSOptionManager
 	*
 	* @param string $sKey
 	* @param mixed $oValue
+	* @param bool $bAdd Indicates that this option setting is a creation one (i.e. addOptions() analog)
 	* @return null
 	* @see setOptions
 	*/
-	public function setOption( $sKey, $oValue )
+	public function setOption( $sKey, $oValue, $bAdd = false )
 	{
 		//	Validate the key
 		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
 			return null;
 
-		//	Set the option...
-		if ( ! is_array( $oValue ) )
-			$_oValue = array( '_value' => $oValue );
-		else if ( is_array( $oValue ) && ! in_array( '_value', $oValue ) )
-			$oValue[ '_value' ] = $oValue;
+		//	Check for private options...
+		if ( ! $this->hasOption( $sKey ) && false === strpos( $sKey, '_', strlen( $sKey ) - 1 ) )
+			if ( isset( self::$m_arOptions[ $sKey . '_' ] ) )
+				$sKey .= '_';
 
-		//	Set the option...
-		self::$m_arOptions[ $sKey ] = $oValue;
+		//	Being added?
+		if ( $bAdd )
+			self::$m_arOptions[ $sKey ] = $oValue;
+		else
+		{
+			if ( ! is_array( $oValue ) )
+				self::$m_arOptions[ $sKey ][ '_value' ] = $oValue;
+			else if ( is_array( self::$m_arOptions[ $sKey ] ) && is_array( $oValue ) )
+				self::$m_arOptions[ $sKey ] = array_merge( self::$m_arOptions[ $sKey ], $oValue );
+			else
+				self::$m_arOptions[ $sKey ] = $oValue;
+		}
 
 		//	Sort the array
 		ksort( self::$m_arOptions );

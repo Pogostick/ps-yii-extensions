@@ -101,18 +101,6 @@ class CPSWidget extends CInputWidget
 	public function setBehaviorProperty( $sName, $oValue ) { return CPSCommonBase::setBehaviorProperty( $this, $sName, $oValue ); }
 
 	//********************************************************************************
-	//* Public Methods
-	//********************************************************************************
-
-	/**
-	* Constructor
-	*
-	*/
-	public function __construct()
-	{
-	}
-
-	//********************************************************************************
 	//* Constructor
 	//********************************************************************************
 

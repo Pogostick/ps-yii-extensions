@@ -44,7 +44,8 @@ class CPSgApiWidget extends CPSApiWidget
 						'type' => 'array',
 						'valid' => array( 'maps', 'search', 'feeds', 'language', 'gdata', 'earth', 'visualization' ),
 					),
-			)
+			),
+			true
 		);
 
 		//	Log it and check for issues...

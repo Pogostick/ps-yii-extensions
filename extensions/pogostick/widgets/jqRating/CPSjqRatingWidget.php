@@ -76,12 +76,14 @@ class CPSjqRatingWidget extends CPSWidget
 		//	Call daddy...
 		parent::init();
 
-		$this->validOptions = array(
-			'cancel' => array( 'type' => 'string' ),
-			'cancelValue' => array( 'type' => 'string' ),
-			'readOnly' => array( 'type' => 'boolean' ),
-			'required' => array( 'type' => 'boolean' ),
-			'resetAll' => array( 'type' => 'boolean' ),
+		$this->setOptions(
+			array(
+				'cancel' => array( '_validPattern' => array( 'type' => 'string' ) ),
+				'cancelValue' => array( '_validPattern' => array( 'type' => 'string' ) ),
+				'readOnly' => array( '_validPattern' => array( 'type' => 'bool' ) ),
+				'required' => array( '_validPattern' => array( 'type' => 'bool' ) ),
+				'resetAll' => array( '_validPattern' => array( 'type' => 'bool' ) ),
+			)
 		);
 
 		$this->validCallbacks = array(
@@ -101,14 +103,14 @@ class CPSjqRatingWidget extends CPSWidget
 	public function run()
 	{
 		//	Validate baseUrl
-		if ( empty( $this->baseUrl ) )
-			throw new CHttpException( 500, __CLASS__ . ': baseUrl is required.');
+		if ( '' == $this->baseUrl ) )
+			throw new CHttpException( 403, __CLASS__ . ': baseUrl is required.');
 
 		//	Register the scripts/css
 		$this->registerClientScripts();
 
 		$this->html = $this->render( $this->viewName,
-				array( "options" => $this->options ),
+				array( "options" => $this->makeOptions() ),
 				$this->returnString
 		);
 
