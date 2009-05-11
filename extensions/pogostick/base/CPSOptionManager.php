@@ -22,13 +22,13 @@
  * 		//	(@link makeOptions())
  * 		'optionName{_}' => array(
  * 			//	Option name for a javascript widget. Defaults to '<b>optionName</b>'.
- * 			'_extName' => external-facing name | empty
  *			//	Defaults to null,
- * 			'_value' => default value,
+ * 			CPSOptionManager::META_DEFAULTVALUE => default value,
  * 			//	Lay out the validation parameters
- * 			'_validPattern' => array(
+ * 			CPSOptionManager::META_RULES => array(
  * 				//	Any valid PHP type (i.e. string, array, integer, etc.),
  * 				'type' => 'typename',
+ * 				'_extName' => external-facing name | empty
  * 				// An array of valid values for the option
  * 				'valid' => array( 'v1', 'v2', 'v3', etc.)
  * 		)
@@ -103,6 +103,62 @@
  */
 class CPSOptionManager
 {
+	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+
+	/**
+	* These are shortcuts to the metadata options in the array.
+	*/
+
+	/**
+	* @var string|array
+	*/
+	const META_ALLOWED 		= '_allowed';
+	/**
+	* @var string
+	*/
+	const META_DEFAULTVALUE	= '_defaultValue';
+	/**
+	* @var string
+	*/
+	const META_EXTERNALNAME = '_extName';
+	/**
+	* @var bool
+	*/
+	const META_PRIVATE 		= '_private';
+	/**
+	* @var bool
+	*/
+	const META_REQUIRED 	= '_required';
+	/**
+	* @var array
+	*/
+	const META_RULES 		= '_rules';
+	/**
+	* @var string
+	*/
+	const META_TYPE 		= '_type';
+	/**
+	* @var string
+	* @todo Implement handling of this
+	*/
+	const META_VALUEPATTERN	= '_valuePattern';
+	/**
+	* @var array
+	*/
+	private $VALID_METADATA =
+		array(
+			self::META_ALLOWED,
+			self::META_EXTERNALNAME,
+			self::META_DEFAULTVALUE,
+			self::META_PRIVATE,
+			self::META_REQUIRED,
+			self::META_RULES,
+			self::META_TYPE,
+			self::META_VALUEPATTERN
+		);
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -181,7 +237,7 @@ class CPSOptionManager
 	* @see getOption
 	* @see setOptions
 	*/
-	public function &getOptions() { return self::$m_arOptions[ $this->m_sInternalName ]; }
+	public function &getOptions() { return self::$m_arOptions; }
 
 	/**
 	* Add bulk options to the manager.
@@ -192,7 +248,7 @@ class CPSOptionManager
 	* @param bool $bAdd Indicates that this option setting is a creation one (i.e. addOptions() analog)
 	*
 	* <code>
-	* $this->setOptions( array( 'option_x' => array( 'value' => '1', 'valid' => array( 'x', 'y', 'z' ) );
+	* $this->setOptions( array( 'option_x' => array( CPSOptionManager::META_DEFAULTVALUE => '1', CPSOptionManager::META_ALLOWED => array( 'x', 'y', 'z' ) );
 	* </code>
 	*
 	* @see getOptions
@@ -200,8 +256,8 @@ class CPSOptionManager
 	*/
 	public function setOptions( array $arOptions, $bAdd = true )
 	{
+		//	Run through array and set each item.
 		foreach ( $arOptions as $_sKey => $_oValue )
-			if ( $_sKey = $this->validateKey( $_sKey ) )
 				$this->setOption( $_sKey, $_oValue, $bAdd );
 
 		//	Sort the array
@@ -209,62 +265,112 @@ class CPSOptionManager
 	}
 
 	/**
-	* Retrieves an option value from the options array. If key doesn't exist, it's created as an empty array and returned.
+	* Sets a single option to the array
+	*
+	* $oValue
 	*
 	* @param string $sKey
-	* @return mixed
-	* @see getOptions
-	* @see setOption
+	* @param mixed $oValue
+	* @param bool $bAdd Indicates that this option setting is a creation one (i.e. addOptions() analog).
+	* @return null
+	* @see setOptions
 	*/
-	public function &getOption( $sKey )
+	public function setOption( $sKey, $oValue )
 	{
 		//	Validate the key
 		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
 			return null;
 
-		//	Not a private option? Check if it's in the array as private and kajigger the key...
-		if ( ! $this->hasOption( $sKey ) && false === strpos( $sKey, '_', strlen( $sKey ) - 1 ) )
-			if ( isset( self::$m_arOptions[ $sKey . '_' ] ) )
-				$sKey .= '_';
-
-		return ( isset( self::$m_arOptions[ $sKey ][ '_value' ] ) ) ? self::$m_arOptions[ $sKey ][ '_value' ] : self::$m_arOptions[ $sKey ][ '_value' ] = array();
+		//	Get the value out of the array...
+		return self::$m_arOptions[ $sKey ] = $oValue;
 	}
 
 	/**
-	* Sets a single option to the array
+	* Add bulk options to the manager.
+	*
+	* @param array $arOptions An array containing option_key => value pairs to put into
+	* option array. The parameter $arOptions is merged with the existing options array.
+	* Existing option values are overwritten or added.
+	* @param bool $bAdd Indicates that this option setting is a creation one (i.e. addOptions() analog)
+	*
+	* <code>
+	* $this->setOptions( array( 'option_x' => array( CPSOptionManager::META_DEFAULTVALUE => '1', CPSOptionManager::META_ALLOWED => array( 'x', 'y', 'z' ) );
+	* </code>
+	*
+	* @see getOption
+	* @see setOption
+	* @see addOption
+	*/
+	public function addOptions( array $arOptions )
+	{
+		//	Run through array and set each item.
+		foreach ( $arOptions as $_sKey => $_oValue )
+				$this->addOption( $_sKey, $_oValue, true );
+
+		//	Sort the array
+		ksort( self::$m_arOptions );
+	}
+
+	/**
+	* Adds a single option to the array
 	*
 	* @param string $sKey
-	* @param mixed $oValue
-	* @param bool $bAdd Indicates that this option setting is a creation one (i.e. addOptions() analog)
-	* @return null
-	* @see setOptions
+	* @param array $oValue Must be an array containing the RULES for this option
+	* @see setOption
 	*/
-	public function setOption( $sKey, $oValue, $bAdd = false )
+	public function addOption( $sKey, $oValue, $bNoSort = false )
 	{
 		//	Validate the key
 		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
 			return null;
 
 		//	Check for private options...
-		if ( ! $this->hasOption( $sKey ) && false === strpos( $sKey, '_', strlen( $sKey ) - 1 ) )
-			if ( isset( self::$m_arOptions[ $sKey . '_' ] ) )
-				$sKey .= '_';
-
-		//	Being added?
-		if ( $bAdd )
-			self::$m_arOptions[ $sKey ] = $oValue;
-		else
+		if ( false !== ( $_iPos = strpos( $sKey, '_', strlen( $sKey ) - 1 ) ) )
 		{
-			if ( ! is_array( $oValue ) )
-				self::$m_arOptions[ $sKey ][ '_value' ] = $oValue;
-			else if ( is_array( self::$m_arOptions[ $sKey ] ) && is_array( $oValue ) )
-				self::$m_arOptions[ $sKey ] = array_merge( self::$m_arOptions[ $sKey ], $oValue );
-			else
-				self::$m_arOptions[ $sKey ] = $oValue;
+			//	Strip off '_'
+			$sKey = substr( $sKey, 0, $_iPos );
+			$this->setMetaDataValue( $sKey, self::META_PRIVATE, true );
 		}
 
+		//	Get the value out of the array...
+		$_arRules = array();
+
+		if ( is_array( $oValue ) )
+		{
+			$_arRules = ( isset( $oValue[ self::META_RULES ] ) ) ? $oValue[ self::META_RULES ] : array();
+			$_oValue = ( isset( $oValue[ self::META_DEFAULTVALUE ] ) ) ? $oValue[ self::META_DEFAULTVALUE ] : null;
+		}
+
+		//	Set all the metadata rules...
+		$this->setMetaDataValues( $sKey, $_arRules );
+
+		//	Now stuff the default value, if there...
+		self::$m_arOptions[ $sKey ] = $_oValue;
+
 		//	Sort the array
-		ksort( self::$m_arOptions );
+		if ( ! $bNoSort )
+			ksort( self::$m_arOptions );
+	}
+
+	/**
+	* Retrieves an option value from the options array. If key doesn't exist, it's created as an empty array and returned.
+	*
+	* @param string $sKey
+	* @return mixed|null if not found
+	* @see getOptions
+	* @see setOption
+	*/
+	public function &getOption( $sKey, $oDefault = null )
+	{
+		//	Validate the key
+		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
+			return null;
+
+		//	Key not there? Make it with default...
+		if ( ! isset( self::$m_arOptions[ $sKey ] ) )
+			self::$m_arOptions[ $sKey ] = $oDefault;
+
+		return self::$m_arOptions[ $sKey ];
 	}
 
 	/**
@@ -277,12 +383,7 @@ class CPSOptionManager
 	*/
 	public function hasOption( $sKey )
 	{
-		$_arOptions = $this->getOptions();
-
-		if ( empty( $_arOptions ) )
-			$_arOptions = array();
-
-		return in_array( $this->validateKey( $sKey ), $_arOptions );
+		return in_array( $this->validateKey( $sKey ), self::$m_arOptions );
 	}
 
 	/**
@@ -323,7 +424,7 @@ class CPSOptionManager
 
 		//	One at a time...
 		foreach ( $arOptions as $_sKey => $_oValue )
-			$this->checkOption( $this->validateKey( $_sKey ), $_oValue );
+			$this->checkOption( $_sKey, $_oValue );
 
 		//	We made it here? We cool baby!
 		return true;
@@ -339,36 +440,31 @@ class CPSOptionManager
 	*/
 	public function checkOption( $sKey, $oValue )
 	{
+		//	Validate the key
+		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
+			return null;
+
 		//	Check if this option is available
 		if ( $this->hasOption( $sKey ) )
 		{
-			//	See if it hase valid options...
-			$_arValidPattern = $this->{$sKey}[ '_validPattern' ];
+			//	Get the type of our value...
+			$_sType = gettype( $oValue );
 
-			//	What type should it be?
-			if ( array_key_exists( 'type', $_arValid ) )
-			{
-				//	Get the type of our value...
-				$_sType = gettype( $oValue );
+			//	Get the value of 'type'
+			$_oVPType = $this->getMetaDataValue( $sKey, self::META_TYPE );
 
-				//	Get the value of 'type'
-				$_oVPType = $_arValidPattern[ '' ];
-
-				//	Is this a valid type for this option?
-				if ( ( ! is_array( $_oVPType ) && ( $_sType != $_oVPType ) ) || ( is_array( $_oVPType ) && ! in_array( $_sType, $_oVPType ) ) )
-					throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $_sKey, '{y}' => ( is_array( $_oVPType ) ) ? implode( ', ', $_oVPType ) : $_oVPType ) ) );
-			}
+			//	Is this a valid type for this option?
+			if ( ( ! is_array( $_oVPType ) && ( $_sType != $_oVPType ) ) || ( is_array( $_oVPType ) && ! in_array( $_sType, $_oVPType ) ) )
+				throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $_sKey, '{y}' => ( is_array( $_oVPType ) ) ? implode( ', ', $_oVPType ) : $_oVPType ) ) );
 
 			//	Check if this is a valid value for this option
-			if ( array_key_exists( 'valid', $_arValidPattern ) )
+			if ( null !== ( $_arValid = $this->getMetaDataValue( $sKey, self::META_ALLOWED ) ) )
 			{
-				$_arValid = $arValidOptions[ 'valid' ];
-
-				if ( is_array( $_arValid[ 'valid' ] ) && ! in_array( $_oValue, $_arValid ) )
+				if ( is_array( $_arValid ) && ! in_array( $_oValue, $_arValid ) )
 					throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: "{y}"', array( '{x}' => $_sKey, '{y}' => implode( ', ', $_arValid ) ) ) );
 			}
 
-			if ( isset( $_arValidPattern[ 'required' ] ) && $_arValidPattern[ 'required' ] && empty( self::$m_arOptions[ $sKey ] ) )
+			if ( $this->getMetaDataValue( $sKey, self::META_REQUIRED ) && empty( self::$m_arOptions[ $sKey ] ) )
 				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ) );
 		}
 		else
@@ -377,6 +473,76 @@ class CPSOptionManager
 
 		//	Looks clean....
 		return true;
+	}
+
+	//********************************************************************************
+	//* Private metadata access methods...
+	//********************************************************************************
+
+	/**
+	* Returns a string to be used as the meta data key for our options
+	*
+	* @returns string The metadata key
+	*/
+	protected function getMetaDataKey( $sKey ) { return '_md.' . $this->m_sInternalName . $this->getPrefixDelimiter() . strtolower( $sKey ); }
+
+	/**
+	* Adds an array of metadata to the option array
+	*
+	* @param string $sKey
+	* @param array $arRules
+	*/
+	protected function setMetaDataValues( $sKey, array $arRules )
+	{
+		foreach ( $arRules as $_sKey => $_oValue )
+				$this->setMetaDataValue( $sKey, $_sKey, $_oValue );
+
+		ksort( self::$m_arOptions );
+	}
+
+	/**
+	* Sets a single option metadata value.
+	*
+	* @param string $sKey
+	* @param string $sWhich
+	* @param mixed $oValue
+	* @return string
+	*/
+	protected function setMetaDataValue( $sKey, $eMDKey, $oValue )
+	{
+		//	Validate the key
+		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
+			return null;
+
+		if ( in_array( $eMDKey, $this->VALID_METADATA ) )
+			self::$m_arOptions[ $this->getMetaDataKey( $sKey ) ][ $eMDKey ] = $oValue;
+	}
+
+	/**
+	* Gets a single option metadata value.
+	*
+	* @param string $sKey
+	* @param string $eMDKey (Use the self::META_* constants)
+	* @return mixed
+	*/
+	public function getMetaDataValue( $sKey, $eMDKey )
+	{
+		//	Validate the key
+		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
+			return null;
+
+		if ( in_array( $eMDKey, $this->VALID_METADATA ) )
+			return self::$m_arOptions[ $this->getMetaDataKey( $sKey ) ][ $eMDKey ];
+	}
+
+	/**
+	* Tests if a key is a meta data key.
+	*
+	* @param string $sKey
+	*/
+	public function isMetaDataKey( $sKey )
+	{
+		return ( false !== strpos( $sKey, $this->getMetaDataKey( '' ) ) );
 	}
 
 }

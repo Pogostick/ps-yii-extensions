@@ -35,14 +35,14 @@ class CPSgApiWidget extends CPSApiWidget
 		parent::__construct();
 
 		//	Our object settings
-		$this->setOption(
+		$this->addOption(
 			'apisToLoad',
 			array(
-				'_value' => array(),
-				'_validPattern' =>
+				CPSOptionManager::META_DEFAULTVALUE => array(),
+				CPSOptionManager::META_RULES =>
 					array(
-						'type' => 'array',
-						'valid' => array( 'maps', 'search', 'feeds', 'language', 'gdata', 'earth', 'visualization' ),
+						CPSOptionManager::META_TYPE => 'array',
+						CPSOptionManager::META_ALLOWED => array( 'maps', 'search', 'feeds', 'language', 'gdata', 'earth', 'visualization' ),
 					),
 			),
 			true
@@ -68,7 +68,7 @@ class CPSgApiWidget extends CPSApiWidget
 		$this->script = '';
 
 //		foreach ( $this->apisToLoad as $_sApi => $_sVersion )
-//			$this->script .= "google.load(\"{$_sApi}\", \"{$_sVersion}\");";
+//			$this->script .= "google.load(\"{$_sApi}\", \"{$_sVersion}\");\n";
 
 		return( $this->script );
 	}

@@ -31,7 +31,7 @@ class CPSWidgetBehavior extends CPSComponentBehavior
 		parent::__construct();
 
 		//	Add our settings to this
-		$this->setOptions( self::getBaseOptions() );
+		$this->addOptions( self::getBaseOptions() );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
@@ -49,10 +49,10 @@ class CPSWidgetBehavior extends CPSComponentBehavior
 	{
 		return(
 			array(
-				'html_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
-				'script_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
-				'cssFile_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
-				'viewName_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'html_' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'script_' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'cssFile_' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'viewName_' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}

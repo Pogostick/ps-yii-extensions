@@ -47,7 +47,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 		parent::__construct();
 
 		//	Add ours...
-		$this->setOptions( self::getBaseOptions() );
+		$this->addOptions( self::getBaseOptions() );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
@@ -66,17 +66,17 @@ class CPSApiBehavior extends CPSComponentBehavior
 		return(
 			array(
 				//	API options
-				'altApiKey' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
-				'apiBaseUrl' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
-				'apiKey' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
-				'apiQueryName' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
-				'apiToUse' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
-				'apiSubUrls' => array( '_value' => array(), '_validPattern' => array( 'type' => 'array' ) ),
-				'format' => array( '_value' => 'array', '_validPattern' => array( 'type' => 'string' ) ),
-				'httpMethod' => array( '_value' => self::HTTP_GET, '_validPattern' => array( 'type' => 'string' ) ),
-				'requestData' => array( '_value' => array(), '_validPattern' => array( 'type' => 'array' ) ),
-				'requestMap' => array( '_value' => array(), '_validPattern' => array( 'type' => 'array' ) ),
-				'userAgent' => array( '_value' => 'Pogostick Components for Yii; (+http://www.pogostick.com/yii)', '_validPattern' => array( 'type' => 'string' ) ),
+				'altApiKey' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'apiBaseUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'apiKey' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'apiQueryName' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'apiToUse' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'apiSubUrls' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'format' => array( CPSOptionManager::META_DEFAULTVALUE => 'array', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'httpMethod' => array( CPSOptionManager::META_DEFAULTVALUE => self::HTTP_GET, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'requestData' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'requestMap' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'userAgent' => array( CPSOptionManager::META_DEFAULTVALUE => 'Pogostick Components for Yii; (+http://www.pogostick.com/yii)', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}
@@ -174,7 +174,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 
 		//	Add mapping...
 		$_arOptions =& $this->getOptions();
-		$_arOptions[ 'requestMap' ][ '_value' ][ $_sLastApiName ][ $_sLastSubApiName ][ $sLabel ] = $_arTemp;
+		$_arOptions[ 'requestMap' ][ $_sLastApiName ][ $_sLastSubApiName ][ $sLabel ] = $_arTemp;
 
 		return true;
 	}

@@ -144,7 +144,7 @@ class CPSCommonBase
 
 		//	Check behavior methods...
 		if ( $_oBehave = self::hasBehaviorMethod( $oObject, $sName ) )
-				return call_user_func_array( array( $_oBehave[ '_object' ], $sName ), $arParams );
+				return call_user_func_array( array( $_oBehave[ CPSComponent::BEHAVIOR_META_OBJECT ], $sName ), $arParams );
 
 		//	Invalid property...
 		if ( null != $oEvent )
@@ -166,7 +166,7 @@ class CPSCommonBase
 		{
 			foreach ( $oComponent->getBehaviors() as $_sKey => $_oBehave )
 			{
-				if ( in_array( strtolower( $sMethodName ), $_oBehave[ '_classMethods' ] ) )
+				if ( in_array( strtolower( $sMethodName ), $_oBehave[ CPSComponent::BEHAVIOR_META_METHODS ] ) )
 					return $_oBehave;
 			}
 		}
@@ -191,7 +191,7 @@ class CPSCommonBase
 
 			foreach ( $_arBehaviors as $_sKey => $_oBehave )
 			{
-				if ( in_array( strtolower( $sName ), $_oBehave[ '_classVars' ] ) )
+				if ( in_array( strtolower( $sName ), $_oBehave[ CPSComponent::BEHAVIOR_META_VARS ] ) )
 					return $_oBehave;
 
 				//	Check options
@@ -224,7 +224,7 @@ class CPSCommonBase
 	{
 		//	Do we have that somewhere?
 		if ( $_oBehave = $oComponent->hasBehaviorProperty( $sName ) )
-			return $_oBehave[ '_object' ]->getOption( $oComponent->getNamePrefix() . $sName );
+			return $_oBehave[ CPSComponent::BEHAVIOR_META_OBJECT ]->getOption( $oComponent->getNamePrefix() . $sName );
 
 		//	This exception can be ignored upstream...
 		throw new CException( Yii::t( 'yii', 'Behavior Property "{class}.{property}" is not defined.', array( '{class}' => get_class( $oComponent ), '{property}' => $sName ) ) );
@@ -246,7 +246,7 @@ class CPSCommonBase
 		//	If a behavior contains
 		if ( $_oBehave = self::hasBehaviorProperty( $oComponent, $sName ) )
 		{
-			$_oBehave[ '_object' ]->setOption( $oComponent->getNamePrefix() . $sName, $oValue );
+			$_oBehave[ CPSComponent::BEHAVIOR_META_OBJECT ]->setOption( $oComponent->getNamePrefix() . $sName, $oValue );
 			return;
 		}
 
@@ -271,9 +271,9 @@ class CPSCommonBase
 
 		//	Log the message
 		if ( 'trace' == $sLevel )
-			Yii::trace( $_LogMessage, $sCategory );
+			Yii::trace( $_sLogMessage, $sCategory );
 		else
-			Yii::log( $_LogMessage, $sLevel, $sCategory );
+			Yii::log( $_sLogMessage, $sLevel, $sCategory );
 
 		//	Make sure we have the proper support
 		if ( null != $sExceptionMessage )
