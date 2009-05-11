@@ -34,21 +34,17 @@ class CPSApiBehavior extends CPSComponentBehavior
 	const HTTP_POST = 'POST';
 
 	//********************************************************************************
-	//* Member Variables
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Member Variables
+	//* Constructor
 	//********************************************************************************
 
 	/***
 	* Constructor
 	*
 	*/
-	public function __construct( $arClassOptions = null )
+	public function __construct()
 	{
 		//	Call daddy...
-		parent::__construct( $arClassOptions );
+		parent::__construct();
 
 		//	Add ours...
 		$this->setOptions( self::getBaseOptions() );
@@ -56,6 +52,10 @@ class CPSApiBehavior extends CPSComponentBehavior
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
 	}
+
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
 
 	/**
 	* Allows for single behaviors
@@ -65,74 +65,21 @@ class CPSApiBehavior extends CPSComponentBehavior
 	{
 		return(
 			array(
-				'altApiKey' => array( 'value' => '', 'type' => 'string' ),
-				'apiBaseUrl' => array( 'value' => '', 'type' => 'string' ),
-				'apiKey' => array( 'value' => '', 'type' => 'string' ),
-				'apiQueryName' => array( 'value' => '', 'type' => 'string' ),
-				'apiToUse' => array( 'value' => '', 'type' => 'string' ),
-				'apiSubUrls' => array( 'value' => array(), 'type' => 'array' ),
-				'format' => array( 'value' => 'array', 'type' => 'string' ),
-				'httpMethod' => array( 'value' => self::HTTP_GET, 'type' => 'string' ),
-				'requestData' => array( 'value' => array(), 'type' => 'array' ),
-				'requestMap' => array( 'value' => array(), 'type' => 'array' ),
-				'userAgent' => array( 'value' => 'Pogostick Components for Yii; (+http://www.pogostick.com/yii)', 'type' => 'string' ),
+				//	API options
+				'altApiKey' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'apiBaseUrl' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'apiKey' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'apiQueryName' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'apiToUse' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'apiSubUrls' => array( '_value' => array(), '_validPattern' => array( 'type' => 'array' ) ),
+				'format' => array( '_value' => 'array', '_validPattern' => array( 'type' => 'string' ) ),
+				'httpMethod' => array( '_value' => self::HTTP_GET, '_validPattern' => array( 'type' => 'string' ) ),
+				'requestData' => array( '_value' => array(), '_validPattern' => array( 'type' => 'array' ) ),
+				'requestMap' => array( '_value' => array(), '_validPattern' => array( 'type' => 'array' ) ),
+				'userAgent' => array( '_value' => 'Pogostick Components for Yii; (+http://www.pogostick.com/yii)', '_validPattern' => array( 'type' => 'string' ) ),
 			)
 		);
 	}
-
-	//********************************************************************************
-	//* Public Methods
-	//********************************************************************************
-
-	/**
-	 * Declares events and the corresponding event handler methods.
-	 * @return array events (array keys) and the corresponding event handler methods (array values).
-	 * @see CBehavior::events
-	 */
-	public function events()
-	{
-		return(
-			array_merge(
-				parent::events(),
-				array(
-					'onBeforeApiCall' => 'beforeApiCall',
-					'onAfterApiCall' => 'afterApiCall',
-					'onRequestComplete' => 'requestComplete',
-				)
-			)
-		);
-	}
-
-	/**
-	* beforeApiCall event
-	*
-	* @param CPSApiEvent $oEvent
-	*/
-	public function beforeApiCall( $oEvent )
-	{
-	}
-
-	/**
-	* afterApiCall event
-	*
-	* @param CPSApiEvent $oEvent
-	*/
-	public function afterApiCall( $oEvent )
-	{
-	}
-
-	/**
-	* requestComplete event
-	*
-	* @param CPSApiEvent $oEvent
-	*/
-	public function requestComplete( $oEvent )
-	{
-	}
-
-	//********************************************************************************
-	//* Private Methods
-	//********************************************************************************
 
 	 /**
 	 * Make an HTTP request
@@ -227,67 +174,59 @@ class CPSApiBehavior extends CPSComponentBehavior
 
 		//	Add mapping...
 		$_arOptions =& $this->getOptions();
-		$_arOptions[ 'requestMap' ][ $_sLastApiName ][ $_sLastSubApiName ][ $sLabel ] = $_arTemp;
+		$_arOptions[ 'requestMap' ][ '_value' ][ $_sLastApiName ][ $_sLastSubApiName ][ $sLabel ] = $_arTemp;
 
 		return true;
 	}
 
+	//********************************************************************************
+	//* Events and Handlers
+	//********************************************************************************
+
 	/**
-	* Creates an array for requestMap
-	*
-	* @param array $arMap The map of items to insert into the array. Format is the same as {@link makeMapItem}
-	* @param bool $bSetRequestMap If false, will NOT insert constructed array into {@link requestMap}
-	* @returns array Returns the constructed array item ready to insert into your requestMap
-	* @see makeMapItem
-	*/
-	public function makeMapArray( $sApiName, $sSubApiName = null, array $arMap, $bSetRequestMap = true )
+	 * Declares events and the corresponding event handler methods.
+	 * @return array events (array keys) and the corresponding event handler methods (array values).
+	 * @see CBehavior::events
+	 */
+	public function events()
 	{
-		$_arFinal = array();
-
-		foreach ( $arMap as $_sKey => $_oValue )
-		{
-			$_sLabel = ( in_array( 'label', $_oValue ) ) ? $_oValue[ 'name' ] : $_oValue[ 'label' ];
-			$_bRequired = ( in_array( 'required', $_oValue ) ) ? $_oValue[ 'required' ] : false;
-			$_arOptions = ( in_array( 'options', $_oValue ) ) ? $_oValue[ 'options' ] : null;
-			$_sParamName = $_oValue[ 'name' ];
-
-			if ( $bSetRequestMap )
-				$this->addRequestMapping( $_sLabel, $_oValue[ 'name' ], $sApiName, $sSubApiName, $_bRequired, $_arOptions );
-			else
-			{
-				$_arTemp = $this->makeMapItem( $_sLabel, $_sParamName, $_bRequired, $_arOptions );
- 				$_arFinal[ $sApiName ] = ( ! is_array( $_arFinal[ $sApiName ] ) && sizeof( $_arFinal[ $sApiName ] ) > 0 ) ? $_arTemp : array_merge( $_arFinal[ $sApiName ], $_arTemp );
- 			}
-		}
-
-		//	Return final array
-		return( $_arFinal );
+		return(
+			array_merge(
+				parent::events(),
+				array(
+					'onBeforeApiCall' => 'beforeApiCall',
+					'onAfterApiCall' => 'afterApiCall',
+					'onRequestComplete' => 'requestComplete',
+				)
+			)
+		);
 	}
 
 	/**
-	* Creates an entry for requestMap and inserts it into the array.
+	* beforeApiCall event
 	*
-	* @param string $sLabel The label or friendly name of this map item
-	* @param string $sParamName The actual parameter name to send to API. If not specified, will default to $sLabel
-	* @param bool $bRequired Set to true if the parameter is required
-	* @param array $arOptions If supplied, will merge with generated options
-	* @param array $arTargetArray If supplied, will insert into array
-	* @returns array Returns the constructed array item ready to insert into your requestMap
+	* @param CPSApiEvent $oEvent
 	*/
-	public function makeMapItem( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, array $arTargetArray = null )
+	public function beforeApiCall( $oEvent )
 	{
-		//	Build default settings
-		$_arMapOptions = array( 'name' => ( null != $sParamName ) ? $sParamName : $sLabel, 'required' => $bRequired );
-
-		//	Add on supplied options
-		if ( null != $arOptions )
-			$_arMapOptions = array_merge( $_arMapOptions, $arOptions );
-
-		//	Insert for caller if requested
-		if ( null != $arTargetArray )
-			$arTargetArray[ $sLabel ] = $_arMapOptions;
-
-		//	Return our array
-		return( $_arMapOptions );
 	}
+
+	/**
+	* afterApiCall event
+	*
+	* @param CPSApiEvent $oEvent
+	*/
+	public function afterApiCall( $oEvent )
+	{
+	}
+
+	/**
+	* requestComplete event
+	*
+	* @param CPSApiEvent $oEvent
+	*/
+	public function requestComplete( $oEvent )
+	{
+	}
+
 }

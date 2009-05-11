@@ -31,23 +31,6 @@ class CPSComponentBehavior extends CBehavior
 	*/
 	private $m_oOptions;
 	/**
-	* The valid patterns for options, checked before they are set.
-	*
-	* Patterns need to be specified as follows:
-	* <code>
-	* array( 'optionName' =>
-	* 	array( 'mustContain' =>
-	* 		array( 'subOptions' =>
-	* 			array( '
-	* </code>
-	*
-	* @var array
-	* @see setValidPattern
-	* @see getValidPattern
-	* @todo Implement pattern recognition
-	*/
-	protected $m_arPatterns = null;
-	/**
 	* The internal name of the component. Used as the name of the behavior when attaching.
 	*
 	* In order to facilitate option separation, this value is used along with the prefix delimiter by the internal option
@@ -104,8 +87,11 @@ class CPSComponentBehavior extends CBehavior
 		//	Get our name...
 		$_sName = CPSCommonBase::createInternalName( $this );
 
+		//	Import needed classes...
+		Yii::import( 'pogostick.base.CPSOptionManager' );
+
 		//	build our option manager...
-		$this->m_oOptions = new CPSOptionManager();
+		$this->m_oOptions = new CPSOptionManager( $this->m_sInternalName );
 
 		//	Set up our base settings
 		$this->setOptions( self::getBaseOptions() );
@@ -146,7 +132,7 @@ class CPSComponentBehavior extends CBehavior
 	*
 	* @param array $arOptions An array containing option_key => value pairs to put into option array. The parameter $arOptions is merged with the existing options array. Existing option values are overwritten or added.
 	* <code>
-	* $this->setOptions( array( 'option_x' => array( 'value' => '1', 'valid' => array( 'x', 'y', 'z' ) );
+	* $this->setOptions( array( 'option_x' => array( '_value' => '1', '_validPattern' => array( 'valid' => array( 'x', 'y', 'z' ) ) );
 	* </code>
 	* @returns null
 	* @see getOptions
@@ -198,56 +184,39 @@ class CPSComponentBehavior extends CBehavior
 	{
 		return(
 			array(
-				'baseUrl' => array( 'value' => '', 'type' => 'string' ),
-				'checkOptions' => array( 'value' => true, 'type' => 'boolean' ),
-				'validOptions' => array( 'value' => array(), 'type' => 'array' ),
-				'options' => array( 'value' => array(), 'type' => 'array' ),
-				'checkCallbacks' => array( 'value' => true, 'type' => 'boolean' ),
-				'validCallbacks' => array( 'value' => array(), 'type' => 'array' ),
-				'callbacks' => array( 'value' => array(), 'type' => 'array' ),
+				'baseUrl_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'checkOptions_' => array( '_value' => true, '_validPattern' => array( 'type' => 'boolean' ) ),
+				'validOptions_' => array( '_value' => array(), '_validPattern' => array( 'type' => 'string' ) ),
+				'checkCallbacks_' => array( '_value' => true, '_validPattern' => array( 'type' => 'boolean' ) ),
+				'validCallbacks_' => array( '_value' => array(), '_validPattern' => array( 'type' => 'string' ) ),
+				'callbacks_' => array( '_value' => array(), '_validPattern' => array( 'type' => 'string' ) ),
 			)
 		);
 	}
 
-	/**
-    * Check the options against the valid ones
+  /**
+    * Checks the callback array to see if they're valid.
     *
-    * @param array $value user's options
-    * @param array $validOptions valid options
+    * @throws CException
+    * @returns true If all is good.
+
     */
-	public function checkOptions( array $arOptions = null, array $arValidOptions = null )
- 	{
-		if ( ! isset( $arValidOptions ) )
-			$arValidOptions = $this->validOptions;
+	public function checkCallbacks()
+	{
+		$_arCallbacks = $this->getOption( 'callbacks' );
+		$_arValidCallbacks = $this->getOption( 'validCallbacks' );
 
-		if ( ! isset( $arOptions ) )
-			$arOptions = $this->options;
-
-		foreach ( $arOptions as $_sKey => $_oValue )
+		if ( ! empty( $_arCallbacks ) && ! empty( $_arValidCallbacks ) )
 		{
-			if ( is_array( $arValidOptions ) && ! array_key_exists( $_sKey, $arValidOptions ) )
-				throw new CException( Yii::t( __CLASS__, '"{x}" is not a valid option', array( '{x}' => $_sKey ) ) );
-
-			$_sType = gettype( $_oValue );
-			$_oVOType = $arValidOptions[ $_sKey ][ 'type' ];
-
-			if ( ( ! is_array( $_oVOType ) && ( $_sType != $_oVOType ) ) || ( is_array( $_oVOType ) && ! in_array( $_sType, $_oVOType ) ) )
-				throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $_sKey, '{y}' => ( is_array( $_oVOType ) ) ? implode( ', ', $_oVOType ) : $_oVOType ) ) );
-
-			if ( array_key_exists( 'valid', $arValidOptions[ $_sKey ] ) )
+			foreach ( $_arCallbacks as $_sKey => $_oValue )
 			{
-				$_arValid = $arValidOptions[ $_sKey ][ 'valid' ];
-
-				if ( is_array( $_arValid[ 'valid' ] ) && ! in_array( $_oValue, $_arValid ) )
-					throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: "{y}"', array( '{x}' => $_sKey, '{y}' => implode( ', ', $_arValid ) ) ) );
+				if ( ! in_array( $_sKey, $_arValidCallbacks ) )
+					throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: {y}', array( '{x}' => $_sKey, '{y}' => implode( ', ', $_arValidCallbacks ) ) ) );
 			}
-
-			if ( ( $_sType == 'array' ) && array_key_exists( 'elements', $arValidOptions[ $_sKey ] ) )
-				$this->checkOptions( $_oValue, $arValidOptions[ $_sKey ][ 'elements' ] );
 		}
 
-		//	Now validate them...
-		return( $this->validateOptions( $arOptions, $arValidOptions ) );
+		//	Clean...
+		return true;
 	}
 
 	/**
@@ -256,11 +225,25 @@ class CPSComponentBehavior extends CBehavior
 	* @param array $arOptions
 	* @return string
 	*/
-	public function makeOptions( array $arOptions = null )
+	public function makeOptions()
 	{
-		$_arOptions = ( $arOptions == null ) ? $this->getOption( 'options' ) : $arOptions;
+		$_arOptions = array();
 
-		foreach ( $this->getOption( 'callbacks' ) as $_sKey => $_oValue )
+		//	Now get option/value pairs
+		foreach( $this->getOptions() as $_sKey => $_oValue )
+		{
+			//	Is this private? Move along...
+			if ( false !== strpos( $_sKey, '_', strlen( $_sKey ) - 1 ) )
+				continue;
+
+			//	This option is safe to output
+			$_arOptions[ $_sKey ] = $_oValue;
+		}
+
+		$_arCallbacks = $this->getOption( 'callbacks' );
+
+		//	Add callbacks to the array...
+		foreach ( $_arCallbacks as $_sKey => $_oValue )
 		{
 			if ( ! empty( $_oValue ) )
 				$_arOptions[ "cb_{$_sKey}" ] = $_sKey;
@@ -270,20 +253,14 @@ class CPSComponentBehavior extends CBehavior
 		$_arToEncode = array();
 
 		foreach( $_arOptions as $_oOption )
-		{
-			//	Ignore private options
-			if ( isset( $_oOption[ 'private' ] ) && true == $_oOption[ 'private' ] )
-				continue;
-
-			$_arToEncode[ $_oOption[ 'name' ] ] = $_oOption[ 'value' ];
-		}
+			$_arToEncode[ ( isset( $_oOption[ '_extName' ] ) ) ? $_oOption[ '_extName' ] : key( $_oOption ) ] = $_oOption[ '_value' ];
 
 		if ( sizeof( $_arToEncode ) > 0 )
 		{
 			$_sEncodedOptions = CJavaScript::encode( $_arToEncode );
 
 			//	Fix up the callbacks...
-			foreach ( $this->getOption( 'callbacks' ) as $_sKey => $_oValue )
+			foreach ( $_arCallbacks as $_sKey => $_oValue )
 			{
 				if ( ! empty( $_oValue ) )
 				{
@@ -298,47 +275,6 @@ class CPSComponentBehavior extends CBehavior
 		}
 
 		return( null );
-	}
-
-	/**
-	* Validates that required options have been specified...
-	*
-	* @param mixed $arOptions
-	* @param mixed $arValidOptions
-	*/
-	public function validateOptions( array $arOptions , array $arValidOptions )
-	{
-		foreach ( $arOptions as $_sKey => $_oValue )
-		{
-			//	Is it a valid option?
-			if ( ! array_key_exists( $_sKey, $arValidOptions ) )
-				throw new CException( Yii::t( __CLASS__, '"{x}" is not a valid option', array( '{x}' => $_sKey ) ) );
-
-			$_oCurOption = $arOptions[ $_sKey ];
-			$_oCurValidOption = $arValidOptions[ $_sKey ];
-
-			if ( isset( $_oCurValidOption[ 'required' ] ) && $_oCurValidOption[ 'required' ] && ( ! $_oCurOption || empty( $_oCurOption ) ) )
-				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ) );
-		}
-
-		return( true );
-	}
-
-   /**
-    *
-    * @param array $value user's callbacks
-    * @param array $validCallbacks valid callbacks
-    */
-	public function checkCallbacks( array $arCallbacks = null, array $arValidCallbacks = null )
-	{
-		if ( ! empty( $arValidCallbacks ) && is_array( $arValidCallbacks ) )
-		{
-			foreach ( $arCallbacks as $_sKey => $_oValue )
-			{
-				if ( ! in_array( $_sKey, $arValidWidgetCallbacks ) )
-					throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: {y}', array( '{x}' => $_sKey, '{y}' => implode( ', ', $arValidCallbacks ) ) ) );
-			}
-		}
 	}
 
 	//********************************************************************************
@@ -366,7 +302,7 @@ class CPSComponentBehavior extends CBehavior
 	 * @return mixed the property value, event handlers attached to the event, or the named behavior
 	 * @throws CException if the property or event is not defined
 	 * @see __set
-	 * @see CPSCommonBase::genericGet
+	 * @see getBehaviorProperty
 	 */
 	public function __get( $sName )
 	{
@@ -397,7 +333,7 @@ class CPSComponentBehavior extends CBehavior
 	 * @param mixed the property value or callback
 	 * @throws CException if the property/event is not defined or the property is read only.
 	 * @see __get
-	 * @see CPSCommonBase::genericSet
+	 * @see setBehaviorProperty
 	 */
 	public function __set( $sName, $oValue )
 	{
@@ -408,27 +344,4 @@ class CPSComponentBehavior extends CBehavior
 		return $this->setBehaviorProperty( $oObject, $sName, $oValue );
 	}
 
-	/**
-	 * Calls the named method which is not a class method.
-	 * Do not call this method. This is a PHP magic method that we override
-	 * @param string The method name
-	 * @param array The method parameters
-	 * @throws CException if the property/event is not defined or the property is read only.
-	 * @see __call
-	 * @return mixed The method return value
-	 */
-	public function OLD__call( $sName, $arParams )
-	{
-		//	Try parent first... cache exception
-		try { return parent::__call( $sName, $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
-
-		//	Check behavior methods...
-		if ( $_oBehave = $this->hasBehaviorMethod( $oObject, $sName ) )
-			return call_user_func_array( array( $_oBehave[ '_object' ], $sName ), $arParams );
-
-		//	Invalid property...
-		if ( null != $oEvent )
-			throw $oEvent;
-	}
-
-}
+ }
