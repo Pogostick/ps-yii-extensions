@@ -49,10 +49,10 @@ class CPSWidgetBehavior extends CPSComponentBehavior
 	{
 		return(
 			array(
-				'html_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ),
-				'script_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ),
-				'cssFile_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ),
-				'viewName_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ),
+				'html_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'script_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'cssFile_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'viewName_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
 			)
 		);
 	}

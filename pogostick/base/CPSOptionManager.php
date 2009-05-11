@@ -10,20 +10,88 @@
 
 /**
  * CPSOptionManager provides the base class for generic options settings for use with any class.
- * Avoids the need for declaring member variables and provides convenience magic functions to search the options.
+ * Avoids the need for declaring member variables and provides convenience magic functions to
+ * search the options.
  *
- * setOptions array format:
+ * Here is an example option specification and pattern.
+ *
  * <code>
  * array(
- * 		'optionName' => array(							//	optionName is the name of your option key
- * 			// Predefined Array Values
- * 			'value' => default value,					//	Defaults to null,
- * 			'type' => 'typename',						//	Any valid PHP type (i.e. string, array, integer, etc.),
- * 			'access' => 'public',						//	The access level for this key (public, protected, or private)
- * 			'component' => 'false',						//	Indicates that this is a private option.
- * 			'valid' => array( 'v1', 'v2', 'v3', etc.)	// An array of valid values for the option
+ *		//	optionName is the name of your option key, optionally private (by appending an
+ * 		//	underscore ('_') to the option name. Private options are never returned from
+ * 		//	(@link makeOptions())
+ * 		'optionName{_}' => array(
+ * 			//	Option name for a javascript widget. Defaults to '<b>optionName</b>'.
+ * 			'_extName' => external-facing name | empty
+ *			//	Defaults to null,
+ * 			'_value' => default value,
+ * 			//	Lay out the validation parameters
+ * 			'_validPattern' => array(
+ * 				//	Any valid PHP type (i.e. string, array, integer, etc.),
+ * 				'type' => 'typename',
+ * 				// An array of valid values for the option
+ * 				'valid' => array( 'v1', 'v2', 'v3', etc.)
  * 		)
  * )
+ * </code>
+ *
+ * <b>_extName</b> tells the option manager to use this when formatting an options array with (@link CPSOptionManager::makeOptions()).
+ *
+ * <b>_value</b> tells the option manager what to set the value of the option to upon creation. New values will override this default value.
+ *
+ * When adding options to the options manager, you must specify the pattern for the option's value.
+ * The pattern must be placed in the array element with a key of '<b>_validPattern</b>' to be recognized
+ * by the option manager.
+ *
+ * <b>_validPattern</b> tells the option manager what type of variable is allowed to be assigned to the option.
+ * Any legal PHP type is allowed. If more than one type is allowed, you may send in an array as the
+ * value of '<b>type</b>'.
+ *
+ * This pattern can include none, one, or more pattern sub-types.
+ *
+ * These are:
+ * 	1. <b>type</b>
+ *  2. <b>valid</b>
+ *  3. <b>required</b>
+ *
+ * <b>type</b> tells the option manager what type of variable is allowed to be assigned to the option.
+ * Any legal PHP type is allowed. If more than one type is allowed, you may send in an array as the
+ * value of '<b>type</b>'.
+ *
+ * <b>valid</b> tells the option manager the valid values of the option that is being set. This must
+ * be specified as an array. For instance, if an option can only have three possible values: '<b>public</b>',
+ * '<b>protected</b>', or '<b>private</b>', the array specified for the value of '<b>valid</b>' would be
+ *
+ * <b>required</b> tells the option manager that the option is required and as such, must have a non-null <b>_value</b>.
+ *
+ * <code>
+ *
+ * array( 'public', 'protected', 'private' )
+ *
+ * </code>
+ *
+ * This next snippet defines an option named '<b>hamburgerCount</b>'. It is private because we've appended
+ * an underscore to the name. It's default value is 6, it can be only of type '<b>int</b>', and has no
+ * required values.
+ *
+ * <code>
+ *
+ * 'hamburgerCount_' = array(
+ * 	'_value' => 6,
+ * 	'_validPattern' =>
+ * 		array(
+ * 			'type' => 'int',
+ * 			'valid' => null,
+ * 		),
+ * 	);
+ *
+ * </code>
+ *
+ * Using this option from a Pogostick component or widget is as simple as this:
+ *
+ * <code>
+ * $this->hamburgerCount_ = 3;
+ * echo $this->hamburgerCount_;
  * </code>
  *
  * @access public
@@ -35,12 +103,6 @@
  */
 class CPSOptionManager
 {
-	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-
-	const PSOPTION_ERROR_NOT_ARRAY = -1;
-
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -75,36 +137,17 @@ class CPSOptionManager
 	* Constructor
 	*
 	*/
-	public function __construct()
+	public function __construct( $sInternalName = null )
 	{
 		//	Create our name
 		$_sName = CPSCommonBase::createInternalName( $this );
 
+		//	Reset our name if requested...
+		if ( null != $sInternalName )
+			$this->setInternalName( $sInternalName );
+
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $_sName );
-	}
-
-	/**
-	* Sets option manager metadata. Metadata keys must begin with an underscore ('_').
-	* If not provided, one will be added.
-	*
-	* @param string|array $oName
-	* @param mixed $oValue
-	*/
-	public function setMetaData( $oName, $oValue = null )
-	{
-		$_arTemp = $oName;
-
-		if ( ! is_array( $oName ) )
-			$_arTemp = array( $oName => $oValue );
-
-		foreach ( $_arTemp as $_sKey => $_oValue )
-		{
-			if ( false === strpos( $_sKey, '_' ) )
-				$_sKey .= '_' . $_sKey;
-
-			$this->setOption( $_sKey, $_oValue );
-		}
 	}
 
 	//********************************************************************************
@@ -127,6 +170,10 @@ class CPSOptionManager
 	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
 	protected function setPrefixDelimiter( $sValue ) { $this->m_sPrefixDelimiter = $sValue; }
 
+	//********************************************************************************
+	//* Options Access Methods
+	//********************************************************************************
+
 	/**
 	* Returns a reference to the entire option array
 	*
@@ -134,7 +181,7 @@ class CPSOptionManager
 	* @see getOption
 	* @see setOptions
 	*/
-	public function &getOptions() { return self::$m_arOptions; }
+	public function &getOptions() { return self::$m_arOptions[ $this->m_sInternalName ]; }
 
 	/**
 	* Add bulk options to the manager.
@@ -153,7 +200,8 @@ class CPSOptionManager
 	public function setOptions( array $arOptions )
 	{
 		foreach ( $arOptions as $_sKey => $_oValue )
-			$this->setOption( $_sKey, $_oValue );
+			if ( $_sKey = $this->validateKey( $_sKey ) )
+				$this->setOption( $_sKey, $_oValue );
 
 		//	Sort the array
 		ksort( self::$m_arOptions );
@@ -169,11 +217,16 @@ class CPSOptionManager
 	*/
 	public function &getOption( $sKey )
 	{
+		//	Not a private option? Check if it's in the array as private and kajigger the key...
+		if ( ! $this->hasOption( $sKey ) && false === strpos( $sKey, '_', strlen( $sKey ) - 1 ) )
+			if ( isset( self::$m_arOptions[ $sKey . '_' ] ) )
+				$sKey .= '_';
+
 		//	Validate the key
 		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
 			return null;
 
-		return ( isset( self::$m_arOptions[ $sKey ] ) ) ? self::$m_arOptions[ $sKey ] : self::$m_arOptions[ $sKey ] = null;
+		return ( isset( self::$m_arOptions[ $sKey ][ '_value' ] ) ) ? self::$m_arOptions[ $sKey ][ '_value' ] : self::$m_arOptions[ $sKey ][ '_value' ] = array();
 	}
 
 	/**
@@ -191,10 +244,34 @@ class CPSOptionManager
 			return null;
 
 		//	Set the option...
+		if ( ! is_array( $oValue ) )
+			$_oValue = array( '_value' => $oValue );
+		else if ( is_array( $oValue ) && ! in_array( '_value', $oValue ) )
+			$oValue[ '_value' ] = $oValue;
+
+		//	Set the option...
 		self::$m_arOptions[ $sKey ] = $oValue;
 
 		//	Sort the array
 		ksort( self::$m_arOptions );
+	}
+
+	/**
+	* Checks if an option exists in the options array...
+	*
+	* @param string $sKey
+	* @return bool
+	* @see setOption
+	* @see setOptions
+	*/
+	public function hasOption( $sKey )
+	{
+		$_arOptions = $this->getOptions();
+
+		if ( empty( $_arOptions ) )
+			$_arOptions = array();
+
+		return in_array( $this->validateKey( $sKey ), $_arOptions );
 	}
 
 	/**
@@ -220,22 +297,75 @@ class CPSOptionManager
 		return $sKey;
 	}
 
-	public function checkOption( $sKey, $oValue, array &$arResults = null )
+	/**
+	* Checks the options array or a passed in array for validity checking...
+	*
+	* @param array $arOptions
+	* @throws CException
+	* @returns bool
+	*/
+	public function checkOptions( array $arOptions = null )
 	{
-		//	Our results array
-		$_arReturn = array();
+		//	None were passed in? Then we check our array
+		if ( empty( $arOptions ) )
+			$arOptions = self::$m_arOptions;
 
-//		if ( ! is_array( $oValue ) )
-//			return self::PSOPTION_ERROR_NOT_ARRAY;
+		//	One at a time...
+		foreach ( $arOptions as $_sKey => $_oValue )
+			$this->checkOption( $this->validateKey( $_sKey ), $_oValue );
 
-		/*
- * 		'optionName' => array(							//	optionName is the name of your option key
- * 			// Predefined Array Values
- * 			'value' => default value,					//	Defaults to null,
- * 			'type' => 'typename',						//	Any valid PHP type (i.e. string, array, integer, etc.),
- * 			'access' => 'public',						//	The access level for this key (public, protected, or private)
- * 			'component' => 'false',						//	Indicates that this is a private option.
- * 			'valid' => array( 'v1', 'v2', 'v3', etc.)	// An array of valid values for the option
-*/
+		//	We made it here? We cool baby!
+		return true;
 	}
+
+	/**
+	* Checks a single option against its pattern.
+	*
+	* @param string $sKey
+	* @param mixed $oValue
+	* @throws CException
+	* @returns bool
+	*/
+	public function checkOption( $sKey, $oValue )
+	{
+		//	Check if this option is available
+		if ( $this->hasOption( $sKey ) )
+		{
+			//	See if it hase valid options...
+			$_arValidPattern = $this->{$sKey}[ '_validPattern' ];
+
+			//	What type should it be?
+			if ( array_key_exists( 'type', $_arValid ) )
+			{
+				//	Get the type of our value...
+				$_sType = gettype( $oValue );
+
+				//	Get the value of 'type'
+				$_oVPType = $_arValidPattern[ '' ];
+
+				//	Is this a valid type for this option?
+				if ( ( ! is_array( $_oVPType ) && ( $_sType != $_oVPType ) ) || ( is_array( $_oVPType ) && ! in_array( $_sType, $_oVPType ) ) )
+					throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $_sKey, '{y}' => ( is_array( $_oVPType ) ) ? implode( ', ', $_oVPType ) : $_oVPType ) ) );
+			}
+
+			//	Check if this is a valid value for this option
+			if ( array_key_exists( 'valid', $_arValidPattern ) )
+			{
+				$_arValid = $arValidOptions[ 'valid' ];
+
+				if ( is_array( $_arValid[ 'valid' ] ) && ! in_array( $_oValue, $_arValid ) )
+					throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: "{y}"', array( '{x}' => $_sKey, '{y}' => implode( ', ', $_arValid ) ) ) );
+			}
+
+			if ( isset( $_arValidPattern[ 'required' ] ) && $_arValidPattern[ 'required' ] && empty( self::$m_arOptions[ $sKey ] ) )
+				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ) );
+		}
+		else
+			//	Invalid option
+			throw new CException( Yii::t( __CLASS__, '"{x}" is not a valid option for "{intname}"', array( '{x}' => $sKey, '{intname}' => $this->m_sInternalName ) ) );
+
+		//	Looks clean....
+		return true;
+	}
+
 }
