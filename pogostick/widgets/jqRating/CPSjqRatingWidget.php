@@ -69,20 +69,18 @@ class CPSjqRatingWidget extends CPSWidget
 	/**
 	* Constructs a CPSjqRatingWidget
 	*
-	* @param array $arOptions
 	*/
-	public function init()
+	public function __construct( $oOwner = null )
 	{
-		//	Call daddy...
-		parent::init();
+		parent::__construct( $oOwner );
 
-		$this->setOptions(
+		//	Add these options in the constructor so the Yii base can pre-fill them from the config files.
+		$this->addOptions(
 			array(
-				'cancel' => array( '_validPattern' => array( 'type' => 'string' ) ),
-				'cancelValue' => array( '_validPattern' => array( 'type' => 'string' ) ),
-				'readOnly' => array( '_validPattern' => array( 'type' => 'bool' ) ),
-				'required' => array( '_validPattern' => array( 'type' => 'bool' ) ),
-				'resetAll' => array( '_validPattern' => array( 'type' => 'bool' ) ),
+				'cancel' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'cancelValue' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'readOnly' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool' ) ),
+				'required' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool' ) ),
 			)
 		);
 
@@ -103,7 +101,7 @@ class CPSjqRatingWidget extends CPSWidget
 	public function run()
 	{
 		//	Validate baseUrl
-		if ( '' == $this->baseUrl ) )
+		if ( '' == $this->baseUrl )
 			throw new CHttpException( 403, __CLASS__ . ': baseUrl is required.');
 
 		//	Register the scripts/css
@@ -251,41 +249,42 @@ class CPSjqRatingWidget extends CPSWidget
 	{
 		static $_iIdCount = 0;
 
-		$sBaseUrl = CAppHelpers::getOption( $arOptions, 'baseUrl' );
-		$sId = CAppHelpers::getOption( $arOptions, 'id', null );
-		$sName = CAppHelpers::getOption( $arOptions, 'name' );
+		//	Fix up the base url...
+		$sBaseUrl = CPSHelp::getOption( $arOptions, 'baseUrl', '' );
+
+		if ( null == $sBaseUrl )
+			$sBaseUrl = Yii::app()->baseUrl . '/extra/jqRating';
+
+		CPSHelp::setOption( $arOptions, 'baseUrl', $sBaseUrl );
+
+		$sId = CPSHelp::getOption( $arOptions, 'id' );
+		$sName = CPSHelp::getOption( $arOptions, 'name' );
 
 		//	Build the options...
 		$_arOptions = array(
-			'supressScripts' => CAppHelpers::getOption( $arOptions, 'supressScripts', false ),
-			'returnString' => CAppHelpers::getOption( $arOptions, 'returnString', false ),
-			'baseUrl' => Yii::app()->baseUrl . ( $sBaseUrl == null ? '/extra/jqRating' : $sBaseUrl ),
-			'name' => ( $sName == null ? 'rating' . $_iIdCount : $sName ),
-			'starClass' => CAppHelpers::getOption( $arOptions, 'starClass', 'star' ),
-			'split' => CAppHelpers::getOption( $arOptions, 'split', 1 ),
-			'starCount' => CAppHelpers::getOption( $arOptions, 'starCount', 5 ),
-			'selectValue' => CAppHelpers::getOption( $arOptions, 'selectValue', 0 ),
-			'ajaxCallback' => CAppHelpers::getOption( $arOptions, 'ajaxCallback' ),
-			'starTitles' => CAppHelpers::getOption( $arOptions, 'starTitles' ),
-			'starValues' => CAppHelpers::getOption( $arOptions, 'starValues' ),
-			'hoverTips' => CAppHelpers::getOption( $arOptions, 'hoverTips' ),
-			'options' => array(
-				'cancel' => CAppHelpers::getOption( $arOptions, 'cancel', 'Cancel Rating' ),
-				'cancelValue' => CAppHelpers::getOption( $arOptions, 'cancelValue', '' ),
-				'readOnly' => CAppHelpers::getOption( $arOptions, 'readOnly', Yii::app()->user->isGuest ),
-				'required' => CAppHelpers::getOption( $arOptions, 'required', false ),
-				'resetAll' => CAppHelpers::getOption( $arOptions, 'resetAll', false ),
-			),
-			'callbacks' => array(
-				'callback' => CAppHelpers::getOption( $arOptions, 'callback', null ),
-				'focus' => CAppHelpers::getOption( $arOptions, 'focus', null ),
-				'blur' => CAppHelpers::getOption( $arOptions, 'blur', null ),
+			'supressScripts' => CPSHelp::getOption( $arOptions, 'supressScripts', false ),
+			'returnString' => CPSHelp::getOption( $arOptions, 'returnString', false ),
+			'baseUrl' => CPSHelp::getOption( $arOptions, 'baseUrl', $sBaseUrl ),
+			'name' => ( $sName == null ? 'rating' . $_iIdCount : $sName . $_iIdCount ),
+			'starClass' => CPSHelp::getOption( $arOptions, 'starClass', 'star' ),
+			'split' => CPSHelp::getOption( $arOptions, 'split', 1 ),
+			'starCount' => CPSHelp::getOption( $arOptions, 'starCount', 5 ),
+			'selectValue' => CPSHelp::getOption( $arOptions, 'selectValue', 0 ),
+			'ajaxCallback' => CPSHelp::getOption( $arOptions, 'ajaxCallback' ),
+			'starTitles' => CPSHelp::getOption( $arOptions, 'starTitles' ),
+			'starValues' => CPSHelp::getOption( $arOptions, 'starValues' ),
+			'hoverTips' => CPSHelp::getOption( $arOptions, 'hoverTips' ),
+			'callbacks' =>
+				array(
+					'callback' => CPSHelp::getOption( $arOptions, 'callback', null ),
+					'focus' => CPSHelp::getOption( $arOptions, 'focus', null ),
+					'blur' => CPSHelp::getOption( $arOptions, 'blur', null ),
 			),
 		);
 
 		//	Not logged in? No ratings for you!
 		if ( Yii::app()->user->isGuest )
-			unset( $_arOptions[ 'ajaxCallback' ] );
+			CPSHelp::unsetOption( $arOptions, 'ajaxCallback' );
 
 		$_oWidget = Yii::app()->controller->widget(
 			'pogostick.widgets.jqRating.CPSjqRatingWidget',

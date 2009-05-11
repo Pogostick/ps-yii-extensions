@@ -22,19 +22,20 @@ class CPSgMapsWidget extends CPSgApiWidget
 {
 	public function init()
 	{
-		$this->setOptions(
+		$this->addOptions(
 			array(
 				//	GMapOptions
-				'size' => array( 'type' => 'array' ),
-				'mapTypes' => array( 'type' => 'array' ),
-				'draggableCursor' => array( 'type' => 'string' ),
-				'draggingCursor' => array( 'type' => 'string' ),
-				'googleBarOptions' => array( 'type' => 'array' ),
-				'backgroundColor' => array( 'type' => 'string' ),
+				'size' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'mapTypes' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'draggableCursor' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'draggingCursor' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'googleBarOptions' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'backgroundColor' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				//	Method Options
-				'mapCenter' => array( 'type' => 'array' ),
-				'mapType' => array( 'type' => 'string' ),
-			)
+				'mapCenter' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'mapType' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+			),
+			true
 		);
 	}
 

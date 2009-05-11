@@ -97,7 +97,7 @@ class CPSComponentBehavior extends CBehavior
 		$this->m_oOptions = new CPSOptionManager( $this->m_sInternalName );
 
 		//	Set up our base settings
-		$this->setOptions( self::getBaseOptions() );
+		$this->addOptions( self::getBaseOptions() );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
@@ -108,6 +108,24 @@ class CPSComponentBehavior extends CBehavior
 	//********************************************************************************
 
 	/**
+	* Retrieves an option value from the options array. If key doesn't exist, it's created as an empty array and returned.
+	*
+	* @param string $sKey
+	* @param array $arValue
+	* @param bool $bNoSort If set to false, the option array will not be sorted after the addition
+	* @see addOptions
+	*/
+	public function addOption( $sKey, $arValue, $bNoSort = false ) { return $this->m_oOptions->addOption( $sKey, $arValue, $bNoSort ); }
+
+	/**
+	* Add a batch of options to the option manager
+	*
+	* @param array $arOptions
+	* @see addOption
+	*/
+	public function addOptions( $arOptions ) { return $this->m_oOptions->addOptions( $arOptions ); }
+
+	/**
 	* Sets the default (@link $m_sPrefixDelimiter). Defaults to '::'.
 	*
 	* @param string $sValue
@@ -115,51 +133,16 @@ class CPSComponentBehavior extends CBehavior
 	public function setPrefixDelimiter( $sValue ) { $this->m_sPrefixDelimiter = $sValue; }
 
 	/**
-	* Returns a reference to the entire reference array
-	*
-	* @returns array A reference to the internal options array
-	* @see getOption
-	*/
-	public function &getOptions() { return $this->m_oOptions->getOptions(); }
-
-	/**
-	* Returns a reference to the entire reference array
-	*
-	* @returns array A reference to the internal options array
-	* @see getOption
-	*/
-	public function &getOptionsObject() { return $this->m_oOptions; }
-
-	/**
 	* Add bulk options to the manager.
 	*
 	* @param array $arOptions An array containing option_key => value pairs to put into option array. The parameter $arOptions is merged with the existing options array. Existing option values are overwritten or added.
 	* <code>
-	* $this->setOptions( array( 'option_x' => array( '_value' => '1', '_validPattern' => array( 'valid' => array( 'x', 'y', 'z' ) ) );
+	* $this->setOptions( array( 'option_x' => array( CPSOptionManager::META_DEFAULTVALUE => '1', CPSOptionManager::META_RULES => array( 'valid' => array( 'x', 'y', 'z' ) ) );
 	* </code>
 	* @returns null
 	* @see getOptions
 	*/
 	public function setOptions( array $arOptions ) { $this->m_oOptions->setOptions( $arOptions ); }
-
-	/**
-	* Retrieves an option value from the options array. If key doesn't exist, it's created as an empty array and returned.
-	*
-	* @param string $sKey
-	* @return mixed
-	* @see getOptions
-	*/
-	public function getOption( $sKey ) { return $this->m_oOptions->getOption( $sKey ); }
-
-	/**
-	* Checks if an option exists in the options array...
-	*
-	* @param string $sKey
-	* @return bool
-	* @see setOption
-	* @see setOptions
-	*/
-	public function hasOption( $sKey ) { return $this->m_oOptions->hasOption( $sKey ); }
 
 	/**
 	* Sets a single option to the array
@@ -175,6 +158,51 @@ class CPSComponentBehavior extends CBehavior
 		$this->m_oOptions->setOption( $sKey, $oValue );
 	}
 
+	/**
+	* Returns a reference to the entire reference array
+	*
+	* @returns array A reference to the internal options array
+	* @see getOption
+	*/
+	public function &getOptions() { return $this->m_oOptions->getOptions(); }
+
+	/**
+	* Retrieves an option value from the options array. If key doesn't exist, it's created as an empty array and returned.
+	*
+	* @param string $sKey
+	* @return mixed
+	* @see getOptions
+	*/
+	public function getOption( $sKey ) { return $this->m_oOptions->getOption( $sKey ); }
+
+	/**
+	* Returns a reference to the entire reference array
+	*
+	* @returns array A reference to the internal options array
+	* @see getOption
+	*/
+	public function &getOptionsObject() { return $this->m_oOptions; }
+
+	/**
+	* Checks if an option exists in the options array...
+	*
+	* @param string $sKey
+	* @return bool
+	* @see setOption
+	* @see setOptions
+	*/
+	public function hasOption( $sKey ) { return $this->m_oOptions->hasOption( $sKey ); }
+
+	/**
+	* Merges the supplied options into parent's option array. No checking is done at the time. It's a blind merge.
+	*
+	* @param array $arOptions
+	*/
+	public function mergeOptions( array $arOptions )
+	{
+		$this->getOptionsObject()->mergeOptions( $arOptions );
+	}
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -188,12 +216,12 @@ class CPSComponentBehavior extends CBehavior
 	{
 		return(
 			array(
-				'baseUrl_' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
-				'checkOptions_' => array( '_value' => true, '_validPattern' => array( 'type' => 'boolean' ) ),
-				'validOptions_' => array( '_value' => array(), '_validPattern' => array( 'type' => 'string' ) ),
-				'checkCallbacks_' => array( '_value' => true, '_validPattern' => array( 'type' => 'boolean' ) ),
-				'validCallbacks_' => array( '_value' => array(), '_validPattern' => array( 'type' => 'string' ) ),
-				'callbacks_' => array( '_value' => array(), '_validPattern' => array( 'type' => 'string' ) ),
+				'baseUrl_' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'checkOptions_' => array( CPSOptionManager::META_DEFAULTVALUE => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
+				'validOptions_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'checkCallbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
+				'validCallbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'callbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}
@@ -233,11 +261,15 @@ class CPSComponentBehavior extends CBehavior
 	{
 		$_arOptions = array();
 
-		//	Now get option/value pairs
+		//	Build an array with non-private entities
 		foreach( $this->getOptions() as $_sKey => $_oValue )
 		{
-			//	Is this private? Move along...
-			if ( false !== strpos( $_sKey, '_', strlen( $_sKey ) - 1 ) )
+			//	Ignore meta data...
+			if ( ! $this->getOptionsObject()->isMetaDataKey( $_sKey ) && ! $this->getOptionsObject()->getMetaDataValue( $_sKey, CPSOptionManager::META_PRIVATE ) )
+				continue;
+
+			//	Validate the key
+			if ( null == ( $_sKey = $this->getOptionsObject()->validateKey( $s_Key ) ) )
 				continue;
 
 			//	This option is safe to output
@@ -245,6 +277,9 @@ class CPSComponentBehavior extends CBehavior
 		}
 
 		$_arCallbacks = $this->getOption( 'callbacks' );
+
+		if ( empty( $_arCallbacks ) )
+			$_arCallbacks = array();
 
 		//	Add callbacks to the array...
 		foreach ( $_arCallbacks as $_sKey => $_oValue )
@@ -256,8 +291,14 @@ class CPSComponentBehavior extends CBehavior
 		//	Get all the options merged...
 		$_arToEncode = array();
 
-		foreach( $_arOptions as $_oOption )
-			$_arToEncode[ ( isset( $_oOption[ '_extName' ] ) ) ? $_oOption[ '_extName' ] : key( $_oOption ) ] = $_oOption[ '_value' ];
+		foreach( $_arOptions as $_sKey => $_oValue )
+		{
+			$_sExtName = $this->getOptionsObject()->getMetaDataValue( $_sKey, CPSOptionManager::META_EXTERNALNAME );
+			if ( empty( $_sExtName ) )
+				$_sExtName = $_sKey;
+
+			$_arToEncode[ $_sExtName ] = $_oValue;
+		}
 
 		if ( sizeof( $_arToEncode ) > 0 )
 		{

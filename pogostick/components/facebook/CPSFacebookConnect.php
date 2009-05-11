@@ -28,7 +28,13 @@ class CPSFacebookConnect extends CPSApiWidget
 	{
 		parent::__construct();
 
-		$this->setOptions( array( 'appId' => null, 'callbackUrl' => null, 'xdrUrl' => null ) );
+		$this->addOptions(
+			array(
+				'appId' => array( CPSOptionManager::META_RULES => array( CPSComponent::META_TYPE => 'string' ) ),
+				'callbackUrl' => array( CPSOptionManager::META_RULES => array( CPSComponent::META_TYPE => 'string' ) ),
+				'xdrUrl' => array( CPSOptionManager::META_RULES => array( CPSComponent::META_TYPE => 'string' ) ),
+			)
+		);
 	}
 
 	/***
