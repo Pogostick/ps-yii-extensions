@@ -47,24 +47,18 @@ class CPSApiWidgetBehavior extends CPSApiBehavior
 	{
 		return(
 			array(
-				//	Widget Options
-				'html' => array( 'value' => '', 'type' => 'string' ),
-				'script' => array( 'value' => '', 'type' => 'string' ),
-				'cssFile' => array( 'value' => '', 'type' => 'string' ),
-				'viewName' => array( 'value' => '', 'type' => 'string' ),
-
 				//	API options
-				'altApiKey' => array( 'value' => '', 'type' => 'string' ),
-				'apiBaseUrl' => array( 'value' => '', 'type' => 'string' ),
-				'apiKey' => array( 'value' => '', 'type' => 'string' ),
-				'apiQueryName' => array( 'value' => '', 'type' => 'string' ),
-				'apiToUse' => array( 'value' => '', 'type' => 'string' ),
-				'apiSubUrls' => array( 'value' => array(), 'type' => 'array' ),
-				'format' => array( 'value' => 'array', 'type' => 'string' ),
-				'httpMethod' => array( 'value' => self::HTTP_GET, 'type' => 'string' ),
-				'requestData' => array( 'value' => array(), 'type' => 'array' ),
-				'requestMap' => array( 'value' => array(), 'type' => 'array' ),
-				'userAgent' => array( 'value' => 'Pogostick Components for Yii; (+http://www.pogostick.com/yii)', 'type' => 'string' ),
+				'altApiKey' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'apiBaseUrl' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'apiKey' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'apiQueryName' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'apiToUse' => array( '_value' => '', '_validPattern' => array( 'type' => 'string' ) ),
+				'apiSubUrls' => array( '_value' => array(), '_validPattern' => array( 'type' => 'array' ) ),
+				'format' => array( '_value' => 'array', '_validPattern' => array( 'type' => 'string' ) ),
+				'httpMethod' => array( '_value' => self::HTTP_GET, '_validPattern' => array( 'type' => 'string' ) ),
+				'requestData' => array( '_value' => array(), '_validPattern' => array( 'type' => 'array' ) ),
+				'requestMap' => array( '_value' => array(), '_validPattern' => array( 'type' => 'array' ) ),
+				'userAgent' => array( '_value' => 'Pogostick Components for Yii; (+http://www.pogostick.com/yii)', '_validPattern' => array( 'type' => 'string' ) ),
 			)
 		);
 	}
