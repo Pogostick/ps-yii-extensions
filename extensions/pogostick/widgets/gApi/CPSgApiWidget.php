@@ -35,11 +35,15 @@ class CPSgApiWidget extends CPSApiWidget
 		parent::__construct();
 
 		//	Our object settings
-		$this->setOption( 'apisToLoad',
+		$this->setOption(
+			'apisToLoad',
 			array(
-				'value' => array(),
-				'type' => 'array',
-				'valid' => array( 'maps', 'search', 'feeds', 'language', 'gdata', 'earth', 'visualization' ),
+				'_value' => array(),
+				'_validPattern' =>
+					array(
+						'type' => 'array',
+						'valid' => array( 'maps', 'search', 'feeds', 'language', 'gdata', 'earth', 'visualization' ),
+					),
 			)
 		);
 

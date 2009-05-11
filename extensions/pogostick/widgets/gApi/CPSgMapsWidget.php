@@ -22,7 +22,7 @@ class CPSgMapsWidget extends CPSgApiWidget
 {
 	public function init()
 	{
-		$this->setOptions( 'widgetOptions',
+		$this->setOptions(
 			array(
 				//	GMapOptions
 				'size' => array( 'type' => 'array' ),

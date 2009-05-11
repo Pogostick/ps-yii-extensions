@@ -28,6 +28,7 @@ class CPSComponentBehavior extends CBehavior
 	* An instance of our option manager for this behavior
 	*
 	* @var (@link CPSOptionManager)
+	* @access private
 	*/
 	private $m_oOptions;
 	/**
@@ -42,6 +43,7 @@ class CPSComponentBehavior extends CBehavior
 	* @var string
 	* @see setInternalName
 	* @see $m_sPrefixDelimiter
+	* @access protected
 	*/
 	protected $m_sInternalName;
 	/**
@@ -51,6 +53,7 @@ class CPSComponentBehavior extends CBehavior
 	* of the '::' characters.
 	*
 	* @var string
+	* @access protected
 	*/
 	protected static $m_sPrefixDelimiter = '::';
 
@@ -156,7 +159,7 @@ class CPSComponentBehavior extends CBehavior
 	* @see setOption
 	* @see setOptions
 	*/
-	public function hasOption( $sKey ) { return in_array( $sKey, $this->m_oOptions->getOptionsObject() ); }
+	public function hasOption( $sKey ) { return $this->m_oOptions->hasOption( $sKey ); }
 
 	/**
 	* Sets a single option to the array
@@ -179,6 +182,7 @@ class CPSComponentBehavior extends CBehavior
 	/**
 	* Easier on the eyes
 	*
+	* @access private
 	*/
 	private function getBaseOptions()
 	{

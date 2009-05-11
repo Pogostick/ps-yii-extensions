@@ -24,6 +24,10 @@ class CPSWidget extends CInputWidget
 	//* Member variables
 	//********************************************************************************
 
+	//********************************************************************************
+	//* Member variables
+	//********************************************************************************
+
 	/**
 	* The internal name of the component. Used as the name of the behavior when attaching.
 	*
@@ -39,19 +43,6 @@ class CPSWidget extends CInputWidget
 	*/
 	protected $m_sInternalName;
 	/**
-	* As behaviors are added to the object, this is set to true to quickly determine if the
-	* component does in fact contain behaviors.
-	*
-	* @var bool
-	*/
-	protected $m_bHasBehaviors = false;
-	/**
-	* A private array containing all the attached behaviors of this component.
-	*
-	* @var array
-	*/
-	protected $m_arBehaviors = null;
-	/**
 	* The delimiter to use for prefixes. This must contain only characters that are not allowed
 	* in variable names (i.e. '::', '||', '.', etc.). Defaults to '::'. There is no length limit,
 	* but 2 works out. There is really no need to ever change this unless you have a strong dislike
@@ -60,6 +51,19 @@ class CPSWidget extends CInputWidget
 	* @var string
 	*/
 	protected $m_sPrefixDelimiter = '::';
+	/**
+	* As behaviors are added to the object, this is set to true to quickly determine if the
+	* component does in fact contain behaviors.
+	*
+	* @var bool
+	*/
+	protected $m_bHasBehaviors = false;
+	/**
+	* A private array containing all the attached behaviors information of this component.
+	*
+	* @var array
+	*/
+	protected $m_arBehaviors = null;
 
 	//********************************************************************************
 	//* Property Accessors
@@ -97,6 +101,18 @@ class CPSWidget extends CInputWidget
 	public function setBehaviorProperty( $sName, $oValue ) { return CPSCommonBase::setBehaviorProperty( $this, $sName, $oValue ); }
 
 	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
+
+	/**
+	* Constructor
+	*
+	*/
+	public function __construct()
+	{
+	}
+
+	//********************************************************************************
 	//* Constructor
 	//********************************************************************************
 
@@ -110,14 +126,11 @@ class CPSWidget extends CInputWidget
 		//	Call daddy...
 		parent::__construct( $oOwner );
 
-		//	Import behaviors
-		Yii::import( 'pogostick.behaviors.CPSComponentBehavior' );
-		Yii::import( 'pogostick.behaviors.CPSWidgetBehavior' );
-		Yii::import( 'pogostick.behaviors.CPSApiBehavior' );
-		Yii::import( 'pogostick.behaviors.CPSApiWidgetBehavior' );
-
 		//	Create our internal name
 		$_sName = CPSCommonBase::createInternalName( $this );
+
+		//	Import behaviors
+		Yii::import( 'pogostick.behaviors.CPSWidgetBehavior' );
 
 		//	Attach our widget behaviors
 		$this->attachBehavior( $_sName, 'pogostick.behaviors.CPSWidgetBehavior' );
@@ -227,10 +240,6 @@ class CPSWidget extends CInputWidget
 
 		return $_oObject;
 	}
-
-	//********************************************************************************
-	//* Magic Methods
-	//********************************************************************************
 
 	//********************************************************************************
 	//* Magic Methods

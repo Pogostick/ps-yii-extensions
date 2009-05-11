@@ -108,11 +108,11 @@ class CPSComponent extends CApplicationComponent
 	*/
 	public function __construct()
 	{
-		//	Import our preset behaviors
-		Yii::import( 'pogostick.behaviors.CPSComponentBehavior' );
-
 		//	Create our internal name
 		$_sName = CPSCommonBase::createInternalName( $this );
+
+		//	Import our preset behaviors
+		Yii::import( 'pogostick.behaviors.CPSComponentBehavior' );
 
 		//	Attach our default behavior
 		$this->attachBehavior( $_sName, 'pogostick.behaviors.CPSComponentBehavior' );
