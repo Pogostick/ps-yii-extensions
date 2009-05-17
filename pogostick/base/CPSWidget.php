@@ -24,10 +24,6 @@ class CPSWidget extends CInputWidget
 	//* Member variables
 	//********************************************************************************
 
-	//********************************************************************************
-	//* Member variables
-	//********************************************************************************
-
 	/**
 	* The internal name of the component. Used as the name of the behavior when attaching.
 	*

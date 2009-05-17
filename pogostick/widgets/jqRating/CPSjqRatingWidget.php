@@ -15,55 +15,12 @@
 * @version SVN: $Id$
 * @package psYiiExtensions
 * @subpackage Widgets
-* @since 1.0.3
+* @since 1.0.0
 */
 class CPSjqRatingWidget extends CPSWidget
 {
 	//********************************************************************************
-	//* Members
-	//********************************************************************************
-
-	protected $m_iStarCount = 5;
-	protected $m_arStarTitles = array();
-	protected $m_arStarValues = array();
-	protected $m_sStarClass = 'star';
-	protected $m_bHalf = false;
-	protected $m_iSplit = 1;
-	protected $m_arHoverTips = array();
-	protected $m_bReturnString = false;
-	protected $m_sAjaxCallback = null;
-	protected $m_bSupressScripts = false;
-	protected $m_fSelectValue = 0;
-
-	//********************************************************************************
-	//* Properties
-	//********************************************************************************
-
-	public function getStarCount() { return( $this->m_iStarCount ); }
-	public function setStarCount( $sValue ) { $this->m_iStarCount = $sValue; }
-	public function getStarTitles() { return( $this->m_arStarTitles ); }
-	public function setStarTitles( $sValue ) { $this->m_arStarTitles = $sValue; }
-	public function getStarValues() { return( $this->m_arStarValues ); }
-	public function setStarValues( $sValue ) { $this->m_arStarValues = $sValue; }
-	public function getStarClass() { return( $this->m_sStarClass ); }
-	public function setStarClass( $sValue ) { $this->m_sStarClass = $sValue; }
-	public function getHalf() { return( $this->m_bHalf ); }
-	public function setHalf( $sValue ) { $this->m_bHalf = $sValue; }
-	public function getSplit() { return( $this->m_iSplit ); }
-	public function setSplit( $sValue ) { $this->m_iSplit = $sValue; }
-	public function getHoverTips() { return( $this->m_arHoverTips ); }
-	public function setHoverTips( $sValue ) { $this->m_arHoverTips = $sValue; }
-	public function getReturnString() { return( $this->m_bReturnString ); }
-	public function setReturnString( $sValue ) { $this->m_bReturnString = $sValue; }
-	public function getAjaxCallback() { return( $this->m_sAjaxCallback ); }
-	public function setAjaxCallback( $sValue ) { $this->m_sAjaxCallback = $sValue; }
-	public function getSupressScripts() { return( $this->m_bSupressScripts ); }
-	public function setSupressScripts( $sValue ) { $this->m_bSupressScripts = $sValue; }
-	public function getSelectValue() { return( $this->m_fSelectValue ); }
-	public function setSelectValue( $sValue ) { $this->m_fSelectValue = $sValue; }
-
-	//********************************************************************************
-	//* Methods
+	//* Constructor
 	//********************************************************************************
 
 	/**
@@ -72,18 +29,30 @@ class CPSjqRatingWidget extends CPSWidget
 	*/
 	public function __construct( $oOwner = null )
 	{
+		//	Phone home. Call first to get base behaviors loaded...
 		parent::__construct( $oOwner );
 
 		//	Add these options in the constructor so the Yii base can pre-fill them from the config files.
 		$this->addOptions(
 			array(
+				'ajaxCallback' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'cancel' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'cancelValue' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'half' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
+				'hoverTips' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
 				'readOnly' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool' ) ),
 				'required' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool' ) ),
+				'selectValue' => array( CPSOptionManager::META_DEFAULTVALUE => 0, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'float' ) ),
+				'split' => array( CPSOptionManager::META_DEFAULTVALUE => 1, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'int' ) ),
+				'starClass' => array( CPSOptionManager::META_DEFAULTVALUE => 'start', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'starCount' => array( CPSOptionManager::META_DEFAULTVALUE => 5, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'int' ) ),
+				'starTitles' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'starValues' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'supressScripts' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
 			)
 		);
 
+		//	These are the valid callbacks for this class
 		$this->validCallbacks = array(
 			'callback',
 			'focus',
@@ -93,6 +62,10 @@ class CPSjqRatingWidget extends CPSWidget
 		//	Set our view name...
 		$this->viewName = __CLASS__ . 'View';
 	}
+
+	//********************************************************************************
+	//* Yii Overrides
+	//********************************************************************************
 
 	/***
 	* Runs this widget
@@ -112,7 +85,7 @@ class CPSjqRatingWidget extends CPSWidget
 				$this->returnString
 		);
 
-		return( $this->html );
+		return $this->html;
 	}
 
 	/**
@@ -250,12 +223,13 @@ class CPSjqRatingWidget extends CPSWidget
 		static $_iIdCount = 0;
 
 		//	Fix up the base url...
-		$sBaseUrl = CPSHelp::getOption( $arOptions, 'baseUrl', '' );
+		$_sBaseUrl = CPSHelp::getOption( $arOptions, 'baseUrl', '' );
 
-		if ( null == $sBaseUrl )
-			$sBaseUrl = Yii::app()->baseUrl . '/extra/jqRating';
+		if ( null == $_sBaseUrl )
+			$_sBaseUrl = Yii::app()->baseUrl . '/extra/jqRating';
 
-		CPSHelp::setOption( $arOptions, 'baseUrl', $sBaseUrl );
+		//	Put it back in the array
+		CPSHelp::setOption( $arOptions, 'baseUrl', $_sBaseUrl );
 
 		$sId = CPSHelp::getOption( $arOptions, 'id' );
 		$sName = CPSHelp::getOption( $arOptions, 'name' );
@@ -264,7 +238,7 @@ class CPSjqRatingWidget extends CPSWidget
 		$_arOptions = array(
 			'supressScripts' => CPSHelp::getOption( $arOptions, 'supressScripts', false ),
 			'returnString' => CPSHelp::getOption( $arOptions, 'returnString', false ),
-			'baseUrl' => CPSHelp::getOption( $arOptions, 'baseUrl', $sBaseUrl ),
+			'baseUrl' => CPSHelp::getOption( $arOptions, 'baseUrl', $_sBaseUrl ),
 			'name' => ( $sName == null ? 'rating' . $_iIdCount : $sName . $_iIdCount ),
 			'starClass' => CPSHelp::getOption( $arOptions, 'starClass', 'star' ),
 			'split' => CPSHelp::getOption( $arOptions, 'split', 1 ),
@@ -311,7 +285,7 @@ class CPSjqRatingWidget extends CPSWidget
 		$_iSortCol = 1;
 		$_sSortOrder = 'asc';
 		$_arArgs = array( 'page', 'rows', 'sidx', 'sord' );
-		$_bHaveDBC = ( is_object( $oCriteria ) && ( get_class( $oCriteria ) == 'CDbCriteria' || is_subclass_of( $oCriteria, 'CDbCriteria' ) ) );
+		$_bHaveDBC = ( $oCriteria instanceof CDbCriteria );
 
 		//	Use user argument naames?
 		if ( $arQSElems )
@@ -381,7 +355,7 @@ class CPSjqRatingWidget extends CPSWidget
 			header( "Content-type: text/xml;charset=utf-8" );
 
 		//	Now create the Xml...
-		$_sOut = CAppHelpers::asXml(
+		$_sOut = self::asXml(
 			$_oRows,
 			array(
 				'jqGrid' => true,

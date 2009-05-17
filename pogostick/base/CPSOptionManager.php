@@ -236,8 +236,37 @@ class CPSOptionManager
 	* @returns array A reference to the internal options array
 	* @see getOption
 	* @see setOptions
+	* @returns array
 	*/
 	public function &getOptions() { return self::$m_arOptions; }
+
+	/**
+	* Returns a copy of ONLY the public options in the internal options array
+	*
+	* @see getOptions
+	* @returns array
+	*/
+	public function getPublicOptions()
+	{
+		$_arOptions = array();
+
+		//	Build an array with non-private entities
+		foreach( self::$m_arOptions as $_sKey => $_oValue )
+		{
+			//	Ignore meta data...
+			if ( ! $this->isMetaDataKey( $_sKey ) && ! $this->getMetaDataValue( $_sKey, CPSOptionManager::META_PRIVATE ) )
+				continue;
+
+			//	Validate the key
+			if ( null == ( $_sKey = $this->validateKey( $_sKey ) ) )
+				continue;
+
+			//	This option is safe to output
+			$_arOptions[ $_sKey ] = $_oValue;
+		}
+
+		return $_arOptions;
+	}
 
 	/**
 	* Add bulk options to the manager.

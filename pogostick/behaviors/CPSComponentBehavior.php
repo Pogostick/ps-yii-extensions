@@ -167,6 +167,14 @@ class CPSComponentBehavior extends CBehavior
 	public function &getOptions() { return $this->m_oOptions->getOptions(); }
 
 	/**
+	* Returns a copy of only the public options within the options array
+	*
+	* @returns array A copy of the public options stored...
+	* @see getOptions
+	*/
+	public function getPublicOptions() { return $this->m_oOptions->getPublicOptions(); }
+
+	/**
 	* Retrieves an option value from the options array. If key doesn't exist, it's created as an empty array and returned.
 	*
 	* @param string $sKey
@@ -259,27 +267,12 @@ class CPSComponentBehavior extends CBehavior
 	*/
 	public function makeOptions()
 	{
-		$_arOptions = array();
+		//	Get our public options...
+		$_arOptions = $this->getPublicOptions();
+		$_arCallbacks = array();
 
-		//	Build an array with non-private entities
-		foreach( $this->getOptions() as $_sKey => $_oValue )
-		{
-			//	Ignore meta data...
-			if ( ! $this->getOptionsObject()->isMetaDataKey( $_sKey ) && ! $this->getOptionsObject()->getMetaDataValue( $_sKey, CPSOptionManager::META_PRIVATE ) )
-				continue;
-
-			//	Validate the key
-			if ( null == ( $_sKey = $this->getOptionsObject()->validateKey( $s_Key ) ) )
-				continue;
-
-			//	This option is safe to output
-			$_arOptions[ $_sKey ] = $_oValue;
-		}
-
-		$_arCallbacks = $this->getOption( 'callbacks' );
-
-		if ( empty( $_arCallbacks ) )
-			$_arCallbacks = array();
+		if ( ! isset( $_arOptions[ 'callbacks' ] ) )
+			$_arCallbacks = $_arOptions[ 'callbacks' ];
 
 		//	Add callbacks to the array...
 		foreach ( $_arCallbacks as $_sKey => $_oValue )
@@ -291,6 +284,7 @@ class CPSComponentBehavior extends CBehavior
 		//	Get all the options merged...
 		$_arToEncode = array();
 
+		//	Now build our final array...
 		foreach( $_arOptions as $_sKey => $_oValue )
 		{
 			$_sExtName = $this->getOptionsObject()->getMetaDataValue( $_sKey, CPSOptionManager::META_EXTERNALNAME );
