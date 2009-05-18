@@ -93,7 +93,7 @@ class CPSWidget extends CInputWidget
 	*/
 	public function &hasBehaviorMethod( $sMethodName ) { return CPSCommonBase::hasBehaviorMethod( $this, $sMethodName ); }
 	public function &hasBehaviorProperty( $sName ) { return CPSCommonBase::hasBehaviorProperty( $this, $sName ); }
-	public function getBehaviorProperty( $sName ) { return CPSCommonBase::getBehaviorProperty( $this, $sName); }
+	public function &getBehaviorProperty( $sName ) { return CPSCommonBase::getBehaviorProperty( $this, $sName); }
 	public function setBehaviorProperty( $sName, $oValue ) { return CPSCommonBase::setBehaviorProperty( $this, $sName, $oValue ); }
 
 	//********************************************************************************
@@ -245,7 +245,7 @@ class CPSWidget extends CInputWidget
 	 * @see __set
 	 * @see CPSCommonBase::genericGet
 	 */
-	public function __get( $sName )
+	public function &__get( $sName )
 	{
 		//	Try daddy...
 		try { return parent::__get( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }

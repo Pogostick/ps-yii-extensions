@@ -311,4 +311,17 @@ class CPSHelp
 		//	And return...
 		return( $_sOut );
 	}
+
+	/**
+	* Checks for an empty variable.
+	*
+	* Useful because the PHP empty() function cannot be reliably used with overridden __get methods.
+	*
+	* @param mixed $oVar
+	* @return bool
+	*/
+	public static function isEmpty( $oVar )
+	{
+		return ( null == $oVar || '' == $oVar );
+	}
 }

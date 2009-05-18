@@ -67,8 +67,9 @@ class CPSgApiWidget extends CPSApiWidget
 	{
 		$this->script = '';
 
-//		foreach ( $this->apisToLoad as $_sApi => $_sVersion )
-//			$this->script .= "google.load(\"{$_sApi}\", \"{$_sVersion}\");\n";
+		if ( is_array( $this->apisToLoad ) )
+			foreach ( $this->apisToLoad as $_sApi => $_sVersion )
+				$this->script .= "google.load(\"{$_sApi}\", \"{$_sVersion}\");\n";
 
 		return( $this->script );
 	}

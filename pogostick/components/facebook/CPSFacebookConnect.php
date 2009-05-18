@@ -30,9 +30,9 @@ class CPSFacebookConnect extends CPSApiWidget
 
 		$this->addOptions(
 			array(
-				'appId' => array( CPSOptionManager::META_RULES => array( CPSComponent::META_TYPE => 'string' ) ),
-				'callbackUrl' => array( CPSOptionManager::META_RULES => array( CPSComponent::META_TYPE => 'string' ) ),
-				'xdrUrl' => array( CPSOptionManager::META_RULES => array( CPSComponent::META_TYPE => 'string' ) ),
+				'appId' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'callbackUrl' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'xdrUrl' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}

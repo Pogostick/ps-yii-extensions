@@ -141,6 +141,10 @@ class CPSOptionManager
 	const META_TYPE 		= '_type';
 	/**
 	* @var string
+	*/
+	const META_KEYNAME 		= '_keyName';
+	/**
+	* @var string
 	* @todo Implement handling of this
 	*/
 	const META_VALUEPATTERN	= '_valuePattern';
@@ -156,8 +160,28 @@ class CPSOptionManager
 			self::META_REQUIRED,
 			self::META_RULES,
 			self::META_TYPE,
-			self::META_VALUEPATTERN
+			self::META_VALUEPATTERN,
+			self::META_KEYNAME,
 		);
+	/**
+	* @var array
+	*/
+	private $VALID_METADATA_TYPES =
+		array(
+			'string',
+			'int',
+			'integer',
+			'bool',
+			'boolean',
+			'array',
+			'double',
+		);
+
+	/**
+	* The meta data prefix tag
+	* @var string
+	*/
+	const MD_TAG = '_md.';
 
 	//********************************************************************************
 	//* Member Variables
@@ -168,7 +192,7 @@ class CPSOptionManager
 	*
 	* @staticvar array
 	*/
-	private static $m_arOptions = array();
+	public static $m_arOptions = array();
 	/**
 	* My internal tag for option filtering
 	*
@@ -253,16 +277,18 @@ class CPSOptionManager
 		//	Build an array with non-private entities
 		foreach( self::$m_arOptions as $_sKey => $_oValue )
 		{
-			//	Ignore meta data...
-			if ( ! $this->isMetaDataKey( $_sKey ) && ! $this->getMetaDataValue( $_sKey, CPSOptionManager::META_PRIVATE ) )
-				continue;
+			//	Go through metadata, pull out non-private keys
+			if ( $this->isMetaDataKey( $_sKey ) && ! $this->getMetaDataValue( $_sKey, CPSOptionManager::META_PRIVATE ) )
+			{
+				$_sRealKey = $this->getMetaDataValue( $_sKey, CPSOptionManager::META_KEYNAME );
 
-			//	Validate the key
-			if ( null == ( $_sKey = $this->validateKey( $_sKey ) ) )
-				continue;
+				//	Validate the key
+				if ( null == ( $_sKey = $this->validateKey( $_sKey, true ) ) )
+					continue;
 
-			//	This option is safe to output
-			$_arOptions[ $_sKey ] = $_oValue;
+				//	This option is safe to output. Pull the key from the array
+				$_arOptions[ $_sRealKey ] = self::$m_arOptions[ $_sRealKey ];
+			}
 		}
 
 		return $_arOptions;
@@ -349,6 +375,8 @@ class CPSOptionManager
 	*/
 	public function addOption( $sKey, $oValue, $bNoSort = false )
 	{
+		$_bPrivate = false;
+
 		//	Validate the key
 		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
 			return null;
@@ -359,6 +387,7 @@ class CPSOptionManager
 			//	Strip off '_'
 			$sKey = substr( $sKey, 0, $_iPos );
 			$this->setMetaDataValue( $sKey, self::META_PRIVATE, true );
+			$_bPrivate = true;
 		}
 
 		//	Get the value out of the array...
@@ -367,8 +396,77 @@ class CPSOptionManager
 		if ( is_array( $oValue ) )
 		{
 			$_arRules = ( isset( $oValue[ self::META_RULES ] ) ) ? $oValue[ self::META_RULES ] : array();
-			$_oValue = ( isset( $oValue[ self::META_DEFAULTVALUE ] ) ) ? $oValue[ self::META_DEFAULTVALUE ] : null;
+
+			//	Fix up bool types...
+			$_sType = $_arRules[ self::META_TYPE ];
+
+			//	Allowed type?
+			if ( ! in_array( $_sType, $this->VALID_METADATA_TYPES ) )
+				throw new CException( Yii::t( __CLASS__, 'Invalid "type" specified for "{x}"', array( '{x}' => $sKey ) ) );
+
+			//	Fix up our allowed shortcuts...
+			if ( $_sType == 'bool' )
+			{
+				$this->setMetaDataValue( $sKey, self::META_TYPE, 'boolean' );
+				$_sType = 'boolean';
+			}
+
+			if ( $_sType == 'int' )
+			{
+				$this->setMetaDataValue( $sKey, self::META_TYPE, 'integer' );
+				$_sType = 'integer';
+			}
+
+			//	Set value
+			$_oValue = null;
+
+			//	Try and set it correctly...
+			if ( isset( $_arRules[ self::META_TYPE ] ) )
+			{
+				if ( ! isset( $oValue[ self::META_DEFAULTVALUE ] ) )
+				{
+					switch ( $_sType )
+					{
+						case 'integer':
+							$_oValue = 0;
+							break;
+						case 'string':
+							$_oValue = '';
+							break;
+						case 'boolean':
+							$_oValue = false;
+							break;
+						case 'array':
+							$_oValue = array();
+							break;
+						default:
+							$_oValue = null;
+							break;
+					}
+				}
+				else
+				{
+					//	Only validate public options
+					if ( ! $bPrivate )
+					{
+						//	Skip null strings...
+						if ( $_sType == 'string' && null == $oValue[ self::META_DEFAULTVALUE ] )
+							;
+						else
+						{
+							if ( $_sType != gettype( $oValue[ self::META_DEFAULTVALUE ] ) && ! $_bPrivate && null != $oValue[ self::META_DEFAULTVALUE ] )
+								throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_sType ) ) ? implode( ', ', $_sType ) : $_sType ) ) );
+						}
+					}
+
+					//	It passed...
+					$_oValue = $oValue[ self::META_DEFAULTVALUE ];
+				}
+			}
 		}
+
+		//	Set the key name since ours is lowercased...
+		$_arRules[ self::META_KEYNAME ] = $sKey;
 
 		//	Set all the metadata rules...
 		$this->setMetaDataValues( $sKey, $_arRules );
@@ -428,6 +526,10 @@ class CPSOptionManager
 		{
 			$_sName = substr( $sKey, 0, $_iPos );
 			$sKey = substr( $sKey, $_iPos + strlen( $this->m_sPrefixDelimiter ) );
+
+			//	Strip off meta data identifier for comparison
+			if ( self::MD_TAG == substr( $_sName, 0, strlen( self::MD_TAG ) ) )
+				$_sName = substr( $_sName, strlen( self::MD_TAG ) );
 
 			//	If option doesn't belong to me, boogie...
 			if ( $this->m_sInternalName != $_sName )
@@ -513,7 +615,7 @@ class CPSOptionManager
 	*
 	* @returns string The metadata key
 	*/
-	protected function getMetaDataKey( $sKey ) { return '_md.' . $this->m_sInternalName . $this->getPrefixDelimiter() . strtolower( $sKey ); }
+	protected function getMetaDataKey( $sKey ) { return self::MD_TAG . $this->m_sInternalName . $this->getPrefixDelimiter() . strtolower( $sKey ); }
 
 	/**
 	* Adds an array of metadata to the option array
@@ -545,6 +647,17 @@ class CPSOptionManager
 
 		if ( in_array( $eMDKey, $this->VALID_METADATA ) )
 			self::$m_arOptions[ $this->getMetaDataKey( $sKey ) ][ $eMDKey ] = $oValue;
+	}
+
+	/**
+	* Gets a single option metadata value.
+	*
+	* @param string $sKey
+	* @return array The meta data for the specified key
+	*/
+	public function getMetaData( $sKey )
+	{
+		return self::$m_arOptions[ $this->getMetaDataKey( $this->validateKey( $sKey ) ) ];
 	}
 
 	/**
