@@ -76,7 +76,7 @@ class CPSCommonBase
 	 * @see __set
 	 * @static
 	 */
-	public static function genericGet( $oObject, $oParent = null, $oEvent = null, $sName )
+	public static function &genericGet( $oObject, $oParent = null, $oEvent = null, $sName )
 	{
 		//	Check behavior getter methods...
 		return self::getBehaviorProperty( $oObject, $sName );
@@ -220,7 +220,7 @@ class CPSCommonBase
 	* @see hasBehaviorProperty
 	* @throws CException
 	*/
-	public static function getBehaviorProperty( $oComponent, $sName )
+	public static function &getBehaviorProperty( $oComponent, $sName )
 	{
 		//	Do we have that somewhere?
 		if ( $_oBehave = $oComponent->hasBehaviorProperty( $sName ) )

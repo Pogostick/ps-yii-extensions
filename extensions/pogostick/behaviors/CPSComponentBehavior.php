@@ -181,7 +181,7 @@ class CPSComponentBehavior extends CBehavior
 	* @return mixed
 	* @see getOptions
 	*/
-	public function getOption( $sKey ) { return $this->m_oOptions->getOption( $sKey ); }
+	public function &getOption( $sKey ) { return $this->m_oOptions->getOption( $sKey ); }
 
 	/**
 	* Returns a reference to the entire reference array
@@ -267,11 +267,14 @@ class CPSComponentBehavior extends CBehavior
 	*/
 	public function makeOptions()
 	{
+		//	Check them first...
+		$this->checkOptions();
+
 		//	Get our public options...
 		$_arOptions = $this->getPublicOptions();
 		$_arCallbacks = array();
 
-		if ( ! isset( $_arOptions[ 'callbacks' ] ) )
+		if ( isset( $_arOptions[ 'callbacks' ] ) )
 			$_arCallbacks = $_arOptions[ 'callbacks' ];
 
 		//	Add callbacks to the array...
@@ -287,11 +290,15 @@ class CPSComponentBehavior extends CBehavior
 		//	Now build our final array...
 		foreach( $_arOptions as $_sKey => $_oValue )
 		{
-			$_sExtName = $this->getOptionsObject()->getMetaDataValue( $_sKey, CPSOptionManager::META_EXTERNALNAME );
-			if ( empty( $_sExtName ) )
-				$_sExtName = $_sKey;
+			//	Skip nulls...
+			if ( isset( $_arOptions[ $_sKey ] ) )
+			{
+				$_sExtName = $this->getOptionsObject()->getMetaDataValue( $_sKey, CPSOptionManager::META_EXTERNALNAME );
+				if ( empty( $_sExtName ) )
+					$_sExtName = $_sKey;
 
-			$_arToEncode[ $_sExtName ] = $_oValue;
+				$_arToEncode[ $_sExtName ] = $_oValue;
+			}
 		}
 
 		if ( sizeof( $_arToEncode ) > 0 )
@@ -314,6 +321,42 @@ class CPSComponentBehavior extends CBehavior
 		}
 
 		return( null );
+	}
+
+	/**
+	* Checks options for validity based on the meta data rules (if any)
+	*
+	* @returns bool
+	*/
+	public function checkOptions()
+ 	{
+		foreach ( $this->getPublicOptions() as $_sKey => $_oValue )
+		{
+			//	Required and missing?
+			if ( isset( $_arMD[ CPSOptionManager::META_REQUIRED ] ) && $_arMD[ CPSOptionManager::META_REQUIRED ] && ( ! $_oValue || empty( $_oValue ) ) )
+				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ) );
+
+			if ( null !== $_oValue )
+			{
+				//	Check types and whatnot
+				$_sType = gettype( $_oValue );
+				$_arMD = $this->getOptionsObject()->getMetaData( $_sKey );
+				$_oVOType = $_arMD[ CPSOptionManager::META_TYPE ];
+
+				if ( eval( "return ! is_" . strtolower( $_oVOType ) . "( \$_oValue );" ) )
+					throw new CException( Yii::t( __CLASS__, '"{x} ({z})" must be of type "{y}"', array( '{x}' => $_sKey, '{y}' => ( is_array( $_oVOType ) ) ? implode( ', ', $_oVOType ) : $_oVOType, '{z}' => $_sType ) ) );
+
+				if ( array_key_exists( CPSOptionManager::META_ALLOWED, $_arMD ) )
+				{
+					$_arValid = $_arMD[ CPSOptionManager::META_ALLOWED ];
+					if ( is_array( $_arValid ) && ! in_array( $_oValue, $_arValid ) )
+						throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: "{y}"', array( '{x}' => $_sKey, '{y}' => implode( ', ', $_arValid ) ) ) );
+				}
+			}
+		}
+
+		//	We made it!
+		return true;
 	}
 
 	//********************************************************************************
@@ -343,7 +386,7 @@ class CPSComponentBehavior extends CBehavior
 	 * @see __set
 	 * @see getBehaviorProperty
 	 */
-	public function __get( $sName )
+	public function &__get( $sName )
 	{
 		if ( in_array( $sName, array_keys( get_class_vars( get_class( $this ) ) ) ) )
 			return $this->{$sName};

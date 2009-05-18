@@ -52,6 +52,17 @@ class CPSApiComponent extends CPSComponent
 	*/
 	protected function makeRequest( $sSubType = null, $arRequestData = null )
 	{
+		//	Make sure apiQueryName is set...
+		if ( CPSHelp::isEmpty( $this->apiQueryName ) )
+		{
+			throw new CException(
+				Yii::t(
+					__CLASS__,
+					'Required option "apiQueryName" is not set.'
+				)
+			);
+		}
+
 		//	Default...
 		$_arRequestData = $this->requestData;
 
@@ -83,8 +94,7 @@ class CPSApiComponent extends CPSComponent
 			( isset( $this->apiSubUrls[ $this->apiToUse ] ) ? $this->apiSubUrls[ $this->apiToUse ] : '' );
 
 		//	Add the API key...
-		if ( ! empty( $this->apiQueryName ) )
-			$_sQuery = $this->apiQueryName . '=' . $this->apiKey;
+		$_sQuery = $this->apiQueryName . '=' . $this->apiKey;
 
 		//	Add the request data to the Url...
 		if ( is_array( $this->requestMap ) && ! empty( $sSubType ) )
@@ -133,7 +143,7 @@ class CPSApiComponent extends CPSComponent
 		switch ( $this->format )
 		{
 			case 'xml':
-				$_sResults = CAppHelpers::arrayToXml( json_decode( $_sResults, true ), 'Results' );
+				$_sResults = CPSHelp::arrayToXml( json_decode( $_sResults, true ), 'Results' );
 				break;
 
 			case 'array':

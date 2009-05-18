@@ -35,14 +35,14 @@ class CPSjqRatingWidget extends CPSWidget
 		//	Add these options in the constructor so the Yii base can pre-fill them from the config files.
 		$this->addOptions(
 			array(
-				'ajaxCallback' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'ajaxCallback' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'cancel' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'cancelValue' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'half' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
 				'hoverTips' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'readOnly' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool' ) ),
-				'required' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool' ) ),
-				'selectValue' => array( CPSOptionManager::META_DEFAULTVALUE => 0, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'float' ) ),
+				'readOnly' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
+				'required' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
+				'selectValue' => array( CPSOptionManager::META_DEFAULTVALUE => 0, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'double' ) ),
 				'split' => array( CPSOptionManager::META_DEFAULTVALUE => 1, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'int' ) ),
 				'starClass' => array( CPSOptionManager::META_DEFAULTVALUE => 'start', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'starCount' => array( CPSOptionManager::META_DEFAULTVALUE => 5, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'int' ) ),
@@ -243,7 +243,7 @@ class CPSjqRatingWidget extends CPSWidget
 			'starClass' => CPSHelp::getOption( $arOptions, 'starClass', 'star' ),
 			'split' => CPSHelp::getOption( $arOptions, 'split', 1 ),
 			'starCount' => CPSHelp::getOption( $arOptions, 'starCount', 5 ),
-			'selectValue' => CPSHelp::getOption( $arOptions, 'selectValue', 0 ),
+			'selectValue' => ( double )CPSHelp::getOption( $arOptions, 'selectValue', 0 ),
 			'ajaxCallback' => CPSHelp::getOption( $arOptions, 'ajaxCallback' ),
 			'starTitles' => CPSHelp::getOption( $arOptions, 'starTitles' ),
 			'starValues' => CPSHelp::getOption( $arOptions, 'starValues' ),
@@ -258,7 +258,7 @@ class CPSjqRatingWidget extends CPSWidget
 
 		//	Not logged in? No ratings for you!
 		if ( Yii::app()->user->isGuest )
-			CPSHelp::unsetOption( $arOptions, 'ajaxCallback' );
+			unset( $arOptions[ 'ajaxCallback' ] );
 
 		$_oWidget = Yii::app()->controller->widget(
 			'pogostick.widgets.jqRating.CPSjqRatingWidget',
