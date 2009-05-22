@@ -89,11 +89,12 @@ class CPSApiBehavior extends CPSComponentBehavior
 	 * @param string $sQueryString The query string to attach
 	 * @param string $sMethod The HTTP method to use. Can be 'GET' or 'SET'
 	 * @param integer $iTimeOut The number of seconds to wait for a response. Defaults to 60 seconds
+	 * @param array $arHeaders Headers to add to the request
 	 * @param function|array $oHeaderCallback The callback function to call after the header has been read. Accepts function reference or array( object, method )
 	 * @param function|array $oReadCallback The callback function to call after the body has been read. Accepts function reference or array( object, method )
 	 * @return mixed The data returned from the HTTP request or null for no data
 	 */
-	public function makeHttpRequest( $sUrl, $sQueryString = null, $sMethod = 'GET', $sUserAgent = null, $iTimeOut = 60, $oHeaderCallback = null, $oReaderCallback = null )
+	public function makeHttpRequest( $sUrl, $sQueryString = null, $sMethod = 'GET', $sUserAgent = null, $iTimeOut = 60, $arHeaders = null, $oHeaderCallback = null, $oReaderCallback = null )
 	{
 		//	Our user-agent string
 		$_sAgent = ( null != $sUserAgent ) ? $sUserAgent : 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506; InfoPath.3)';
@@ -112,6 +113,9 @@ class CPSApiBehavior extends CPSComponentBehavior
 			curl_setopt( $_oCurl, CURLOPT_TIMEOUT, 60 );
 			curl_setopt( $_oCurl, CURLOPT_FOLLOWLOCATION, true );
 			curl_setopt( $_oCurl, CURLOPT_URL, $sUrl . ( 'GET' == $sMethod  ? ( ! empty( $sQueryString ) ? '?' . $sQueryString : '' ) : '' ) );
+
+			if ( null != $arHeaders )
+				curl_setopt( $_oCurl, CURLOPT_HTTPHEADER, $arHeaders );
 
 			if ( null != $oHeaderCallback )
 				cur_setopt( $_oCurl, CURLOPT_HEADERFUNCTION, $oHeaderCallback );
