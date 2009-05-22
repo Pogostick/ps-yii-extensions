@@ -243,8 +243,8 @@ class CPSComponentBehavior extends CBehavior
     */
 	public function checkCallbacks()
 	{
-		$_arCallbacks = $this->getOption( 'callbacks' );
-		$_arValidCallbacks = $this->getOption( 'validCallbacks' );
+		$_arCallbacks = $this->callbacks;
+		$_arValidCallbacks = $this->validCallbacks;
 
 		if ( ! empty( $_arCallbacks ) && ! empty( $_arValidCallbacks ) )
 		{
@@ -272,10 +272,7 @@ class CPSComponentBehavior extends CBehavior
 
 		//	Get our public options...
 		$_arOptions = $this->getPublicOptions();
-		$_arCallbacks = array();
-
-		if ( isset( $_arOptions[ 'callbacks' ] ) )
-			$_arCallbacks = $_arOptions[ 'callbacks' ];
+		$_arCallbacks = $this->getOption( 'callbacks' );
 
 		//	Add callbacks to the array...
 		foreach ( $_arCallbacks as $_sKey => $_oValue )
@@ -291,7 +288,7 @@ class CPSComponentBehavior extends CBehavior
 		foreach( $_arOptions as $_sKey => $_oValue )
 		{
 			//	Skip nulls...
-			if ( isset( $_arOptions[ $_sKey ] ) )
+			if ( isset( $_arOptions[ $_sKey ] ) && $_sKey != 'callbacks' )
 			{
 				$_sExtName = $this->getOptionsObject()->getMetaDataValue( $_sKey, CPSOptionManager::META_EXTERNALNAME );
 				if ( empty( $_sExtName ) )
@@ -330,33 +327,20 @@ class CPSComponentBehavior extends CBehavior
 	*/
 	public function checkOptions()
  	{
-		foreach ( $this->getPublicOptions() as $_sKey => $_oValue )
-		{
-			//	Required and missing?
-			if ( isset( $_arMD[ CPSOptionManager::META_REQUIRED ] ) && $_arMD[ CPSOptionManager::META_REQUIRED ] && ( ! $_oValue || empty( $_oValue ) ) )
-				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ) );
+		return $this->getOptionsObject()->checkOptions( $this->getPublicOptions() );
+	}
 
-			if ( null !== $_oValue )
-			{
-				//	Check types and whatnot
-				$_sType = gettype( $_oValue );
-				$_arMD = $this->getOptionsObject()->getMetaData( $_sKey );
-				$_oVOType = $_arMD[ CPSOptionManager::META_TYPE ];
-
-				if ( eval( "return ! is_" . strtolower( $_oVOType ) . "( \$_oValue );" ) )
-					throw new CException( Yii::t( __CLASS__, '"{x} ({z})" must be of type "{y}"', array( '{x}' => $_sKey, '{y}' => ( is_array( $_oVOType ) ) ? implode( ', ', $_oVOType ) : $_oVOType, '{z}' => $_sType ) ) );
-
-				if ( array_key_exists( CPSOptionManager::META_ALLOWED, $_arMD ) )
-				{
-					$_arValid = $_arMD[ CPSOptionManager::META_ALLOWED ];
-					if ( is_array( $_arValid ) && ! in_array( $_oValue, $_arValid ) )
-						throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: "{y}"', array( '{x}' => $_sKey, '{y}' => implode( ', ', $_arValid ) ) ) );
-				}
-			}
-		}
-
-		//	We made it!
-		return true;
+	/**
+	* Checks for an empty variable.
+	*
+	* Useful because the PHP empty() function cannot be reliably used with overridden __get methods.
+	*
+	* @param mixed $oVar
+	* @return bool
+	*/
+	public function isEmpty( $oVar )
+	{
+		return empty( $oVar );
 	}
 
 	//********************************************************************************
@@ -388,6 +372,10 @@ class CPSComponentBehavior extends CBehavior
 	 */
 	public function &__get( $sName )
 	{
+		//	Empty check short cut?
+		if ( '_' == substr( $sName, 0, 1 ) && '_' == substr( $sName, strlen( $sName ) - 1, 1 ) )
+			return $this->isEmpty( $this->__get( substr( $sName, 1, strlen( $sName ) - 2 ) ) );
+
 		if ( in_array( $sName, array_keys( get_class_vars( get_class( $this ) ) ) ) )
 			return $this->{$sName};
 

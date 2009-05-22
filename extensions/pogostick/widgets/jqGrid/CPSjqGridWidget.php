@@ -29,12 +29,12 @@ class CPSjqGridWidget extends CPSWidget
 	/**
 	* Constructs a CPSjqGridWidget
 	*
-	* @param array $arOptions
+	* @param mixed $oOwner
 	* @return CPSjqGridWidget
 	*/
-	public function init()
+	public function __construct( $oOwner = null )
 	{
-		parent::init();
+		parent::__construct( $oOwner );
 
 		//	Set the valid options for this widget
 		$this->addOptions(
@@ -122,7 +122,7 @@ class CPSjqGridWidget extends CPSWidget
 	public function run()
 	{
 		//	Validate baseUrl
-		if ( empty( $this->baseUrl ) )
+		if ( $this->isEmpty( $this->baseUrl ) )
 			throw new CHttpException( 500, __CLASS__ . ': baseUrl is required.');
 
 		//	Register the scripts/css
@@ -143,8 +143,8 @@ class CPSjqGridWidget extends CPSWidget
 		$_oCS = parent::registerClientScripts();
 
 		//	If image path isn't specified, set to current theme path
-		if ( ! array_key_exists( 'imgpath', $this->options ) || empty( $this->options[ 'imgpath' ] ) )
-			$this->options[ 'imgpath' ] = "{$this->baseUrl}/themes/{$this->options[ 'theme' ]}/images";
+		if ( $this->isEmpty( $this->imgpath ) )
+			$this->imgpath = "{$this->baseUrl}/themes/{$this->theme}/images";
 
 		//	Register scripts necessary
 		$_oCS->registerScriptFile( "{$this->baseUrl}/jquery.jqGrid.js" );
@@ -156,7 +156,7 @@ class CPSjqGridWidget extends CPSWidget
 		$_oCS->registerScript( 'Yii.' . __CLASS__ . '#' . $this->id, $_sScript, CClientScript::POS_READY );
 
 		//	Register css files...
-		$_oCS->registerCssFile( "{$this->baseUrl}/themes/{$this->getOption( 'theme' )}/grid.css", 'screen' );
+		$_oCS->registerCssFile( "{$this->baseUrl}/themes/{$this->theme}/grid.css", 'screen' );
 		$_oCS->registerCssFile( "{$this->baseUrl}/themes/jqModal.css", 'screen' );
 	}
 
@@ -190,7 +190,7 @@ CODE;
 	protected function generateHtml()
 	{
 		$_sHtml = '';
-		$_sPagerId = $this->getOption( 'pagerId' );
+		$_sPagerId = $this->pagerId;
 
 		$_sHtml .=<<<CODE
 <table id="{$this->id}" class="scroll"></table>
@@ -204,11 +204,118 @@ CODE;
 	* Override of makeOptions to insert correct pager jQuery code
 	*
 	*/
-	protected function makeOptions( $arOptions = null )
+	protected function makeOptions()
 	{
+		$_arOptions = $this->getPublicOptions();
+
 		//	Fix up the pager...
-		$_sPagerId = $this->getOption( 'pagerId' );
-		return( str_replace( "'pagerId':'{$_sPagerId}'", "'pager': jQuery('#{$_sPagerId}')", parent::makeOptions( $arOptions ) ) );
+		$_sPagerId = $this->pagerId;
+		return str_replace( "'pagerId':'{$_sPagerId}'", "'pager': jQuery('#{$_sPagerId}')", parent::makeOptions() );
+	}
+
+	/**
+	* Handles and formats the query and Xml output for a jqGrid
+	*
+	* @param CModel $oModel The model to use for the query
+	* @param CDbCriteria|string $oCriteria Can be a full CDbCriteria object or a comma separated list of columns to "SELECT"
+	* @param array $arQSElems The query string elements in array format. Must be in PAGE, ROWS, SORTCOLUMN, SORTORDER. Defaults to 'page', 'rows', 'sidx', 'sord'
+	* @return string The Xml data for the grid
+	*/
+	public static function asXml( $oModel, $oCriteria = null, $arQSElems = null, $bReturnString = false )
+	{
+		//	Defaults...
+		$_iPage = 1;
+		$_iLimit = 25;
+		$_iSortCol = 1;
+		$_sSortOrder = 'asc';
+		$_arArgs = array( 'page', 'rows', 'sidx', 'sord' );
+		$_bHaveDBC = ( $oCriteria instanceof CDbCriteria );
+
+		//	Use user argument naames?
+		if ( $arQSElems )
+		{
+			unset( $_arArgs );
+			$_arArgs = $arQSElems;
+		}
+
+		//	Get any passed in arguments
+		if ( isset( $_REQUEST[ $_arArgs[ 0 ] ] ) )
+			$_iPage = $_REQUEST[ $_arArgs[ 0 ] ];
+
+		if ( isset( $_REQUEST[ $_arArgs[ 1 ] ] ) )
+			$_iLimit = $_REQUEST[ $_arArgs[ 1 ] ];
+
+		if ( isset( $_REQUEST[ $_arArgs[ 2 ] ] ) )
+			$_iSortCol = $_REQUEST[ $_arArgs[ 2 ] ];
+
+		if ( isset( $_REQUEST[ $_arArgs[ 3 ] ] ) )
+			$_sSortOrder = $_REQUEST[ $_arArgs[ 3 ] ];
+
+		//	Get a count of rows for this result set
+		$_iRowCount = $oModel->count( ( $_bHaveDBC ) ? $oCriteria : '' );
+
+		//	Calculate paging info
+		if ( $_iRowCount > 0 )
+			$_iTotalPages = ceil( $_iRowCount / $_iLimit );
+		else
+			$_iTotalPages = 0;
+
+		//	Sanity checks
+		if ( $_iPage > $_iTotalPages )
+			$_iPage = $_iTotalPages;
+
+		if ( $_iPage < 1 )
+			$_iPage = 1;
+
+		//	Calculate starting offset
+		$_iStart = $_iLimit * $_iPage - $_iLimit;
+
+		//	Sanity check
+		if ( $_iStart < 0 )
+			$_iStart = 0;
+
+		//	Adjust the criteria for the actual query...
+		$_dbc = new CDbCriteria();
+
+		if ( $_bHaveDBC )
+		{
+			unset( $_dbc );
+			$_dbc = $oCriteria;
+		}
+		else if ( gettype( $oCriteria ) == 'string' )
+		{
+			$_dbc->select = $oCriteria;
+		}
+
+		$_dbc->order = "{$_iSortCol} {$_sSortOrder}";
+		$_dbc->limit = $_iLimit;
+		$_dbc->offset = $_iStart;
+		$_oRows = $oModel->findAll( $_dbc );
+
+		//	Set appropriate content type
+		if ( stristr( $_SERVER[ 'HTTP_ACCEPT' ], "application/xhtml+xml" ) )
+			header( "Content-type: application/xhtml+xml;charset=utf-8" );
+		else
+			header( "Content-type: text/xml;charset=utf-8" );
+
+		//	Now create the Xml...
+		$_sOut = CPSHelp::asXml(
+			$_oRows,
+			array(
+				'jqGrid' => true,
+				'innerElements' => array(
+					array( 'name' => 'page', 'type' => 'integer', 'value' => $_iPage ),
+					array( 'name' => 'total', 'type' => 'integer', 'value' => $_iTotalPages ),
+					array( 'name' => 'records', 'type' => 'integer', 'value' => $_iRowCount ),
+				),
+			)
+		);
+
+		//	Spit it out...
+		if ( ! $bReturnString )
+			echo "<?xml version='1.0' encoding='utf-8'?>" . $_sOut;
+		else
+			return( "<?xml version='1.0' encoding='utf-8'?>" . $_sOut );
 	}
 
 }

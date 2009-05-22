@@ -67,15 +67,16 @@ class CPSApiBehavior extends CPSComponentBehavior
 			array(
 				//	API options
 				'altApiKey' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'appendFormat' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
 				'apiBaseUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'apiKey' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'apiQueryName' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'apiToUse' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'apiSubUrls' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'format' => array( CPSOptionManager::META_DEFAULTVALUE => 'array', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'httpMethod' => array( CPSOptionManager::META_DEFAULTVALUE => self::HTTP_GET, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'requestData' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
 				'requestMap' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'requireApiQueryName' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
 				'userAgent' => array( CPSOptionManager::META_DEFAULTVALUE => 'Pogostick Components for Yii; (+http://www.pogostick.com/yii)', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
@@ -152,14 +153,14 @@ class CPSApiBehavior extends CPSComponentBehavior
 	{
 		//	Save for next call
 		static $_sLastApiName;
-		static $_sLastSubApiName;
+		static $_sLastAction;
 
 		//	Set up statics so next call can omit those parameters.
 		if ( null != $sApiName && $sApiName != $_sLastApiName )
 			$_sLastApiName = $sApiName;
 
-		if (  null != $sSubApiName && $sSubApiName != $_sLastSubApiName )
-			$_sLastSubApiName = $sSubApiName;
+		if (  null != $sSubApiName && $sSubApiName != $_sLastAction )
+			$_sLastAction = $sSubApiName;
 
 		//	Build the options
 		$_arTemp = array( 'name' => ( null != $sParamName ) ? $sParamName : $sLabel, 'required' => $bRequired );
@@ -169,12 +170,12 @@ class CPSApiBehavior extends CPSComponentBehavior
 			$_arTemp = array_merge( $_arTemp, $arOptions );
 
 		//	Add the mapping...
-		if ( null == $_sLastApiName && null == $_sLastSubApiName )
+		if ( null == $_sLastApiName && null == $_sLastAction )
 			return false;
 
 		//	Add mapping...
 		$_arOptions =& $this->getOptions();
-		$_arOptions[ 'requestMap' ][ $_sLastApiName ][ $_sLastSubApiName ][ $sLabel ] = $_arTemp;
+		$_arOptions[ 'requestMap' ][ $_sLastApiName ][ $_sLastAction ][ $sLabel ] = $_arTemp;
 
 		return true;
 	}

@@ -224,11 +224,11 @@ class CPSComponent extends CApplicationComponent
 	 */
 	public function &__get( $sName )
 	{
-		//	Try daddy...
-		try { return parent::__get( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
-
 		//	Check behavior properties
-		return $this->getBehaviorProperty( $sName );
+		try { return $this->getBehaviorProperty( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
+
+		//	Try daddy...
+		return parent::__get( $sName );
 	}
 
 	/**
@@ -252,11 +252,11 @@ class CPSComponent extends CApplicationComponent
 	 */
 	public function __set( $sName, $oValue )
 	{
-		//	Let parent take a stab. He'll check getter/setters and behavior methods
-		try { return parent::__set( $sName, $oValue ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
-
 		//	Check behavior properties
-		return $this->setBehaviorProperty( $sName, $oValue );
+		try { return $this->setBehaviorProperty( $sName, $oValue ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
+
+		//	Let parent take a stab. He'll check getter/setters and behavior methods
+		return parent::__set( $sName, $oValue );
 	}
 
 	/**
@@ -270,16 +270,12 @@ class CPSComponent extends CApplicationComponent
 	 */
 	public function __call( $sName, $arParams )
 	{
-		//	Try parent first... cache exception
-		try { return parent::__call( $sName, $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
-
 		//	Check behavior methods...
 		if ( $_oBehave = $this->hasBehaviorMethod( $oObject, $sName ) )
-			return call_user_func_array( array( $_oBehave[ self::BEHAVIOR_META_OBJECT ], $sName ), $arParams );
+			try { return call_user_func_array( array( $_oBehave[ self::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
-		//	Invalid property...
-		if ( null != $oEvent )
-			throw $oEvent;
+		//	Try parent first... cache exception
+		return parent::__call( $sName, $arParams );
 	}
 
 }
