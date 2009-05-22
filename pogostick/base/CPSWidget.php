@@ -243,15 +243,14 @@ class CPSWidget extends CInputWidget
 	 * @return mixed the property value, event handlers attached to the event, or the named behavior
 	 * @throws CException if the property or event is not defined
 	 * @see __set
-	 * @see CPSCommonBase::genericGet
 	 */
 	public function &__get( $sName )
 	{
-		//	Try daddy...
-		try { return parent::__get( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
-
 		//	Check behavior properties
-		return $this->getBehaviorProperty( $sName );
+		try { return $this->getBehaviorProperty( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
+
+		//	Try daddy...
+		return parent::__get( $sName );
 	}
 
 	/**
@@ -271,15 +270,14 @@ class CPSWidget extends CInputWidget
 	 * @param mixed the property value or callback
 	 * @throws CException if the property/event is not defined or the property is read only.
 	 * @see __get
-	 * @see CPSCommonBase::genericSet
 	 */
 	public function __set( $sName, $oValue )
 	{
-		//	Let parent take a stab. He'll check getter/setters and behavior methods
-		try { return parent::__set( $sName, $oValue ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
-
 		//	Check behavior properties
-		return $this->setBehaviorProperty( $sName, $oValue );
+		try { return $this->setBehaviorProperty( $sName, $oValue ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
+
+		//	Let parent take a stab. He'll check getter/setters and behavior methods
+		return parent::__set( $sName, $oValue );
 	}
 
 	/**
@@ -288,21 +286,15 @@ class CPSWidget extends CInputWidget
 	 * @param string The method name
 	 * @param array The method parameters
 	 * @throws CException if the property/event is not defined or the property is read only.
-	 * @see __call
 	 * @return mixed The method return value
 	 */
 	public function __call( $sName, $arParams )
 	{
-		//	Try parent first... cache exception
-		try { return parent::__call( $sName, $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
-
 		//	Check behavior methods...
 		if ( $_oBehave = $this->hasBehaviorMethod( $oObject, $sName ) )
-			return call_user_func_array( array( $_oBehave[ CPSComponent::BEHAVIOR_META_OBJECT ], $sName ), $arParams );
+			try { return call_user_func_array( array( $_oBehave[ self::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
-		//	Invalid property...
-		if ( null != $oEvent )
-			throw $oEvent;
+		//	Try parent first... cache exception
+		return parent::__call( $sName, $arParams );
 	}
-
 }

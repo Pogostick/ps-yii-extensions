@@ -398,69 +398,77 @@ class CPSOptionManager
 			$_arRules = ( isset( $oValue[ self::META_RULES ] ) ) ? $oValue[ self::META_RULES ] : array();
 
 			//	Fix up bool types...
-			$_sType = $_arRules[ self::META_TYPE ];
+			$_arType = $_arRules[ self::META_TYPE ];
+
+			if ( ! is_array( $_arType ) )
+				$_arType = array( $_arType );
 
 			//	Allowed type?
-			if ( ! in_array( $_sType, $this->VALID_METADATA_TYPES ) )
-				throw new CException( Yii::t( __CLASS__, 'Invalid "type" specified for "{x}"', array( '{x}' => $sKey ) ) );
-
-			//	Fix up our allowed shortcuts...
-			if ( $_sType == 'bool' )
+			foreach ( $_arType as $_sKey => $_sType )
 			{
-				$this->setMetaDataValue( $sKey, self::META_TYPE, 'boolean' );
-				$_sType = 'boolean';
-			}
+				if ( ! in_array( $_sType, $this->VALID_METADATA_TYPES ) )
+					throw new CException( Yii::t( __CLASS__, 'Invalid "type" specified for "{x}"', array( '{x}' => $sKey ) ) );
 
-			if ( $_sType == 'int' )
-			{
-				$this->setMetaDataValue( $sKey, self::META_TYPE, 'integer' );
-				$_sType = 'integer';
-			}
-
-			//	Set value
-			$_oValue = null;
-
-			//	Try and set it correctly...
-			if ( isset( $_arRules[ self::META_TYPE ] ) )
-			{
-				if ( ! isset( $oValue[ self::META_DEFAULTVALUE ] ) )
+				//	Fix up our allowed shortcuts...
+				if ( $_sType == 'bool' )
 				{
-					switch ( $_sType )
-					{
-						case 'integer':
-							$_oValue = 0;
-							break;
-						case 'string':
-							$_oValue = '';
-							break;
-						case 'boolean':
-							$_oValue = false;
-							break;
-						case 'array':
-							$_oValue = array();
-							break;
-						default:
-							$_oValue = null;
-							break;
-					}
+					$_arType[ $_sKey ] = 'boolean';
+					$this->setMetaDataValue( $_arType, self::META_TYPE, 'boolean' );
+					$_sType = 'boolean';
 				}
-				else
+
+				if ( $_sType == 'int' )
 				{
-					//	Only validate public options
-					if ( ! $bPrivate )
+					$_arType[ $_sKey ] = 'integer';
+					$this->setMetaDataValue( $_arType, self::META_TYPE, 'integer' );
+					$_sType = 'integer';
+				}
+
+				//	Set value
+				$_oValue = null;
+
+				//	Try and set it correctly...
+				if ( isset( $_arRules[ self::META_TYPE ] ) )
+				{
+					if ( ! isset( $oValue[ self::META_DEFAULTVALUE ] ) )
 					{
-						//	Skip null strings...
-						if ( $_sType == 'string' && null == $oValue[ self::META_DEFAULTVALUE ] )
-							;
-						else
+						switch ( $_sType )
 						{
-							if ( $_sType != gettype( $oValue[ self::META_DEFAULTVALUE ] ) && ! $_bPrivate && null != $oValue[ self::META_DEFAULTVALUE ] )
-								throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_sType ) ) ? implode( ', ', $_sType ) : $_sType ) ) );
+							case 'integer':
+								$_oValue = 0;
+								break;
+							case 'string':
+								$_oValue = '';
+								break;
+							case 'boolean':
+								$_oValue = false;
+								break;
+							case 'array':
+								$_oValue = array();
+								break;
+							default:
+								$_oValue = null;
+								break;
 						}
 					}
+					else
+					{
+						//	Only validate public options
+						if ( ! $bPrivate )
+						{
+							//	Skip null strings...
+							if ( $_sType == 'string' && null == $oValue[ self::META_DEFAULTVALUE ] )
+								;
+							else
+							{
+								if ( $_sType != gettype( $oValue[ self::META_DEFAULTVALUE ] ) && ! $_bPrivate && null != $oValue[ self::META_DEFAULTVALUE ] )
+									throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_sType ) ) ? implode( ', ', $_sType ) : $_sType ) ) );
+							}
+						}
 
-					//	It passed...
-					$_oValue = $oValue[ self::META_DEFAULTVALUE ];
+						//	It passed...
+						$_oValue = $oValue[ self::META_DEFAULTVALUE ];
+					}
 				}
 			}
 		}
@@ -578,6 +586,10 @@ class CPSOptionManager
 		//	Check if this option is available
 		if ( $this->hasOption( $sKey ) )
 		{
+			//	Required and missing? Bail
+			if ( $this->getMetaDataValue( $sKey, self::META_REQUIRED ) && empty( self::$m_arOptions[ $sKey ] ) )
+				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ) );
+
 			//	Get the type of our value...
 			$_sType = gettype( $oValue );
 
@@ -591,12 +603,9 @@ class CPSOptionManager
 			//	Check if this is a valid value for this option
 			if ( null !== ( $_arValid = $this->getMetaDataValue( $sKey, self::META_ALLOWED ) ) )
 			{
-				if ( is_array( $_arValid ) && ! in_array( $_oValue, $_arValid ) )
-					throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: "{y}"', array( '{x}' => $_sKey, '{y}' => implode( ', ', $_arValid ) ) ) );
+				if ( null != $oValue && is_array( $_arValid ) && ! in_array( $oValue, $_arValid ) )
+					throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: "{y}"', array( '{x}' => $sKey, '{y}' => implode( ', ', $_arValid ) ) ) );
 			}
-
-			if ( $this->getMetaDataValue( $sKey, self::META_REQUIRED ) && empty( self::$m_arOptions[ $sKey ] ) )
-				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ) );
 		}
 		else
 			//	Invalid option

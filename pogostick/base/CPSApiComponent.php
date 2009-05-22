@@ -53,7 +53,7 @@ class CPSApiComponent extends CPSComponent
 	protected function makeRequest( $sSubType = null, $arRequestData = null )
 	{
 		//	Make sure apiQueryName is set...
-		if ( CPSHelp::isEmpty( $this->apiQueryName ) )
+		if ( $this->requireApiQueryName && ! $this->_apiQueryName_ )
 		{
 			throw new CException(
 				Yii::t(
@@ -91,10 +91,12 @@ class CPSApiComponent extends CPSComponent
 		//	First build the url...
 		$_sUrl = $this->apiBaseUrl .
 			( substr( $this->apiBaseUrl, strlen( $this->apiBaseUrl ) - 1, 1 ) != '/' ? '/' : '' ) .
-			( isset( $this->apiSubUrls[ $this->apiToUse ] ) ? $this->apiSubUrls[ $this->apiToUse ] : '' );
+			( isset( $this->apiSubUrls[ $this->apiToUse ] ) ? $this->apiSubUrls[ $this->apiToUse ] : '' ) .
+			( $this->mvcQueryFormat ) ? '/' : '';
 
 		//	Add the API key...
-		$_sQuery = $this->apiQueryName . '=' . $this->apiKey;
+		if ( $this->requireApiQueryName )
+			$_sQuery = $this->apiQueryName . ( $this->mvcQueryFormat ) ? '/' : '=' . $this->apiKey;
 
 		//	Add the request data to the Url...
 		if ( is_array( $this->requestMap ) && ! empty( $sSubType ) )
