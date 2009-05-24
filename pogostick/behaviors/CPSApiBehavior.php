@@ -111,10 +111,11 @@ class CPSApiBehavior extends CPSComponentBehavior
 			curl_setopt( $_oCurl, CURLOPT_FAILONERROR, true );
 			curl_setopt( $_oCurl, CURLOPT_USERAGENT, $_sAgent );
 			curl_setopt( $_oCurl, CURLOPT_TIMEOUT, 60 );
+			curl_setopt( $_oCurl, CURLOPT_VERBOSE, true );
 			curl_setopt( $_oCurl, CURLOPT_FOLLOWLOCATION, true );
 			curl_setopt( $_oCurl, CURLOPT_URL, $sUrl . ( 'GET' == $sMethod  ? ( ! empty( $sQueryString ) ? '?' . $sQueryString : '' ) : '' ) );
 
-			if ( null != $arHeaders )
+//			if ( null != $arHeaders )
 				curl_setopt( $_oCurl, CURLOPT_HTTPHEADER, $arHeaders );
 
 			if ( null != $oHeaderCallback )
@@ -132,6 +133,8 @@ class CPSApiBehavior extends CPSComponentBehavior
 			}
 
 			$_sResult = curl_exec( $_oCurl );
+			$_e = curl_errno( $_oCurl );
+			$_em = curl_error( $_oCurl );
 			curl_close( $_oCurl );
 		}
 		else

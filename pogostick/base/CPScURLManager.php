@@ -1,6 +1,6 @@
 <?php
 /**
- * CPSOAuthResponse class file.
+ * CPScURLManager class file.
  *
  * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://ps-yii-extensions.googlecode.com
@@ -9,48 +9,50 @@
  */
 
 /**
- * CPSOAuthResponse encapsulates a response from and OAuth provider
+ * CPScURLManager provides a manager for the cURL objects
  *
  * @author Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
  * @package psYiiExtensions
- * @subpackage Components
+ * @subpackage Base
  * @since 1.0.0
  */
-class CPSOAuthResponse
+class CPScURLManager
 {
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
 
-	private $m_oResponse;
+	/**
+	* The key to the array
+	*
+	* @var string
+	*/
+	protected $m_sKey;
+	/**
+	* The cURL object
+	*
+	* @var CPScURLObject
+	*/
+	protected $m_ocURL;
 
 	//********************************************************************************
 	//* Constructor
 	//********************************************************************************
 
-	public function __construct( $oResp )
+	function __construct( $sKey )
 	{
-		$this->m_oResponse = $oResp;
+	    $this->m_sKey = $sKey;
+	    $this->m_ocURL = CPScURLObject::getInstance();
 	}
 
 	//********************************************************************************
-	//* Magic Method Ovverides
+	//* Magic Methods
 	//********************************************************************************
 
-	public function __get( $sKey )
+	public function __get( $sName )
 	{
-		$_iCode = $this->m_oResponse->code;
-
-		if ( $_iCode < 200 || $_iCode > 299 )
-			return false;
-
-		parse_str( $this->m_oResponse->data, $_arResults );
-
-		foreach ( $_arResults as $_sKey => $_oValue )
-			$this->$_sKey = $_oValue;
-
-		return $_arResults[ $sKey ];
+		$_arResponses = $this->m_ocURL->getResult( $this->m_sKey );
+		return $_arResponses[ $sName ];
 	}
-
 }

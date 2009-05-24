@@ -21,6 +21,15 @@
 class CPSWidget extends CInputWidget
 {
 	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+
+	const BEHAVIOR_META_METHODS = '_classMethods';
+	const BEHAVIOR_META_OBJECT = '_object';
+	const BEHAVIOR_META_VALID = '_validOptions';
+	const BEHAVIOR_META_VARS = '_classVars';
+
+	//********************************************************************************
 	//* Member variables
 	//********************************************************************************
 
@@ -193,23 +202,23 @@ class CPSWidget extends CInputWidget
 			$_oObject->getOptionsObject()->setInternalName( $sName );
 
 			$this->m_bHasBehaviors |= true;
-			$this->m_arBehaviors[ $sName ][ CPSComponent::BEHAVIOR_META_OBJECT ] = $_oObject;
+			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_OBJECT ] = $_oObject;
 
 			//	Place valid options in here for fast checking...
-			$this->m_arBehaviors[ $sName ][ CPSComponent::BEHAVIOR_META_VALID ] = array();
+			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VALID ] = array();
 
 			//	Cache behavior methods for lookup speed
-			$this->m_arBehaviors[ $sName ][ CPSComponent::BEHAVIOR_META_METHODS ] =
+			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ] =
 				array_merge(
-					( null == $this->m_arBehaviors[ $sName ][ CPSComponent::BEHAVIOR_META_METHODS ] ) ? array() : $this->m_arBehaviors[ $sName ][ CPSComponent::BEHAVIOR_META_METHODS ],
+					( null == $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ] ) ? array() : $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ],
 					array_change_key_case( array_flip( array_values( get_class_methods( $_oObject ) ) ), CASE_LOWER
 				)
 			);
 
 			//	Cache behavior members for lookup speed
-			$this->m_arBehaviors[ $sName ][ CPSComponent::BEHAVIOR_META_VARS ] =
+			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ] =
 				array_merge(
-					( null == $this->m_arBehaviors[ $sName ][ CPSComponent::BEHAVIOR_META_VARS ] ) ? array() : $this->m_arBehaviors[ $sName ][ CPSComponent::BEHAVIOR_META_VARS ],
+					( null == $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ] ) ? array() : $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ],
 					array_change_key_case( array_flip( array_keys( get_class_vars( get_class( $this ) ) ) ), CASE_LOWER
 				)
 			);

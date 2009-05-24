@@ -33,18 +33,13 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	* Constructor
 	*
 	*/
-	public function __construct( $sConsumerKey = null, $sConsumerSecret = null, $sSigMethod = self::OAUTH_SIGMETHOD_HMAC_SHA1 )
+	public function __construct()
 	{
 		//	Call daddy...
 		parent::__construct();
 
 		//	Add ours...
 		$this->addOptions( self::getBaseOptions() );
-
-		//	Override defaults and configuration settings if provided
-		if ( null != $sConsumerKey ) $this->consumerKey = $sConsumerKey;
-		if ( null != $sConsumerSecret ) $this->consumerKey = $sConsumerSecret;
-		if ( null != $sSigMethod ) $this->signatureMethod = $sSigMethod;
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
@@ -63,13 +58,14 @@ class CPSOAuthBehavior extends CPSApiBehavior
 		return(
 			array(
 				//	API options
-				'requestTokenUrl' => array( CPSOptionManager::META_TYPE => 'string' ),
-				'accessTokenUrl' => array( CPSOptionManager::META_TYPE => 'string' ),
-				'consumerKey' => array( CPSOptionManager::META_TYPE => 'string' ),
-				'consumerSecret' => array( CPSOptionManager::META_TYPE => 'string' ),
-				'token' => array( CPSOptionManager::META_TYPE => 'string' ),
-				'tokenSecret' => array( CPSOptionManager::META_TYPE => 'string' ),
-				'signatureMethod' => array( CPSOptionManager::META_TYPE => 'string' ),
+				'accessTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'authorizeTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'token' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'tokenSecret' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'signatureMethod' => array( CPSOptionManager::META_DEFAULTVALUE => CPSOAuthBehavior::OAUTH_SIGMETHOD_HMAC_SHA1, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'callbackUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'requestTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'version' => array( CPSOptionManager::META_DEFAULTVALUE => '1', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}
@@ -78,11 +74,11 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	//* Public Methods
 	//********************************************************************************
 
-	public function getAccessToken() { return new CPSOAuthResponse( $this->oauthRequest( CPSApiBehavior::HTTP_GET, $this->accessTokenUrl ) ); }
-	public function getAuthorizationUrl() { return $this->authorizeUrl . '?oauth_token=' . $this->getRequestToken()->oauth_token; }
-	public function getRequestToken() { return new CPSOAuthResponse( $this->oauthRequest( CPSApiBehavior::HTTP_GET, $this->requestTokenUrl ) ); }
+	public function getAccessToken() { return new CPSOAuthResponse( $this->makeOAuthRequest( CPSApiBehavior::HTTP_GET, $this->getOption( 'accessTokenUrl' ) ) ); }
+	public function getAuthorizationUrl() { return $this->getOption( 'authorizeTokenUrl' ) . '?oauth_token=' . $this->getRequestToken()->oauth_token; }
+	public function getRequestToken() { return new CPSOAuthResponse( $this->makeOAuthRequest( CPSApiBehavior::HTTP_POST, $this->getOption( 'requestTokenUrl' ) ) ); }
 
-	public function oauthRequest( $sMethod = null, $sUrl = null, $arParams = null )
+	public function makeOAuthRequest( $sMethod = null, $sUrl = null, $arParams = null )
 	{
 		if ( empty( $sMethod ) || empty( $sUrl ) )
 			return false;
@@ -91,44 +87,44 @@ class CPSOAuthBehavior extends CPSApiBehavior
 			$arParams = $this->prepareParameters( $sMethod, $sUrl, $arParams );
 
 		$_sQuery = '';
-		if( count( $arParams[ 'request' ] ) > 0)
+		if ( count( $arParams[ 'request' ] ) > 0 )
 		{
 			foreach ( $arParams[ 'request' ] as $_sKey => $_sValue )
 				$_sQuery .= $_sKey . '=' . $_sValue . '&';
 			$_sQuery = substr( $_sQuery, 0, -1 );
 		}
 
-		$this->getOAuthHeaders( $url, $arParams[ 'oauth' ] );
-
-		return $this->makeHttpRequest( $sUrl, $_sQuery, $sMethod, null, null, $this->getOAuthHeaders( $sUrl, $arParams ) );
+		return $this->makeHttpRequest( $sUrl, $_sQuery, $sMethod, null, null, $this->getOAuthHeaders( $sUrl, $arParams[ 'oauth' ] ) );
 	}
 
 	public function setToken( $sToken = null, $sSecret = null )
 	{
-		$this->token = $sToken;
-		$this->tokenSecret = $sSecret;
+		$this->setOption( 'token', $sToken );
+		$this->setOption( 'tokenSecret', $sSecret );
 	}
 
 	public function encode( $sString ) { return rawurlencode( utf8_encode( $sString ) ); }
 
-	protected function getOAuthHeaders( $sUrl, $oauthHeaders )
+	protected function getOAuthHeaders( $sUrl, $arOAuthHeaders )
 	{
-		$_arHeaders = array( 'Expect:' );
-		$_ar_arUrlParts = parse_url( $sUrl );
-		$_sOAuth = 'Authorization: OAuth realm="' . $_ar_arUrlParts[ 'path' ] . '",';
+		$_sHeaders;
+		$_arUrlParts = parse_url( $sUrl );
+		$_sOAuth = 'Authorization: OAuth realm="http://' . $_SERVER[ 'HTTP_HOST' ] . '",';
 
-		foreach( $arOAuthHeaders as $sName => $sValue )
-			$_sOAuth .= "{$sName}=\"{$sValue}\",";
+		if ( is_array( $arOAuthHeaders ) )
+		{
+			foreach( $arOAuthHeaders as $sName => $sValue )
+				$_sOAuth .= "{$sName}=\"{$sValue}\",";
+		}
 
-		$_arHeaders[] = substr( $_sOAuth, 0, -1 );
-
-		return $_arHeaders;
+		return array( substr( $_sOAuth, 0, -1 ) );
 	}
 
 	protected function generateNonce()
 	{
-		if ( isset( $this->nonce ) ) // for unit testing
-			return $this->nonce;
+		$_sNonce = $this->getOption( 'nonce' );
+		if ( isset( $_sNonce ) ) // for unit testing
+			return $_sNonce;
 
 		return md5( uniqid( rand(), true ) );
 	}
@@ -140,10 +136,13 @@ class CPSOAuthBehavior extends CPSApiBehavior
 
 		$_sAllParams = '';
 
-		foreach ( $arParams as $_sKey => $_sValue )
-			$_sAllParams .= $_sKey . '=' . $this->encode( $_sValue ) . '&';
+		if ( is_array( $arParams ) )
+		{
+			foreach ( $arParams as $_sKey => $_sValue )
+				$_sAllParams .= $_sKey . '=' . $this->encode( $_sValue ) . '&';
 
-		$_sAllParams = $this->encode( substr( $_sAllParams, 0, -1 ) );
+			$_sAllParams = $this->encode( substr( $_sAllParams, 0, -1 ) );
+		}
 
 		$sUrl = $this->encode( $this->normalizeUrl( $sUrl ) );
 		return $this->signString( "{$sMethod}&{$sUrl}&{$_AllParms}" );
@@ -151,7 +150,7 @@ class CPSOAuthBehavior extends CPSApiBehavior
 
 	protected function normalizeUrl( $sUrl = null )
 	{
-		$_ar_arUrlParts = parse_url( $sUrl );
+		$_arUrlParts = parse_url( $sUrl );
 		$_sScheme = strtolower( $_arUrlParts[ 'scheme' ] );
 		$_sHost   = strtolower( $_arUrlParts[ 'host' ] );
 		$_iPort = intval( $_arUrlParts[ 'port' ] );
@@ -174,12 +173,13 @@ class CPSOAuthBehavior extends CPSApiBehavior
 		if ( empty( $sMethod ) || empty( $sUrl ) )
 			return false;
 
-		$_arOAuth[ 'oauth_consumer_key' ] = $this->consumerKey;
-		$_arOAuth[ 'oauth_token' ] = $this->token;
+		$_arOAuth[ 'oauth_consumer_key' ] = $this->getOption( 'apiKey' );
+		$_arOAuth[ 'oauth_token' ] = $this->getOption( 'token' );
 		$_arOAuth[ 'oauth_nonce' ] = $this->generateNonce();
-		$_arOAuth[ 'oauth_timestamp' ] = ! isset( $this->timestamp ) ? time() : $this->timestamp; // for unit test
-		$_arOAuth[ 'oauth_signature_method' ] = $this->signatureMethod;
-		$_arOAuth[ 'oauth_version' ] = $this->version;
+		$_sTimeStamp = $this->getOption( 'timestamp' );
+		$_arOAuth[ 'oauth_timestamp' ] = ! isset( $_sTimeStamp ) ? time() : $_sTimeStamp; // for unit test
+		$_arOAuth[ 'oauth_signature_method' ] = $this->getOption( 'signatureMethod' );
+		$_arOAuth[ 'oauth_version' ] = $this->getOption( 'version' );
 
 		//	Encode
 		array_walk( $_arOAuth, array( $this, 'encode' ) );
@@ -194,6 +194,7 @@ class CPSOAuthBehavior extends CPSApiBehavior
 
 		//	Sign
 		$_arOAuth[ 'oauth_signature' ] = $this->encode( $this->generateSignature( $sMethod, $sUrl, $_arEncParms ) );
+
 		return array( 'request' => $arParams, 'oauth' => $_arOAuth );
 	}
 
@@ -201,10 +202,10 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	{
 		$_sOut = false;
 
-		switch ( $this->signatureMethod )
+		switch ( $this->getOption( 'signatureMethod' ) )
 		{
 			case self::OAUTH_SIGMETHOD_HMAC_SHA1:
-				$_sKey = $this->encode( $this->consumerSecret ) . '&' . $this->encode( $this->tokenSecret );
+				$_sKey = $this->encode( $this->getOption( 'altApiKey' ) ) . '&' . $this->encode( $this->getOption( 'tokenSecret' ) );
 				$_sOut = base64_encode( hash_hmac( 'sha1', $sString, $_sKey, true ) );
 				break;
 		}
