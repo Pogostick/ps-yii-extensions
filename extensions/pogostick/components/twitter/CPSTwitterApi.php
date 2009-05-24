@@ -19,6 +19,8 @@
  *
  * @todo Implement Direct Message API
  * @todo Implement Block API
+ * @todo Implement Trends API
+ * @todo Implement Search API
  */
 class CPSTwitterApi extends CPSApiComponent
 {
@@ -36,6 +38,48 @@ class CPSTwitterApi extends CPSApiComponent
 	const TWITTER_FAVORITE_API = 'favorites';
 	const TWITTER_NOTIFICATION_API = 'notifications';
 	const TWITTER_BLOCK_API = 'blocks';
+	const TWITTER_TRENDS_API = 'trends';
+	const TWITTER_SEARCH_API = 'search';
+
+	//********************************************************************************
+	//* Construct
+	//********************************************************************************
+
+	public function __construct( $sConsumerKey = null, $sConsumerSecret = null, $sOAuthToken = null, $sOAuthTokenSecret = null )
+	{
+		//	Phone home...
+		parent::__construct();
+
+		//	Create our internal name
+		$_sName = CPSCommonBase::createInternalName( $this );
+
+		//	Import our OAuth stuff...
+		Yii::import( 'pogostick.components.oauth.*' );
+
+		//	Add our OAuth behavior
+		$this->attachBehavior( $_sName, 'pogostick.components.oauth.behaviors.CPSOAuthBehavior' );
+
+		//	Override defaults and configuration settings if provided
+		if ( null != $sConsumerKey ) $this->apiKey = $sConsumerKey;
+		if ( null != $sConsumerSecret ) $this->altApiKey = $sConsumerSecret;
+		if ( null != $sOAuthToken ) $this->token = $sOAuthToken;
+		if ( null != $sOAuthTokenSecret ) $this->tokenSecret = $sOAuthTokenSecret;
+
+		$this->signatureMethod = CPSOAuthBehavior::OAUTH_SIGMETHOD_HMAC_SHA1;
+
+		//	Set our token
+		if ( null == $sOAuthToken || null == $sOAuthTokenSecret )
+		    $this->setToken( $this->apiKey, $this->altApiKey );
+		else
+		{
+			$this->token = $sOAuthToken;
+			$this->tokenSecret = $sOAuthTokenSecret;
+		    $this->setToken( $sOAuthToken, $sOAuthTokenSecret );
+		}
+
+		//	Log it and check for issues...
+		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
+	}
 
 	//********************************************************************************
 	//* Yii Overrides
@@ -66,7 +110,7 @@ class CPSTwitterApi extends CPSApiComponent
 				'count' => false,
 				'page' => false,
 			),
-			null
+			array( '_requireAuth' => true )
 		);
 
 		$this->addTwitterRequestMapping( 'user_timeline',
@@ -78,7 +122,8 @@ class CPSTwitterApi extends CPSApiComponent
 				'max_id' => false,
 				'count' => false,
 				'page' => false,
-			)
+			),
+			array( '_requireAuth' => true )
 		);
 
 		$this->addTwitterRequestMapping( 'mentions',
@@ -87,7 +132,8 @@ class CPSTwitterApi extends CPSApiComponent
 				'max_id' => false,
 				'count' => false,
 				'page' => false,
-			)
+			),
+			array( '_requireAuth' => true )
 		);
 
 		$this->addTwitterRequestMapping( 'show',
@@ -128,7 +174,8 @@ class CPSTwitterApi extends CPSApiComponent
 				'user_id' => false,
 				'screen_name' => false,
 				'page' => false,
-			)
+			),
+			array( '_requireAuth' => true )
 		);
 
 		//********************************************************************************
@@ -161,6 +208,7 @@ class CPSTwitterApi extends CPSApiComponent
 			array(
 				'_method' => CPSApiBehavior::HTTP_POST,
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+				'_requireAuth' => true,
 			),
 			self::TWITTER_FRIENDSHIP_API
 		);
@@ -174,16 +222,17 @@ class CPSTwitterApi extends CPSApiComponent
 			array(
 				'_method' => CPSApiBehavior::HTTP_POST,
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+				'_requireAuth' => true,
 			),
 			self::TWITTER_FRIENDSHIP_API
 		);
 
-		$this->addTwitterRequestMapping( 'test',
+		$this->addTwitterRequestMapping( 'exists',
 			array(
 				'user_a' => true,
 				'user_b' => true,
 			),
-			null,
+			array( '_requireAuth' => true ),
 			self::TWITTER_FRIENDSHIP_API
 		);
 
@@ -227,17 +276,30 @@ class CPSTwitterApi extends CPSApiComponent
 
 		$this->addTwitterRequestMapping( 'verify_credentials',
 			null,
-			null,
+			array( '_requireAuth' => true ),
 			self::TWITTER_ACCOUNT_API
 		);
 
-		$this->addTwitterRequestMapping( 'rate_limit_status' );
+		$this->addTwitterRequestMapping( 'rate_limit_status',
+			null,
+			array( '_requireAuth' => true )
+		 );
 
-		$this->addTwitterRequestMapping( 'end_session' );
+		$this->addTwitterRequestMapping( 'end_session',
+			null,
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true
+			)
+		 );
 
 		$this->addTwitterRequestMapping( 'update_delivery_device',
 			array(
 				'device' => true,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true
 			)
 		);
 
@@ -252,6 +314,7 @@ class CPSTwitterApi extends CPSApiComponent
 			array(
 				'_method' => CPSApiBehavior::HTTP_POST,
 				'_requireOneOf' => array( 'profile_background_color', 'profile_text_color', 'profile_link_color', 'profile_sidebar_fill_color', 'profile_sidebar_border_color' ),
+				'_requireAuth' => true,
 			)
 		);
 
@@ -261,6 +324,7 @@ class CPSTwitterApi extends CPSApiComponent
 			),
 			array(
 				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true,
 			)
 		);
 
@@ -271,6 +335,7 @@ class CPSTwitterApi extends CPSApiComponent
 			),
 			array(
 				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true,
 			)
 		);
 
@@ -285,6 +350,7 @@ class CPSTwitterApi extends CPSApiComponent
 			array(
 				'_method' => CPSApiBehavior::HTTP_POST,
 				'_requireOneOf' => array( 'name', 'email', 'url', 'location', 'description' ),
+				'_requireAuth' => true,
 			)
 		);
 
@@ -297,7 +363,9 @@ class CPSTwitterApi extends CPSApiComponent
 				'id' => false,
 				'page' => false,
 			),
-			null,
+			array(
+				'_requireAuth' => true,
+			),
 			self::TWITTER_FAVORITE_API
 		);
 
@@ -307,6 +375,7 @@ class CPSTwitterApi extends CPSApiComponent
 			),
 			array(
 				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true,
 			)
 		);
 
@@ -316,6 +385,7 @@ class CPSTwitterApi extends CPSApiComponent
 			),
 			array(
 				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true,
 			)
 		);
 
@@ -332,6 +402,7 @@ class CPSTwitterApi extends CPSApiComponent
 			array(
 				'_method' => CPSApiBehavior::HTTP_POST,
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+				'_requireAuth' => true,
 			),
 			self::TWITTER_NOTIFICATION_API
 		);
@@ -345,6 +416,7 @@ class CPSTwitterApi extends CPSApiComponent
 			array(
 				'_method' => CPSApiBehavior::HTTP_POST,
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+				'_requireAuth' => true,
 			)
 		);
 	}
