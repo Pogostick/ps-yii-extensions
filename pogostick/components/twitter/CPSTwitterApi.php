@@ -2,6 +2,9 @@
 /**
  * CPSTwitterApi class file.
  *
+ * Code based on:
+ * TwitterOAuth - http://github.com/abraham/twitteroauth/
+ * 
  * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://ps-yii-extensions.googlecode.com
  * @copyright Copyright &copy; 2009 Pogostick, LLC
@@ -18,7 +21,7 @@
  * @since 1.0.0
  *
  * @todo Implement Direct Message API
- * @todo Implement Block API
+ * @todo Implement Block APIs
  * @todo Implement Trends API
  * @todo Implement Search API
  */
@@ -45,7 +48,7 @@ class CPSTwitterApi extends CPSApiComponent
 	//* Construct
 	//********************************************************************************
 
-	public function __construct( $sConsumerKey = null, $sConsumerSecret = null, $sOAuthToken = null, $sOAuthTokenSecret = null )
+	public function __construct()
 	{
 		//	Phone home...
 		parent::__construct();
@@ -53,30 +56,15 @@ class CPSTwitterApi extends CPSApiComponent
 		//	Create our internal name
 		$_sName = CPSCommonBase::createInternalName( $this );
 
-		//	Import our OAuth stuff...
-		Yii::import( 'pogostick.components.oauth.*' );
-
 		//	Add our OAuth behavior
-		$this->attachBehavior( $_sName, 'pogostick.components.oauth.behaviors.CPSOAuthBehavior' );
-
-		//	Override defaults and configuration settings if provided
-		if ( null != $sConsumerKey ) $this->apiKey = $sConsumerKey;
-		if ( null != $sConsumerSecret ) $this->altApiKey = $sConsumerSecret;
-		if ( null != $sOAuthToken ) $this->token = $sOAuthToken;
-		if ( null != $sOAuthTokenSecret ) $this->tokenSecret = $sOAuthTokenSecret;
-
+		$this->attachBehavior( $_sName, 'pogostick.behaviors.CPSOAuthBehavior' );
+		
+		//	Set current twitter api url
+		$this->setOption( 'apiBaseUrl', 'https://twitter.com' );
+		
+		//	Twitter uses HMAC_SHA1
 		$this->signatureMethod = CPSOAuthBehavior::OAUTH_SIGMETHOD_HMAC_SHA1;
-
-		//	Set our token
-		if ( null == $sOAuthToken || null == $sOAuthTokenSecret )
-		    $this->setToken( $this->apiKey, $this->altApiKey );
-		else
-		{
-			$this->token = $sOAuthToken;
-			$this->tokenSecret = $sOAuthTokenSecret;
-		    $this->setToken( $sOAuthToken, $sOAuthTokenSecret );
-		}
-
+		
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
 	}
@@ -465,6 +453,7 @@ class CPSTwitterApi extends CPSApiComponent
 	{
 		//	Default...
 		$_arRequestData = $this->requestData;
+		$_arReqArgs = array();
 
 		//	Check data...
 		if ( null != $arRequestData )
@@ -522,7 +511,7 @@ class CPSTwitterApi extends CPSApiComponent
 
 					//	Add to query string if set...
 					if ( isset( $_arRequestData[ $_sKey ] ) )
-						$_sQuery .= "&{$_sKey}=" . urlencode( $_arRequestData[ $_sKey ] );
+						$_arReqArgs[ $_sKey ] = $_arRequestData[ $_sKey ];
 				}
 			}
 		}
@@ -544,16 +533,12 @@ class CPSTwitterApi extends CPSApiComponent
 		//	Build the url...
 		$_sUrl = $this->apiBaseUrl . '/' . $this->apiToUse . ( ( $sAction == '/' ) ? '' : '/' . $sAction ) . '.json';
 
-		//	Strip off initial &amp;
-		if ( $_sMethod != CPSApiBehavior::HTTP_POST )
-			$_sQuery = substr( $_sQuery, 1 );
-
 		//	Handle events...
 		$_oEvent = new CPSApiEvent( $_sUrl, $_sQuery, null, $this );
 		$this->beforeApiCall( $_oEvent );
 
 		//	Ok, we've build our request, now let's get the results...
-		$_sResults = $this->makeHttpRequest( $_sUrl, $_sQuery, $_sMethod, $this->userAgent );
+		$_sResults = $this->makeOAuthRequest( $_sUrl, $_arReqArgs, $_sMethod );
 
 		//	Handle events...
 		$_oEvent->urlResults = $_sResults;

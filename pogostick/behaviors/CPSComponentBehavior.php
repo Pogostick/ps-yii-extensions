@@ -91,7 +91,7 @@ class CPSComponentBehavior extends CBehavior
 		$_sName = CPSCommonBase::createInternalName( $this );
 
 		//	Import needed classes...
-		Yii::import( 'pogostick.base.CPSOptionManager' );
+//		Yii::import( 'pogostick.base.CPSOptionManager' );
 
 		//	build our option manager...
 		$this->m_oOptions = new CPSOptionManager( $this->m_sInternalName );
@@ -375,10 +375,14 @@ class CPSComponentBehavior extends CBehavior
 		//	Empty check short cut?
 		if ( '_' == substr( $sName, 0, 1 ) && '_' == substr( $sName, strlen( $sName ) - 1, 1 ) )
 			return $this->isEmpty( $this->__get( substr( $sName, 1, strlen( $sName ) - 2 ) ) );
-
+			
+		//	Is it a member variable?
 		if ( in_array( $sName, array_keys( get_class_vars( get_class( $this ) ) ) ) )
 			return $this->{$sName};
-
+			
+		if ( $this->hasOption( $sName ) )
+			return $this->getOption( $sName );
+			
 		//	Try daddy...
 		try { return parent::__get( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
@@ -407,7 +411,9 @@ class CPSComponentBehavior extends CBehavior
 	 */
 	public function __set( $sName, $oValue )
 	{
-		//	Try daddy...
+		if ( $this->hasOption( $sName ) )
+			return $this->setOption( $sName, $oValue );
+			
 		try { return parent::__set( $sName, $oValue ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
 		//	Look in our behavior properties

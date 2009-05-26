@@ -228,7 +228,7 @@ class CPSOptionManager
 			$this->setInternalName( $sInternalName );
 
 		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $_sName );
+		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
 	}
 
 	//********************************************************************************
@@ -455,7 +455,7 @@ class CPSOptionManager
 					else
 					{
 						//	Only validate public options
-						if ( ! $bPrivate )
+						if ( ! $oValue[ self::META_PRIVATE ] )
 						{
 							//	Skip null strings...
 							if ( $_sType == 'string' && null == $oValue[ self::META_DEFAULTVALUE ] )

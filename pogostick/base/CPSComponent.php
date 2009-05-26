@@ -23,15 +23,6 @@
 class CPSComponent extends CApplicationComponent
 {
 	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-
-	const BEHAVIOR_META_METHODS = '_classMethods';
-	const BEHAVIOR_META_OBJECT = '_object';
-	const BEHAVIOR_META_VALID = '_validOptions';
-	const BEHAVIOR_META_VARS = '_classVars';
-
-	//********************************************************************************
 	//* Member variables
 	//********************************************************************************
 
@@ -119,7 +110,7 @@ class CPSComponent extends CApplicationComponent
 	{
 		//	Create our internal name
 		$_sName = CPSCommonBase::createInternalName( $this );
-
+		
 		//	Attach our default behavior
 		$this->attachBehavior( $_sName, 'pogostick.behaviors.CPSComponentBehavior' );
 
@@ -170,29 +161,47 @@ class CPSComponent extends CApplicationComponent
 			$_oObject->getOptionsObject()->setInternalName( $sName );
 
 			$this->m_bHasBehaviors |= true;
-			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_OBJECT ] = $_oObject;
+			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_OBJECT ] = $_oObject;
 
 			//	Place valid options in here for fast checking...
-			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VALID ] = array();
+			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VALID ] = array();
 
 			//	Cache behavior methods for lookup speed
-			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ] =
+			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] =
 				array_merge(
-					( null == $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ] ) ? array() : $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ],
+					( null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] ) ? array() : $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ],
 					array_change_key_case( array_flip( array_values( get_class_methods( $_oObject ) ) ), CASE_LOWER
 				)
 			);
 
 			//	Cache behavior members for lookup speed
-			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ] =
+			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] =
 				array_merge(
-					( null == $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ] ) ? array() : $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ],
+					( null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] ) ? array() : $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ],
 					array_change_key_case( array_flip( array_keys( get_class_vars( get_class( $this ) ) ) ), CASE_LOWER
 				)
 			);
 		}
 
 		return $_oObject;
+	}
+	
+	/**
+	* Yii CComponent::init() override
+	* 
+	*/
+	public function init()
+	{
+		//	Call daddy
+		parent::init();
+
+		//	Call our behaviors init() method if they exist
+		foreach ( $this->m_arBehaviors as $_oBehave )
+		{
+			//	Only call init() on our own behaviors
+			if ( method_exists( $_oBehave[ CPSCommonBase::BEHAVIOR_META_OBJECT ], 'init' ) )
+				$_oBehave[ CPSCommonBase::BEHAVIOR_META_OBJECT ]->init();
+		}
 	}
 
 	//********************************************************************************
@@ -271,8 +280,8 @@ class CPSComponent extends CApplicationComponent
 	public function __call( $sName, $arParams )
 	{
 		//	Check behavior methods...
-		if ( $_oBehave = $this->hasBehaviorMethod( $oObject, $sName ) )
-			try { return call_user_func_array( array( $_oBehave[ self::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
+		if ( $_oBehave = $this->hasBehaviorMethod( $sName ) )
+			try { return call_user_func_array( array( $_oBehave[ CPSCommonBase::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
 		//	Try parent first... cache exception
 		return parent::__call( $sName, $arParams );
