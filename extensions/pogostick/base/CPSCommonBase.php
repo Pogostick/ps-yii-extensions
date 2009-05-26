@@ -7,6 +7,8 @@
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @license http://www.pogostick.com/license/
  */
+ 
+Yii::import( 'pogostick.components.*' );
 
 /**
  * CPSCommonBase provides methods that are common to both CComponent and CWidget.
@@ -23,6 +25,15 @@
  */
 class CPSCommonBase
 {
+	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+
+	const BEHAVIOR_META_METHODS = '_classMethods';
+	const BEHAVIOR_META_OBJECT = '_object';
+	const BEHAVIOR_META_VALID = '_validOptions';
+	const BEHAVIOR_META_VARS = '_classVars';
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -144,7 +155,7 @@ class CPSCommonBase
 
 		//	Check behavior methods...
 		if ( $_oBehave = self::hasBehaviorMethod( $oObject, $sName ) )
-				return call_user_func_array( array( $_oBehave[ CPSComponent::BEHAVIOR_META_OBJECT ], $sName ), $arParams );
+				return call_user_func_array( array( $_oBehave[ self::BEHAVIOR_META_OBJECT ], $sName ), $arParams );
 
 		//	Invalid property...
 		if ( null != $oEvent )
@@ -166,7 +177,7 @@ class CPSCommonBase
 		{
 			foreach ( $oComponent->getBehaviors() as $_sKey => $_oBehave )
 			{
-				if ( in_array( strtolower( $sMethodName ), $_oBehave[ CPSComponent::BEHAVIOR_META_METHODS ] ) )
+				if ( is_array( $_oBehave[ self::BEHAVIOR_META_METHODS ] ) && in_array( strtolower( $sMethodName ), $_oBehave[ self::BEHAVIOR_META_METHODS ] ) )
 					return $_oBehave;
 			}
 		}
@@ -191,7 +202,7 @@ class CPSCommonBase
 
 			foreach ( $_arBehaviors as $_sKey => $_oBehave )
 			{
-				if ( in_array( strtolower( $sName ), $_oBehave[ CPSComponent::BEHAVIOR_META_VARS ] ) )
+				if ( is_array( $_oBehave[ self::BEHAVIOR_META_VARS ] ) && in_array( strtolower( $sName ), $_oBehave[ self::BEHAVIOR_META_VARS ] ) )
 					return $_oBehave;
 
 				//	Check options
@@ -205,8 +216,6 @@ class CPSCommonBase
 			if ( $oComponent->hasOption( $sName ) )
 				return $oComponent;
 		}
-
-		return null;
 	}
 
 	/**
@@ -224,7 +233,7 @@ class CPSCommonBase
 	{
 		//	Do we have that somewhere?
 		if ( $_oBehave = $oComponent->hasBehaviorProperty( $sName ) )
-			return $_oBehave[ CPSComponent::BEHAVIOR_META_OBJECT ]->getOption( $oComponent->getNamePrefix() . $sName );
+			return $_oBehave[ self::BEHAVIOR_META_OBJECT ]->getOption( $oComponent->getNamePrefix() . $sName );
 
 		//	This exception can be ignored upstream...
 		throw new CException( Yii::t( 'yii', 'Behavior Property "{class}.{property}" is not defined.', array( '{class}' => get_class( $oComponent ), '{property}' => $sName ) ) );
@@ -246,7 +255,7 @@ class CPSCommonBase
 		//	If a behavior contains
 		if ( $_oBehave = self::hasBehaviorProperty( $oComponent, $sName ) )
 		{
-			$_oBehave[ CPSComponent::BEHAVIOR_META_OBJECT ]->setOption( $oComponent->getNamePrefix() . $sName, $oValue );
+			$_oBehave[ self::BEHAVIOR_META_OBJECT ]->setOption( $oComponent->getNamePrefix() . $sName, $oValue );
 			return;
 		}
 

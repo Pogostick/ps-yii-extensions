@@ -115,7 +115,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 			curl_setopt( $_oCurl, CURLOPT_FOLLOWLOCATION, true );
 			curl_setopt( $_oCurl, CURLOPT_URL, $sUrl . ( 'GET' == $sMethod  ? ( ! empty( $sQueryString ) ? '?' . $sQueryString : '' ) : '' ) );
 
-//			if ( null != $arHeaders )
+			if ( null != $arHeaders )
 				curl_setopt( $_oCurl, CURLOPT_HTTPHEADER, $arHeaders );
 
 			if ( null != $oHeaderCallback )

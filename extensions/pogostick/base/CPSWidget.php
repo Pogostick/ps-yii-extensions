@@ -126,7 +126,7 @@ class CPSWidget extends CInputWidget
 		$this->attachBehavior( $_sName, 'pogostick.behaviors.CPSWidgetBehavior' );
 
 		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => $_sClass ) ), 'trace', $_sName );
+		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
 	}
 
 	//********************************************************************************
@@ -144,6 +144,14 @@ class CPSWidget extends CInputWidget
 
 		//	Get the id/name of this widget
 		list( $this->name, $this->id ) = $this->resolveNameID();
+
+		//	Call our behaviors init() method if they exist
+		foreach ( $this->m_arBehaviors as $_oBehave )
+		{
+			//	Only call init() on our own behaviors
+			if ( $_oBehave instanceof CPSComponentBehavior )
+				call_user_method( 'init', $_oBehave );
+		}
 	}
 
 	/***
@@ -202,23 +210,23 @@ class CPSWidget extends CInputWidget
 			$_oObject->getOptionsObject()->setInternalName( $sName );
 
 			$this->m_bHasBehaviors |= true;
-			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_OBJECT ] = $_oObject;
+			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_OBJECT ] = $_oObject;
 
 			//	Place valid options in here for fast checking...
-			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VALID ] = array();
+			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VALID ] = array();
 
 			//	Cache behavior methods for lookup speed
-			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ] =
+			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] =
 				array_merge(
-					( null == $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ] ) ? array() : $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ],
+					( null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] ) ? array() : $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ],
 					array_change_key_case( array_flip( array_values( get_class_methods( $_oObject ) ) ), CASE_LOWER
 				)
 			);
 
 			//	Cache behavior members for lookup speed
-			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ] =
+			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] =
 				array_merge(
-					( null == $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ] ) ? array() : $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ],
+					( null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] ) ? array() : $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ],
 					array_change_key_case( array_flip( array_keys( get_class_vars( get_class( $this ) ) ) ), CASE_LOWER
 				)
 			);
@@ -253,7 +261,7 @@ class CPSWidget extends CInputWidget
 	 * @throws CException if the property or event is not defined
 	 * @see __set
 	 */
-	public function &__get( $sName )
+	public function __get( $sName )
 	{
 		//	Check behavior properties
 		try { return $this->getBehaviorProperty( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
@@ -299,9 +307,11 @@ class CPSWidget extends CInputWidget
 	 */
 	public function __call( $sName, $arParams )
 	{
+		$_oBehave = null;
+		
 		//	Check behavior methods...
-		if ( $_oBehave = $this->hasBehaviorMethod( $oObject, $sName ) )
-			try { return call_user_func_array( array( $_oBehave[ self::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
+		if ( $_oBehave = $this->hasBehaviorMethod( $sName ) )
+			try { return call_user_func_array( array( $_oBehave[ CPSCommonBase::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
 		//	Try parent first... cache exception
 		return parent::__call( $sName, $arParams );

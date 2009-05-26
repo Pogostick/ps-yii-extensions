@@ -8,6 +8,8 @@
  * @license http://www.pogostick.com/license/
  */
 
+require_once( dirname( __FILE__ ) . '/../components/oauth/OAuth.php' );
+ 
 /**
  * CPSOAuthBehavior provides OAuth support to any Pogostick component
  *
@@ -16,6 +18,7 @@
  * @package psYiiExtensions
  * @subpackage Components
  * @since 1.0.0
+ * @uses pogostick.components.oauth.OAuth.php
  */
 class CPSOAuthBehavior extends CPSApiBehavior
 {
@@ -23,8 +26,9 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	//* Constants
 	//********************************************************************************
 
+	//	Signature types
 	const OAUTH_SIGMETHOD_HMAC_SHA1 = 'HMAC-SHA1';
-
+	
 	//********************************************************************************
 	//* Constructor
 	//********************************************************************************
@@ -40,7 +44,7 @@ class CPSOAuthBehavior extends CPSApiBehavior
 
 		//	Add ours...
 		$this->addOptions( self::getBaseOptions() );
-
+		
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
 	}
@@ -48,7 +52,7 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
-
+                                     
 	/**
 	* Add our options
 	*
@@ -57,160 +61,153 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	{
 		return(
 			array(
-				//	API options
-				'accessTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'authorizeTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'token' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'tokenSecret' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				//	Required settings
+				'consumerObject' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'object' ) ),
+				'token' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'object' ) ),
 				'signatureMethod' => array( CPSOptionManager::META_DEFAULTVALUE => CPSOAuthBehavior::OAUTH_SIGMETHOD_HMAC_SHA1, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'signatureObject' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'object' ) ),
 				'callbackUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'requestTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'version' => array( CPSOptionManager::META_DEFAULTVALUE => '1', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				//	Informational
+				'httpLastStatus' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'apiLastUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'currentState' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'isAuthorized' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
+				//	Urls
+				'accessTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '/oauth/access_token', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'authorizeUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '/oauth/authorize', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'requestTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '/oauth/request_token', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}
 
-	//********************************************************************************
-	//* Public Methods
-	//********************************************************************************
-
-	public function getAccessToken() { return new CPSOAuthResponse( $this->makeOAuthRequest( CPSApiBehavior::HTTP_GET, $this->getOption( 'accessTokenUrl' ) ) ); }
-	public function getAuthorizationUrl() { return $this->getOption( 'authorizeTokenUrl' ) . '?oauth_token=' . $this->getRequestToken()->oauth_token; }
-	public function getRequestToken() { return new CPSOAuthResponse( $this->makeOAuthRequest( CPSApiBehavior::HTTP_POST, $this->getOption( 'requestTokenUrl' ) ) ); }
-
-	public function makeOAuthRequest( $sMethod = null, $sUrl = null, $arParams = null )
+	/**
+	* Initialize this behavior
+	* 
+	*/
+	public function init()
 	{
-		if ( empty( $sMethod ) || empty( $sUrl ) )
-			return false;
-
-		if( empty( $arParams[ 'oauth_signature' ] ) )
-			$arParams = $this->prepareParameters( $sMethod, $sUrl, $arParams );
-
-		$_sQuery = '';
-		if ( count( $arParams[ 'request' ] ) > 0 )
-		{
-			foreach ( $arParams[ 'request' ] as $_sKey => $_sValue )
-				$_sQuery .= $_sKey . '=' . $_sValue . '&';
-			$_sQuery = substr( $_sQuery, 0, -1 );
-		}
-
-		return $this->makeHttpRequest( $sUrl, $_sQuery, $sMethod, null, null, $this->getOAuthHeaders( $sUrl, $arParams[ 'oauth' ] ) );
-	}
-
-	public function setToken( $sToken = null, $sSecret = null )
-	{
-		$this->setOption( 'token', $sToken );
-		$this->setOption( 'tokenSecret', $sSecret );
-	}
-
-	public function encode( $sString ) { return rawurlencode( utf8_encode( $sString ) ); }
-
-	protected function getOAuthHeaders( $sUrl, $arOAuthHeaders )
-	{
-		$_sHeaders;
-		$_arUrlParts = parse_url( $sUrl );
-		$_sOAuth = 'Authorization: OAuth realm="http://' . $_SERVER[ 'HTTP_HOST' ] . '",';
-
-		if ( is_array( $arOAuthHeaders ) )
-		{
-			foreach( $arOAuthHeaders as $sName => $sValue )
-				$_sOAuth .= "{$sName}=\"{$sValue}\",";
-		}
-
-		return array( substr( $_sOAuth, 0, -1 ) );
-	}
-
-	protected function generateNonce()
-	{
-		$_sNonce = $this->getOption( 'nonce' );
-		if ( isset( $_sNonce ) ) // for unit testing
-			return $_sNonce;
-
-		return md5( uniqid( rand(), true ) );
-	}
-
-	protected function generateSignature( $sMethod = null, $sUrl = null, $arParams = null )
-	{
-		if ( empty( $sMethod ) || empty( $sUrl ) )
-			return false;
-
-		$_sAllParams = '';
-
-		if ( is_array( $arParams ) )
-		{
-			foreach ( $arParams as $_sKey => $_sValue )
-				$_sAllParams .= $_sKey . '=' . $this->encode( $_sValue ) . '&';
-
-			$_sAllParams = $this->encode( substr( $_sAllParams, 0, -1 ) );
-		}
-
-		$sUrl = $this->encode( $this->normalizeUrl( $sUrl ) );
-		return $this->signString( "{$sMethod}&{$sUrl}&{$_AllParms}" );
-	}
-
-	protected function normalizeUrl( $sUrl = null )
-	{
-		$_arUrlParts = parse_url( $sUrl );
-		$_sScheme = strtolower( $_arUrlParts[ 'scheme' ] );
-		$_sHost   = strtolower( $_arUrlParts[ 'host' ] );
-		$_iPort = intval( $_arUrlParts[ 'port' ] );
-
-		$_sOut = $_sScheme . '://' . $_sHost;
-
-		if ( $_iPort > 0 && ( $_sScheme === 'http' && $_iPort !== 80 ) || ( $_sScheme === 'https' && $_iPort !== 443 ) )
-			$_sOut .= ':' . $_iPort;
-
-		$_sOut .= $_arUrlParts[ 'path' ];
-
-		if ( ! empty( $_arUrlParts[ 'query' ] ) )
-			$_sOut .= '?' . $_arUrlParts[ 'query' ];
-
-		return $_sOut;
-	}
-
-	protected function prepareParameters( $sMethod = null, $sUrl = null, $arParams = null )
-	{
-		if ( empty( $sMethod ) || empty( $sUrl ) )
-			return false;
-
-		$_arOAuth[ 'oauth_consumer_key' ] = $this->getOption( 'apiKey' );
-		$_arOAuth[ 'oauth_token' ] = $this->getOption( 'token' );
-		$_arOAuth[ 'oauth_nonce' ] = $this->generateNonce();
-		$_sTimeStamp = $this->getOption( 'timestamp' );
-		$_arOAuth[ 'oauth_timestamp' ] = ! isset( $_sTimeStamp ) ? time() : $_sTimeStamp; // for unit test
-		$_arOAuth[ 'oauth_signature_method' ] = $this->getOption( 'signatureMethod' );
-		$_arOAuth[ 'oauth_version' ] = $this->getOption( 'version' );
-
-		//	Encode
-		array_walk( $_arOAuth, array( $this, 'encode' ) );
-
-		if ( is_array( $arParams ) )
-			array_walk( $arParams, array( $this, 'encode' ) );
-
-		$_arEncParams = array_merge( $_arOAuth, ( array )$arParams );
-
-		//	Sort
-		ksort( $_arEncParams );
-
-		//	Sign
-		$_arOAuth[ 'oauth_signature' ] = $this->encode( $this->generateSignature( $sMethod, $sUrl, $_arEncParms ) );
-
-		return array( 'request' => $arParams, 'oauth' => $_arOAuth );
-	}
-
-	protected function signString( $sString = null )
-	{
-		$_sOut = false;
-
-		switch ( $this->getOption( 'signatureMethod' ) )
+		//	Set our defaults
+		switch ( $this->signatureMethod )
 		{
 			case self::OAUTH_SIGMETHOD_HMAC_SHA1:
-				$_sKey = $this->encode( $this->getOption( 'altApiKey' ) ) . '&' . $this->encode( $this->getOption( 'tokenSecret' ) );
-				$_sOut = base64_encode( hash_hmac( 'sha1', $sString, $_sKey, true ) );
+			default:
+				$this->signatureObject = new OAuthSignatureMethod_HMAC_SHA1();
 				break;
 		}
-
-		return $_sOut;
+		
+		//	Make our consumer object...
+		$this->consumerObject = new OAuthConsumer( $this->apiKey, $this->apiSecretKey, $this->callbackUrl );
+		
+		//	Set state from previous session if any
+		$this->isAuthorized = false;
+		
+		//	Have we been authenticated?
+		if ( null != $_REQUEST[ 'oauth_token' ] ) 
+		{
+			$this->token = new OAuthConsumer( $_REQUEST[ 'oauth_token' ], ( null != $_REQUEST[ 'oauth_token_secret' ] ) ? $_REQUEST[ 'oauth_token_secret' ] : $_REQUEST[ 'oauth_request_token_secret' ] );
+			$this->isAuthorized = true;
+			$this->getAccessToken();
+		}
+		else
+			$this->getRequestToken();
 	}
 
+	/**
+	* Appends the current token to the authorizeUrl option
+	* 	
+	* @param mixed $oToken
+	*/
+	public function getAuthorizeUrl()
+	{
+		return $this->apiBaseUrl . $this->authorizeUrl . '?oauth_token=' . $this->token->key;
+	}
+
+	/**
+	* Retrieve the access token
+	* 
+	* @param array $oToken
+	* @return array
+	*/
+	public function getAccessToken()
+	{
+		$_oToken = $this->makeOAuthRequest( $this->apiBaseUrl . $this->accessTokenUrl );
+		return $this->setToken( $_oToken[ 'oauth_token' ], $_oToken[ 'oauth_token_secret' ] );
+	}
+
+	/**
+	* Retrieve the request token
+	* 
+	*/
+	public function getRequestToken() 
+	{ 
+		$_oToken = $this->makeOAuthRequest( $this->apiBaseUrl . $this->requestTokenUrl );
+		return $this->setToken( $_oToken[ 'oauth_token' ], $_oToken[ 'oauth_token_secret' ] );
+	}
+	
+	/**
+	* Given the two token parts, an OAuthConsumer object is created...
+	* 
+	* @param string $Token
+	* @param string $sTokenSecret
+	* @returns OAuthConsumer
+	*/
+	public function setToken( $sToken, $sTokenSecret )
+	{
+		return $this->token = new OAuthConsumer( $sToken, $sTokenSecret, $this->callbackUrl );
+	}
+
+	/**
+	* Parse the response back from the OAuth server
+	* 
+	* @param string $sResponse The response from the OAuth server
+	* @return array An array of parameters returned from the OAuth server
+	*/
+	protected function parseOAuthResponse( $sResponse )
+	{
+		$_arResponse = array();
+		
+		foreach ( explode( '&', $sResponse ) as $_sParam )
+		{
+			$_arPair = explode( '=', $_sParam, 2 );
+			if ( count( $_arPair ) != 2 )
+				continue;
+				
+			$_arResponse[ urldecode( $_arPair[ 0 ] ) ] = urldecode( $_arPair[ 1 ] );
+		}
+		
+		return $_arResponse;
+	}
+	
+	/**
+	* Makes a request to an OAuth server
+	* 
+	* @param string $sUrl
+	* @param array $arArgs
+	* @param string $sMethod
+	* @return array
+	* @see parseOAuthResponse
+	*/
+	public function makeOAuthRequest( $sUrl, $arArgs = array(), $sMethod = NULL )
+	{
+		$_sCallbackUrl = $this->callbackUrl;
+		
+		if ( empty( $sMethod ) ) 
+			$sMethod = empty( $arArgs ) ? 'GET' : 'POST';
+		
+		if ( ! in_array( 'oauth_callback', $arArgs ) && ! empty( $_sCallbackUrl ) )
+			$arArgs[ 'oauth_callback' ] = $_sCallbackUrl;
+		
+		$_oRequest = OAuthRequest::from_consumer_and_token( $this->consumerObject, $this->token, $sMethod, $sUrl, $arArgs );
+		$_oRequest->sign_request( $this->signatureObject, $this->consumerObject, $this->token );
+	
+		switch ( $sMethod )
+		{
+			case 'GET': 
+				return $this->parseOAuthResponse( $this->makeHttpRequest( $_oRequest->to_url() ) );
+				
+			case 'POST': 
+				return $this->parseOAuthResponse( $this->makeHttpRequest( $_oRequest->get_normalized_http_url(), $_oRequest->to_postdata(), 'POST' ) );
+		}
+	}
 }
