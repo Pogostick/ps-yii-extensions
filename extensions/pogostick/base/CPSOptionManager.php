@@ -175,6 +175,7 @@ class CPSOptionManager
 			'boolean',
 			'array',
 			'double',
+			'object',
 		);
 
 	/**
