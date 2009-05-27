@@ -554,9 +554,13 @@ class CPSTwitterApi extends CPSApiComponent
 			case 'xml':
 				$_sResults = CPSHelp::arrayToXml( json_decode( $_sResults, true ), 'Results' );
 				break;
+				
+			case 'json':
+				$_sResults = json_encode( $_sResults );
+				break;
 
 			case 'array':
-				$_sResults = json_decode( $_sResults, true );
+				//	Already in array format
 				break;
 		}
 

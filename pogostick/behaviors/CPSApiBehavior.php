@@ -156,7 +156,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 	* @see makeMapItem
 	* @see makeMapArray
 	*/
-	protected function addRequestMapping( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, $sApiName = null, $sSubApiName = null )
+	public function addRequestMapping( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, $sApiName = null, $sSubApiName = null )
 	{
 		//	Save for next call
 		static $_sLastApiName;

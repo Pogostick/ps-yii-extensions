@@ -59,7 +59,9 @@ class CPSgApiWidget extends CPSApiWidget
 	public function run()
 	{
 		parent::run();
+		
 		$this->registerClientScripts();
+		
 		echo $this->generateHtml();
 	}
 

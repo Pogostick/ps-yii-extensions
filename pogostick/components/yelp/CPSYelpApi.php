@@ -39,10 +39,12 @@ class CPSYelpApi extends CPSApiComponent
 	public function init()
 	{
 		//	Call daddy
-		parent::init();                               c
+		parent::init();
 
-		//	This API requires a key in the request
+		//	Set Yelp API defaults
 		$this->requireApiQueryName = true;
+		$this->apiQueryName = 'ywsid';
+		$this->apiBaseUrl = 'http://api.yelp.com';
 
 		//	The valid Yelp APIs to call
 		$this->apiSubUrls =

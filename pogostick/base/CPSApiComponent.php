@@ -91,12 +91,11 @@ class CPSApiComponent extends CPSComponent
 		//	First build the url...
 		$_sUrl = $this->apiBaseUrl .
 			( substr( $this->apiBaseUrl, strlen( $this->apiBaseUrl ) - 1, 1 ) != '/' ? '/' : '' ) .
-			( isset( $this->apiSubUrls[ $this->apiToUse ] ) ? $this->apiSubUrls[ $this->apiToUse ] : '' ) .
-			( $this->mvcQueryFormat ) ? '/' : '';
+			( isset( $this->apiSubUrls[ $this->apiToUse ] ) ? $this->apiSubUrls[ $this->apiToUse ] : '' );
 
 		//	Add the API key...
 		if ( $this->requireApiQueryName )
-			$_sQuery = $this->apiQueryName . ( $this->mvcQueryFormat ) ? '/' : '=' . $this->apiKey;
+			$_sQuery = $this->apiQueryName . '=' . $this->apiKey;
 
 		//	Add the request data to the Url...
 		if ( is_array( $this->requestMap ) && ! empty( $sSubType ) )

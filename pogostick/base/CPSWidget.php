@@ -312,6 +312,9 @@ class CPSWidget extends CInputWidget
 		//	Check behavior methods...
 		if ( $_oBehave = $this->hasBehaviorMethod( $sName ) )
 			try { return call_user_func_array( array( $_oBehave[ CPSCommonBase::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
+			
+		if ( $_oEvent && 1 == $_oEvent->getCode() )
+			throw $_oEvent;
 
 		//	Try parent first... cache exception
 		return parent::__call( $sName, $arParams );

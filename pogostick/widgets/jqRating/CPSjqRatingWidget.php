@@ -38,17 +38,17 @@ class CPSjqRatingWidget extends CPSWidget
 				'ajaxCallback' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'cancel' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'cancelValue' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'half' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
+				'half' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
 				'hoverTips' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'readOnly' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
-				'required' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
+				'readOnly' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
+				'required' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
 				'selectValue' => array( CPSOptionManager::META_DEFAULTVALUE => 0, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'double' ) ),
-				'split' => array( CPSOptionManager::META_DEFAULTVALUE => 1, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'int' ) ),
+				'split' => array( CPSOptionManager::META_DEFAULTVALUE => 1, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'integer' ) ),
 				'starClass' => array( CPSOptionManager::META_DEFAULTVALUE => 'start', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'starCount' => array( CPSOptionManager::META_DEFAULTVALUE => 5, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'int' ) ),
+				'starCount' => array( CPSOptionManager::META_DEFAULTVALUE => 5, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'integer' ) ),
 				'starTitles' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
 				'starValues' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'supressScripts' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'bool', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
+				'supressScripts' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
 			)
 		);
 
