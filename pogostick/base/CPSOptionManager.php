@@ -479,6 +479,9 @@ class CPSOptionManager
 
 		//	Set all the metadata rules...
 		$this->setMetaDataValues( $sKey, $_arRules );
+		
+		//	Required?
+		$this->setMetaDataValue( $sKey, self::META_REQUIRED, isset( $oValue[ self::META_REQUIRED ] ) ? $oValue[ self::META_REQUIRED ] : false );
 
 		//	Now stuff the default value, if there...
 		self::$m_arOptions[ $sKey ] = $_oValue;
@@ -636,7 +639,7 @@ class CPSOptionManager
 	protected function setMetaDataValues( $sKey, array $arRules )
 	{
 		foreach ( $arRules as $_sKey => $_oValue )
-				$this->setMetaDataValue( $sKey, $_sKey, $_oValue );
+			$this->setMetaDataValue( $sKey, $_sKey, $_oValue );
 
 		ksort( self::$m_arOptions );
 	}

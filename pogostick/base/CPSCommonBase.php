@@ -58,110 +58,6 @@ class CPSCommonBase
 		return $_sIntName;
 	}
 
-	//********************************************************************************
-	//* Magic Method Stubs
-	//********************************************************************************
-
-	/**
-	 * Returns a property value, an event handler list or a behavior based on its name.
-	 * Do not call this method. This is a PHP magic method that we override
-	 * to allow using the following syntax to read a property or obtain event handlers:
-	 * <code>
-	 * $value=$component->propertyName;
-	 * $handlers=$component->eventName;
-	 * </code>
-	 *
-	 * Will also return a property from an attached behavior directly without the need for using the behavior name
-	 * <code>
-	 * $value = $component->behaviorPropertyName;
-	 * </code>
-	 * instead of
-	 * <code>
-	 * $value = $component->behaviorName->propertyName
-	 * </code>
-	 * @param CComponent|CWidget $oObject The the calling object
-	 * @param string the property name or event name
-	 * @return mixed the property value, event handlers attached to the event, or the named behavior
-	 * @throws CException if the property or event is not defined
-	 * @see (@link genericSet)
-	 * @see __set
-	 * @static
-	 */
-	public static function &genericGet( $oObject, $oParent = null, $oEvent = null, $sName )
-	{
-		//	Check behavior getter methods...
-		return self::getBehaviorProperty( $oObject, $sName );
-
-		//	Invalid property...
-		if ( null != $oEvent )
-			throw $oEvent;
-	}
-
-	/**
-	 * Sets value of a component property.
-	 * Do not call this method. This is a PHP magic method that we override
-	 * to allow using the following syntax to set a property or attach an event handler
-	 * <pre>
-	 * $this->propertyName=$value;
-	 * $this->eventName=$callback;
-	 * </pre>
-	 *
-	 * Will also set a property value in an attached behavior directly without the need for using the behavior name
-	 * <pre>
-	 * $this->behaviorPropertyName = $value;
-	 * </pre>
-	 * @param CComponent|CWidget $oObject The the calling object
-	 * @param string $sName The property name or the event name
-	 * @param mixed $oValue The property value or callback
-	 * @throws CException if the property/event is not defined or the property is read only.
-	 * @see __get
-	 * @static
-	 */
-	public static function genericSet( $oObject, $oParent = null, $oEvent = null, $sName, $oValue )
-	{
-		//	Direct getter method...
-		$_sSetter = 'set' . $sName;
-		if ( method_exists( $oObject, $_sSetter ) )
-			return $oObject->{$_sSetter}( $oValue );
-
-		//	Are you my daddy?
-		if ( $oParent )
-			try { return $oParent->__set( $sName, $oValue ); } catch ( CException $_ex ) { /* Ignore and pass through */ $oEvent = $_ex; }
-
-		//	Check behavior getter methods...
-		return self::setBehaviorProperty( $oObject, $sName, $oValue );
-
-		//	Invalid property...
-		if ( null != $oEvent )
-			throw $oEvent;
-	}
-
-	/**
-	 * Calls the named method which is not a class method.
-	 *
-	 * @param CComponent|CWidget $oObject The the calling object
-	 * @param string the method name
-	 * @param array method parameters
-	 * @return mixed the method return value
-	 * @throws CException if the property/event is not defined or the property is read only.
-	 * @see __call
-	 * @static
-	 */
-	public function genericCall( $oObject, $oParent = null, $oEvent = null, $sName, $arParams )
-	{
-		//	Are you my daddy?
-		if ( $oParent )
-			try { return $oParent->__call( $sName, $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $oEvent = $_ex; }
-
-		//	Check behavior methods...
-		if ( $_oBehave = self::hasBehaviorMethod( $oObject, $sName ) )
-				return call_user_func_array( array( $_oBehave[ self::BEHAVIOR_META_OBJECT ], $sName ), $arParams );
-
-		//	Invalid property...
-		if ( null != $oEvent )
-			throw $oEvent;
-	}
-
 	/**
 	* Test to see if a behavior has a particular method available
 	*
@@ -288,5 +184,4 @@ class CPSCommonBase
 		if ( null != $sExceptionMessage )
 			throw new CException( $sExceptionMessage, $sLevel, $sCategory );
 	}
-
 }
