@@ -408,7 +408,7 @@ class CPSOptionManager
 			foreach ( $_arType as $_sKey => $_sType )
 			{
 				if ( ! in_array( $_sType, $this->VALID_METADATA_TYPES ) )
-					throw new CException( Yii::t( __CLASS__, 'Invalid "type" specified for "{x}"', array( '{x}' => $sKey ) ) );
+					throw new CException( Yii::t( __CLASS__, 'Invalid "type" specified for "{x}"', array( '{x}' => $sKey ) ), 1  );
 
 				//	Fix up our allowed shortcuts...
 				if ( $_sType == 'bool' )
@@ -463,7 +463,7 @@ class CPSOptionManager
 							else
 							{
 								if ( $_sType != gettype( $oValue[ self::META_DEFAULTVALUE ] ) && ! $_bPrivate && null != $oValue[ self::META_DEFAULTVALUE ] )
-									throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_sType ) ) ? implode( ', ', $_sType ) : $_sType ) ) );
+									throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_sType ) ) ? implode( ', ', $_sType ) : $_sType ) ), 1  );
 							}
 						}
 
@@ -578,7 +578,7 @@ class CPSOptionManager
 	*
 	* @param string $sKey
 	* @param mixed $oValue
-	* @throws CException
+	* @throws CException           
 	* @returns bool
 	*/
 	public function checkOption( $sKey, $oValue )
@@ -592,7 +592,7 @@ class CPSOptionManager
 		{
 			//	Required and missing? Bail
 			if ( $this->getMetaDataValue( $sKey, self::META_REQUIRED ) && empty( self::$m_arOptions[ $sKey ] ) )
-				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ) );
+				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ), 1 );
 
 			//	Get the type of our value...
 			$_sType = gettype( $oValue );
@@ -601,19 +601,22 @@ class CPSOptionManager
 			$_oVPType = $this->getMetaDataValue( $sKey, self::META_TYPE );
 
 			//	Is this a valid type for this option?
-			if ( ( ! is_array( $_oVPType ) && ( $_sType != $_oVPType ) ) || ( is_array( $_oVPType ) && ! in_array( $_sType, $_oVPType ) ) )
-				throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $_sKey, '{y}' => ( is_array( $_oVPType ) ) ? implode( ', ', $_oVPType ) : $_oVPType ) ) );
+			if ( null !== $oValue )
+			{			
+				if ( ( ! is_array( $_oVPType ) && ( $_sType != $_oVPType ) ) || ( is_array( $_oVPType ) && ! in_array( $_sType, $_oVPType ) ) )
+					throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}". Found type "{z}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_oVPType ) ) ? implode( ', ', $_oVPType ) : $_oVPType, '{z}' => $_oVOType ) ), 1  );
 
-			//	Check if this is a valid value for this option
-			if ( null !== ( $_arValid = $this->getMetaDataValue( $sKey, self::META_ALLOWED ) ) )
-			{
-				if ( null != $oValue && is_array( $_arValid ) && ! in_array( $oValue, $_arValid ) )
-					throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: "{y}"', array( '{x}' => $sKey, '{y}' => implode( ', ', $_arValid ) ) ) );
+				//	Check if this is a valid value for this option
+				if ( null !== ( $_arValid = $this->getMetaDataValue( $sKey, self::META_ALLOWED ) ) )
+				{
+					if ( null != $oValue && is_array( $_arValid ) && ! in_array( $oValue, $_arValid ) )
+						throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: "{y}"', array( '{x}' => $sKey, '{y}' => implode( ', ', $_arValid ) ) ), 1  );
+				}
 			}
 		}
 		else
 			//	Invalid option
-			throw new CException( Yii::t( __CLASS__, '"{x}" is not a valid option for "{intname}"', array( '{x}' => $sKey, '{intname}' => $this->m_sInternalName ) ) );
+			throw new CException( Yii::t( __CLASS__, '"{x}" is not a valid option for "{intname}"', array( '{x}' => $sKey, '{intname}' => $this->m_sInternalName ) ), 1  );
 
 		//	Looks clean....
 		return true;

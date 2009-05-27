@@ -271,7 +271,7 @@ class CPSComponentBehavior extends CBehavior
 		$this->checkOptions();
 
 		//	Get our public options...
-		$_arOptions = $this->getPublicOptions();
+		$_arOptions = $this->m_oOptions->getPublicOptions();
 		$_arCallbacks = $this->getOption( 'callbacks' );
 
 		//	Add callbacks to the array...
@@ -327,7 +327,7 @@ class CPSComponentBehavior extends CBehavior
 	*/
 	public function checkOptions()
  	{
-		return $this->getOptionsObject()->checkOptions( $this->getPublicOptions() );
+		return $this->getOptionsObject()->checkOptions( $this->m_oOptions->getPublicOptions() );
 	}
 
 	/**
@@ -372,10 +372,6 @@ class CPSComponentBehavior extends CBehavior
 	 */
 	public function &__get( $sName )
 	{
-		//	Empty check short cut?
-		if ( '_' == substr( $sName, 0, 1 ) && '_' == substr( $sName, strlen( $sName ) - 1, 1 ) )
-			return $this->isEmpty( $this->__get( substr( $sName, 1, strlen( $sName ) - 2 ) ) );
-			
 		//	Is it a member variable?
 		if ( in_array( $sName, array_keys( get_class_vars( get_class( $this ) ) ) ) )
 			return $this->{$sName};
@@ -384,10 +380,7 @@ class CPSComponentBehavior extends CBehavior
 			return $this->getOption( $sName );
 			
 		//	Try daddy...
-		try { return parent::__get( $sName ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
-
-		//	Now us...
-		return $this->getBehaviorProperty( $oObject, $sName );
+		return parent::__get( $sName );
 	}
 
 	/**
@@ -414,10 +407,7 @@ class CPSComponentBehavior extends CBehavior
 		if ( $this->hasOption( $sName ) )
 			return $this->setOption( $sName, $oValue );
 			
-		try { return parent::__set( $sName, $oValue ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
-
-		//	Look in our behavior properties
-		return $this->setBehaviorProperty( $oObject, $sName, $oValue );
+		return parent::__set( $sName, $oValue );
 	}
 
  }
