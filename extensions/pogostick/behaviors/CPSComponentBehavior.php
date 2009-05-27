@@ -272,7 +272,7 @@ class CPSComponentBehavior extends CBehavior
 
 		//	Get our public options...
 		$_arOptions = $this->m_oOptions->getPublicOptions();
-		$_arCallbacks = $this->getOption( 'callbacks' );
+		$_arCallbacks = $this->callbacks;
 
 		//	Add callbacks to the array...
 		foreach ( $_arCallbacks as $_sKey => $_oValue )
@@ -288,7 +288,7 @@ class CPSComponentBehavior extends CBehavior
 		foreach( $_arOptions as $_sKey => $_oValue )
 		{
 			//	Skip nulls...
-			if ( isset( $_arOptions[ $_sKey ] ) && $_sKey != 'callbacks' )
+			if ( $_sKey != 'callbacks' && isset( $_arOptions[ $_sKey ] ) )
 			{
 				$_sExtName = $this->getOptionsObject()->getMetaDataValue( $_sKey, CPSOptionManager::META_EXTERNALNAME );
 				if ( empty( $_sExtName ) )
