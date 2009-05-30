@@ -187,5 +187,4 @@ abstract class CPSApiWidget extends CPSWidget
 	{
 		$this->raiseEvent( 'onRequestComplete', $oEvent );
 	}
-
 }
