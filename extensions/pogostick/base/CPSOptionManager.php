@@ -191,9 +191,9 @@ class CPSOptionManager
 	/**
 	* The base option collection
 	*
-	* @staticvar array
+	* @var array
 	*/
-	public static $m_arOptions = array();
+	protected $m_arOptions = array();
 	/**
 	* My internal tag for option filtering
 	*
@@ -263,7 +263,7 @@ class CPSOptionManager
 	* @see setOptions
 	* @returns array
 	*/
-	public function &getOptions() { return self::$m_arOptions; }
+	public function &getOptions() { return $this->m_arOptions; }
 
 	/**
 	* Returns a copy of ONLY the public options in the internal options array
@@ -276,7 +276,7 @@ class CPSOptionManager
 		$_arOptions = array();
 
 		//	Build an array with non-private entities
-		foreach( self::$m_arOptions as $_sKey => $_oValue )
+		foreach( $this->m_arOptions as $_sKey => $_oValue )
 		{
 			//	Go through metadata, pull out non-private keys
 			if ( $this->isMetaDataKey( $_sKey ) && ! $this->getMetaDataValue( $_sKey, CPSOptionManager::META_PRIVATE ) )
@@ -288,7 +288,7 @@ class CPSOptionManager
 					continue;
 
 				//	This option is safe to output. Pull the key from the array
-				$_arOptions[ $_sRealKey ] = self::$m_arOptions[ $_sRealKey ];
+				$_arOptions[ $_sRealKey ] = $this->m_arOptions[ $_sRealKey ];
 			}
 		}
 
@@ -317,7 +317,7 @@ class CPSOptionManager
 				$this->setOption( $_sKey, $_oValue, $bAdd );
 
 		//	Sort the array
-		ksort( self::$m_arOptions );
+		ksort( $this->m_arOptions );
 	}
 
 	/**
@@ -338,7 +338,7 @@ class CPSOptionManager
 			return null;
 
 		//	Get the value out of the array...
-		return self::$m_arOptions[ $sKey ] = $oValue;
+		return $this->m_arOptions[ $sKey ] = $oValue;
 	}
 
 	/**
@@ -364,7 +364,7 @@ class CPSOptionManager
 				$this->addOption( $_sKey, $_oValue, true );
 
 		//	Sort the array
-		ksort( self::$m_arOptions );
+		ksort( $this->m_arOptions );
 	}
 
 	/**
@@ -407,7 +407,7 @@ class CPSOptionManager
 			//	Allowed type?
 			foreach ( $_arType as $_sKey => $_sType )
 			{
-				if ( ! in_array( $_sType, $this->VALID_METADATA_TYPES ) )
+				if ( null != $_sType && ! in_array( $_sType, $this->VALID_METADATA_TYPES ) )
 					throw new CException( Yii::t( __CLASS__, 'Invalid "type" specified for "{x}"', array( '{x}' => $sKey ) ), 1  );
 
 				//	Fix up our allowed shortcuts...
@@ -484,11 +484,11 @@ class CPSOptionManager
 		$this->setMetaDataValue( $sKey, self::META_REQUIRED, isset( $oValue[ self::META_REQUIRED ] ) ? $oValue[ self::META_REQUIRED ] : false );
 
 		//	Now stuff the default value, if there...
-		self::$m_arOptions[ $sKey ] = $_oValue;
+		$this->m_arOptions[ $sKey ] = $_oValue;
 
 		//	Sort the array
 		if ( ! $bNoSort )
-			ksort( self::$m_arOptions );
+			ksort( $this->m_arOptions );
 	}
 
 	/**
@@ -506,10 +506,10 @@ class CPSOptionManager
 			return null;
 
 		//	Key not there? Make it with default...
-		if ( ! isset( self::$m_arOptions[ $sKey ] ) )
-			self::$m_arOptions[ $sKey ] = $oDefault;
+		if ( ! isset( $this->m_arOptions[ $sKey ] ) )
+			$this->m_arOptions[ $sKey ] = $oDefault;
 
-		return self::$m_arOptions[ $sKey ];
+		return $this->m_arOptions[ $sKey ];
 	}
 
 	/**
@@ -522,7 +522,7 @@ class CPSOptionManager
 	*/
 	public function hasOption( $sKey )
 	{
-		return in_array( $this->validateKey( $sKey ), self::$m_arOptions );
+		return in_array( $this->validateKey( $sKey ), $this->m_arOptions );
 	}
 
 	/**
@@ -563,7 +563,7 @@ class CPSOptionManager
 	{
 		//	None were passed in? Then we check our array
 		if ( empty( $arOptions ) )
-			$arOptions = self::$m_arOptions;
+			$arOptions = $this->m_arOptions;
 
 		//	One at a time...
 		foreach ( $arOptions as $_sKey => $_oValue )
@@ -591,7 +591,7 @@ class CPSOptionManager
 		if ( $this->hasOption( $sKey ) )
 		{
 			//	Required and missing? Bail
-			if ( $this->getMetaDataValue( $sKey, self::META_REQUIRED ) && empty( self::$m_arOptions[ $sKey ] ) )
+			if ( $this->getMetaDataValue( $sKey, self::META_REQUIRED ) && empty( $this->m_arOptions[ $sKey ] ) )
 				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ), 1 );
 
 			//	Get the type of our value...
@@ -601,7 +601,7 @@ class CPSOptionManager
 			$_oVPType = $this->getMetaDataValue( $sKey, self::META_TYPE );
 
 			//	Is this a valid type for this option?
-			if ( null !== $oValue )
+			if ( null !== $oValue && null !== $_VPType )
 			{			
 				if ( ( ! is_array( $_oVPType ) && ( $_sType != $_oVPType ) ) || ( is_array( $_oVPType ) && ! in_array( $_sType, $_oVPType ) ) )
 					throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}". Found type "{z}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_oVPType ) ) ? implode( ', ', $_oVPType ) : $_oVPType, '{z}' => $_oVOType ) ), 1  );
@@ -644,7 +644,7 @@ class CPSOptionManager
 		foreach ( $arRules as $_sKey => $_oValue )
 			$this->setMetaDataValue( $sKey, $_sKey, $_oValue );
 
-		ksort( self::$m_arOptions );
+		ksort( $this->m_arOptions );
 	}
 
 	/**
@@ -662,7 +662,7 @@ class CPSOptionManager
 			return null;
 
 		if ( in_array( $eMDKey, $this->VALID_METADATA ) )
-			self::$m_arOptions[ $this->getMetaDataKey( $sKey ) ][ $eMDKey ] = $oValue;
+			$this->m_arOptions[ $this->getMetaDataKey( $sKey ) ][ $eMDKey ] = $oValue;
 	}
 
 	/**
@@ -673,7 +673,7 @@ class CPSOptionManager
 	*/
 	public function getMetaData( $sKey )
 	{
-		return self::$m_arOptions[ $this->getMetaDataKey( $this->validateKey( $sKey ) ) ];
+		return $this->m_arOptions[ $this->getMetaDataKey( $this->validateKey( $sKey ) ) ];
 	}
 
 	/**
@@ -690,7 +690,7 @@ class CPSOptionManager
 			return null;
 
 		if ( in_array( $eMDKey, $this->VALID_METADATA ) )
-			return self::$m_arOptions[ $this->getMetaDataKey( $sKey ) ][ $eMDKey ];
+			return $this->m_arOptions[ $this->getMetaDataKey( $sKey ) ][ $eMDKey ];
 	}
 
 	/**

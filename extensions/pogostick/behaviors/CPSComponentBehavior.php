@@ -16,7 +16,7 @@
  * @package psYiiExtensions
  * @subpackage Behaviors
  * @filesource
- * @since 1.0.0
+ * @since 1.0.1
  */
 class CPSComponentBehavior extends CBehavior
 {
@@ -294,6 +294,21 @@ class CPSComponentBehavior extends CBehavior
 				if ( empty( $_sExtName ) )
 					$_sExtName = $_sKey;
 
+				//	Check for callbacks in the inner array (.i.e. "buttons" from jqUI dialog)
+				if ( is_array( $_oValue ) )
+				{
+					foreach ( $_oValue as $_sKey1 => $_oValue1 )
+					{
+						if ( $this->isCBFunction( $_oValue1 ) )
+						{
+							//	Remove from options and move to callbacks..
+							$_oValue[ 'cb_' . $_sKey1 ] = $_sKey1;
+							unset( $_oValue[ $_sKey1 ] );
+							$_arCallbacks[ '!!!' . $_sKey1 ] = $_oValue1;
+						}
+					}
+				}
+					
 				$_arToEncode[ $_sExtName ] = $_oValue;
 			}
 		}
@@ -305,10 +320,19 @@ class CPSComponentBehavior extends CBehavior
 			//	Fix up the callbacks...
 			foreach ( $_arCallbacks as $_sKey => $_oValue )
 			{
+				$_sQuote = null;
+				
+				//	Indicator to quote key...
+				if ( '!!!' == substr( $_sKey, 0, 3 ) )
+				{
+					$_sQuote = "'";
+					$_sKey = substr( $_sKey, 3 );
+				}
+				
 				if ( ! empty( $_oValue ) )
 				{
-					if ( 0 == strncasecmp( $_oValue, 'function(', 9 ) )
-						$_sEncodedOptions = str_replace( "'cb_{$_sKey}':'{$_sKey}'", "{$_sKey}:{$_oValue}", $_sEncodedOptions );
+					if ( $this->isCBFunction( $_oValue ) )
+						$_sEncodedOptions = str_replace( "'cb_{$_sKey}':'{$_sKey}'", "{$_sQuote}{$_sKey}{$_sQuote}:{$_oValue}", $_sEncodedOptions );
 					else
 						$_sEncodedOptions = str_replace( "'cb_{$_sKey}':'{$_sKey}'", "{$_sKey}:'{$_oValue}'", $_sEncodedOptions );
 				}
@@ -410,4 +434,14 @@ class CPSComponentBehavior extends CBehavior
 		return parent::__set( $sName, $oValue );
 	}
 
- }
+	/**
+	* Check to see if the value follows a callback function pattern
+	* 	
+	* @param string $sValue
+	*/
+	protected function isCBFunction( $sValue )
+	{
+		return ( 0 == strncasecmp( $sValue, 'function(', 9 ) || 0 == strncasecmp( $sValue, 'jQuery(', 7 ) || 0 == strncasecmp( $sValue, '$(', 2 ) );
+	}
+
+}
