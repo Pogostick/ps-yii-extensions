@@ -84,7 +84,7 @@ class CPSjqUIWrapper extends CPSWidget
 	{
 		//	Validate baseUrl
 		if ( $this->isEmpty( $this->baseUrl ) )
-			$this->baseUrl = $this->getExtLibUrl() . '/jqui',
+			$this->baseUrl = $this->getExtLibUrl() . '/jqui';
 
 		//	Validate theme
 		if ( $this->isEmpty( $this->theme ) )
@@ -153,7 +153,7 @@ CODE;
 	//* Static methods
 	//********************************************************************************
 	
-	public static function create( $sName, array $arOptions = array(), $bAutoRun = false, $sId = null, $sTheme = 'base', $sBaseUrl = '/extra/jqui' )
+	public static function create( $sName, array $arOptions = array(), $bAutoRun = false, $sId = null, $sTheme = 'base', $sBaseUrl = null )
 	{
 		static $_sLastTheme = null;
 		static $_sLastBaseUrl = null;
