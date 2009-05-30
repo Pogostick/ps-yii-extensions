@@ -123,7 +123,7 @@ class CPSjqGridWidget extends CPSWidget
 	{
 		//	Validate baseUrl
 		if ( $this->isEmpty( $this->baseUrl ) )
-			throw new CHttpException( 500, __CLASS__ . ': baseUrl is required.');
+			$this->baseUrl = $this->getExtLibUrl() . '/jqGrid';
 
 		//	Register the scripts/css
 		$this->registerClientScripts();
@@ -147,7 +147,7 @@ class CPSjqGridWidget extends CPSWidget
 			$this->imgpath = "{$this->baseUrl}/themes/{$this->theme}/images";
 
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "{$this->baseUrl}/jquery.jqGrid.js" );
+		$_oCS->registerScriptFile( "{$this->baseUrl}/jquery.jqGrid.js?path=" . $this->baseUrl );
 		$_oCS->registerScriptFile( "{$this->baseUrl}/js/jqModal.js" );
 		$_oCS->registerScriptFile( "{$this->baseUrl}/js/jqDnR.js" );
 

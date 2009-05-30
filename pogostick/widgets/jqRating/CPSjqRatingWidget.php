@@ -75,7 +75,7 @@ class CPSjqRatingWidget extends CPSWidget
 	{
 		//	Validate baseUrl
 		if ( $this->isEmpty( $this->baseUrl ) )
-			throw new CHttpException( 403, __CLASS__ . ': baseUrl is required.');
+			$this->baseUrl = $this->getExtLibUrl() . '/jqRating';
 
 		//	Register the scripts/css
 		$this->registerClientScripts();
@@ -225,8 +225,8 @@ class CPSjqRatingWidget extends CPSWidget
 		//	Fix up the base url...
 		$_sBaseUrl = CPSHelp::getOption( $arOptions, 'baseUrl', '' );
 
-		if ( null == $_sBaseUrl )
-			$_sBaseUrl = Yii::app()->baseUrl . '/extra/jqRating';
+		if ( empty( $_sBaseUrl ) )
+			$_sBaseUrl = Yii::getPathOfAlias( 'pogostick' ) . '/jqRating';
 
 		//	Put it back in the array
 		CPSHelp::setOption( $arOptions, 'baseUrl', $_sBaseUrl );

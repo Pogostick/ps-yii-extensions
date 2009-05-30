@@ -84,7 +84,7 @@ class CPSjqUIWrapper extends CPSWidget
 	{
 		//	Validate baseUrl
 		if ( $this->isEmpty( $this->baseUrl ) )
-			throw new CHttpException( 500, __CLASS__ . ': baseUrl is required.');
+			$this->baseUrl = $this->getExtLibUrl() . '/jqui',
 
 		//	Validate theme
 		if ( $this->isEmpty( $this->theme ) )
