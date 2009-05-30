@@ -1,8 +1,9 @@
 <refentry id="{@id}">
  <refnamediv>
   <refname>Pogostick Yii Extension Library</refname>
-  <refpurpose>Easily create Yii components and widgets!</refpurpose>
+  <refpurpose>Component/Widget Library</refpurpose>
  </refnamediv>
+ {@toc}
  <refsynopsisdiv>
   <author>
    Jerry Ablan
@@ -13,17 +14,13 @@
  </refsynopsisdiv>
  <refsect1 id="{@id intro}">
   <title>Why do I need a mini-framework inside a framework?</title>
-  <para>My thought was that if it could be even easier to extend Yii, more people would build extensions.</para>
- </refsect1>
-  <refsect1 id="{@id references}">
-  <title>References for learning how to use phpDocumentor</title>
-  <para>
-   <itemizedlist>
-    <listitem>
-	 <para>aaaf</para>
-	</listitem>
-   </itemizedlist>
-  </para>
+  <para>After building a few projects using the {@link http://www.yiiframework.com Yii Framework}, I found I was repeating myself in a few areas. I decided I would separate out my common base of code to make it easier to reuse. During the separation, I started adding a few things here and there and finally ended up with this base set of functionality.</para>
+  <para>The major features of the psYiiExtension library are as follows</para>
+  <itemizedlist>
+  	<listitem>A new base {@link CPSComponent component} and {@link CPSWidget widget}</listitem>
+  	<listitem>New behaviors that are closely linked to these objects</listitem>
+  	<listitem>Several components and widgets built with upon this framework</listitem>
+  </itemizedlist>
+  <para>I will try my best to explain how to use these objects and hopefully you will find them useful.</para>
  </refsect1>
 </refentry>
-
