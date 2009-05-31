@@ -111,18 +111,20 @@ abstract class CPSApiWidget extends CPSWidget
 	/**
 	* Generates the javascript code for the widget
 	*
-	* @abstract
 	* @return string
 	*/
-	abstract protected function generateJavascript();
+	protected function generateJavascript()
+	{
+	}
 
 	/**
 	* Generates the javascript code for the widget
 	*
-	* @abstract
 	* @return string
 	*/
-	abstract protected function generateHtml();
+	protected function generateHtml()
+	{
+	}
 
 	//********************************************************************************
 	//* Event Handlers

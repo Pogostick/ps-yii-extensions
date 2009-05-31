@@ -592,7 +592,7 @@ class CPSOptionManager
 		{
 			//	Required and missing? Bail
 			if ( $this->getMetaDataValue( $sKey, self::META_REQUIRED ) && empty( $this->m_arOptions[ $sKey ] ) )
-				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $_sKey ) ), 1 );
+				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $sKey ) ), 1 );
 
 			//	Get the type of our value...
 			$_sType = gettype( $oValue );

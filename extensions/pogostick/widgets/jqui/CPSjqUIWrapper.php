@@ -84,7 +84,7 @@ class CPSjqUIWrapper extends CPSWidget
 	{
 		//	Validate baseUrl
 		if ( $this->isEmpty( $this->baseUrl ) )
-			$this->baseUrl = $this->getExtLibUrl() . '/jqui';
+			$this->baseUrl = $this->extLibUrl . '/jqui';
 
 		//	Validate theme
 		if ( $this->isEmpty( $this->theme ) )
@@ -92,6 +92,8 @@ class CPSjqUIWrapper extends CPSWidget
 
 		//	Register the scripts/css
 		$this->registerClientScripts();
+		
+		echo $this->generateHtml();
 	}
 
 	/**
@@ -125,6 +127,9 @@ class CPSjqUIWrapper extends CPSWidget
 
 		//	Register css files...
 		$_oCS->registerCssFile( "{$this->baseUrl}/css/{$this->theme}/ui.all.css", 'screen' );
+		
+		//	Don't forget subclasses
+		return $_oCS;
 	}
 
 	//********************************************************************************

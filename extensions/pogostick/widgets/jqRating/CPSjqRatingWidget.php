@@ -75,7 +75,7 @@ class CPSjqRatingWidget extends CPSWidget
 	{
 		//	Validate baseUrl
 		if ( $this->isEmpty( $this->baseUrl ) )
-			$this->baseUrl = $this->getExtLibUrl() . '/jqRating';
+			$this->baseUrl = $this->extLibUrl . '/jqRating';
 
 		//	Register the scripts/css
 		$this->registerClientScripts();

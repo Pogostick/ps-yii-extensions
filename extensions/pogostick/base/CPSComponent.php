@@ -62,12 +62,6 @@ class CPSComponent extends CApplicationComponent
 	* @var array
 	*/
 	protected $m_arBehaviors = null;
-	/**
-	* The path of the extension library
-	* 
-	* @var string
-	*/
-	protected $m_sExtLibUrl = null;
 
 	//********************************************************************************
 	//* Property Accessors
@@ -80,7 +74,6 @@ class CPSComponent extends CApplicationComponent
 	public function getNamePrefix() { return $this->m_sInternalName . $this->m_sPrefixDelimiter; }
 	public function getPrefixDelimiter() { return $this->m_sPrefixDelimiter; }
 	public function getHasBehaviors() { return $this->m_bHasBehaviors; }
-	public function getExtLibUrl() { return $this->m_sExtLibUrl; }
 
 	/**
 	* Setters for internal members
@@ -88,7 +81,6 @@ class CPSComponent extends CApplicationComponent
 	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
 	protected function setPrefixDelimiter( $sValue ) { $this->m_sPrefixDelimiter = $sValue; }
 	public function setHasBehaviors( $bValue ) { $this->m_bHasBehaviors = $bValue; }
-	public function setExtLibUrl( $sValue ) { $this->m_sExtLibUrl = $sValue; }
 
 	/**
 	* Retrieves the behaviors attached to this component
@@ -116,9 +108,6 @@ class CPSComponent extends CApplicationComponent
 	*/
 	public function __construct()
 	{
-		//	Set the external library path
-		Yii::app()->user->setState( 'psUrl', $this->m_sExtLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick' ) . '/external', true, -1 ) );
-
 		//	Create our internal name
 		$_sName = CPSCommonBase::createInternalName( $this );
 		
