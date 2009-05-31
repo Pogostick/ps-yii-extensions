@@ -90,14 +90,14 @@ class CPSComponentBehavior extends CBehavior
 		//	Get our name...
 		$_sName = CPSCommonBase::createInternalName( $this );
 
-		//	Import needed classes...
-//		Yii::import( 'pogostick.base.CPSOptionManager' );
-
 		//	build our option manager...
 		$this->m_oOptions = new CPSOptionManager( $this->m_sInternalName );
 
 		//	Set up our base settings
 		$this->addOptions( self::getBaseOptions() );
+
+		//	Set the external library path
+		$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick' ) . '/external', true, -1 );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
@@ -230,6 +230,7 @@ class CPSComponentBehavior extends CBehavior
 				'checkCallbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
 				'validCallbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'callbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'extLibUrl_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}
