@@ -158,7 +158,7 @@ CODE;
 	//* Static methods
 	//********************************************************************************
 	
-	public static function create( $sName, array $arOptions = array(), $bAutoRun = false, $sId = null, $sTheme = 'base', $sBaseUrl = null )
+	public static function create( $sName, array $arOptions = array(), $bAutoRun = false, $sId = null, $sTheme = null, $sBaseUrl = null )
 	{
 		static $_sLastTheme = null;
 		static $_sLastBaseUrl = null;
