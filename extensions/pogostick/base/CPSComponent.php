@@ -116,6 +116,10 @@ class CPSComponent extends CApplicationComponent
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
+		
+		//	Preinitialize if available
+		if ( method_exists( $this, 'preinit' ) )
+			$this->preinit();
 	}
 
 	//********************************************************************************
