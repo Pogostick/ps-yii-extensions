@@ -209,7 +209,24 @@ CODE;
 	//* Static methods
 	//********************************************************************************
 	
-	public static function create( $sName, array $arOptions = array(), $bAutoRun = false, $sId = null, $sTheme = 'base', $sBaseUrl = null )
+	/**
+	* Constructs and returns a jqUI widget
+	* 
+	* The $baseUrl and $theme values are cached between calls so you do not need to 
+	* specify them each time you call this method. 
+	* 
+	* The options passed in are dynamically added to the options array and will be accessible 
+	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
+	* 
+	* @param string $sName The type of jqUI widget to create
+	* @param array $arOptions The options for the widget
+	* @param boolean $bAutoRun Whether or not to call the run() method of the widget
+	* @param string $sId The DOM id of the widget if other than $sName
+	* @param string $sTheme The jqUI theme to use
+	* @param string $sBaseUrl The base Url of the jqUI files, if different from the default
+	* @return CPSjqUIWrapper
+	*/
+	public static function create( $sName, array $arOptions = array(), $bAutoRun = false, $sId = null, $sTheme = null, $sBaseUrl = null )
 	{
 		static $_sLastTheme = null;
 		static $_sLastBaseUrl = null;

@@ -94,7 +94,7 @@ class CPSComponentBehavior extends CBehavior
 		$this->m_oOptions = new CPSOptionManager( $this->m_sInternalName );
 
 		//	Set up our base settings
-		$this->addOptions( self::getBaseOptions() );
+			$this->addOptions( self::getBaseOptions() );
 
 		//	Set the external library path
 		$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick' ) . '/external', true, -1 );
@@ -268,11 +268,13 @@ class CPSComponentBehavior extends CBehavior
 	*/
 	public function makeOptions()
 	{
+		//	Get the public options...
+		$_arOptions = $this->m_oOptions->getPublicOptions();
+		
 		//	Check them first...
-		$this->checkOptions();
+		$this->checkOptions( $_arOptions );
 
 		//	Get our public options...
-		$_arOptions = $this->m_oOptions->getPublicOptions();
 		$_arCallbacks = $this->callbacks;
 
 		//	Add callbacks to the array...
@@ -292,6 +294,7 @@ class CPSComponentBehavior extends CBehavior
 			if ( $_sKey != 'callbacks' && isset( $_arOptions[ $_sKey ] ) )
 			{
 				$_sExtName = $this->getOptionsObject()->getMetaDataValue( $_sKey, CPSOptionManager::META_EXTERNALNAME );
+				
 				if ( empty( $_sExtName ) )
 					$_sExtName = $_sKey;
 
@@ -350,9 +353,10 @@ class CPSComponentBehavior extends CBehavior
 	*
 	* @returns bool
 	*/
-	public function checkOptions()
+	public function checkOptions( $arOptions = null )
  	{
-		return $this->getOptionsObject()->checkOptions( $this->m_oOptions->getPublicOptions() );
+ 		if ( null == $arOptions ) $arOptions = $this->m_oOptions->getPublicOptions();
+		return $this->getOptionsObject()->checkOptions( $arOptions );
 	}
 
 	/**

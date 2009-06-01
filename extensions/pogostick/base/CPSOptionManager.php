@@ -590,8 +590,10 @@ class CPSOptionManager
 		//	Check if this option is available
 		if ( $this->hasOption( $sKey ) )
 		{
+			$_bHasValue = ( isset( $this->m_arOptions[ $this->getMetaDataValue( $sKey, self::META_KEYNAME ) ] ) || isset( $this->m_arOptions[ strtolower( $sKey ) ] ) );
+			
 			//	Required and missing? Bail
-			if ( $this->getMetaDataValue( $sKey, self::META_REQUIRED ) && empty( $this->m_arOptions[ $sKey ] ) )
+			if ( $this->getMetaDataValue( $sKey, self::META_REQUIRED ) && ! $_bHasValue )
 				throw new CException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $sKey ) ), 1 );
 
 			//	Get the type of our value...

@@ -10,6 +10,56 @@
 
 /**
 * The CPSjqUIWraqpper is a wrapper for any jQuery UI widget
+* 
+* This class must be instantiated by using the static method (@link create). 
+* If you do not use that method, the options will not initiate properly.
+* 
+* Here we create an accordion:
+* <code>
+* //	Create an accordian...
+* CPSjqUIWrapper::create( 'accordion', array( 'header' => 'h3' ), true, null, 'cupertino' );
+* 
+* ...
+* 
+* <html>
+* 
+* ...
+* 
+* <h2 class="demoHeaders">Accordion</h2>
+* <div id="accordion">
+* 	<div>
+* 		<h3><a href="#">First</a></h3>
+* 		<div>Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.</div>
+* 	</div>
+* 	<div>
+* 		<h3><a href="#">Second</a></h3>
+* 		<div>Phasellus mattis tincidunt nibh.</div>
+* 	</div>
+* 	<div>
+* 		<h3><a href="#">Third</a></h3>
+* 		<div>Nam dui erat, auctor a, dignissim quis.</div>
+* 	</div>
+* </div>
+* 
+* ...
+* 
+* </html>
+* </code>
+* 
+* In the above example, the 3rd parameter instructs the library to execute the widget's 
+* (@link CWidget::run()) method after it has been initialized. This causes the output to 
+* render. If you wish to run the widget at a later time, use the following code:
+* <code>
+* //	Create an accordian...
+* 
+* $_widget = CPSjqUIWrapper::create( 'accordion', array( 'header' => 'h3' ), false, null, 'cupertino' );
+* 
+* ...
+* 
+* $_widget->run();
+* </code>
+* 
+* 
 *
 * @author Jerry Ablan <jablan@pogostick.com>
 * @version $Id$
@@ -48,7 +98,7 @@ class CPSjqUIWrapper extends CPSWidget
 	* @param mixed $oOwner
 	* @return CPSjqUIWraqpper
 	*/
-	public function __construct( $oOwner = null )
+	function __construct( $oOwner = null )
 	{
 		parent::__construct( $oOwner );
 		
@@ -88,7 +138,7 @@ class CPSjqUIWrapper extends CPSWidget
 
 		//	Validate theme
 		if ( $this->isEmpty( $this->theme ) )
-			$this->theme = 'base';
+			$this->theme = 'cupertino';
 
 		//	Register the scripts/css
 		$this->registerClientScripts();
@@ -158,6 +208,23 @@ CODE;
 	//* Static methods
 	//********************************************************************************
 	
+	/**
+	* Constructs and returns a jqUI widget
+	* 
+	* The $baseUrl and $theme values are cached between calls so you do not need to 
+	* specify them each time you call this method. 
+	* 
+	* The options passed in are dynamically added to the options array and will be accessible 
+	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
+	* 
+	* @param string $sName The type of jqUI widget to create
+	* @param array $arOptions The options for the widget
+	* @param boolean $bAutoRun Whether or not to call the run() method of the widget
+	* @param string $sId The DOM id of the widget if other than $sName
+	* @param string $sTheme The jqUI theme to use
+	* @param string $sBaseUrl The base Url of the jqUI files, if different from the default
+	* @return CPSjqUIWrapper
+	*/
 	public static function create( $sName, array $arOptions = array(), $bAutoRun = false, $sId = null, $sTheme = null, $sBaseUrl = null )
 	{
 		static $_sLastTheme = null;
