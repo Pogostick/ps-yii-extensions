@@ -128,12 +128,13 @@ class CPSjQueryWidget extends CPSWidget
 	*
 	* @return string
 	*/
-	protected function generateJavascript()
+	protected function generateJavascript( $sClassName = null, $arOptions = null )
 	{
-		$_arOptions = $this->makeOptions();
-
+		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
+		$_sId = ( null != $sClassName ) ? '.' . $sClassName : '#' . $this->id;
+		
 		$this->script =<<<CODE
-$('#{$this->id}').{$this->widgetName}({$_arOptions});
+$('{$_sId}').{$this->widgetName}({$_arOptions});
 CODE;
 
 		return( $this->script );

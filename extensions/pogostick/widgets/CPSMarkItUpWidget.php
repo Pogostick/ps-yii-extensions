@@ -1,6 +1,6 @@
 <?php
 /**
- * CPSWysiwygWidget class file.
+ * CPSMarkItUpWidget class file.
  *
  * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://ps-yii-extensions.googlecode.com
@@ -10,14 +10,14 @@
  */
 
 /**
- * CPSWysiwygWidget a wrapper to the excellent (@link http://code.google.com/p/jwysiwyg/ WYSIWYG jQuery widget)
+ * CPSMarkItUpWidget a wrapper to the excellent (@link http://markitup.jaysalvat.com MarkItUp jQuery widget)
  *
  * @author Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
  * @subpackage Widgets
  * @since 1.0.0
  */
-class CPSWysiwygWidget extends CPSjqUIWrapper
+class CPSMarkItUpWidget extends CPSjqUIWrapper
 {
 	//********************************************************************************
 	//* Public Methods
@@ -32,8 +32,8 @@ class CPSWysiwygWidget extends CPSjqUIWrapper
 		parent::run();
 		
 		//	This widget info
-		$this->baseUrl = $this->extLibUrl . '/jquery-plugins/wysiwyg';
-		$this->widgetName = 'wysiwyg';
+		$this->baseUrl = $this->extLibUrl . '/jquery-plugins/markitup';
+		$this->widgetName = 'markItUp';
 
 		//	Register the scripts/css
 		$this->registerClientScripts();
@@ -51,11 +51,13 @@ class CPSWysiwygWidget extends CPSjqUIWrapper
 		
 		//	Register scripts necessary
 		self::loadScripts( $this, $this->theme );
-		$_oCS->registerScriptFile( "{$this->extLibUrl}/jquery-plugins/wysiwyg/jquery.wysiwyg.js" );
-		$_oCS->registerCssFile( "{$this->extLibUrl}/jquery-plugins/wysiwyg/jquery.wysiwyg.css" );
+		$_oCS->registerScriptFile( "{$this->extLibUrl}/jquery-plugins/markitup/jquery.markitup.pack.js" );
+		$_oCS->registerScriptFile( "{$this->extLibUrl}/jquery-plugins/markitup/sets/html/set.js" );
+		$_oCS->registerCssFile( "{$this->extLibUrl}/jquery-plugins/markitup/skins/markitup/style.css" );
+		$_oCS->registerCssFile( "{$this->extLibUrl}/jquery-plugins/markitup/sets/html/style.css" );
 	
 		//	Get the javascript for this widget
-		$_oCS->registerScript( 'pswysiwyg.' . $this->widgetName . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
+		$_oCS->registerScript( 'pswysiwyg.' . $this->widgetName . '#' . $this->id, $this->generateJavascript( 'markItUp', 'mySettings' ), CClientScript::POS_READY );
 	}
 
 	/**
@@ -70,7 +72,7 @@ class CPSWysiwygWidget extends CPSjqUIWrapper
 	*/
 	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
 	{
-		return parent::create( 'wysiwyg', $arOptions, $sClass );
+		return parent::create( 'markItUp', $arOptions, $sClass );
 	}
 	
 }
