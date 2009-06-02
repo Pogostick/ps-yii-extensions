@@ -1,0 +1,29 @@
+/*
+* Styles for buttons and toolbars for jQuery
+* Hijacked from Filament Group Labs (http://www.filamentgroup.com/lab/styling_buttons_and_toolbars_with_the_jquery_ui_css_framework/)!
+* Thanks Guys!
+*/
+
+.ps-button { outline: 0; margin:0 4px 0 0; padding: .4em 1em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
+.ps-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }
+
+a.ps-button { float:left; }
+
+/* remove extra button width in IE */
+button.ps-button { width:auto; overflow:visible; }
+
+.ps-button-icon-left { padding-left: 2.1em; }
+.ps-button-icon-right { padding-right: 2.1em; }
+.ps-button-icon-left .ui-icon { right: auto; left: .2em; margin-left: 0; }
+.ps-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; }
+
+.ps-button-icon-solo { display:block; width:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
+
+.ps-buttonset { float:left; }
+.ps-buttonset .ps-button { float: left; }
+.ps-buttonset-single .ps-button, 
+.ps-buttonset-multi .ps-button { margin-right: -1px;}
+
+.ps-toolbar { padding: .5em; margin: 0;  }
+.ps-toolbar .ps-buttonset { margin-right:1.5em; padding-left: 1px; }
+.ps-toolbar .ps-button { font-size: 1em;  }

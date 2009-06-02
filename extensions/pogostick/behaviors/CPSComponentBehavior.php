@@ -234,7 +234,7 @@ class CPSComponentBehavior extends CBehavior
 				'checkCallbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
 				'validCallbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'callbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'extLibUrl_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'extLibUrl_' => array( CPSOptionManager::META_DEFAULTVALUE => '/', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}
