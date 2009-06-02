@@ -28,8 +28,6 @@ class CPSjqGridWidget extends CPSjqUIWrapper
 
 	/**
 	* Registers the needed CSS and JavaScript.
-	*
-	* @param string $sId
 	*/
 	public function registerClientScripts()
 	{
@@ -42,6 +40,8 @@ class CPSjqGridWidget extends CPSjqUIWrapper
 
 		//	Register css files...
 		$_oCS->registerCssFile( "{$this->extLibUrl}/jqGrid/css/ui.jqgrid.css", 'screen' );
+		
+		return $_oCS;
 	}
 
 	//********************************************************************************
@@ -83,20 +83,29 @@ CODE;
 	protected function generateJavascript()
 	{
 		$_arOptions = $this->makeOptions();
-		
-		$_bEdit = $this->pagerEdit | false;
-		$_bAdd = $this->pagerAdd | false;
-		$_bDel = $this->pagerDel | false;
 
 		$this->script =<<<CODE
-$('#{$this->id}').{$this->widgetName}({$_arOptions}).navGrid('#{$this->pagerId}',{edit:$_bEdit,add:$_bAdd,del:$_bDel});
+$('#{$this->id}').{$this->widgetName}({$_arOptions}).navGrid('#{$this->pagerId}',{edit:false,add:false,del:false});
 CODE;
 
-		return( $this->script );
+		return $this->script;
 	}
 
-
-
+	/**
+	* Constructs and returns a jQuery widget
+	* 
+	* The options passed in are dynamically added to the options array and will be accessible 
+	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
+	* 
+	* @param array $arOptions The options for the widget
+	* @param string $sClass The class of the calling object if different
+	* @return CPSjqGridWidget
+	*/
+	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
+	{
+		return parent::create( 'jqGrid', $arOptions, $sClass );
+	}
+	
 	/**
 	* Handles and formats the query and Xml output for a jqGrid
 	*
@@ -112,7 +121,10 @@ CODE;
 		$_iLimit = 25;
 		$_iSortCol = 1;
 		$_sSortOrder = 'asc';
-		$_arArgs = array( 'page', 'rows', 'sidx', 'sord' );
+		$_sSearchField;
+		$_sSearchValue;
+		$_sSearchOperator;
+		$_arArgs = array( 'page', 'rows', 'sidx', 'sord', 'searchField', 'searchString', 'searchOper' );
 		$_bHaveDBC = ( $oCriteria instanceof CDbCriteria );
 
 		//	Use user argument naames?
@@ -123,18 +135,16 @@ CODE;
 		}
 
 		//	Get any passed in arguments
-		if ( isset( $_REQUEST[ $_arArgs[ 0 ] ] ) )
-			$_iPage = $_REQUEST[ $_arArgs[ 0 ] ];
+		if ( isset( $_REQUEST[ $_arArgs[ 0 ] ] ) ) $_iPage = $_REQUEST[ $_arArgs[ 0 ] ];
+		if ( isset( $_REQUEST[ $_arArgs[ 1 ] ] ) ) $_iLimit = $_REQUEST[ $_arArgs[ 1 ] ];
+		if ( isset( $_REQUEST[ $_arArgs[ 2 ] ] ) ) $_iSortCol = $_REQUEST[ $_arArgs[ 2 ] ];
+		if ( isset( $_REQUEST[ $_arArgs[ 3 ] ] ) ) $_sSortOrder = $_REQUEST[ $_arArgs[ 3 ] ];
+		if ( isset( $_REQUEST[ $_arArgs[ 4 ] ] ) ) $_sSearchField = $_REQUEST[ $_arArgs[ 4 ] ];
+		if ( isset( $_REQUEST[ $_arArgs[ 5 ] ] ) ) $_sSearchValue = $_REQUEST[ $_arArgs[ 5 ] ];
+		if ( isset( $_REQUEST[ $_arArgs[ 6 ] ] ) ) $_sSearchOperator = $_REQUEST[ $_arArgs[ 6 ] ];
 
-		if ( isset( $_REQUEST[ $_arArgs[ 1 ] ] ) )
-			$_iLimit = $_REQUEST[ $_arArgs[ 1 ] ];
-
-		if ( isset( $_REQUEST[ $_arArgs[ 2 ] ] ) )
-			$_iSortCol = $_REQUEST[ $_arArgs[ 2 ] ];
-
-		if ( isset( $_REQUEST[ $_arArgs[ 3 ] ] ) )
-			$_sSortOrder = $_REQUEST[ $_arArgs[ 3 ] ];
-
+		Yii::trace( var_export($_REQUEST,true));
+		
 		//	Get a count of rows for this result set
 		$_iRowCount = $oModel->count( ( $_bHaveDBC ) ? $oCriteria : '' );
 
@@ -170,6 +180,33 @@ CODE;
 		{
 			$_dbc->select = $oCriteria;
 		}
+		
+		//	Handle search requests...
+		if ( $_sSearchField && $_sSearchValue && $_sSearchOperator )
+		{
+			$_sOrigSearchValue = $_sSearchValue;
+			
+			$_sCon = $_dbc->condition;
+			$_sCon .= ' and ' . $_sSearchField;
+			
+			if ( ! is_numeric( $_sSearchField ) )
+				$_sSearchValue = "'" . addslashes( $_sSearchValue ) . "'";
+
+			switch ( $_sSearchOperator )
+			{
+				case 'eq': $_sCon .= ' = '; break;
+				case 'ne': $_sCon .= ' <> '; break;
+				case 'lt': $_sCon .= ' < '; break;
+				case 'le': $_sCon .= ' <= '; break;
+				case 'gt': $_sCon .= ' > '; break;
+				case 'ge': $_sCon .= ' => '; break;
+				case 'bw': $_sCon .= ' LIKE '; $_sSearchValue = "'%" . addslashes( $_sOrigSearchValue ) . "'"; break;
+				case 'ew': $_sCon .= ' LIKE '; $_sSearchValue = "'" . addslashes( $_sOrigSearchValue ) . "%'"; break;
+				case 'cn': $_sCon .= ' LIKE '; $_sSearchValue = "'%" . addslashes( $_sOrigSearchValue ) . "%'"; break;
+			}
+			
+			$_dbc->condition = $_sCon . $_sSearchValue;
+		}
 
 		$_dbc->order = "{$_iSortCol} {$_sSortOrder}";
 		$_dbc->limit = $_iLimit;
@@ -203,80 +240,5 @@ CODE;
 			echo "<?xml version='1.0' encoding='utf-8'?>" . $_sOut;
 		else
 			return( "<?xml version='1.0' encoding='utf-8'?>" . $_sOut );
-	}
-
-	//********************************************************************************
-	//* Static methods
-	//********************************************************************************
-	
-	/**
-	* Constructs and returns a jqUI widget
-	* 
-	* The $baseUrl and $theme values are cached between calls so you do not need to 
-	* specify them each time you call this method. 
-	* 
-	* The options passed in are dynamically added to the options array and will be accessible 
-	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
-	* 
-	* @param string $sName The type of jqUI widget to create
-	* @param array $arOptions The options for the widget
-	* @param boolean $bAutoRun Whether or not to call the run() method of the widget
-	* @param string $sId The DOM id of the widget if other than $sName
-	* @param string $sTheme The jqUI theme to use
-	* @param string $sBaseUrl The base Url of the jqUI files, if different from the default
-	* @return CPSjqUIWrapper
-	*/
-	public static function create( $sName, array $arOptions = array(), $bAutoRun = false, $sId = null, $sTheme = null, $sBaseUrl = null )
-	{
-		static $_sLastTheme = null;
-		static $_sLastBaseUrl = null;
-
-		//	Set up theme and base url for next call...		
-		if ( $sTheme != $_sLastTheme ) $_sLastTheme = $sTheme;
-		if ( $sBaseUrl != $_sLastBaseUrl ) $_sLastBaseUrl = $sBaseUrl;
-
-		//	Instantiate...
-		$_oWidget = new CPSjqGridWidget();
-
-		//	Set default options...
-		$_oWidget->id = ( null == $sId ) ? $sName : $sId;
-		$_oWidget->name = ( null == $sId ) ? $sName : $sId;
-		$_oWidget->theme = $_sLastTheme;
-		$_oWidget->baseUrl = $_sLastBaseUrl;
-		$_oWidget->widgetName = $sName;
-		
-		//	Set variable options...
-		if ( is_array( $arOptions ) )
-		{
-			//	Check for scripts...
-			if ( isset( $arOptions[ '_scripts' ] ) && is_array( $arOptions[ '_scripts' ] ) )
-			{
-				//	Add them...
-				$_oWidget->addScripts( $arOptions[ '_scripts' ] );
-					
-				//	Kill _scripts option...
-				unset( $arOptions[ '_scripts' ] );
-				
-			}
-
-			//	Now process the rest of the options...			
-			foreach( $arOptions as $_sKey => $_oValue )
-			{
-				//	Add it
-				$_oWidget->addOption( $_sKey, null, false );
-				
-				//	Set it
-				$_oWidget->setOption( $_sKey, $_oValue );
-			}
-		}
-		
-		//	Initialize the widget
-		$_oWidget->init();
-
-		//	Does user want us to run it?
-		if ( $bAutoRun ) $_oWidget->run();
-		
-		//	And return...
-		return $_oWidget;
 	}
 }

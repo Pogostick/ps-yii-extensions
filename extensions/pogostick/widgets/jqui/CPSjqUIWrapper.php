@@ -17,7 +17,7 @@
 * Here we create an accordion:
 * <code>
 * //	Create an accordian...
-* CPSjqUIWrapper::create( 'accordion', array( 'header' => 'h3' ), true, null, 'cupertino' );
+* CPSjqUIWrapper::create( 'accordion', array( 'header' => 'h3' ) );
 * 
 * ...
 * 
@@ -68,7 +68,7 @@
 * @subpackage Widgets
 * @since 1.0.0
 */
-class CPSjqUIWrapper extends CPSWidget
+class CPSjqUIWrapper extends CPSjQueryWidget
 {
 	//********************************************************************************
 	//* Member variables
@@ -81,13 +81,6 @@ class CPSjqUIWrapper extends CPSWidget
 	*/
 	protected $m_arValidThemes = array( 'base', 'black-tie', 'blitzer', 'cupertino', 'dot-luv', 'excite-bike', 'hot-sneaks', 'humanity', 'mint-choc', 'redmond', 'smoothness', 'south-street', 'start', 'swanky-purse', 'trontastic', 'ui-darkness', 'ui-lightness', 'vader' ); 
 	
-	/**
-	* Any additional widget scripts
-	* 
-	* @var array
-	*/
-	protected $m_arScripts = array();
-
 	//********************************************************************************
 	//* Methods
 	//********************************************************************************
@@ -105,12 +98,10 @@ class CPSjqUIWrapper extends CPSWidget
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
 			array(
-				//	The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
-				'widgetName_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				//	Image path will be automatically set. You can override the default here.
-				'imagePath_' => array( CPSOptionManager::META_REQUIRED => false, CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				//	The theme to use. Defaults to 'base'
 				'theme_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string', CPSOptionManager::META_ALLOWED => $this->m_arValidThemes ) ),
+				//	Image path will be automatically set. You can override the default here.
+				'imagePath_' => array( CPSOptionManager::META_REQUIRED => false, CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}
@@ -125,6 +116,28 @@ class CPSjqUIWrapper extends CPSWidget
 		foreach ( $arScripts as $_sScript )
 			$this->m_arScripts[] = $_sScript;
 	}
+	
+	/**
+	* Initialize the widget
+	* 
+	*/
+	public function init()
+	{
+		//	Call daddy
+		parent::init();
+		
+		//	Validate theme
+		if ( empty( $this->theme ) )
+			$this->theme = 'base';
+			
+		//	Validate baseUrl
+		if ( empty( $this->baseUrl ) )
+			$this->baseUrl = $this->extLibUrl . '/jqui';
+			
+		//	If image path isn't specified, set to current theme path
+		if ( empty( $this->imagePath ) )
+			$this->imagePath = "{$this->baseUrl}/css/{$this->theme}/images";
+	}
 
 	/***
 	* Runs this widget
@@ -132,18 +145,12 @@ class CPSjqUIWrapper extends CPSWidget
 	*/
 	public function run()
 	{
-		//	Validate baseUrl
-		if ( $this->isEmpty( $this->baseUrl ) )
-			$this->baseUrl = $this->extLibUrl . '/jqui';
-
-		//	Validate theme
-		if ( $this->isEmpty( $this->theme ) )
-			$this->theme = 'cupertino';
-
 		//	Register the scripts/css
 		$this->registerClientScripts();
-		
-		echo $this->generateHtml();
+
+		//	Generate the HTML if available
+		if ( method_exists( $this, 'generateHtml' ) )
+			echo $this->generateHtml();
 	}
 
 	/**
@@ -153,55 +160,17 @@ class CPSjqUIWrapper extends CPSWidget
 	*/
 	public function registerClientScripts()
 	{
-		static $_iScriptCount = 0;
-		
 		//	Daddy...
 		$_oCS = parent::registerClientScripts();
 		
-		//	Require jQuery
-		Yii::app()->clientScript->registerCoreScript( 'jquery' );
-
-		//	If image path isn't specified, set to current theme path
-		if ( $this->isEmpty( $this->imagePath ) )
-			$this->imagePath = "{$this->baseUrl}/css/{$this->theme}/images";
-
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "{$this->baseUrl}/js/jquery-ui-1.7.1.min.js" );
-	
+		self::loadScripts( $this );
+
 		//	Get the javascript for this widget
 		$_oCS->registerScript( 'psjqui.' . $this->widgetName . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
 
-		//	Additional scripts		
-		foreach ( $this->m_arScripts as $_sScript )
-			$_oCS->registerScript( 'psjqui.script' . $_iScriptCount++ . '#' . $this->id, $_sScript, CClientScript::POS_READY );
-
-		//	Register css files...
-		$_oCS->registerCssFile( "{$this->baseUrl}/css/{$this->theme}/ui.all.css", 'screen' );
-		
 		//	Don't forget subclasses
 		return $_oCS;
-	}
-
-	//********************************************************************************
-	//* Private methods
-	//********************************************************************************
-
-	/**
-	* Generates the javascript code for the widget
-	*
-	* @return string
-	*/
-	protected function generateJavascript()
-	{
-		$this->script = '';
-
-		$_arOptions = $this->makeOptions();
-
-		$this->script .=<<<CODE
-$('#{$this->id}').{$this->widgetName}({$_arOptions});
-CODE;
-
-		return( $this->script );
 	}
 
 	//********************************************************************************
@@ -209,73 +178,49 @@ CODE;
 	//********************************************************************************
 	
 	/**
-	* Constructs and returns a jqUI widget
-	* 
-	* The $baseUrl and $theme values are cached between calls so you do not need to 
-	* specify them each time you call this method. 
+	* Constructs and returns a jQuery widget
 	* 
 	* The options passed in are dynamically added to the options array and will be accessible 
 	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
 	* 
-	* @param string $sName The type of jqUI widget to create
+	* @param string $sName The type of jq widget to create
 	* @param array $arOptions The options for the widget
-	* @param boolean $bAutoRun Whether or not to call the run() method of the widget
 	* @param string $sId The DOM id of the widget if other than $sName
-	* @param string $sTheme The jqUI theme to use
-	* @param string $sBaseUrl The base Url of the jqUI files, if different from the default
+	* @param string $sClass The class of the calling object if different
 	* @return CPSjqUIWrapper
 	*/
-	public static function create( $sName, array $arOptions = array(), $bAutoRun = false, $sId = null, $sTheme = null, $sBaseUrl = null )
+	public static function create( $sName, array $arOptions = array(), $sClass = __CLASS__ )
 	{
-		static $_sLastTheme = null;
-		static $_sLastBaseUrl = null;
-
-		//	Set up theme and base url for next call...		
-		if ( $sTheme != $_sLastTheme ) $_sLastTheme = $sTheme;
-		if ( $sBaseUrl != $_sLastBaseUrl ) $_sLastBaseUrl = $sBaseUrl;
-
-		//	Instantiate...
-		$_oWidget = new CPSjqUIWrapper();
-
-		//	Set default options...
-		$_oWidget->id = ( null == $sId ) ? $sName : $sId;
-		$_oWidget->name = ( null == $sId ) ? $sName : $sId;
-		$_oWidget->theme = $_sLastTheme;
-		$_oWidget->baseUrl = $_sLastBaseUrl;
-		$_oWidget->widgetName = $sName;
-		
-		//	Set variable options...
-		if ( is_array( $arOptions ) )
-		{
-			//	Check for scripts...
-			if ( isset( $arOptions[ '_scripts' ] ) && is_array( $arOptions[ '_scripts' ] ) )
-			{
-				//	Add them...
-				$_oWidget->addScripts( $arOptions[ '_scripts' ] );
-					
-				//	Kill _scripts option...
-				unset( $arOptions[ '_scripts' ] );
-				
-			}
-
-			//	Now process the rest of the options...			
-			foreach( $arOptions as $_sKey => $_oValue )
-			{
-				//	Add it
-				$_oWidget->addOption( $_sKey, null, false );
-				
-				//	Set it
-				$_oWidget->setOption( $_sKey, $_oValue );
-			}
-		}
-		
-		//	Initialize the widget
-		$_oWidget->init();
-
-		//	Does user want us to run it?
-		if ( $bAutoRun ) $_oWidget->run();
-		
-		//	And return...
-		return $_oWidget;
+		return parent::create( $sName, $arOptions, $sClass );
 	}
+	
+	/**
+	* Registers the needed CSS and JavaScript.
+	* 
+	* One may use this to load the scripts necessary for styling buttons and 
+	* whatnot when jqUI widgets are not in use on a page.
+	*
+	* @param string $sTheme The theme to use.
+	* @param CPSjqUIWrapper $oWidget The widget making this call, if any
+	* @param CClientScript $oCS The clientScript object of the app
+	*/
+	public static function loadScripts( $oWidget = null, $sTheme = 'base' )
+	{
+		//	Daddy...
+		$_oCS = Yii::app()->getClientScript();
+		
+		//	Instantiate if needed...
+		$_oWidget = ( null == $oWidget ) ? new CPSjqUIWrapper() : $oWidget;
+		if ( ! $_oWidget->theme ) $_oWidget->theme = $sTheme;
+
+		//	Register scripts necessary
+		$_oCS->registerCoreScript( 'jquery' );
+		$_oCS->registerScriptFile( "{$_oWidget->extLibUrl}/jqui/js/jquery-ui-1.7.1.min.js" );
+		$_oCS->registerScriptFile( "{$_oWidget->extLibUrl}/jqui/js/jquery.pogostick.hover.js", CClientScript::POS_END );
+
+		//	Register css files...
+		$_oCS->registerCssFile( "{$_oWidget->extLibUrl}/jqui/css/{$_oWidget->theme}/ui.all.css", 'screen' );
+		$_oCS->registerCssFile( "{$_oWidget->extLibUrl}/jqui/css/ui.pogostick.css", 'screen' );
+	}
+
 }
