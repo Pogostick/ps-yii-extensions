@@ -80,9 +80,10 @@ class CPSjqRatingWidget extends CPSWidget
 		//	Register the scripts/css
 		$this->registerClientScripts();
 
-		$this->html = $this->render( $this->viewName,
-				array( "options" => $this->makeOptions() ),
-				$this->returnString
+		$this->html = $this->render( 
+			$this->viewName,
+			array( "options" => $this->makeOptions() ),
+			$this->returnString
 		);
 
 		return $this->html;

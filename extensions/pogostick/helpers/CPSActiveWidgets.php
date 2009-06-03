@@ -6,7 +6,6 @@
  * @link http://ps-yii-extensions.googlecode.com
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @license http://www.pogostick.com/license/
- * @package psYiiExtensions
  */
 
 /**
@@ -14,6 +13,7 @@
  *
  * @author Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
+ * @package psYiiExtensions
  * @subpackage Widgets
  * @since 1.0.0
  */
