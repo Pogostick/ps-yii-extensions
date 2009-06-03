@@ -23,8 +23,30 @@
 class CPSjqGridWidget extends CPSjqUIWrapper
 {
 	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+	
+	/**
+	* The name of this widget
+	*/
+	const PS_WIDGET_NAME = 'jqGrid';
+	/**
+	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
+	*/
+	const PS_EXTERNAL_PATH = '/jqGrid';
+
+	//********************************************************************************
 	//* Methods
 	//********************************************************************************
+
+	public function init()
+	{
+		parent::init();
+	
+		//	Set my name...	
+		$this->widgetName = self::PS_WIDGET_NAME;
+	}
+		
 
 	/**
 	* Registers the needed CSS and JavaScript.
@@ -34,12 +56,15 @@ class CPSjqGridWidget extends CPSjqUIWrapper
 		//	Daddy...
 		$_oCS = parent::registerClientScripts();
 		
+		//	Reset the baseUrl for our own scripts
+		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
+
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "{$this->extLibUrl}/jqGrid/js/i18n/grid.locale-en.js" );
-		$_oCS->registerScriptFile( "{$this->extLibUrl}/jqGrid/js/jquery.jqGrid.min.js" );
+		$_oCS->registerScriptFile( "{$this->baseUrl}/js/i18n/grid.locale-en.js" );
+		$_oCS->registerScriptFile( "{$this->baseUrl}/js/jquery.jqGrid.min.js" );
 
 		//	Register css files...
-		$_oCS->registerCssFile( "{$this->extLibUrl}/jqGrid/css/ui.jqgrid.css", 'screen' );
+		$_oCS->registerCssFile( "{$this->baseUrl}/css/ui.jqgrid.css", 'screen' );
 		
 		return $_oCS;
 	}
@@ -56,8 +81,7 @@ class CPSjqGridWidget extends CPSjqUIWrapper
 	protected function generateHtml()
 	{
 		$_sHtml =<<<CODE
-<table id="{$this->id}" class="scroll"></table>
-<div id="{$this->pagerId}" class="scroll" style="text-align:center;"></div>
+<table id="{$this->id}" class="scroll"></table><div id="{$this->pagerId}" class="scroll" style="text-align:center;"></div>
 CODE;
 		return( $_sHtml );
 	}
@@ -68,8 +92,6 @@ CODE;
 	*/
 	protected function makeOptions()
 	{
-		$this->widgetName = 'jqGrid';
-		
 		//	Fix up the pager...
 		$_sPagerId = $this->pagerId;
 		return str_replace( "'pagerId':'{$_sPagerId}'", "pager: jQuery('#{$_sPagerId}')", parent::makeOptions() );
@@ -103,7 +125,7 @@ CODE;
 	*/
 	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
 	{
-		return parent::create( 'jqGrid', $arOptions, $sClass );
+		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
 	}
 	
 	/**
@@ -120,6 +142,7 @@ CODE;
 		$_iPage = 1;
 		$_iLimit = 25;
 		$_iSortCol = 1;
+		$_iTotalPages = 0;
 		$_sSortOrder = 'asc';
 		$_sSearchField;
 		$_sSearchValue;
@@ -149,24 +172,17 @@ CODE;
 		$_iRowCount = $oModel->count( ( $_bHaveDBC ) ? $oCriteria : '' );
 
 		//	Calculate paging info
-		if ( $_iRowCount > 0 )
-			$_iTotalPages = ceil( $_iRowCount / $_iLimit );
-		else
-			$_iTotalPages = 0;
+		if ( $_iRowCount > 0 ) $_iTotalPages = ceil( $_iRowCount / $_iLimit );
 
 		//	Sanity checks
-		if ( $_iPage > $_iTotalPages )
-			$_iPage = $_iTotalPages;
-
-		if ( $_iPage < 1 )
-			$_iPage = 1;
+		if ( $_iPage > $_iTotalPages ) $_iPage = $_iTotalPages;
+		if ( $_iPage < 1 ) $_iPage = 1;
 
 		//	Calculate starting offset
 		$_iStart = $_iLimit * $_iPage - $_iLimit;
 
 		//	Sanity check
-		if ( $_iStart < 0 )
-			$_iStart = 0;
+		if ( $_iStart < 0 ) $_iStart = 0;
 
 		//	Adjust the criteria for the actual query...
 		$_dbc = new CDbCriteria();
@@ -176,7 +192,7 @@ CODE;
 			unset( $_dbc );
 			$_dbc = $oCriteria;
 		}
-		else if ( gettype( $oCriteria ) == 'string' )
+		else if ( 'string' == gettype( $oCriteria ) )
 		{
 			$_dbc->select = $oCriteria;
 		}
@@ -214,19 +230,13 @@ CODE;
 		$_oRows = $oModel->findAll( $_dbc );
 
 		//	Set appropriate content type
-		if ( ! headers_sent() )
-		{
-			if ( stristr( $_SERVER[ 'HTTP_ACCEPT' ], "application/xhtml+xml" ) )
-				header( "Content-type: application/xhtml+xml;charset=utf-8" );
-			else
-				header( "Content-type: text/xml;charset=utf-8" );
-		}
+		if ( ! headers_sent() ) header( "Content-type: " . ( ( stristr( $_SERVER[ 'HTTP_ACCEPT' ], "application/xhtml+xml" ) ) ? "application/xhtml+xml" : "text/xml" ) . ";charset=utf-8" );
 
 		//	Now create the Xml...
 		$_sOut = CPSHelp::asXml(
 			$_oRows,
 			array(
-				'jqGrid' => true,
+				self::PS_WIDGET_NAME => true,
 				'innerElements' => array(
 					array( 'name' => 'page', 'type' => 'integer', 'value' => $_iPage ),
 					array( 'name' => 'total', 'type' => 'integer', 'value' => $_iTotalPages ),
@@ -236,9 +246,9 @@ CODE;
 		);
 
 		//	Spit it out...
-		if ( ! $bReturnString )
-			echo "<?xml version='1.0' encoding='utf-8'?>" . $_sOut;
-		else
-			return( "<?xml version='1.0' encoding='utf-8'?>" . $_sOut );
+		if ( $bReturnString ) return "<?xml version='1.0' encoding='utf-8'?>" . $_sOut;	
+			
+		//	Otherwise, just spit it out...
+		echo "<?xml version='1.0' encoding='utf-8'?>" . $_sOut;	
 	}
 }

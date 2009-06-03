@@ -119,7 +119,7 @@ class CPSComponentBehavior extends CBehavior
 	* @param bool $bNoSort If set to false, the option array will not be sorted after the addition
 	* @see addOptions
 	*/
-	public function addOption( $sKey, $arValue, $bNoSort = false ) { return $this->m_oOptions->addOption( $sKey, $arValue, $bNoSort ); }
+	public function addOption( $sKey, $arValue, $bNoSort = false, $oSetValue = null ) { return $this->m_oOptions->addOption( $sKey, $arValue, $bNoSort, $oSetValue ); }
 
 	/**
 	* Add a batch of options to the option manager

@@ -344,10 +344,7 @@ class CPSOptionManager
 	/**
 	* Add bulk options to the manager.
 	*
-	* @param array $arOptions An array containing option_key => value pairs to put into
-	* option array. The parameter $arOptions is merged with the existing options array.
-	* Existing option values are overwritten or added.
-	* @param bool $bAdd Indicates that this option setting is a creation one (i.e. addOptions() analog)
+	* @param array $arOptions An array containing option_key => value pairs to put into option array. The parameter $arOptions is merged into the existing options array. Existing option values are overwritten.
 	*
 	* <code>
 	* $this->setOptions( array( 'option_x' => array( CPSOptionManager::META_DEFAULTVALUE => '1', CPSOptionManager::META_ALLOWED => array( 'x', 'y', 'z' ) );
@@ -372,10 +369,13 @@ class CPSOptionManager
 	*
 	* @param string $sKey
 	* @param array $oValue Must be an array containing the RULES for this option
+	* @param bool $bNoSort If true, the array is sorted after the operation
+	* @param mixed $oSetValue If not null, the the value is set on the option after it has been added.
 	* @see setOption
 	*/
-	public function addOption( $sKey, $oValue, $bNoSort = false )
+	public function addOption( $sKey, $oValue, $bNoSort = false, $oSetValue = null )
 	{
+		$_oValue = null;
 		$_bPrivate = false;
 
 		//	Validate the key
@@ -424,9 +424,6 @@ class CPSOptionManager
 					$this->setMetaDataValue( $_arType, self::META_TYPE, 'integer' );
 					$_sType = 'integer';
 				}
-
-				//	Set value
-				$_oValue = null;
 
 				//	Try and set it correctly...
 				if ( isset( $_arRules[ self::META_TYPE ] ) )
@@ -479,16 +476,15 @@ class CPSOptionManager
 
 		//	Set all the metadata rules...
 		$this->setMetaDataValues( $sKey, $_arRules );
-		
+
 		//	Required?
 		$this->setMetaDataValue( $sKey, self::META_REQUIRED, isset( $oValue[ self::META_REQUIRED ] ) ? $oValue[ self::META_REQUIRED ] : false );
 
-		//	Now stuff the default value, if there...
-		$this->m_arOptions[ $sKey ] = $_oValue;
+		//	Now stuff the default or passed in value
+		$this->setOption( $sKey, ( null != $oSetValue ) ? $oSetValue : $_oValue );
 
 		//	Sort the array
-		if ( ! $bNoSort )
-			ksort( $this->m_arOptions );
+		if ( ! $bNoSort ) ksort( $this->m_arOptions );
 	}
 
 	/**

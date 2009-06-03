@@ -58,11 +58,11 @@ class CPSActiveWidgets extends CHtml
 	* @param array $arData Any data necessary for the field (i.e. drop down data)
 	* @returns string
 	*/
-	public static function simpleActiveField( $eFieldType, $oModel, $sColName, $arOptions = array(), $sLabel = null, $arLabelOptions = array(), $arData = null )
+	public static function simpleActiveBlock( $eFieldType, $oModel, $sColName, $arOptions = array(), $sLabel = null, $arLabelOptions = array(), $arData = null )
 	{
 		$_sOut = '<div class="simple">';
 		$_sOut .= self::activeLabelEx( $oModel, ( null == $sLabel ) ? $sColName : $sLabel, $arLabelOptions );
-		$_sOut .= self::activeField( $eFieldType, $oModel, $sColName, $arOptions, $arData );
+		$_sOut .= self::activeField( $eFieldType, $oModel, $sColName, $arOptions, null, $arData );
 		$_sOut .= '</div>';
 
 		return $_sOut;
@@ -74,35 +74,43 @@ class CPSActiveWidgets extends CHtml
 	* @param string $eFieldType One of the PSAWFT_* constants
 	* @param CModel $oModel The model for this form
 	* @param string $sColName The column/attribute name
-	* @param array $arOptions The htmlOptions for the field
+	* @param array $arHtmlOptions The htmlOptions for the field
+	* @param array $arWidgetOptions The widget options for the field
 	* @param array $arData Any data necessary for the field (i.e. drop down data)
 	* @returns string
 	*/
-	public static function activeField( $eFieldType, $oModel, $sColName, $arOptions = array(), $arData = null )
+	public static function activeField( $eFieldType, $oModel, $sColName, $arHtmlOptions = array(), $arWidgetOptions = array(), $arData = null )
 	{
-		static $_oMarkItUp = null;
-		
+		//	Auto set id and name if they aren't already...
+		if ( ! isset( $arHtmlOptions[ 'name' ] ) ) $arHtmlOptions[ 'name' ] = self::resolveName( $oModel, $sColName );
+		if ( ! isset( $arHtmlOptions[ 'id' ] ) ) $arHtmlOptions[ 'id' ] = self::getIdByName( $arHtmlOptions[ 'name' ] );
+				
+		//	Handle special types...
 		switch ( $eFieldType )
 		{
+			//	WYSIWYG Plug-in
 			case self::PSAWFT_WYSIWYG:
-				$_sName = self::resolveName( $oModel, $sColName );
-				if ( ! isset( $arOptions[ 'name' ] ) ) $arOptions[ 'name' ] = $_sName;
-				$_sId = self::getIdByName( $_sName );
-				if ( ! isset( $arOptions[ 'id' ] ) ) $arOptions[ 'id' ] = $_sId;
-				CPSWysiwygWidget::create( array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) );
+				CPSWysiwygWidget::create( array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
 				$eFieldType = self::PSAWFT_TEXTAREA;
 				break;
 				
+			//	markItUp! Plug-in
 			case self::PSAWFT_MARKITUP:
-				if ( ! $_oMarkItUp )
-					$_oMarkItUp = CPSMarkItUpWidget::create();
-					
-				$arOptions[ 'class' ] = 'markItUp';
+				$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
+				$arWidgetOptions[ 'id' ] = $arHtmlOptions[ 'id' ];
+				CPSMarkItUpWidget::create( $arWidgetOptions );
 				$eFieldType = self::PSAWFT_TEXTAREA;
 				break;
+
+			//	These guys need data in third parameter
+			case self::PSAWFT_DROPDOWN:
+			case self::PSAWFT_CHECKLIST:
+			case self::PSAWFT_RADIOLIST:
+			case self::PSAWFT_LISTBOX:
+				return self::$eFieldType( $oModel, $sColName, $arData, $arHtmlOptions );
 		}
 		
-		return self::$eFieldType( $oModel, $sColName, $arOptions );
+		return self::$eFieldType( $oModel, $sColName, $arHtmlOptions );
 	}
 
 	/**

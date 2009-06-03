@@ -53,7 +53,7 @@ class CPSApiComponent extends CPSComponent
 	protected function makeRequest( $sSubType = null, $arRequestData = null )
 	{
 		//	Make sure apiQueryName is set...
-		if ( $this->requireApiQueryName && ! empty( $this->apiQueryName ) )
+		if ( $this->requireApiQueryName && ! $this->isEmpty( $this->apiQueryName ) )
 		{
 			throw new CException(
 				Yii::t(

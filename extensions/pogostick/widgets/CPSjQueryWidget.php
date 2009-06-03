@@ -17,6 +17,9 @@
 * @package psYiiExtensions
 * @subpackage Widgets
 * @since 1.0.0
+* 
+* @property $autoRun The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
+* @property $widgetName The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
 */
 class CPSjQueryWidget extends CPSWidget
 {
@@ -48,9 +51,7 @@ class CPSjQueryWidget extends CPSWidget
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
 			array(
-				//	The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
 				'autoRun_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_DEFAULTVALUE => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
-				//	The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
 				'widgetName_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
@@ -77,8 +78,7 @@ class CPSjQueryWidget extends CPSWidget
 		parent::init();
 		
 		//	Validate baseUrl
-		if ( $this->isEmpty( $this->baseUrl ) )
-			$this->baseUrl = $this->extLibUrl;
+		if ( $this->isEmpty( $this->baseUrl ) ) $this->baseUrl = $this->extLibUrl;
 	}
 
 	/***
@@ -91,8 +91,7 @@ class CPSjQueryWidget extends CPSWidget
 		$this->registerClientScripts();
 
 		//	Generate the HTML if available
-		if ( method_exists( $this, 'generateHtml' ) )
-			echo $this->generateHtml();
+		if ( method_exists( $this, 'generateHtml' ) ) echo $this->generateHtml();
 	}
 
 	/**
@@ -152,7 +151,6 @@ CODE;
 	* 
 	* @param string $sName The type of jq widget to create
 	* @param array $arOptions The options for the widget
-	* @param string $sId The DOM id of the widget if other than $sName
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjQueryWidget
 	*/
@@ -164,7 +162,7 @@ CODE;
 		//	Set default options...
 		$_oWidget->id = isset( $arOptions[ 'id' ] ) ? $arOptions[ 'id' ] : $sName;
 		$_oWidget->name = isset( $arOptions[ 'name' ] ) ? $arOptions[ 'name' ] : $sName;
-		if ( empty( $_oWidget->name ) ) $_oWidget->name = $_oWidget->id;
+		if ( $_oWidget->isEmpty( $_oWidget->name ) ) $_oWidget->name = $_oWidget->id;
 		$_oWidget->widgetName = $sName;
 		
 		return $_oWidget->finalizeCreate( $arOptions );
@@ -187,21 +185,14 @@ CODE;
 			//	Check for scripts...
 			if ( isset( $arOptions[ '_scripts' ] ) && is_array( $arOptions[ '_scripts' ] ) )
 			{
-				//	Add them...
+				//	Add them and remove from options...
 				$this->addScripts( $arOptions[ '_scripts' ] );
-					
-				//	Kill _scripts option...
 				unset( $arOptions[ '_scripts' ] );
-				
 			}
 
 			//	Now process the rest of the options...			
-			foreach( $arOptions as $_sKey => $_oValue )
-			{
-				//	Add option and set it...
-				$this->addOption( $_sKey, null, false );
-				$this->setOption( $_sKey, $_oValue );
-			}
+			foreach ( $arOptions as $_sKey => $_oValue )
+				$this->addOption( $_sKey, null, false, $_oValue );
 		}
 		
 		//	Initialize the widget

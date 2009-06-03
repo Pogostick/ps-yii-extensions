@@ -67,9 +67,25 @@
 * @package psYiiExtensions
 * @subpackage Widgets
 * @since 1.0.0
+* 
+* @property $theme The theme to use. Defaults to 'base'
+* @property $imagePath Image path will be automatically set. You can override the default here.
 */
 class CPSjqUIWrapper extends CPSjQueryWidget
 {
+	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+	
+	/**
+	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
+	*/
+	const PS_WIDGET_NAME = 'jqui';
+	/**
+	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
+	*/
+	const PS_EXTERNAL_PATH = '/jqui';
+	
 	//********************************************************************************
 	//* Member variables
 	//********************************************************************************
@@ -82,7 +98,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	protected $m_arValidThemes = array( 'base', 'black-tie', 'blitzer', 'cupertino', 'dot-luv', 'excite-bike', 'hot-sneaks', 'humanity', 'mint-choc', 'redmond', 'smoothness', 'south-street', 'start', 'swanky-purse', 'trontastic', 'ui-darkness', 'ui-lightness', 'vader' ); 
 	
 	//********************************************************************************
-	//* Methods
+	//* Constructor
 	//********************************************************************************
 
 	/**
@@ -93,14 +109,13 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	*/
 	function __construct( $oOwner = null )
 	{
+		//	Phone home...
 		parent::__construct( $oOwner );
 		
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
 			array(
-				//	The theme to use. Defaults to 'base'
 				'theme_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string', CPSOptionManager::META_ALLOWED => $this->m_arValidThemes ) ),
-				//	Image path will be automatically set. You can override the default here.
 				'imagePath_' => array( CPSOptionManager::META_REQUIRED => false, CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
@@ -126,17 +141,10 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		//	Call daddy
 		parent::init();
 		
-		//	Validate theme
-		if ( empty( $this->theme ) )
-			$this->theme = 'base';
-			
-		//	Validate baseUrl
-		if ( empty( $this->baseUrl ) )
-			$this->baseUrl = $this->extLibUrl . '/jqui';
-			
-		//	If image path isn't specified, set to current theme path
-		if ( empty( $this->imagePath ) )
-			$this->imagePath = "{$this->baseUrl}/css/{$this->theme}/images";
+		//	Validate defaults...
+		if ( $this->isEmpty( $this->theme ) ) $this->theme = 'base';
+		if ( $this->isEmpty( $this->baseUrl ) ) $this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
+		if ( $this->isEmpty( $this->imagePath ) ) $this->imagePath = "{$this->baseUrl}/css/{$this->theme}/images";
 	}
 
 	/***
@@ -149,8 +157,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		$this->registerClientScripts();
 
 		//	Generate the HTML if available
-		if ( method_exists( $this, 'generateHtml' ) )
-			echo $this->generateHtml();
+		if ( method_exists( $this, 'generateHtml' ) ) echo $this->generateHtml();
 	}
 
 	/**
@@ -167,7 +174,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		self::loadScripts( $this );
 
 		//	Get the javascript for this widget
-		$_oCS->registerScript( 'psjqui.' . $this->widgetName . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
+		$_oCS->registerScript( 'ps' . self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
 
 		//	Don't forget subclasses
 		return $_oCS;
@@ -200,27 +207,34 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	* One may use this to load the scripts necessary for styling buttons and 
 	* whatnot when jqUI widgets are not in use on a page.
 	*
-	* @param string $sTheme The theme to use.
 	* @param CPSjqUIWrapper $oWidget The widget making this call, if any
+	* @param string $sTheme The theme to use. If it's specified, will override theme set at the time of creation
 	* @param CClientScript $oCS The clientScript object of the app
 	*/
-	public static function loadScripts( $oWidget = null, $sTheme = 'base' )
+	public static function loadScripts( $oWidget = null, $sTheme = null )
 	{
 		//	Daddy...
 		$_oCS = Yii::app()->getClientScript();
 		
 		//	Instantiate if needed...
 		$_oWidget = ( null == $oWidget ) ? new CPSjqUIWrapper() : $oWidget;
-		if ( ! $_oWidget->theme ) $_oWidget->theme = $sTheme;
+		if ( null != $sTheme ) $_oWidget->theme = $sTheme;
+
+		//	Save then Set baseUrl...
+		$_sOldPath = $_oWidget->baseUrl;
+		$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
 
 		//	Register scripts necessary
 		$_oCS->registerCoreScript( 'jquery' );
-		$_oCS->registerScriptFile( "{$_oWidget->extLibUrl}/jqui/js/jquery-ui-1.7.1.min.js" );
-		$_oCS->registerScriptFile( "{$_oWidget->extLibUrl}/jqui/js/jquery.pogostick.hover.js", CClientScript::POS_END );
+		$_oCS->registerScriptFile( "{$_oWidget->baseUrl}/js/jquery-ui-1.7.1.min.js" );
+		$_oCS->registerScriptFile( "{$_oWidget->baseUrl}/js/jquery.pogostick.hover.js", CClientScript::POS_END );
 
 		//	Register css files...
-		$_oCS->registerCssFile( "{$_oWidget->extLibUrl}/jqui/css/{$_oWidget->theme}/ui.all.css", 'screen' );
-		$_oCS->registerCssFile( "{$_oWidget->extLibUrl}/jqui/css/ui.pogostick.css", 'screen' );
+		$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/{$_oWidget->theme}/ui.all.css", 'screen' );
+		$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/ui.pogostick.css", 'screen' );
+		
+		//	Restore path
+		$_oWidget->baseUrl = $_sOldPath;
 	}
 
 }

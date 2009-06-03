@@ -124,7 +124,7 @@ class CPSjqRatingWidget extends CPSWidget
 	protected function generateJavascript()
 	{
 		//	No callback set? then make the ajax callback
-		if ( ! isset( $this->callbacks[ 'callback' ] ) && ! empty( $this->ajaxCallback ) )
+		if ( ! isset( $this->callbacks[ 'callback' ] ) && ! $this->isEmpty( $this->ajaxCallback ) )
 		{
 			$_arTemp = array(
 				'type' => 'GET',

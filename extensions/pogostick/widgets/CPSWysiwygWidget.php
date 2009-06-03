@@ -20,21 +20,44 @@
 class CPSWysiwygWidget extends CPSjqUIWrapper
 {
 	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+	
+	/**
+	* The name of this widget
+	*/
+	const PS_WIDGET_NAME = 'wysiwyg';
+	/**
+	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
+	*/
+	const PS_EXTERNAL_PATH = '/jquery-plugins/wysiwyg';
+
+	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 
+	/***
+	* Initialize the widget
+	* 
+	*/
+	public function init()
+	{
+		//	Call daddy
+		parent::init();
+		
+		//	Set the default widgetName
+		$this->widgetName = self::PS_WIDGET_NAME;
+	}		
+	
 	/***
 	* Runs this widget
 	*
 	*/
 	public function run()
 	{
+		//	Phone home
 		parent::run();
 		
-		//	This widget info
-		$this->baseUrl = $this->extLibUrl . '/jquery-plugins/wysiwyg';
-		$this->widgetName = 'wysiwyg';
-
 		//	Register the scripts/css
 		$this->registerClientScripts();
 	}
@@ -49,13 +72,16 @@ class CPSWysiwygWidget extends CPSjqUIWrapper
 		//	Daddy...
 		$_oCS = Yii::app()->getClientScript();
 		
+		//	Reset the baseUrl for our own scripts
+		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
+
 		//	Register scripts necessary
 		self::loadScripts( $this, $this->theme );
-		$_oCS->registerScriptFile( "{$this->extLibUrl}/jquery-plugins/wysiwyg/jquery.wysiwyg.js" );
-		$_oCS->registerCssFile( "{$this->extLibUrl}/jquery-plugins/wysiwyg/jquery.wysiwyg.css" );
+		$_oCS->registerScriptFile( "{$this->baseUrl}/jquery.wysiwyg.js" );
+		$_oCS->registerCssFile( "{$this->baseUrl}/jquery.wysiwyg.css" );
 	
 		//	Get the javascript for this widget
-		$_oCS->registerScript( 'pswysiwyg.' . $this->widgetName . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
+		$_oCS->registerScript( 'ps' . self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
 	}
 
 	/**
@@ -70,7 +96,7 @@ class CPSWysiwygWidget extends CPSjqUIWrapper
 	*/
 	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
 	{
-		return parent::create( 'wysiwyg', $arOptions, $sClass );
+		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
 	}
 	
 }

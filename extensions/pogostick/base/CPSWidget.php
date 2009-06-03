@@ -168,7 +168,7 @@ class CPSWidget extends CInputWidget
 		$_oCS = Yii::app()->getClientScript();
 
 		//	Register a special CSS file if we have one...
-		if ( ! empty( $this->cssFile ) )
+		if ( ! $this->isEmpty( $this->cssFile ) )
 			$_oCS->registerCssFile( Yii::app()->baseUrl . "{$this->cssFile}", 'screen' );
 
 		//	Send upstream for convenience
