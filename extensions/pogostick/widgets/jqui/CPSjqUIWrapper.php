@@ -70,6 +70,8 @@
 * 
 * @property $theme The theme to use. Defaults to 'base'
 * @property $imagePath Image path will be automatically set. You can override the default here.
+* @property $currentTheme The currently used theme
+* @property $multiTheme If multiple themes are allowed
 */
 class CPSjqUIWrapper extends CPSjQueryWidget
 {
@@ -91,12 +93,37 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	//********************************************************************************
 
 	/**
+	* The current theme. If set, future theme changes will be ignored
+	* 
+	* @staticvar string
+	* @access protected
+	*/
+	protected static $m_sCurrentTheme;
+	
+	/**
+	* If true, no theme-blocking will be done.
+	* 
+	* @staticvar boolean
+	* @access protected
+	*/
+	protected static $m_bMultiTheme = false;
+	
+	/**
 	* The current valid themes for jqUI widgets
 	* 
 	* @var array
 	*/
 	protected $m_arValidThemes = array( 'base', 'black-tie', 'blitzer', 'cupertino', 'dot-luv', 'excite-bike', 'hot-sneaks', 'humanity', 'mint-choc', 'redmond', 'smoothness', 'south-street', 'start', 'swanky-purse', 'trontastic', 'ui-darkness', 'ui-lightness', 'vader' ); 
 	
+	//********************************************************************************
+	//* Property Accessors
+	//********************************************************************************
+	
+	public function getCurrentTheme() { return self::$m_sCurrentTheme; }
+	public function setCurrentTheme( $sTheme ) { self::$m_sCurrentTheme = $sTheme; }
+	public function getMultiTheme() { return self::$m_bMultiTheme; }
+	public function setMultiTheme( $bValue ) { self::$m_bMultiTheme = $bValue; }
+
 	//********************************************************************************
 	//* Constructor
 	//********************************************************************************
@@ -142,7 +169,9 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		parent::init();
 		
 		//	Validate defaults...
-		if ( $this->isEmpty( $this->theme ) ) $this->theme = 'base';
+		$_sTheme = $this->theme;
+		
+		if ( empty( $_sTheme ) ) $this->theme = ( ! empty( self::$m_sCurrentTheme ) ) ? self::$m_sCurrentTheme : $_sTheme = 'base';
 		if ( $this->isEmpty( $this->baseUrl ) ) $this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 		if ( $this->isEmpty( $this->imagePath ) ) $this->imagePath = "{$this->baseUrl}/css/{$this->theme}/images";
 	}
@@ -218,12 +247,21 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		
 		//	Instantiate if needed...
 		$_oWidget = ( null == $oWidget ) ? new CPSjqUIWrapper() : $oWidget;
-		if ( null != $sTheme ) $_oWidget->theme = $sTheme;
 
 		//	Save then Set baseUrl...
 		$_sOldPath = $_oWidget->baseUrl;
 		$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
+		
+		//	Set $sTheme if missing...
+		if ( null != $oWidget && null == $sTheme )
+			$sTheme = $oWidget->theme;
 
+		//	Check theme overrides...
+		if ( ! self::$m_bMultiTheme && ! empty( self::$m_sCurrentTheme ) )
+			 $_oWidget->theme = self::$m_sCurrentTheme;
+		else
+			$_oWidget->theme = self::$m_sCurrentTheme = $sTheme;
+		
 		//	Register scripts necessary
 		$_oCS->registerCoreScript( 'jquery' );
 		$_oCS->registerScriptFile( "{$_oWidget->baseUrl}/js/jquery-ui-1.7.1.min.js" );

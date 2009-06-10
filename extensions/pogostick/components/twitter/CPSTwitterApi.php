@@ -2,9 +2,6 @@
 /**
  * CPSTwitterApi class file.
  *
- * Code based on:
- * TwitterOAuth - http://github.com/abraham/twitteroauth/
- * 
  * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://ps-yii-extensions.googlecode.com
  * @copyright Copyright &copy; 2009 Pogostick, LLC
@@ -12,42 +9,46 @@
  */
 
 /**
- * CPSTwitterApi provides access to the Twitter API
+ * CPSTwitterApi provides access to the {@link http://apiwiki.twitter.com Twitter API}
  *
  * @author Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
  * @package psYiiExtensions
  * @subpackage Components
- * @since 1.0.0
+ * @since 1.0.3
  *
  * @todo Implement Direct Message API
  * @todo Implement Block APIs
  * @todo Implement Trends API
- * @todo Implement Search API
+ * @todo Complete Search API integdration
  */
-class CPSTwitterApi extends CPSApiComponent
+class CPSTwitterApi extends CPSOAuthComponent
 {
 	//********************************************************************************
 	//* Constants
 	//********************************************************************************
 
-	const TWITTER_STATUS_API = 'statuses';
-	const TWITTER_USER_API = 'users';
-	const TWITTER_DIRECTMESSAGE_API = 'direct_message';
-	const TWITTER_FRIENDSHIP_API = 'friendships';
-	const TWITTER_FRIEND_API = 'friends';
-	const TWITTER_FOLLOWER_API = 'followers';
-	const TWITTER_ACCOUNT_API = 'account';
-	const TWITTER_FAVORITE_API = 'favorites';
-	const TWITTER_NOTIFICATION_API = 'notifications';
-	const TWITTER_BLOCK_API = 'blocks';
-	const TWITTER_TRENDS_API = 'trends';
-	const TWITTER_SEARCH_API = 'search';
+	const STATUS_API = 'statuses';
+	const USER_API = 'users';
+	const DIRECTMESSAGE_API = 'direct_message';
+	const FRIENDSHIP_API = 'friendships';
+	const FRIEND_API = 'friends';
+	const FOLLOWER_API = 'followers';
+	const ACCOUNT_API = 'account';
+	const FAVORITE_API = 'favorites';
+	const NOTIFICATION_API = 'notifications';
+	const BLOCK_API = 'blocks';
+	const TRENDS_API = 'trends';
+	const SEARCH_API = 'search';
 
 	//********************************************************************************
 	//* Construct
 	//********************************************************************************
 
+	/**
+	* Constructs a CPSTwitterApi object
+	* @returns CPSTwitterApi
+	*/
 	public function __construct()
 	{
 		//	Phone home...
@@ -56,17 +57,461 @@ class CPSTwitterApi extends CPSApiComponent
 		//	Create our internal name
 		$_sName = CPSCommonBase::createInternalName( $this );
 
-		//	Add our OAuth behavior
-		$this->attachBehavior( $_sName, 'pogostick.behaviors.CPSOAuthBehavior' );
-		
-		//	Set current twitter api url
-		$this->setOption( 'apiBaseUrl', 'https://twitter.com' );
-		
-		//	Twitter uses HMAC_SHA1
-		$this->signatureMethod = CPSOAuthBehavior::OAUTH_SIGMETHOD_HMAC_SHA1;
+		//	Add ours...
+		$this->addOptions( self::getBaseOptions() );
 		
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
+	}
+
+	/**
+	* Add our options
+	*/
+	private function getBaseOptions()
+	{
+		return(
+			array(
+				//	Required settings
+				'userId' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'screenName' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+			)
+		);
+	}
+
+	//********************************************************************************
+	//* Public methods
+	//********************************************************************************
+
+	/**
+	* Loads data into the component from an alternate source (i.e. database, cookie, etc.)
+	* 
+	* @param string $sUserId The Twitter user_id
+	* @param string $sScreenName The Twitter screen_name
+	* @param boolean $bAuthorized Is user authorized?
+	* @param array $arToken The access token
+	*/
+	public function loadData( $sUserId = null, $sScreenName = null, $bAuthorized = false, $arToken = array() )
+	{
+		$this->userId = $sUserId;
+		$this->screenName = $sScreenName;
+		$this->isAuthorized = $bAuthorized;
+		$this->storeToken( $arToken );
+	}
+
+	//********************************************************************************
+	//* Twitter API Public Access Methods
+	//********************************************************************************
+
+	/**
+	* Returns the 20 most recent statuses from non-protected users who have set a custom user icon. 
+	* The public timeline is cached for 60 seconds so requesting it more often than that is a waste of resources.
+	* 
+	* @return mixed
+	*/
+	public function getPublicTimeline()
+	{
+		$this->apiToUse = self::STATUS_API;
+		return $this->makeRequest( 'public_timeline' );
+	}
+
+	/**
+	* Returns the 20 most recent statuses posted by the authenticating user and that user's friends. 
+	* This is the equivalent of /timeline/home on the Web.
+	* 
+	* @param string $sSinceId
+	* @param string $sMaxId
+	* @param integer $iCount
+	* @param integer $iPage
+	* @return mixed
+	*/
+	public function getFriendsTimeline( $sSinceId = null, $sMaxId = null, $iCount = null, $iPage = null )
+	{
+		$this->apiToUse = self::STATUS_API;
+		return $this->makeRequest( 'friends_timeline', array( 'since_id' => $sSinceId, 'max_id' => $sMaxId, 'count' => $iCount, 'page' => $iPage ) );
+	}
+
+	/**
+	* Returns the 20 most recent statuses posted from the authenticating user. 
+	* It's also possible to request another user's timeline via the id parameter. 
+	* This is the equivalent of the Web /<user> page for your own user, or the profile 
+	* page for a third party
+	* 
+	* @param string $sId
+	* @param string $sUserId
+	* @param string $sScreenName
+	* @param string $sSinceId
+	* @param string $sMaxId
+	* @param integer $iCount
+	* @param integer $iPage
+	* @return mixed
+	*/
+	public function getUserTimeline( $sId = null, $sUserId = null, $sScreenName = null, $sSinceId = null, $sMaxId = null, $iCount = null, $iPage = null )
+	{
+		$this->apiToUse = self::STATUS_API;
+		return $this->makeRequest( 'user_timeline', array( 'id' => $sId, 'user_id' => $sUserId, 'screen_name' => $sScreenName, 'since_id' => $sSinceId, 'max_id' => $sMaxId, 'count' => $iCount, 'page' => $iPage ) );
+	}
+
+	/**
+	* Returns the 20 most recent mentions (status containing @username) for the authenticating user.
+	* 
+	* @param string $sSinceId
+	* @param string $sMaxId
+	* @param integer $iCount
+	* @param integer $iPage
+	* @return mixed
+	*/
+	public function getMentions( $sSinceId = null, $sMaxId = null, $iCount = null, $iPage = null )
+	{
+		$this->apiToUse = self::STATUS_API;
+		return $this->makeRequest( 'mentions', array( 'since_id' => $sSinceId, 'max_id' => $sMaxId, 'count' => $iCount, 'page' => $iPage ) );
+	}
+
+	/**
+	* Returns extended information of a given user, specified by ID or screen name 
+	* as per the required id parameter.  The author's most recent status will be returned inline.
+	* 
+	* @param string $sId
+	* @param string $sUserId
+	* @param string $sScreenName
+	* @return mixed
+	*/
+	public function getExtendedUserInfo( $sId = null, $sUserId = null, $sScreenName = null )
+	{
+		$this->apiToUse = self::USER_API;
+		return $this->makeRequest( 'show', array( 'id' => $sId, 'user_id' => $sUserId, 'screen_name' => $sScreenName ) );
+	}
+
+	/**
+	* Returns a single status, specified by the id parameter below.  
+	* The status's author will be returned inline.
+	* 
+	* @param string $sId
+	* @return mixed
+	*/
+	public function getStatus( $sId )
+	{
+		$this->apiToUse = self::STATUS_API;
+		return $this->makeRequest( 'show', array( 'id' => $sId ) );
+	}
+
+	/**
+	* Updates the authenticating user's status.  
+	* Requires the status parameter specified below.  Request must be a POST.  
+	* A status update with text identical to the authenticating user's current 
+	* status will be ignored to prevent duplicates
+	* 
+	* @param string $sStatus
+	* @param string $sReplyId
+	* @return mixed
+	*/
+	public function updateStatus( $sStatus, $sReplyId = null )
+	{
+		$this->apiToUse = self::STATUS_API;
+		return $this->makeRequest( 'update', array( 'status' => $sStatus, 'in_reply_to_status_id' => $sReplyId ) );
+	}
+
+	/**
+	* Destroys the status specified by the required ID parameter.  
+	* The authenticating user must be the author of the specified status
+	* 
+	* @param string $sUpdateId
+	* @return mixed
+	*/
+	public function removeStatus( $sUpdateId )
+	{
+		$this->apiToUse = self::STATUS_API;
+		return $this->makeRequest( 'destroy', array( 'id' => $sUpdateId ) );
+	}
+
+	/**
+	* Returns a user's friends, each with current status inline. 
+	* They are ordered by the order in which they were added as friends. 
+	* Defaults to the authenticated user's friends. 
+	* It's also possible to request another user's friends list via the $sId parameter.
+	* 
+	* @param string $sId
+	* @param string $sUserId
+	* @param string $sScreenName
+	* @param integer $iPage
+	* @return mixed
+	*/
+	public function getFriends( $sId = null, $sUserId = null, $sScreenName = null, $iPage = null )
+	{
+		$this->apiToUse = self::STATUS_API;
+		return $this->makeRequest( 'friends', array( 'id' => $sId, 'user_id' => $sUserId, 'screen_name' => $sScreenName, 'page' => $iPage ) );
+	}
+
+	/**
+	* Returns the authenticating user's followers, each with current status inline.  
+	* They are ordered by the order in which they joined Twitter
+	* 
+	* @param string $sId
+	* @param string $sUserId
+	* @param string $sScreenName
+	* @param integer $iPage
+	* @return mixed
+	*/
+	public function getFollowers( $sId = null, $sUserId = null, $sScreenName = null, $iPage = null )
+	{
+		$this->apiToUse = self::STATUS_API;
+		return $this->makeRequest( 'followers', array( 'id' => $sId, 'user_id' => $sUserId, 'screen_name' => $sScreenName, 'page' => $iPage ) );
+	}
+
+	/**
+	* Allows the authenticating users to follow the user specified in the $sId parameter.  
+	* Returns the befriended user in the requested format when successful.  
+	* Returns a string describing the failure condition when unsuccessful.
+	* 
+	* @param string $sId
+	* @param string $sUserId
+	* @param string $sScreenName
+	* @param boolean $bEnableNotifications
+	* @return mixed
+	*/
+	public function followUser( $sId = null, $sUserId = null, $sScreenName = null, $bEnableNotifications = false )
+	{
+		$this->apiToUse = self::FRIENDSHIP_API;
+		return $this->makeRequest( 'create', array( 'id' => $sId, 'user_id' => $sUserId, 'screen_name' => $sScreenName, 'follow' => $bEnableNotifications ) );
+	}
+
+	/**
+	* Allows the authenticating users to unfollow the user specified in the $sId parameter.  
+	* Returns the unfollowed user in the requested format when successful.  
+	* Returns a string describing the failure condition when unsuccessful.
+	* 
+	* @param string $sId
+	* @param string $sUserId
+	* @param string $sScreenName
+	* @return mixed
+	*/
+	public function unfollowUser( $sId = null, $sUserId = null, $sScreenName = null )
+	{
+		$this->apiToUse = self::FRIENDSHIP_API;
+		return $this->makeRequest( 'destroy', array( 'id' => $sId, 'user_id' => $sUserId, 'screen_name' => $sScreenName ) );
+	}
+
+	/**
+	* Tests for the existence of friendship between two users. 
+	* Will return true if $sFollowerId follows $sFolloweeId, otherwise will return false.
+	* 
+	* @param string $sFolloweeId The user to test
+	* @param string $sFollowerId The other user to test. If null, authenticated user id is used
+	* @return mixed
+	*/
+	public function isFollowing( $sFolloweeId, $sFollowerId = null )
+	{
+		$this->apiToUse = self::FRIENDSHIP_API;
+		return $this->makeRequest( 'exists', array( 'user_a' => ( null == $sFollowerId ) ? $this->userId : $sFollowerId, 'user_b' => $sFolloweeId ) );
+	}
+
+	/***
+	* Returns an array of numeric IDs for every user the specified user is following.
+	* 
+	* @param string $sId
+	* @param string $sUserId
+	* @param string $sScreenName
+	* @param integer $iPage
+	* @return mixed
+	*/
+	public function getFollowingList( $sId = null, $sUserId = null, $sScreenName = null, $iPage = null )
+	{
+		$this->apiToUse = self::FRIEND_API;
+		return $this->makeRequest( 'ids', array( 'id' => $sId, 'user_id' => $sUserId, 'screen_name' => $sScreenName, 'page' => $iPage ) );
+	}
+
+	/**
+	* Returns an array of users whom are following the authenticated user
+	* 
+	* @param string $sId
+	* @param string $sUserId
+	* @param string $sScreenName
+	* @param integer $iPage
+	* @return mixed
+	*/
+	public function getFollowerList( $sId = null, $sUserId = null, $sScreenName = null, $iPage = null )
+	{
+		$this->apiToUse = self::FOLLOWER_API;
+		return $this->makeRequest( 'ids', array( 'id' => $sId, 'user_id' => $sUserId, 'screen_name' => $sScreenName, 'page' => $iPage ) );
+	}
+	
+	/**
+	* Returns an HTTP 200 OK response code and a representation of the requesting user 
+	* if authentication was successful; returns a 401 status code and an error message if not.  
+	* Use this method to test if supplied user credentials are valid.
+	* 
+	*/
+	public function verifyCredentials()
+	{
+		$this->apiToUse = self::ACCOUNT_API;
+		return $this->makeRequest( 'verify_credentials' );
+	}
+
+	/**
+	* Returns the remaining number of API requests available to the requesting user before the 
+	* API limit is reached for the current hour. Calls to this do not count against the rate limit.  
+	* If authentication credentials are provided, the rate limit status for the authenticating user is returned.  
+	* Otherwise, the rate limit status for the requester's IP address is returned. 
+	* Learn more about the {@link http://apiwiki.twitter.com/Rate-limiting REST API rate limiting}.
+	*/
+	public function getRateLimitStatus()
+	{
+		$this->apiToUse = self::ACCOUNT_API;
+		return $this->makeRequest( 'rate_limit_status' );
+	}
+
+	/**
+	* Ends the session of the authenticating user, returning a null cookie.  
+	* Use this method to sign users out of client-facing applications like widgets
+	*/
+	public function endSession()
+	{
+		$this->apiToUse = self::ACCOUNT_API;
+		return $this->makeRequest( 'end_session' );
+	}
+
+	/**
+	* 
+	* @param string $sDevice
+	* @return mixed
+	*/
+	public function updateDeliveryDevice( $sDevice )
+	{
+		$this->apiToUse = self::ACCOUNT_API;
+		return $this->makeRequest( 'update_deliver_device', array( 'device' => $sDevice ) );
+	}
+
+	/**
+	* 
+	* @param string $sBG
+	* @param string $sText
+	* @param string $sLink
+	* @param string $sSBFill
+	* @param string $sSBBorder
+	* @return mixed
+	*/
+	public function updateProfileColors( $sBG = null, $sText = null, $sLink = null, $sSBFill = null, $sSBBorder = null )
+	{
+		$this->apiToUse = self::ACCOUNT_API;
+		return $this->makeRequest( 'update_profile_colors', array( 'profile_background_color' => $sBG, 'profile_text_color' => $sText, 'profile_link_color' => $sLink, 'profile_sidebar_fill_color' => $sSBFill, 'profile_sidebar_border_color' => $sSBBorder ) );
+	}
+
+	/**
+	* 
+	* @param string $sImageData
+	* @return mixed
+	*/
+	public function updateProfileImage( $sImageData )
+	{
+		$this->apiToUse = self::ACCOUNT_API;
+		return $this->makeRequest( 'update_profile_image', array( 'image' => $sImageData ) );
+	}
+
+	/**
+	* 
+	* @param string $sImageData
+	* @param boolean $bTiled
+	* @return mixed
+	*/
+	public function updateProfileBackgroundImage( $sImageData, $bTiled = false )
+	{
+		$this->apiToUse = self::ACCOUNT_API;
+		return $this->makeRequest( 'update_profile_background_image', array( 'image' => $sImageData, 'tile' => $bTiled ) );
+	}
+
+	/**
+	* 
+	* @param string $sName
+	* @param string $sEmail
+	* @param string $sUrl
+	* @param string $sLocation
+	* @param string $sDescription
+	* @return mixed
+	*/
+	public function updateProfile( $sName = null, $sEmail = null, $sUrl = null, $sLocation = null, $sDescription = null )
+	{
+		$this->apiToUse = self::ACCOUNT_API;
+		return $this->makeRequest( 'update_profile', array( 'name' => $sName, 'email' => $sEmail, 'url' => $sUrl, 'location' => $sLocation, 'description' => $sDescription ) );
+	}
+
+	/**
+	* 
+	* @param string $sId
+	* @param integer $iPage
+	* @return mixed
+	*/
+	public function getFavorites( $sId = null, $iPage = null )
+	{
+		$this->apiToUse = self::FAVORITE_API;
+		return $this->makeRequest( '/', array( 'id' => $sId, 'page' => $iPage ) );
+	}
+
+	/**
+	* 
+	* @param string $sStatusId
+	* @return mixed
+	*/
+	public function addFavorite( $sStatusId )
+	{
+		$this->apiToUse = self::FAVORITE_API;
+		return $this->makeRequest( 'create', array( 'id' => $sStatusId ) );
+	}
+	
+	/**
+	* 
+	* @param string $sStatusId
+	* @return mixed
+	*/
+	public function removeFavorite( $sStatusId )
+	{
+		$this->apiToUse = self::FAVORITE_API;
+		return $this->makeRequest( 'destroy', array( 'id' => $sStatusId ) );
+	}
+	
+	/**
+	* Enables device notifications for updates from the specified user
+	* 
+	* @param string $sId
+	* @param string $sUserId
+	* @param string $sScreenName
+	* @return mixed Returns the specified user when successful
+	*/
+	public function enableFollowNotifications( $sId = null, $sUserId = null, $sScreenName = null )
+	{
+		$this->apiToUse = self::NOTIFICATION_API;
+		return $this->makeRequest( 'follow', array( 'id' => $sId, 'user_id' => $sUserId, 'screen_name' => $sScreenName ) );
+	}
+	
+	/**
+	* Disables notifications for updates from the specified user to the authenticating user
+	* 
+	* @param string $sId
+	* @param string $sUserId
+	* @param string $sScreenName
+	* @return mixed Returns the specified user when successful
+	*/
+	public function disableFollowNotifications( $sId = null, $sUserId = null, $sScreenName = null )
+	{
+		$this->apiToUse = self::NOTIFICATION_API;
+		return $this->makeRequest( 'leave', array( 'id' => $sId, 'user_id' => $sUserId, 'screen_name' => $sScreenName ) );
+	}
+	
+	/**
+	* Returns tweets that match a specified query
+	* 
+	* @param string $sTerm
+	* @param string $sCallback
+	* @param string $sLang
+	* @param integer $iRPP
+	* @param integer $iPage
+	* @param string $sSinceId
+	* @param string $sGeocode
+	* @param boolean $bShowUser
+	* @return mixed
+	*/
+	public function search( $sTerm, $sCallback = null, $sLang = null, $iRPP = null, $iPage = null, $sSinceId = null, $sGeocode = null, $bShowUser = false )
+	{
+		$this->apiToUse = self::SEARCH_API;
+		return $this->makeRequest( '/', array( 'q' => $sTerm, 'callback' => $sCallback, 'lang' => $sLang, 'rpp' => $iRPP, 'page' => $iPage, 'since_id' => $sSinceId, 'geogode' => $sGeocode, 'show_user' => $bShowUser ) );
 	}
 
 	//********************************************************************************
@@ -78,17 +523,21 @@ class CPSTwitterApi extends CPSApiComponent
 		//	Call daddy
 		parent::init();
 
+		//	Set current twitter api url
+		if ( $this->isEmpty( $this->apiBaseUrl ) )
+			$this->apiBaseUrl = 'http://twitter.com';
+		
 		//	Create the base array
 		$this->requestMap = array();
 
 		//********************************************************************************
 		//* Statuses API
 		//********************************************************************************
-
-		$this->addTwitterRequestMapping( 'public_timeline',
+		
+		$this->addTwitterRequestMapping( 'public_timeline',                                                      
 			null,
 			null,
-			self::TWITTER_STATUS_API
+			self::STATUS_API
 		);
 
 		$this->addTwitterRequestMapping( 'friends_timeline',
@@ -111,7 +560,10 @@ class CPSTwitterApi extends CPSApiComponent
 				'count' => false,
 				'page' => false,
 			),
-			array( '_requireAuth' => true )
+			array( 
+				'_requireAuth' => true,
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+			)
 		);
 
 		$this->addTwitterRequestMapping( 'mentions',
@@ -125,7 +577,14 @@ class CPSTwitterApi extends CPSApiComponent
 		);
 
 		$this->addTwitterRequestMapping( 'show',
-			array( 'id' => true )
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+			),
+			array( 
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+			)
 		);
 
 		$this->addTwitterRequestMapping( 'update',
@@ -179,7 +638,7 @@ class CPSTwitterApi extends CPSApiComponent
 			array(
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
 			),
-			self::TWITTER_USER_API
+			self::USER_API
 		);
 
 		//********************************************************************************
@@ -198,7 +657,7 @@ class CPSTwitterApi extends CPSApiComponent
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
 				'_requireAuth' => true,
 			),
-			self::TWITTER_FRIENDSHIP_API
+			self::FRIENDSHIP_API
 		);
 
 		$this->addTwitterRequestMapping( 'destroy',
@@ -212,7 +671,7 @@ class CPSTwitterApi extends CPSApiComponent
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
 				'_requireAuth' => true,
 			),
-			self::TWITTER_FRIENDSHIP_API
+			self::FRIENDSHIP_API
 		);
 
 		$this->addTwitterRequestMapping( 'exists',
@@ -221,7 +680,7 @@ class CPSTwitterApi extends CPSApiComponent
 				'user_b' => true,
 			),
 			array( '_requireAuth' => true ),
-			self::TWITTER_FRIENDSHIP_API
+			self::FRIENDSHIP_API
 		);
 
 		//********************************************************************************
@@ -238,7 +697,7 @@ class CPSTwitterApi extends CPSApiComponent
 			array(
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
 			),
-			self::TWITTER_FRIEND_API
+			self::FRIEND_API
 		);
 
 		//********************************************************************************
@@ -255,7 +714,7 @@ class CPSTwitterApi extends CPSApiComponent
 			array(
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
 			),
-			self::TWITTER_FOLLOWER_API
+			self::FOLLOWER_API
 		);
 
 		//********************************************************************************
@@ -265,7 +724,7 @@ class CPSTwitterApi extends CPSApiComponent
 		$this->addTwitterRequestMapping( 'verify_credentials',
 			null,
 			array( '_requireAuth' => true ),
-			self::TWITTER_ACCOUNT_API
+			self::ACCOUNT_API
 		);
 
 		$this->addTwitterRequestMapping( 'rate_limit_status',
@@ -354,7 +813,7 @@ class CPSTwitterApi extends CPSApiComponent
 			array(
 				'_requireAuth' => true,
 			),
-			self::TWITTER_FAVORITE_API
+			self::FAVORITE_API
 		);
 
 		$this->addTwitterRequestMapping( 'create',
@@ -392,7 +851,7 @@ class CPSTwitterApi extends CPSApiComponent
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
 				'_requireAuth' => true,
 			),
-			self::TWITTER_NOTIFICATION_API
+			self::NOTIFICATION_API
 		);
 
 		$this->addTwitterRequestMapping( 'leave',
@@ -407,6 +866,26 @@ class CPSTwitterApi extends CPSApiComponent
 				'_requireAuth' => true,
 			)
 		);
+		
+		//********************************************************************************
+		//* Search API
+		//********************************************************************************
+
+		$this->addTwitterRequestMapping( '/',
+			array(
+				'callback' => false,
+				'lang' => false,
+				'rpp' => false,
+				'page' => false,
+				'since_id' => false,
+				'geocode' => false,
+				'show_user' => false,
+				'q' => true,
+			),
+			null,
+			self::SEARCH_API
+		);
+		
 	}
 
 	//********************************************************************************
@@ -440,132 +919,6 @@ class CPSTwitterApi extends CPSApiComponent
 		$_arOptions[ 'requestMap' ][ $_sLastController ][ $sAction ] = array( 'params' => $arParams, 'options' => $arOptions, 'controller' => $_sLastController );
 
 		return true;
-	}
-
-	/**
-	* Makes the actual HTTP request based on settings
-	*
-	* @param string $sAction
-	* @param array $arRequestData
-	* @return string
-	*/
-	public function makeRequest( $sAction, $arRequestData = null )
-	{
-		//	Default...
-		$_arRequestData = $this->requestData;
-		$_arReqArgs = array();
-
-		//	Check data...
-		if ( null != $arRequestData )
-			$_arRequestData = array_merge( $_arRequestData, $arRequestData );
-
-		//	Check action...
-		if ( ! empty( $sAction ) && is_array( $this->requestMap[ $this->apiToUse ] ) && ! array_key_exists( $sAction, $this->requestMap[ $this->apiToUse ] ) )
-		{
-			throw new CException(
-				Yii::t(
-					__CLASS__,
-					'Invalid action "{subType}" specified for controller "{apiToUse}". Valid subtypes are "{subTypes}"',
-					array(
-						'{subType}' => $sAction,
-						'{apiToUse}' => $this->apiToUse,
-						'{subTypes}' => implode( ', ', array_keys( $this->requestMap[ $this->apiToUse ] ) )
-					)
-				)
-			);
-		}
-
-		//	Add the request data to the Url...
-		if ( is_array( $this->requestMap )  )
-		{
-			$_arMap = ( isset( $this->requestMap[ $this->apiToUse ][ $sAction ] ) ) ? $this->requestMap[ $this->apiToUse ][ $sAction ] : null;
-			$_arOptions = ( isset( $_arMap[ 'options' ] ) ) ? $_arMap[ 'options' ] : null;
-			$_arReqOneOf = ( isset( $_arOptions[ '_requireOneOf' ] ) ) ? $_arOptions[ '_requireOneOf' ] : null;
-			$_sMethod = ( isset( $_arOptions[ '_method' ] ) ) ? $_arOptions[ '_method' ] : CPSApiBehavior::HTTP_GET;
-			$_arParams = ( isset( $_arParams[ 'params' ] ) ) ? $_arParams[ 'params' ] : null;
-
-			$_sQuery = '';
-			$_bThere = ( null == $_arReqOneOf );
-
-			//	Build our query
-			if ( is_array( $_arParams ) )
-			{
-				foreach ( $_arParams as $_sKey => $_bRequired )
-				{
-					//	Check required items
-					if ( null != $_arReqOneOf && ! $_bThere )
-						$_bThere = in_array( $_sKey, $_arReqOneOf );
-
-					if ( $_bRequired && ! isset( $_arRequestData[ $_sKey ] ) )
-					{
-						throw new CException(
-							Yii::t(
-								__CLASS__,
-								'Required parameter {param} was not included in requestData',
-								array(
-									'{param}' => $_sKey,
-								)
-							)
-						);
-					}
-
-					//	Add to query string if set...
-					if ( isset( $_arRequestData[ $_sKey ] ) )
-						$_arReqArgs[ $_sKey ] = $_arRequestData[ $_sKey ];
-				}
-			}
-		}
-
-		//	Check requireOneOf option...
-		if ( ! $_bThere )
-		{
-			throw new CException(
-				Yii::t(
-					__CLASS__,
-					'This call requires one of the following parameters: {params}',
-					array(
-						'{param}' => implode( ', ', $_requireOneOf ),
-					)
-				)
-			);
-		}
-
-		//	Build the url...
-		$_sUrl = $this->apiBaseUrl . '/' . $this->apiToUse . ( ( $sAction == '/' ) ? '' : '/' . $sAction ) . '.json';
-
-		//	Handle events...
-		$_oEvent = new CPSApiEvent( $_sUrl, $_sQuery, null, $this );
-		$this->beforeApiCall( $_oEvent );
-
-		//	Ok, we've build our request, now let's get the results...
-		$_sResults = $this->makeOAuthRequest( $_sUrl, $_arReqArgs, $_sMethod );
-
-		//	Handle events...
-		$_oEvent->urlResults = $_sResults;
-		$this->afterApiCall( $_oEvent );
-
-		//	Raise our completion event...
-		$_oEvent->setUrlResults( $_sResults );
-		$this->requestComplete( $_oEvent );
-
-		//	If user doesn't want JSON output, then reformat
-		switch ( $this->format )
-		{
-			case 'xml':
-				$_sResults = CPSHelp::arrayToXml( json_decode( $_sResults, true ), 'Results' );
-				break;
-				
-			case 'json':
-				$_sResults = json_encode( $_sResults );
-				break;
-
-			case 'array':
-				//	Already in array format
-				break;
-		}
-
-		//	Return results...
-		return $_sResults;
 	}
 
 }

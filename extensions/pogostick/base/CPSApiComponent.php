@@ -161,8 +161,27 @@ class CPSApiComponent extends CPSComponent
 	}
 
 	//********************************************************************************
-	//* Event Handlers
+	//* Events and Handlers
 	//********************************************************************************
+
+	/**
+	 * Declares events and the corresponding event handler methods.
+	 * @return array events (array keys) and the corresponding event handler methods (array values).
+	 * @see CBehavior::events
+	 */
+	public function events()
+	{
+		return(
+			array_merge(
+				parent::events(),
+				array(
+					'onBeforeApiCall' => 'beforeApiCall',
+					'onAfterApiCall' => 'afterApiCall',
+					'onRequestComplete' => 'requestComplete',
+				)
+			)
+		);
+	}
 
 	/**
 	* Call to raise the onBeforeApiCall event
@@ -201,7 +220,7 @@ class CPSApiComponent extends CPSComponent
 	*/
 	public function onAfterApiCall( $oEvent )
 	{
-		$this->raiseEvent( 'onBeforeApiCall', $oEvent );
+		$this->raiseEvent( 'onAfterApiCall', $oEvent );
 	}
 
 	/**

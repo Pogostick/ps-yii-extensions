@@ -156,11 +156,7 @@ class CPSComponentBehavior extends CBehavior
 	* @return null
 	* @see setOptions
 	*/
-	public function setOption( $sKey, $oValue )
-	{
-		//	Validate options first...
-		$this->m_oOptions->setOption( $sKey, $oValue );
-	}
+	public function setOption( $sKey, $oValue ) {  $this->m_oOptions->setOption( $sKey, $oValue ); }
 
 	/**
 	* Returns a reference to the entire reference array
@@ -442,7 +438,7 @@ class CPSComponentBehavior extends CBehavior
 			
 		return parent::__set( $sName, $oValue );
 	}
-
+	
 	/**
 	* Check to see if the value follows a callback function pattern
 	* 	
@@ -451,6 +447,38 @@ class CPSComponentBehavior extends CBehavior
 	protected function isCBFunction( $sValue )
 	{
 		return ( 0 == strncasecmp( $sValue, 'function(', 9 ) || 0 == strncasecmp( $sValue, 'jQuery(', 7 ) || 0 == strncasecmp( $sValue, '$(', 2 ) );
+	}
+	
+	/**
+	* Redirect event to owner object
+	* 
+	* This doesn't actually raise an event. What it does is calls the 
+	* owner's event raiser method. That method will then raise the event.
+	* 
+	* @param string $sName The event name
+	* @param CPSApiEvent $oEvent The event
+	*/
+	public function raiseEvent( $sName, $oEvent )
+	{
+		//	Save called name...
+		$_sOrigName = $sName;
+		
+		//	Handler exists? Call it
+		if ( method_exists( $this->owner, $sName ) )
+			return call_user_method( $sName, $this->owner, $oEvent );
+	
+		//	See if pre-handler exists...
+		if ( 0 === strncmp( 'on', $sName, 2 ) )
+			$sName = substr( $sName, 2 );
+
+		$sName{0} = strtolower( $sName{0} );
+
+		if ( method_exists( $this->owner, $sName ) )
+			return call_user_method( $sName, $this->owner, $oEvent );
+			
+		//	Not there? Throw error...
+		return parent::raiseEvent( $sName, $oEvent );
+		//throw new CException( Yii::t( $this->m_sInternalName, 'Event "{class}.{event}" is not defined.', array( '{class}' => get_class( $this->owner ), '{event}' => $_sOrigName ) ) );
 	}
 
 }

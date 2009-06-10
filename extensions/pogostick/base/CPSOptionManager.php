@@ -451,13 +451,10 @@ class CPSOptionManager
 					}
 					else
 					{
-						//	Only validate public options
+						//	Skip private vars and null strings...
 						if ( ! $oValue[ self::META_PRIVATE ] )
 						{
-							//	Skip null strings...
-							if ( $_sType == 'string' && null == $oValue[ self::META_DEFAULTVALUE ] )
-								;
-							else
+							if ( $_sType == 'string' && ! isset( $oValue[ self::META_DEFAULTVALUE ] ) )
 							{
 								if ( $_sType != gettype( $oValue[ self::META_DEFAULTVALUE ] ) && ! $_bPrivate && null != $oValue[ self::META_DEFAULTVALUE ] )
 									throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_sType ) ) ? implode( ', ', $_sType ) : $_sType ) ), 1  );
@@ -481,7 +478,7 @@ class CPSOptionManager
 		$this->setMetaDataValue( $sKey, self::META_REQUIRED, isset( $oValue[ self::META_REQUIRED ] ) ? $oValue[ self::META_REQUIRED ] : false );
 
 		//	Now stuff the default or passed in value
-		$this->setOption( $sKey, ( null != $oSetValue ) ? $oSetValue : $_oValue );
+		$this->setOption( $sKey, ( null === $oSetValue ) ? $_oValue : $oSetValue );
 
 		//	Sort the array
 		if ( ! $bNoSort ) ksort( $this->m_arOptions );
@@ -518,7 +515,10 @@ class CPSOptionManager
 	*/
 	public function hasOption( $sKey )
 	{
-		return in_array( $this->validateKey( $sKey ), $this->m_arOptions );
+		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
+			return false;
+			
+		return array_key_exists( $sKey, $this->m_arOptions );
 	}
 
 	/**

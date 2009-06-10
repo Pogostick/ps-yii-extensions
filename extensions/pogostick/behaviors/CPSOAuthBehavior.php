@@ -7,8 +7,6 @@
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @license http://www.pogostick.com/license/
  */
-
-require_once( dirname( __FILE__ ) . '/../components/oauth/OAuth.php' );
  
 /**
  * CPSOAuthBehavior provides OAuth support to any Pogostick component
@@ -16,7 +14,7 @@ require_once( dirname( __FILE__ ) . '/../components/oauth/OAuth.php' );
  * @author Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
  * @package psYiiExtensions
- * @subpackage Components
+ * @subpackage Behaviors
  * @since 1.0.0
  * @uses pogostick.components.oauth.OAuth.php
  */
@@ -26,8 +24,33 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	//* Constants
 	//********************************************************************************
 
-	//	Signature types
-	const OAUTH_SIGMETHOD_HMAC_SHA1 = 'HMAC-SHA1';
+	/***
+	* Our OAuth object
+	* 
+	* @var OAuth
+	*/
+	protected $m_oOAuth = null;
+	/**
+	* The current token
+	* 
+	* @var array
+	*/
+	protected $m_arCurToken = null;
+	
+	//********************************************************************************
+	//* Properties
+	//********************************************************************************
+
+	/**
+	* Retrieves the current token
+	* @returns array
+	*/
+	public function getToken() { return $this->m_arCurToken; }
+	/**
+	* Retrieves the OAuth object
+	* @returns oauth
+	*/
+	public function getOAuthObject() { return $this->m_oOAuth; }
 	
 	//********************************************************************************
 	//* Constructor
@@ -39,6 +62,10 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	*/
 	public function __construct()
 	{
+		//	No oauth? No run...
+		if ( ! extension_loaded( 'oauth' ) )
+			throw new CException( Yii::t( 'psOAuthBehavior', 'The "oauth" extension is not loaded. Please install and/or load the oath extension (PECL).' ) );
+		
 		//	Call daddy...
 		parent::__construct();
 
@@ -48,7 +75,7 @@ class CPSOAuthBehavior extends CPSApiBehavior
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
 	}
-
+	
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -62,16 +89,7 @@ class CPSOAuthBehavior extends CPSApiBehavior
 		return(
 			array(
 				//	Required settings
-				'consumerObject' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'object' ) ),
-				'token' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'object' ) ),
-				'signatureMethod' => array( CPSOptionManager::META_DEFAULTVALUE => CPSOAuthBehavior::OAUTH_SIGMETHOD_HMAC_SHA1, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'signatureObject' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'object' ) ),
 				'callbackUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'version' => array( CPSOptionManager::META_DEFAULTVALUE => '1', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				//	Informational
-				'httpLastStatus' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'apiLastUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'currentState' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'isAuthorized' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
 				//	Urls
 				'accessTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '/oauth/access_token', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
@@ -87,127 +105,78 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	*/
 	public function init()
 	{
-		//	Set our defaults
-		switch ( $this->signatureMethod )
-		{
-			case self::OAUTH_SIGMETHOD_HMAC_SHA1:
-			default:
-				$this->signatureObject = new OAuthSignatureMethod_HMAC_SHA1();
-				break;
-		}
-		
-		//	Make our consumer object...
-		$this->consumerObject = new OAuthConsumer( $this->apiKey, $this->apiSecretKey, $this->callbackUrl );
-		
-		//	Set state from previous session if any
-		$this->isAuthorized = false;
+		//	Create our object...		
+		$this->m_oOAuth = new OAuth( $this->apiKey, $this->apiSecretKey, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI );
+
+		//	Load any tokens we have...
+		$this->loadToken();
 		
 		//	Have we been authenticated?
-		if ( null != $_REQUEST[ 'oauth_token' ] ) 
+		if ( ! $this->isAuthorized )
 		{
-			$this->token = new OAuthConsumer( $_REQUEST[ 'oauth_token' ], ( null != $_REQUEST[ 'oauth_token_secret' ] ) ? $_REQUEST[ 'oauth_token_secret' ] : $_REQUEST[ 'oauth_request_token_secret' ] );
-			$this->isAuthorized = true;
-			$this->getAccessToken();
+			if ( isset( $_REQUEST[ 'oauth_token' ] ) )
+			{
+				if ( $this->m_oOAuth->setToken( $_REQUEST[ 'oauth_token' ], $_REQUEST[ 'oauth_verifier' ] ) )
+				{
+					$_arToken = $this->m_oOAuth->getAccessToken( $this->apiBaseUrl . $this->accessTokenUrl, null, $_REQUEST[ 'oauth_verifier' ] );
+					$this->storeToken( $_arToken );
+					$this->isAuthorized = true;
+				}
+				
+				$this->raiseEvent( 'onUserAuthorized', new CPSOAuthEvent( $this->m_arCurToken ) );
+			}
 		}
-		else
-			$this->getRequestToken();
 	}
-
-	/**
+	
+	/**                                         I
 	* Appends the current token to the authorizeUrl option
 	* 	
 	* @param mixed $oToken
 	*/
 	public function getAuthorizeUrl()
 	{
-		return $this->apiBaseUrl . $this->authorizeUrl . '?oauth_token=' . $this->token->key;
+		$_arToken = $this->m_oOAuth->getRequestToken( $this->apiBaseUrl . $this->requestTokenUrl, $this->callbackUrl );
+		return $this->apiBaseUrl . $this->authorizeUrl . '?oauth_token=' . $_arToken[ 'oauth_token' ];
 	}
-
+	
 	/**
-	* Retrieve the access token
+	* Stores the current token in a member variable and in the user state oAuthToken
 	* 
 	* @param array $oToken
-	* @return array
 	*/
-	public function getAccessToken()
+	public function storeToken( $oToken = array() )
 	{
-		$_oToken = $this->makeOAuthRequest( $this->apiBaseUrl . $this->accessTokenUrl );
-		return $this->setToken( $_oToken[ 'oauth_token' ], $_oToken[ 'oauth_token_secret' ] );
+		try
+		{
+			Yii::app()->user->setState( $this->getInternalName() . '_oAuthToken', $oToken );
+			Yii::app()->user->setState( $this->getInternalName() . '_isAuthorized', $this->isAuthorized );
+			$this->m_arCurToken = $oToken;
+		}
+		catch ( Exception $_ex )
+		{
+			$_sName = $this->getInternalName();
+			CPSCommonBase::writeLog( Yii::t( $_sName, 'Error storing OAuth token "{a}/{b}" : {c}', array( "{a}" => $oToken['oauth_token'], "{b}" => $oToken['oauth_token_secret'], "{c}" => $_ex->getMessage() ), 'trace', $_sName ) );		
+		}
 	}
 
 	/**
-	* Retrieve the request token
+	* Loads a token from the user state oAuthToken
 	* 
 	*/
-	public function getRequestToken() 
-	{ 
-		$_oToken = $this->makeOAuthRequest( $this->apiBaseUrl . $this->requestTokenUrl );
-		return $this->setToken( $_oToken[ 'oauth_token' ], $_oToken[ 'oauth_token_secret' ] );
-	}
-	
-	/**
-	* Given the two token parts, an OAuthConsumer object is created...
-	* 
-	* @param string $Token
-	* @param string $sTokenSecret
-	* @returns OAuthConsumer
-	*/
-	public function setToken( $sToken, $sTokenSecret )
+	public function loadToken()
 	{
-		return $this->token = new OAuthConsumer( $sToken, $sTokenSecret, $this->callbackUrl );
+		$_oUser = Yii::app()->user;
+		
+		if ( $_oUser )
+		{
+			if ( null != ( $_oToken = $_oUser->getState( $this->getInternalName() . '_oAuthToken' ) ) )
+			{
+				$this->m_arCurToken = $_oToken;
+				$this->isAuthorized = ( $_oUser->getState( $this->getInternalName() . '_isAuthorized' ) == true );
+			}
+			else
+				$_oToken = array();
+		}
 	}
 
-	/**
-	* Parse the response back from the OAuth server
-	* 
-	* @param string $sResponse The response from the OAuth server
-	* @return array An array of parameters returned from the OAuth server
-	*/
-	protected function parseOAuthResponse( $sResponse )
-	{
-		$_arResponse = array();
-		
-		foreach ( explode( '&', $sResponse ) as $_sParam )
-		{
-			$_arPair = explode( '=', $_sParam, 2 );
-			if ( count( $_arPair ) != 2 )
-				continue;
-				
-			$_arResponse[ urldecode( $_arPair[ 0 ] ) ] = urldecode( $_arPair[ 1 ] );
-		}
-		
-		return $_arResponse;
-	}
-	
-	/**
-	* Makes a request to an OAuth server
-	* 
-	* @param string $sUrl
-	* @param array $arArgs
-	* @param string $sMethod
-	* @return array
-	* @see parseOAuthResponse
-	*/
-	public function makeOAuthRequest( $sUrl, $arArgs = array(), $sMethod = NULL )
-	{
-		$_sCallbackUrl = $this->callbackUrl;
-		
-		if ( empty( $sMethod ) ) 
-			$sMethod = empty( $arArgs ) ? 'GET' : 'POST';
-		
-		if ( ! in_array( 'oauth_callback', $arArgs ) && ! empty( $_sCallbackUrl ) )
-			$arArgs[ 'oauth_callback' ] = $_sCallbackUrl;
-		
-		$_oRequest = OAuthRequest::from_consumer_and_token( $this->consumerObject, $this->token, $sMethod, $sUrl, $arArgs );
-		$_oRequest->sign_request( $this->signatureObject, $this->consumerObject, $this->token );
-	
-		switch ( $sMethod )
-		{
-			case 'GET': 
-				return $this->parseOAuthResponse( $this->makeHttpRequest( $_oRequest->to_url() ) );
-				
-			case 'POST': 
-				return $this->parseOAuthResponse( $this->makeHttpRequest( $_oRequest->get_normalized_http_url(), $_oRequest->to_postdata(), 'POST' ) );
-		}
-	}
 }
