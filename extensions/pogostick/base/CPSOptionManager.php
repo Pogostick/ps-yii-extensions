@@ -518,7 +518,17 @@ class CPSOptionManager
 		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
 			return false;
 			
-		return array_key_exists( $sKey, $this->m_arOptions );
+    	if ( array_key_exists( $sKey, $this->m_arOptions ) ) return true; 
+
+		if  ( ! ( is_string( $sKey ) && is_array( $this->m_arOptions ) && count( $this->m_arOptions ) ) ) return false;
+
+		$sKey = strtolower( $sKey ); 
+		
+	    foreach ( $this->m_arOptions as $_sKey => $_oValue )
+	    	if ( strtolower( $_sKey ) == $sKey )
+	    		return true;
+	
+	    return false; 
 	}
 
 	/**
