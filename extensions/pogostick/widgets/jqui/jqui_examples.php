@@ -6,36 +6,38 @@
 * @version SVN: $Id$
 * @package psYiiExtensions
 * @subpackage Widgets
-* @since 1.0.0
+* @since 1.0.2
 */
 /***
 * Example file for CPSjqUIWrapper class
+* 
+* To use this, create render as a view from a controller
 */
 
 //	Create an accordian...
-CPSjqUIWrapper::create( 'accordion', array( 'header' => 'h3' ), true, null, 'cupertino' );
+CPSjqUIWrapper::create( 'accordion', array( 'header' => 'h3', 'theme' => 'cupertino' ) );
 
 //	Create tabs...
-CPSjqUIWrapper::create( 'tabs', array(), true );
+CPSjqUIWrapper::create( 'tabs' );
 
 //	Create a dialog...
-CPSjqUIWrapper::create( 'dialog', array( 'autoOpen' => false, 'width' => 600, 'buttons' => array( 'Ok' => 'function(){$(this).dialog("close");}','Cancel'=>'function(){$(this).dialog("close");}' ) ), true );
+CPSjqUIWrapper::create( 'dialog', array( 'autoOpen' => false, 'width' => 600, 'buttons' => array( 'Ok' => 'function(){$(this).dialog("close");}','Cancel'=>'function(){$(this).dialog("close");}' ) ) );
 
 //	Create a dialog with links...
 $_arScripts = array( 
 	"\$('#dialog_link').click(function(){\$('#dialog').dialog('open');return false;});",
 	"\$('#dialog_link, ul#icons li').hover(function() { \$(this).addClass('ui-state-hover'); }, function() { \$(this).removeClass('ui-state-hover'); });",
 );
-CPSjqUIWrapper::create( 'dialog', array( '_scripts' => $_arScripts, 'autoOpen' => false, 'width' => 600, 'buttons' => array( 'Ok' => 'function(){$(this).dialog("close");}','Cancel'=>'function(){$(this).dialog("close");}' ) ), true );
+CPSjqUIWrapper::create( 'dialog', array( '_scripts' => $_arScripts, 'autoOpen' => false, 'width' => 600, 'buttons' => array( 'Ok' => 'function(){$(this).dialog("close");}','Cancel'=>'function(){$(this).dialog("close");}' ) ) );
 
 //	A date picker
-CPSjqUIWrapper::create( 'datepicker', array( 'inline' => true ), true );
+CPSjqUIWrapper::create( 'datepicker', array( 'inline' => true ) );
 
 //	A slider
-CPSjqUIWrapper::create( 'slider', array( 'range' => true, 'values' => array( 17, 67 ) ), true );
+CPSjqUIWrapper::create( 'slider', array( 'range' => true, 'values' => array( 17, 67 ) ) );
 
 //	A progress bar
-CPSjqUIWrapper::create( 'progressbar', array( 'value' => 20 ), true );
+CPSjqUIWrapper::create( 'progressbar', array( 'value' => 20 ) );
 ?>
 
 		<style type="text/css">
