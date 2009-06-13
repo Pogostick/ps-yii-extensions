@@ -27,61 +27,59 @@
  * 			//	Lay out the validation parameters
  * 			CPSOptionManager::META_RULES => array(
  * 				//	Any valid PHP type (i.e. string, array, integer, etc.),
- * 				'type' => 'typename',
- * 				'_extName' => external-facing name | empty
+ * 				CPSOptionManager::META_TYPE => 'typename',
+ * 				//	Is option required?
+ * 				CPSOptionManager::META_REQUIRED => true|false,
+ * 				//	The external name of the option (i.e. what to send to component)
+ * 				CPSOptionManager::META_EXTERNALNAME => external-facing name | empty
  * 				// An array of valid values for the option
- * 				'valid' => array( 'v1', 'v2', 'v3', etc.)
+ * 				CPSOptionManager::META_ALLOWED => array( 'v1', 'v2', 'v3', etc.)
  * 		)
  * )
  * </code>
  *
- * <b>_extName</b> tells the option manager to use this when formatting an options array with (@link CPSOptionManager::makeOptions()).
+ * <b>CPSOptionManager::META_EXTERNALNAME</b> tells the option manager to use this when formatting an options array with (@link CPSOptionManager::makeOptions()).
  *
- * <b>_value</b> tells the option manager what to set the value of the option to upon creation. New values will override this default value.
+ * <b>CPSOptionManager::META_DEFAULTVALUE</b> tells the option manager what to set the value of the option to upon creation. New values will override this default value.
  *
  * When adding options to the options manager, you must specify the pattern for the option's value.
- * The pattern must be placed in the array element with a key of '<b>_validPattern</b>' to be recognized
+ * The pattern must be placed in the array element with a key of '<b>CPSOptionManager::META_RULES</b>' to be recognized
  * by the option manager.
- *
- * <b>_validPattern</b> tells the option manager what type of variable is allowed to be assigned to the option.
- * Any legal PHP type is allowed. If more than one type is allowed, you may send in an array as the
- * value of '<b>type</b>'.
  *
  * This pattern can include none, one, or more pattern sub-types.
  *
  * These are:
- * 	1. <b>type</b>
- *  2. <b>valid</b>
- *  3. <b>required</b>
+ * 	1. <b>CPSOptionManager::META_EXTERNALNAME</b>
+ *  2. <b>CPSOptionManager::META_ALLOWED</b>
+ *  3. <b>CPSOptionManager::META_REQUIRED</b>
  *
- * <b>type</b> tells the option manager what type of variable is allowed to be assigned to the option.
+ * <b>CPSOptionManager::META_TYPE</b> tells the option manager what type of variable is allowed to be assigned to the option.
  * Any legal PHP type is allowed. If more than one type is allowed, you may send in an array as the
- * value of '<b>type</b>'.
+ * value of '<b>CPSOptionManager::META_EXTERNALNAME</b>'.
  *
- * <b>valid</b> tells the option manager the valid values of the option that is being set. This must
+ * <b>CPSOptionManager::META_ALLOWED</b> tells the option manager the valid values of the option that is being set. This must
  * be specified as an array. For instance, if an option can only have three possible values: '<b>public</b>',
- * '<b>protected</b>', or '<b>private</b>', the array specified for the value of '<b>valid</b>' would be
- *
- * <b>required</b> tells the option manager that the option is required and as such, must have a non-null <b>_value</b>.
- *
+ * '<b>protected</b>', or '<b>private</b>', the array specified for the value of '<b>CPSOptionManager::META_TYPE</b>' 
+ * would be:
+ * 
  * <code>
- *
  * array( 'public', 'protected', 'private' )
- *
  * </code>
  *
+ * <b>CPSOptionManager::META_REQUIRED</b> tells the option manager that the option is required and as such, must have a non-null value.
+ *
  * This next snippet defines an option named '<b>hamburgerCount</b>'. It is private because we've appended
- * an underscore to the name. It's default value is 6, it can be only of type '<b>int</b>', and has no
+ * an underscore to the name. It's default value is 6, it can be only of type '<b>integer</b>', and has no
  * required values.
  *
  * <code>
  *
  * 'hamburgerCount_' = array(
- * 	'_value' => 6,
- * 	'_validPattern' =>
+ * 	CPSOptionManager::META_DEFAULTVALUE => 6,
+ * 	CPSOptionManager::META_RULES =>
  * 		array(
- * 			'type' => 'int',
- * 			'valid' => null,
+ * 			CPSOptionManager::META_TYPE => 'integer',
+ * 			CPSOptionManager::META_ALLOWED => null,
  * 		),
  * 	);
  *
@@ -90,11 +88,13 @@
  * Using this option from a Pogostick component or widget is as simple as this:
  *
  * <code>
- * $this->hamburgerCount_ = 3;
- * echo $this->hamburgerCount_;
+ * $this->hamburgerCount = 3;
+ * echo $this->hamburgerCount;
  * </code>
+ * 
+ * Once you declare an option private (suffixing with the underscore as above, you no longer need to provide the underscore when 
+ * accessing the option. The underscore is used ONLY when adding new options and is dropped once added.
  *
- * @access public
  * @author Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
  * @filesource
@@ -109,10 +109,6 @@ class CPSOptionManager
 
 	/**
 	* These are shortcuts to the metadata options in the array.
-	*/
-
-	/**
-	* @var string|array
 	*/
 	const META_ALLOWED 		= '_allowed';
 	/**
@@ -444,7 +440,7 @@ class CPSOptionManager
 							case 'array':
 								$_oValue = array();
 								break;
-							default:
+c							default:
 								$_oValue = null;
 								break;
 						}
@@ -452,7 +448,7 @@ class CPSOptionManager
 					else
 					{
 						//	Skip private vars and null strings...
-						if ( ! $oValue[ self::META_PRIVATE ] )
+						if ( isset( $oValue[ self::META_PRIVATE ] ) && ! $oValue[ self::META_PRIVATE ] )
 						{
 							if ( $_sType == 'string' && ! isset( $oValue[ self::META_DEFAULTVALUE ] ) )
 							{

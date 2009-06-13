@@ -24,7 +24,7 @@ class CPSActiveWidgets extends CHtml
 	//********************************************************************************
 	
 	/**
-	* Field Types
+	* These are a list of form elements that can be used along with the methods in this class.
 	*/
 	const TEXTAREA = 'activeTextArea';
 	const TEXT = 'activeTextField';
@@ -81,6 +81,11 @@ class CPSActiveWidgets extends CHtml
 
 	/**
 	* Adds an activefield to a form
+	* 
+	* There are two special options you can use in $arHtmlOptions:
+	* 
+	*   _appendHtml		--	Extra Html code/scripts to be inserted AFTER the form element has been created
+	*   _widget			--	The name of the jQuery UI widget to create when type = self::JQUI
 	* 
 	* @param string $eFieldType One of the * constants
 	* @param CModel $oModel The model for this form

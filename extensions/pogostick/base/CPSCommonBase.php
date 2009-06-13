@@ -69,16 +69,21 @@ class CPSCommonBase
 	*/
 	public static function &hasBehaviorMethod( $oComponent, $sMethodName )
 	{
+		$_oBehavior = null;
+		
 		if ( ( $oComponent instanceof CPSComponent || $oComponent instanceof CPSWidget ) && $oComponent->hasBehaviors )
 		{
 			foreach ( $oComponent->getBehaviors() as $_sKey => $_oBehave )
 			{
 				if ( is_array( $_oBehave[ self::BEHAVIOR_META_METHODS ] ) && in_array( strtolower( $sMethodName ), $_oBehave[ self::BEHAVIOR_META_METHODS ] ) )
-					return $_oBehave;
+				{
+					$_oBehavior = $_oBehave;
+					break;
+				}
 			}
 		}
 
-		return null;
+		return $_oBehavior;
 	}
 
 	/**
@@ -92,7 +97,7 @@ class CPSCommonBase
 	 */
 	public static function &hasBehaviorProperty( $oComponent, $sName )
 	{
-		if ( ( $oComponent instanceof CPSComponent || $oComponent instanceof CPSWidget ) && $oComponent->hasBehaviors )
+		if ( ( $oComponent instanceof CPSComponent || $oComponent instanceof CPSWidget ) && $oComponent->getHasBehaviors() )
 		{
 			$_arBehaviors = $oComponent->getBehaviors();
 
@@ -112,6 +117,8 @@ class CPSCommonBase
 			if ( $oComponent->hasOption( $sName ) )
 				return $oComponent;
 		}
+		
+		return null;
 	}
 
 	/**

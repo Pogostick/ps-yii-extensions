@@ -165,6 +165,12 @@ class CPSComponent extends CApplicationComponent
 			$_oObject->getOptionsObject()->setInternalName( $sName );
 
 			$this->m_bHasBehaviors |= true;
+			
+			//	Initialize arrays
+			if ( ! isset( $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] ) || null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] ) $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] = array();
+			if ( ! isset( $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] ) || null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] ) $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] = array();
+			
+			//	Set our object
 			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_OBJECT ] = $_oObject;
 
 			//	Place valid options in here for fast checking...
@@ -173,7 +179,7 @@ class CPSComponent extends CApplicationComponent
 			//	Cache behavior methods for lookup speed
 			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] =
 				array_merge(
-					( null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] ) ? array() : $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ],
+					$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ],
 					array_change_key_case( array_flip( array_values( get_class_methods( $_oObject ) ) ), CASE_LOWER
 				)
 			);
@@ -181,7 +187,7 @@ class CPSComponent extends CApplicationComponent
 			//	Cache behavior members for lookup speed
 			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] =
 				array_merge(
-					( null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] ) ? array() : $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ],
+					$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ],
 					array_change_key_case( array_flip( array_keys( get_class_vars( get_class( $this ) ) ) ), CASE_LOWER
 				)
 			);
@@ -283,6 +289,8 @@ class CPSComponent extends CApplicationComponent
 	 */
 	public function __call( $sName, $arParams )
 	{
+		$_oEvent = null;
+		
 		//	Check behavior methods...
 		if ( $_oBehave = $this->hasBehaviorMethod( $sName ) )
 			try { return call_user_func_array( array( $_oBehave[ CPSCommonBase::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }

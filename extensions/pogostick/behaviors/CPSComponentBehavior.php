@@ -399,7 +399,7 @@ class CPSComponentBehavior extends CBehavior
 	 * @see __set
 	 * @see getBehaviorProperty
 	 */
-	public function &__get( $sName )
+	public function __get( $sName )
 	{
 		//	Is it a member variable?
 		if ( in_array( $sName, array_keys( get_class_vars( get_class( $this ) ) ) ) )
