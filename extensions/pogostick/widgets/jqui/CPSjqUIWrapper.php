@@ -149,17 +149,6 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	}
 	
 	/**
-	* Adds a user script to the output array
-	* 
-	* @param array $arScript
-	*/
-	public function addScripts( $arScripts )
-	{
-		foreach ( $arScripts as $_sScript )
-			$this->m_arScripts[] = $_sScript;
-	}
-	
-	/**
 	* Initialize the widget
 	* 
 	*/

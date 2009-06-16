@@ -440,7 +440,7 @@ class CPSOptionManager
 							case 'array':
 								$_oValue = array();
 								break;
-c							default:
+							default:
 								$_oValue = null;
 								break;
 						}
@@ -563,13 +563,9 @@ c							default:
 	*/
 	public function checkOptions( array $arOptions = null )
 	{
-		//	None were passed in? Then we check our array
-		if ( empty( $arOptions ) )
-			$arOptions = $this->m_arOptions;
-
 		//	One at a time...
 		foreach ( $arOptions as $_sKey => $_oValue )
-			$this->checkOption( $_sKey, $_oValue );
+			if ( ! $this->isMetaDataKey( $_sKey ) ) $this->checkOption( $_sKey, $_oValue );
 
 		//	We made it here? We cool baby!
 		return true;
@@ -605,10 +601,10 @@ c							default:
 			$_oVPType = $this->getMetaDataValue( $sKey, self::META_TYPE );
 
 			//	Is this a valid type for this option?
-			if ( null !== $oValue && null !== $_VPType )
+			if ( null !== $oValue && null !== $_oVPType )
 			{			
 				if ( ( ! is_array( $_oVPType ) && ( $_sType != $_oVPType ) ) || ( is_array( $_oVPType ) && ! in_array( $_sType, $_oVPType ) ) )
-					throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}". Found type "{z}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_oVPType ) ) ? implode( ', ', $_oVPType ) : $_oVPType, '{z}' => $_oVOType ) ), 1  );
+					throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}". Found type "{z}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_oVPType ) ) ? implode( ', ', $_oVPType ) : $_oVPType, '{z}' => $_sType ) ), 1 );
 
 				//	Check if this is a valid value for this option
 				if ( null !== ( $_arValid = $this->getMetaDataValue( $sKey, self::META_ALLOWED ) ) )
@@ -693,8 +689,10 @@ c							default:
 		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
 			return null;
 
-		if ( in_array( $eMDKey, $this->VALID_METADATA ) )
-			return $this->m_arOptions[ $this->getMetaDataKey( $sKey ) ][ $eMDKey ];
+		$_sMDKey = $this->getMetaDataKey( $sKey );
+		
+		if ( in_array( $eMDKey, $this->VALID_METADATA ) && isset( $this->m_arOptions[ $_sMDKey ][ $eMDKey ] ) )
+			return $this->m_arOptions[ $_sMDKey ][ $eMDKey ];
 	}
 
 	/**
