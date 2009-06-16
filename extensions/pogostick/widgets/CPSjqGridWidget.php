@@ -102,13 +102,13 @@ CODE;
 	*
 	* @return string
 	*/
-	protected function generateJavascript()
+	protected function generateJavascript( $sClassName = null, $arOptions = null )
 	{
-		$_arOptions = $this->makeOptions();
+		//	Call daddy...
+		parent::generateJavascript( $sClassName, $arOptions );
 
-		$this->script =<<<CODE
-$('#{$this->id}').{$this->widgetName}({$_arOptions}).navGrid('#{$this->pagerId}',{edit:false,add:false,del:false});
-CODE;
+		//	Add the pager...
+		$this->script .= ".navGrid('#{$this->pagerId}',{edit:false,add:false,del:false});";
 
 		return $this->script;
 	}

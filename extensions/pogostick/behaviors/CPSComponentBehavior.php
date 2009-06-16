@@ -97,7 +97,7 @@ class CPSComponentBehavior extends CBehavior
 			$this->addOptions( self::getBaseOptions() );
 
 		//	Set the external library path
-		$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick' ) . '/external', true, -1 );
+		$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick' ) . '/external', true );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );

@@ -118,7 +118,7 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 	
 		//	Get the javascript for this widget
 		$_sScript = $this->generateJavascript( ( ! $this->isEmpty( $this->multiUseClass ) ) ? $this->multiUseClass : null, $this->settingsToUse );
-		$_oCS->registerScript( 'ps' . self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id, $_sScript, CClientScript::POS_READY );
+		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . $this->widgetName . '#' . $this->id . '.' . time() ), $_sScript, CClientScript::POS_READY );
 	}
 
 	/**

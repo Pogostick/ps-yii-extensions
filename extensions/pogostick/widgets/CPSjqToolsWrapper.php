@@ -18,7 +18,7 @@
 * @subpackage Widgets
 * @since 1.0.4
 */
-class CPSjqToolsWrapper extends CPSjqUIWrapper
+class CPSjqToolsWrapper extends CPSjQueryWidget
 {
 	//********************************************************************************
 	//* Constants
@@ -46,6 +46,24 @@ class CPSjqToolsWrapper extends CPSjqUIWrapper
 	protected $m_arSupportFiles = array();
 	
 	//********************************************************************************
+	//* Constructor
+	//********************************************************************************
+
+	public function __construct( $sOwner = null )
+	{
+		//	Phone home...
+		parent::__construct( $oOwner );
+		
+		//	Add the default options for jqUI stuff
+		$this->addOptions( 
+			array(
+				'paneClass_' => array( CPSOptionManager::META_REQUIRED => false, CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+			)
+		);
+		
+	}
+	
+	//********************************************************************************
 	//* Methods
 	//********************************************************************************
 
@@ -53,9 +71,6 @@ class CPSjqToolsWrapper extends CPSjqUIWrapper
 	{
 		parent::init();
 	
-		//	Set my name...	
-		$this->widgetName = self::PS_WIDGET_NAME;
-		
 		//	Set up support files array...
 		$this->m_arSupportFiles = array(
 			'tooltip' => array(
@@ -71,10 +86,17 @@ class CPSjqToolsWrapper extends CPSjqUIWrapper
 				'css' => array( 'overlay.css' )
 			),
 		);
+
+		//	Make sure we have the right stuff		
+		if ( 'tabs' == $this->widgetName )
+		{
+			if ( $this->isEmpty( $this->paneClass ) )
+				throw new CException( Yii::t( 'yii', 'When creating "tabs" you must set the "paneClass" option to the class of the div containing the tab panes.' ) );
+		}
 	}
 		
 
-	/**
+	/**                                                                                                                     
 	* Registers the needed CSS and JavaScript.
 	*/
 	public function registerClientScripts()
@@ -84,7 +106,7 @@ class CPSjqToolsWrapper extends CPSjqUIWrapper
 		
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
-
+		
 		//	Register scripts necessary
 		$_oCS->registerScriptFile( "http://cdn.jquerytools.org/1.0.2/jquery.tools.min.js" );
 
@@ -101,6 +123,10 @@ class CPSjqToolsWrapper extends CPSjqUIWrapper
 			}
 		}
 
+		//	Get the javascript for this widget
+		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );
+
+		//	Don't forget subclasses
 		return $_oCS;
 	}
 
@@ -113,30 +139,39 @@ class CPSjqToolsWrapper extends CPSjqUIWrapper
 	*
 	* @return string
 	*/
-	protected function generateJavascript()
+	protected function generateJavascript( $sClassName = null, $arOptions = null, $sInsertBeforeOptions = null )
 	{
-		$_arOptions = $this->makeOptions();
-
-		$this->script =<<<CODE
-$('#{$this->id}').{$this->widgetName}({$_arOptions});
-CODE;
-
-		return $this->script;
+		//	Fix up tabs...
+		if ( null == $sInsertBeforeOptions && 'tabs' == $this->widgetName )
+			$sInsertBeforeOptions = '"div.' . $this->paneClass . ' > div"';
+			
+		//	Expose widget is attached to target as a click event...
+		if ( 'expose' != $this->widgetName )
+			$_sScript = parent::generateJavascript( $sClassName, $arOptions, $sInsertBeforeOptions );
+		else
+		{
+			$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
+			$_sId = ( null != $sClassName ) ? '.' . $sClassName : ( ! $this->isEmpty( $this->target ) ) ? $this->target : '#' . $this->id;
+			$_sScript = "$(\"{$_sId}\").click(function(){\$(this).expose({$_arOptions}).load();});";
+		}
+		
+		return $this->script = $_sScript;
 	}
 
 	/**
-	* Constructs and returns a jQuery widget
+	* Constructs and returns a jQuery Tools widget
 	* 
 	* The options passed in are dynamically added to the options array and will be accessible 
 	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
 	* 
+	* @param string $sName The type of jqTools widget to create
 	* @param array $arOptions The options for the widget
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqToolsWrapper
 	*/
-	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName, array $arOptions = array(), $sClass = __CLASS__ )
 	{
-		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
+		return parent::create( $sName, $arOptions, $sClass );
 	}
-	
+
 }

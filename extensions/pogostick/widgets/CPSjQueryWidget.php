@@ -20,6 +20,7 @@
 * 
 * @property $autoRun The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
 * @property $widgetName The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
+* @property $target The jQuery selector to which to apply this widget. If $target is not specified, "id" is used and prepended with a "#".
 */
 class CPSjQueryWidget extends CPSWidget
 {
@@ -53,6 +54,7 @@ class CPSjQueryWidget extends CPSWidget
 			array(
 				'autoRun_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_DEFAULTVALUE => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
 				'widgetName_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'target_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}
@@ -112,7 +114,7 @@ class CPSjQueryWidget extends CPSWidget
 	
 		//	Additional scripts		
 		foreach ( $this->m_arScripts as $_sScript )
-			$_oCS->registerScript( 'psjqw.script' . $_iScriptCount++ . '#' . $this->id, $_sScript, CClientScript::POS_READY );
+			$_oCS->registerScript( 'psjqw.script' . $_iScriptCount++ . '.' . md5( $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $_sScript, CClientScript::POS_READY );
 
 		//	Don't forget subclasses
 		return $_oCS;
@@ -127,16 +129,24 @@ class CPSjQueryWidget extends CPSWidget
 	*
 	* @return string
 	*/
-	protected function generateJavascript( $sClassName = null, $arOptions = null )
+	protected function generateJavascript( $sClassName = null, $arOptions = null, $sInsertBeforeOptions = null )
 	{
 		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
-		$_sId = ( null != $sClassName ) ? '.' . $sClassName : '#' . $this->id;
+		$_sId = ( null != $sClassName ) ? '.' . $sClassName : ( ! $this->isEmpty( $this->target ) ) ? $this->target : '#' . $this->id;
+
+		//	Jam something in front of options?
+		if ( null != $sInsertBeforeOptions )
+		{
+			$_sOptions = $sInsertBeforeOptions;
+			if ( ! empty( $_arOptions ) ) $_sOptions .= ", {$_arOptions}";
+			$_arOptions = $_sOptions;
+		}
 		
 		$this->script =<<<CODE
 $('{$_sId}').{$this->widgetName}({$_arOptions});
 CODE;
 
-		return( $this->script );
+		return $this->script;
 	}
 
 	//********************************************************************************
@@ -154,12 +164,13 @@ CODE;
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjQueryWidget
 	*/
-	public static function create( $sName, array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName, array $arOptions = array(), $sClass = __CLASS__ )                  
 	{
 		//	Instantiate...
 		$_oWidget = new $sClass();
 
 		//	Set default options...
+		$_oWidget->target = ( isset( $arOptions[ 'target' ] ) ) ? $arOptions[ 'target' ] : '#' . $sName;
 		$_oWidget->id = isset( $arOptions[ 'id' ] ) ? $arOptions[ 'id' ] : $sName;
 		$_oWidget->name = isset( $arOptions[ 'name' ] ) ? $arOptions[ 'name' ] : $sName;
 		if ( $_oWidget->isEmpty( $_oWidget->name ) ) $_oWidget->name = $_oWidget->id;

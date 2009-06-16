@@ -18,7 +18,7 @@ ul.tabs li {
 
 /* link inside the tab. uses a background image */
 ul.tabs a { 
-	background: url(../images/tabs/blue.png) no-repeat -652px 0;
+	background: url(../images/tabs/tabs.png) no-repeat -652px 0;
 	font-size:11px;
 	display:block;
 	height: 30px;  
@@ -80,3 +80,13 @@ div.panes div.pane {
 	display:none;		
 }
 
+/* tab pane styling */
+div.panes div {
+	display:none;		
+	padding:15px 10px;
+	border:1px solid #999;
+	border-top:0;
+	height:100px;
+	font-size:14px;
+	background-color:#fff;
+}

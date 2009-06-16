@@ -16,3 +16,31 @@ div.tooltip h3 {
     font-size:18px; 
     color:#fff; 
 }
+
+div.tooltip {
+	font-size:12px;		
+}
+
+div.tooltip p {
+	margin: 1.12em 0 !important;
+	padding:0 !important;
+}
+
+#trigger {
+	background:transparent url(http://static.flowplayer.org/img/box/right/tools.png) no-repeat scroll 0 50%;
+	color:#333;
+	display:block;
+	font-size:14px;
+	height:125px;
+	padding:18px 80px 20px 15px;
+	text-decoration:none;
+	width:118px !important;
+	
+	position:relative;
+	top:10px;
+}
+ 
+/* simple mouseover effect for the trigger */
+#trigger:hover {
+	color:#000;
+}

@@ -203,7 +203,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		self::loadScripts( $this );
 
 		//	Get the javascript for this widget
-		$_oCS->registerScript( 'ps' . self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
+		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id . '#' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );
 
 		//	Don't forget subclasses
 		return $_oCS;
