@@ -377,5 +377,25 @@ class CPSHelp
 		$_bSSL = ( isset( $_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] == 'on' );
 		return 'http' . ( ( $_bSSL ) ? 's' : '' ) . '://' . $_SERVER[ "SERVER_NAME" ] . ( ( $_SERVER[ "SERVER_PORT" ] != "80" ) ? ":" . $_SERVER[ "SERVER_PORT" ] : '' ) .  $_SERVER[ "REQUEST_URI" ];
 	}
+	
+	/**
+	* Go out and pull the {@link http://gravatar.com/ gravatar} url for the specificed email address.
+	* 
+	* @access public
+	* @static
+	* @param string $sEmailAddress
+	* @param integer $iSize The size of the image to return from 1px to 512px. Defaults to 80
+	* @param string $sRating The rating of the image to return: G, PG, R, or X. Defaults to G
+	* @since psYiiExtensions v1.0.4
+	*/
+	public static function getGravatarUrl( $sEmailAddress, $iSize = 80, $sRating = 'g' )
+	{
+		$sRating = strtolower( $sRating{0} );
+		$iSize = intval( $iSize );
+		if ( $iSize < 1 || $iSize > 512 ) throw new CPSException( '"$iSize" parameter is out of bounds. Must be between 1 and 512.' );
+		if ( ! in_array( $sRating, array( 'g', 'pg', 'r', 'x' ) ) ) throw new CPSException( '"$sRating" parameter must be either "G", "PG", "R", or "X".' );
+		
+		return "http://www.gravatar.com/avatar/" . md5( strtolower( $sEmailAddress ) ) . ".jpg?s={$iSize}&r={$sRating}";
+	}
 
 }

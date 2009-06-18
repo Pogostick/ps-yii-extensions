@@ -20,6 +20,6 @@
  * @package psYiiExtensions
  * @subpackage Base
  */
-class CPSException
+class CPSException extends CException
 {
 }
