@@ -3,20 +3,15 @@
 * CPSjQueryWidget class file.
 *
 * @filesource
-* @copyright Copyright &copy; 2009 Pogostick, LLC
 * @author Jerry Ablan <jablan@pogostick.com>
-* @link http://ps-yii-extensions.googlecode.com Pogostick Yii Extension Library
-* @package psYiiExtensions
-* @subpackage Base
-* @since psYiiExtensions v1.0.4
-* @version $SVN: Revision: 254 $
-* @modifiedby $LastChangedBy: jerryablan@gmail.com $
-* @lastmodified  $Date: 2009-06-17 22:55:46 -0400 (Wed, 17 Jun 2009) $
-* @license http://www.pogostick.com/license/
+* @link http://ps-yii-extensions.googlecode.com
+* @copyright Copyright &copy; 2009 Pogostick, LLC
+* @license http://www.gnu.org/licenses/gpl.html
+* @version SVN: $Id$
 */
 
 /**
-* The CPSjQueryWidget is a wrapper for any jQuery widget
+* The ultimate wrapper for any jQuery widget
 * 
 * @author Jerry Ablan <jablan@pogostick.com>
 * @package psYiiExtensions
@@ -133,27 +128,11 @@ class CPSjQueryWidget extends CPSWidget
 	*
 	* @return string
 	*/
-	protected function generateJavascript( $sClassName = null, $arOptions = null, $sInsertBeforeOptions = null )
+	protected function generateJavascript( $sTargetSelector = null, $arOptions = null, $sInsertBeforeOptions = null )
 	{
 		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
-		$_sId = '';
+		$_sId = $this->getTargetSelector( $sTargetSelector );
 		
-		//	Get the target. Passed in class overrides all...
-		if ( null != $sClassName )
-		{
-			//	Add a period if one is not there, assume it's a class...
-			if ( $sClassName{0} != '.' && $sClassName != '#' ) $sClassName = ".{$sClassName}";
-			$_sId = $sClassName;
-		}
-		else
-		{
-			//	Do we have a target element?
-			if ( ! $this->isEmpty( $this->target ) ) 
-				$_sId = $this->target;
-			else
-				$_sId = "#{$this->id}";
-		}
-
 		//	Jam something in front of options?
 		if ( null != $sInsertBeforeOptions )
 		{
@@ -167,6 +146,38 @@ $('{$_sId}').{$this->widgetName}({$_arOptions});
 CODE;
 
 		return $this->script;
+	}
+	
+	/**
+	* Determines the target CSS selector for this widget
+	* 
+	* @access protected
+	* @since psYiiExtensions v1.0.5
+	* @param string $sTargetSelector The CSS selector to target, allows you to override option settings
+	* @returns string
+	*/
+	protected function getTargetSelector( $sTargetSelector = null )
+	{
+		$_sId = null;
+		
+		//	Get the target. Passed in class overrides all...
+		if ( null != $sTargetSelector )
+		{
+			//	Add a period if one is not there, assume it's a class...
+			if ( $sTargetSelector{0} != '.' && $sTargetSelector != '#' ) $sTargetSelector = ".{$sTargetSelector}";
+			$_sId = $sTargetSelector;
+		}
+		else
+		{
+			//	Do we have a target element?
+			if ( ! $this->isEmpty( $this->target ) ) 
+				$_sId = $this->target;
+			else
+				$_sId = "#{$this->id}";
+		}
+		
+		//	Return the selector
+		return $_sId;
 	}
 
 	//********************************************************************************
@@ -191,9 +202,9 @@ CODE;
 
 		//	Set default options...
 		$_oWidget->widgetName = $sName;
-		$_oWidget->target = ( isset( $arOptions[ 'target' ] ) ) ? $arOptions[ 'target' ] : null;
-		$_oWidget->id = $_oWidget->name = isset( $arOptions[ 'id' ] ) ? $arOptions[ 'id' ] : $sName;
-		$_oWidget->name = isset( $arOptions[ 'name' ] ) ? $arOptions[ 'name' ] : $_oWidget->id;
+		$_oWidget->target = CPSHelp::getOption( $arOptions, 'target', null, true );
+		$_oWidget->id = $_oWidget->name = CPSHelp::getOption( $arOptions, 'id', $sName );
+		$_oWidget->name = CPSHelp::getOption( $arOptions, 'name', $_oWidget->id );
 
 		return $_oWidget->finalizeCreate( $arOptions );
 	}
