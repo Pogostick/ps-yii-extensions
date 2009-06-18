@@ -2,21 +2,25 @@
 /**
 * CPSjQueryWidget class file.
 *
-* @author Jerry Ablan <jablan@pogostick.com>
-* @link http://ps-yii-extensions.googlecode.com
+* @filesource
 * @copyright Copyright &copy; 2009 Pogostick, LLC
-* @license http://www.gnu.org/licenses/gpl.html
+* @author Jerry Ablan <jablan@pogostick.com>
+* @link http://ps-yii-extensions.googlecode.com Pogostick Yii Extension Library
+* @package psYiiExtensions
+* @subpackage Base
+* @since psYiiExtensions v1.0.4
+* @version $SVN: Revision: 254 $
+* @modifiedby $LastChangedBy: jerryablan@gmail.com $
+* @lastmodified  $Date: 2009-06-17 22:55:46 -0400 (Wed, 17 Jun 2009) $
+* @license http://www.pogostick.com/license/
 */
 
 /**
 * The CPSjQueryWidget is a wrapper for any jQuery widget
 * 
 * @author Jerry Ablan <jablan@pogostick.com>
-* @version $Id$
-* @filesource
 * @package psYiiExtensions
 * @subpackage Widgets
-* @since 1.0.0
 * 
 * @property $autoRun The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
 * @property $widgetName The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
@@ -132,7 +136,23 @@ class CPSjQueryWidget extends CPSWidget
 	protected function generateJavascript( $sClassName = null, $arOptions = null, $sInsertBeforeOptions = null )
 	{
 		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
-		$_sId = ( null != $sClassName ) ? '.' . $sClassName : ( ! $this->isEmpty( $this->target ) ) ? $this->target : '#' . $this->id;
+		$_sId = '';
+		
+		//	Get the target. Passed in class overrides all...
+		if ( null != $sClassName )
+		{
+			//	Add a period if one is not there, assume it's a class...
+			if ( $sClassName{0} != '.' && $sClassName != '#' ) $sClassName = ".{$sClassName}";
+			$_sId = $sClassName;
+		}
+		else
+		{
+			//	Do we have a target element?
+			if ( ! $this->isEmpty( $this->target ) ) 
+				$_sId = $this->target;
+			else
+				$_sId = "#{$this->id}";
+		}
 
 		//	Jam something in front of options?
 		if ( null != $sInsertBeforeOptions )
@@ -170,12 +190,11 @@ CODE;
 		$_oWidget = new $sClass();
 
 		//	Set default options...
-		$_oWidget->target = ( isset( $arOptions[ 'target' ] ) ) ? $arOptions[ 'target' ] : '#' . $sName;
-		$_oWidget->id = isset( $arOptions[ 'id' ] ) ? $arOptions[ 'id' ] : $sName;
-		$_oWidget->name = isset( $arOptions[ 'name' ] ) ? $arOptions[ 'name' ] : $sName;
-		if ( $_oWidget->isEmpty( $_oWidget->name ) ) $_oWidget->name = $_oWidget->id;
 		$_oWidget->widgetName = $sName;
-		
+		$_oWidget->target = ( isset( $arOptions[ 'target' ] ) ) ? $arOptions[ 'target' ] : null;
+		$_oWidget->id = $_oWidget->name = isset( $arOptions[ 'id' ] ) ? $arOptions[ 'id' ] : $sName;
+		$_oWidget->name = isset( $arOptions[ 'name' ] ) ? $arOptions[ 'name' ] : $_oWidget->id;
+
 		return $_oWidget->finalizeCreate( $arOptions );
 	}
 
