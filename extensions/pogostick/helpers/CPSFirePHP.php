@@ -171,7 +171,7 @@ class CPSFirePHP extends CPSComponent
 	 */
 	function getModules() 
 	{
-		return self::JS_NAME . "['Apache Modules'] = " . CJSON::encode( apache_get_modules() ) . ";";
+		if ( function_exists( 'apache_get_modules' ) ) return self::JS_NAME . "['Apache Modules'] = " . CJSON::encode( apache_get_modules() ) . ";";
 	}
 
 	/**

@@ -8,15 +8,14 @@
 * @copyright Copyright &copy; 2009 Pogostick, LLC
 * @license http://www.gnu.org/licenses/gpl.html
 * @version SVN: $Id$
+* @package psYiiExtensions
+* @subpackage Widgets
 */
 
 /**
 * The ultimate wrapper for any jQuery widget
 * 
 * @author Jerry Ablan <jablan@pogostick.com>
-* @package psYiiExtensions
-* @subpackage Widgets
-* 
 * @property $autoRun The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
 * @property $widgetName The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
 * @property $target The jQuery selector to which to apply this widget. If $target is not specified, "id" is used and prepended with a "#".
@@ -108,9 +107,6 @@ class CPSjQueryWidget extends CPSWidget
 		//	Daddy...
 		$_oCS = parent::registerClientScripts();
 
-		//	Register scripts necessary
-		$_oCS->registerCoreScript( 'jquery' );
-	
 		//	Additional scripts		
 		foreach ( $this->m_arScripts as $_sScript )
 			$_oCS->registerScript( 'psjqw.script' . $_iScriptCount++ . '.' . md5( $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $_sScript, CClientScript::POS_READY );
@@ -130,6 +126,7 @@ class CPSjQueryWidget extends CPSWidget
 	*/
 	protected function generateJavascript( $sTargetSelector = null, $arOptions = null, $sInsertBeforeOptions = null )
 	{
+		//	Get the options...		
 		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
 		$_sId = $this->getTargetSelector( $sTargetSelector );
 		
@@ -140,7 +137,7 @@ class CPSjQueryWidget extends CPSWidget
 			if ( ! empty( $_arOptions ) ) $_sOptions .= ", {$_arOptions}";
 			$_arOptions = $_sOptions;
 		}
-		
+
 		$this->script =<<<CODE
 $('{$_sId}').{$this->widgetName}({$_arOptions});
 CODE;

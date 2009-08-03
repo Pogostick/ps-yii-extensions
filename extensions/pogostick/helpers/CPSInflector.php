@@ -1,140 +1,82 @@
 <?php
 /**
- * Pluralize and singularize English words.
- *
- * Used by Cake's naming conventions throughout the framework.
- *
- * PHP versions 4 and 5
- *
- * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
- * Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
- *
- * Licensed under The MIT License
- * Redistributions of files must retain the above copyright notice.
+ * CPSInflector class file.
  *
  * @filesource
- * @copyright     Copyright 2005-2008, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
- * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
- * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @link http://www.pogostick.com.com/
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @license http://www.pogostick.com/license/
  */
-
- /**
- * CPSInflector pluralizes and singularizes English words.
+/**
+ * CPSInflector will pluralize and singularize English words.
  *
- * Inflector pluralizes and singularizes English nouns.
- * Used by Cake's naming conventions throughout the framework.
- * Test with $i = new CPSInflector(); $i->test();
- * 
- * @filesource
+ * @author Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
  * @package psYiiExtensions
  * @subpackage Helpers
- * @since 1.0.4
  */
 class CPSInflector
 {
-/**
- * Pluralized words.
- *
- * @var array
- * @access private
- **/
-	var $pluralized = array();
-/**
- * List of pluralization rules in the form of pattern => replacement.
- *
- * @var array
- * @access public
- * @link http://book.cakephp.org/view/47/Custom-Inflections
- **/
-	var $pluralRules = array();
-/**
- * Singularized words.
- *
- * @var array
- * @access private
- **/
-	var $singularized = array();
-/**
- * List of singularization rules in the form of pattern => replacement.
- *
- * @var array
- * @access public
- * @link http://book.cakephp.org/view/47/Custom-Inflections
- **/
-	var $singularRules = array();
-/**
- * Plural rules from inflections.php
- *
- * @var array
- * @access private
- **/
-	var $__pluralRules = array();
-/**
- * Un-inflected plural rules from inflections.php
- *
- * @var array
- * @access private
- **/
-	var $__uninflectedPlural = array();
-/**
- * Irregular plural rules from inflections.php
- *
- * @var array
- * @access private
- **/
-	var $__irregularPlural = array();
-/**
- * Singular rules from inflections.php
- *
- * @var array
- * @access private
- **/
-	var $__singularRules = array();
-/**
- * Un-inflectd singular rules from inflections.php
- *
- * @var array
- * @access private
- **/
-	var $__uninflectedSingular = array();
-/**
- * Irregular singular rules from inflections.php
- *
- * @var array
- * @access private
- **/
-	var $__irregularSingular = array();
-/**
- * Gets a reference to the Inflector object instance
- *
- * @return object
- * @access public
- */
-	function &getInstance() {
-		static $instance = array();
+	//********************************************************************************
+	//* Constants
+	//********************************************************************************
 
-		if (!$instance) {
-			$instance[0] =& new Inflector();
-			if (file_exists(CONFIGS.'inflections.php')) {
-				include(CONFIGS.'inflections.php');
-				$instance[0]->__pluralRules = $pluralRules;
-				$instance[0]->__uninflectedPlural = $uninflectedPlural;
-				$instance[0]->__irregularPlural = $irregularPlural;
-				$instance[0]->__singularRules = $singularRules;
-				$instance[0]->__uninflectedSingular = $uninflectedPlural;
-				$instance[0]->__irregularSingular = array_flip($irregularPlural);
+	const PLURAL = 0;
+	const UNINFLECTED = 1;
+	const IRREGULAR = 2;
+	const SINGULAR = 3;
+	const UNINFLECTED_SINGULAR = 4;
+	const IRREGULAR_SINGULAR = 5;
+	
+	//********************************************************************************
+	//* Member variables
+	//********************************************************************************
+	
+	/**
+	* A cache of previously converted words
+	* 
+	* @var array
+	*/
+	protected $m_arCache = array();
+	/**
+	* The configuration rules read from disk, if any.
+	* 
+	* @var array
+	*/
+	protected $m_arRules = array();
+	
+	/**
+	 * Gets a reference to the Inflector object instance
+	 *
+	 * @return object
+	 * @access public
+	 */
+	public function &getInstance() 
+	{
+		static $_oInstance = array();
+
+		if ( ! $_oInstance )
+		{
+			$_oInstance[ 0 ] =& new CPSInflector();
+			if ( Yii::app()->getParams()->contains( 'inflector' ) )
+			{
+				$_oInstance[ 0 ]->m_arRules = array_merge( $this->m_arRules, app()->getParams()->inflector );
+				$_oInstance[ 0 ]->m_arRules[ self::UNINFLECTED_SINGULAR ] = $_arParams[ self::UNINFLECTED ];
+				$_oInstance[ 0 ]->m_arRules[ self::IRREGULAR_SINGULAR ] = array_flip( $_arParams[ self::IRREGULAR ] );
 			}
 		}
-		return $instance[0];
+		
+		return $_oInstance[ 0 ];
 	}
-/**
- * Initializes plural inflection rules.
- *
- * @return void
- * @access private
- */
-	function __initPluralRules() {
+	
+	/**
+	 * Initializes plural inflection rules.
+	 *
+	 * @return void
+	 * @access private
+	 */
+	protected function initPluralRules()
+	{
 		$corePluralRules = array(
 			'/(s)tatus$/i' => '\1\2tatuses',
 			'/(quiz)$/i' => '\1zes',
@@ -202,12 +144,12 @@ class CPSInflector
 			'trilby' => 'trilbys',
 			'turf' => 'turfs');
 
-		$pluralRules = Set::pushDiff($this->__pluralRules, $corePluralRules);
+		$m_arRules[ self::PLURAL ] = Set::pushDiff($this->__pluralRules, $corePluralRules);
 		$uninflected = Set::pushDiff($this->__uninflectedPlural, $coreUninflectedPlural);
 		$irregular = Set::pushDiff($this->__irregularPlural, $coreIrregularPlural);
 
-		$this->pluralRules = array('pluralRules' => $pluralRules, 'uninflected' => $uninflected, 'irregular' => $irregular);
-		$this->pluralized = array();
+		$this->pluralRules = array('pluralRules' => $m_arRules[ self::PLURAL ], 'uninflected' => $uninflected, 'irregular' => $irregular);
+		$this->m_arCache[ self::PLURAL ] = array();
 	}
 /**
  * Return $word in plural form.
@@ -246,7 +188,7 @@ class CPSInflector
 			return $word;
 		}
 
-		foreach ($pluralRules as $rule => $replacement) {
+		foreach ($m_arRules[ self::PLURAL ] as $rule => $replacement) {
 			if (preg_match($rule, $word)) {
 				$_this->pluralized[$word] = preg_replace($rule, $replacement, $word);
 				return $_this->pluralized[$word];
@@ -338,11 +280,11 @@ class CPSInflector
 			'trilbys' => 'trilby',
 			'turfs' => 'turf');
 
-		$singularRules = Set::pushDiff($this->__singularRules, $coreSingularRules);
+		$m_arSingularRules = Set::pushDiff($this->__singularRules, $coreSingularRules);
 		$uninflected = Set::pushDiff($this->__uninflectedSingular, $coreUninflectedSingular);
 		$irregular = Set::pushDiff($this->__irregularSingular, $coreIrregularSingular);
 
-		$this->singularRules = array('singularRules' => $singularRules, 'uninflected' => $uninflected, 'irregular' => $irregular);
+		$this->singularRules = array('singularRules' => $m_arSingularRules, 'uninflected' => $uninflected, 'irregular' => $irregular);
 		$this->singularized = array();
 	}
 /**
@@ -382,7 +324,7 @@ class CPSInflector
 			return $word;
 		}
 
-		foreach ($singularRules as $rule => $replacement) {
+		foreach ($m_arSingularRules as $rule => $replacement) {
 			if (preg_match($rule, $word)) {
 				$_this->singularized[$word] = preg_replace($rule, $replacement, $word);
 				return $_this->singularized[$word];

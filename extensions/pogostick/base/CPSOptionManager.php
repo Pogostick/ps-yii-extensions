@@ -143,7 +143,7 @@ class CPSOptionManager
 	* @var string
 	* @todo Implement handling of this
 	*/
-	const META_VALUEPATTERN	= '_valuePattern';
+	const META_RULEPATTERN	= '_rulePattern';
 	/**
 	* @var array
 	*/
@@ -156,7 +156,7 @@ class CPSOptionManager
 			self::META_REQUIRED,
 			self::META_RULES,
 			self::META_TYPE,
-			self::META_VALUEPATTERN,
+			self::META_RULEPATTERN,
 			self::META_KEYNAME,
 		);
 	/**
@@ -172,6 +172,7 @@ class CPSOptionManager
 			'array',
 			'double',
 			'object',
+			'mixed',
 		);
 
 	/**
@@ -306,11 +307,11 @@ class CPSOptionManager
 	* @see getOptions
 	* @see setOption
 	*/
-	public function setOptions( array $arOptions, $bAdd = true )
+	public function setOptions( array $arOptions )
 	{
 		//	Run through array and set each item.
 		foreach ( $arOptions as $_sKey => $_oValue )
-				$this->setOption( $_sKey, $_oValue, $bAdd );
+				$this->setOption( $_sKey, $_oValue );
 
 		//	Sort the array
 		ksort( $this->m_arOptions );
@@ -318,8 +319,6 @@ class CPSOptionManager
 
 	/**
 	* Sets a single option to the array
-	*
-	* $oValue
 	*
 	* @param string $sKey
 	* @param mixed $oValue
@@ -333,8 +332,26 @@ class CPSOptionManager
 		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
 			return null;
 
-		//	Get the value out of the array...
+		//	Set the value in the array...
 		return $this->m_arOptions[ $sKey ] = $oValue;
+	}
+
+	/**
+	* Unsets a single option from the array
+	*
+	* @access public
+	* @param string $sKey
+	* @see setOption
+	*/
+	public function unsetOption( $sKey ) 
+	{  
+		//	Validate the key
+		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
+			return null;
+
+		//	Unset the key and it's metadata compadre
+		unset( $this->m_arOptions[ $this->getMetaDataKey( $sKey ) ] );
+		unset( $this->m_arOptions[ $sKey ] );
 	}
 
 	/**
@@ -387,82 +404,14 @@ class CPSOptionManager
 			$_bPrivate = true;
 		}
 
-		//	Get the value out of the array...
 		$_arRules = array();
-
-		if ( is_array( $oValue ) )
-		{
-			$_arRules = ( isset( $oValue[ self::META_RULES ] ) ) ? $oValue[ self::META_RULES ] : array();
-
-			//	Fix up bool types...
-			$_arType = $_arRules[ self::META_TYPE ];
-
-			if ( ! is_array( $_arType ) )
-				$_arType = array( $_arType );
-
-			//	Allowed type?
-			foreach ( $_arType as $_sKey => $_sType )
-			{
-				if ( null != $_sType && ! in_array( $_sType, $this->VALID_METADATA_TYPES ) )
-					throw new CException( Yii::t( __CLASS__, 'Invalid "type" specified for "{x}"', array( '{x}' => $sKey ) ), 1  );
-
-				//	Fix up our allowed shortcuts...
-				if ( $_sType == 'bool' )
-				{
-					$_arType[ $_sKey ] = 'boolean';
-					$this->setMetaDataValue( $_arType, self::META_TYPE, 'boolean' );
-					$_sType = 'boolean';
-				}
-
-				if ( $_sType == 'int' )
-				{
-					$_arType[ $_sKey ] = 'integer';
-					$this->setMetaDataValue( $_arType, self::META_TYPE, 'integer' );
-					$_sType = 'integer';
-				}
-
-				//	Try and set it correctly...
-				if ( isset( $_arRules[ self::META_TYPE ] ) )
-				{
-					if ( ! isset( $oValue[ self::META_DEFAULTVALUE ] ) )
-					{
-						switch ( $_sType )
-						{
-							case 'integer':
-								$_oValue = 0;
-								break;
-							case 'string':
-								$_oValue = '';
-								break;
-							case 'boolean':
-								$_oValue = false;
-								break;
-							case 'array':
-								$_oValue = array();
-								break;
-							default:
-								$_oValue = null;
-								break;
-						}
-					}
-					else
-					{
-						//	Skip private vars and null strings...
-						if ( isset( $oValue[ self::META_PRIVATE ] ) && ! $oValue[ self::META_PRIVATE ] )
-						{
-							if ( $_sType == 'string' && ! isset( $oValue[ self::META_DEFAULTVALUE ] ) )
-							{
-								if ( $_sType != gettype( $oValue[ self::META_DEFAULTVALUE ] ) && ! $_bPrivate && null != $oValue[ self::META_DEFAULTVALUE ] )
-									throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_sType ) ) ? implode( ', ', $_sType ) : $_sType ) ), 1  );
-							}
-						}
-
-						//	It passed...
-						$_oValue = $oValue[ self::META_DEFAULTVALUE ];
-					}
-				}
-			}
-		}
+		
+		//	Not array? Rule pattern?
+		if ( ! is_array( $oValue ) )
+			$_oValue = $this->parseRulePattern( $sKey, $oValue, $_bPrivate );
+		else
+			//	Process quick pattern versus individual rules....
+			$_oValue = $this->validateOptionType( $sKey, $oValue, $_bPrivate );
 
 		//	Set the key name since ours is lowercased...
 		$_arRules[ self::META_KEYNAME ] = $sKey;
@@ -471,13 +420,119 @@ class CPSOptionManager
 		$this->setMetaDataValues( $sKey, $_arRules );
 
 		//	Required?
-		$this->setMetaDataValue( $sKey, self::META_REQUIRED, isset( $oValue[ self::META_REQUIRED ] ) ? $oValue[ self::META_REQUIRED ] : false );
+		if ( is_array( $oValue ) )
+			$this->setMetaDataValue( $sKey, self::META_REQUIRED, CPSHelp::getOption( $oValue, self::META_REQUIRED, false ) );
 
 		//	Now stuff the default or passed in value
 		$this->setOption( $sKey, ( null === $oSetValue ) ? $_oValue : $oSetValue );
 
 		//	Sort the array
 		if ( ! $bNoSort ) ksort( $this->m_arOptions );
+	}
+	
+	/**
+	* Parses a rule pattern string
+	* 
+	* @param string $sKey
+	* @param string $sPattern
+	* @returns mixed
+	* @access protected
+	*/
+	protected function parseRulePattern( $sKey, $sPattern, $bPrivate )
+	{
+		$_arRules = array();
+		$_sExtName = null;
+		
+		//	Split up pattern (type{:default{:extname{:required{:allowed}}}})
+		$_arPattern = explode( ':', $sPattern );
+		$_arRules[ self::META_TYPE ] = $_arPattern[ 0 ];
+		if ( isset( $_arPattern[ 1 ] ) ) $_arRules[ self::META_DEFAULTVALUE ] = $_arPattern[ 1 ];
+		if ( isset( $_arPattern[ 2 ] ) ) $_sExtName = $_arPattern[ 2 ];
+		if ( isset( $_arPattern[ 3 ] ) ) $_arRules[ self::META_REQUIRED ] = $_arPattern[ 3 ];
+		if ( isset( $_arPattern[ 4 ] ) ) $_arRules[ self::META_ALLOWED ] = explode( '|', $_arPattern[ 4 ] );
+		
+		$this->setMetaDataValue( $sKey, self::META_RULES, $_arRules );
+		$this->setMetaDataValue( $sKey, self::META_EXTERNALNAME, $_sExtName );
+		$this->setMetaDataValue( $sKey, self::META_RULEPATTERN, $sPattern );
+		
+		return $this->validateOptionType( $sKey, null, $bPrivate );
+	}
+
+	/**
+	* Validate the type of the option passed in
+	* 	
+	* @param string $sKey
+	* @param array $oValue
+	* @param boolean $bPrivate
+	* @return mixed
+	* @access protected
+	*/
+	protected function validateOptionType( $sKey, $oValue = null, $bPrivate )
+	{
+		//	Pull out our rules
+		$oValue = ( null == $oValue ) ? $this->getMetaData( $sKey ) : $oValue;
+		$_arRules = CPSHelp::getOption( $oValue, self::META_RULES, array() );
+				
+		//	Fix up types...
+		$_arType = CPSHelp::getOption( $_arRules, self::META_TYPE );
+		if ( ! is_array( $_arType ) ) $_arType = array( $_arType );
+
+		//	Allowed type?
+		foreach ( $_arType as $_sKey => $_sType )
+		{
+			if ( null != $_sType && ! in_array( $_sType, $this->VALID_METADATA_TYPES ) )
+				throw new CException( Yii::t( __CLASS__, 'Invalid "type" specified for "{x}"', array( '{x}' => $sKey ) ), 1  );
+
+			//	Try and set it correctly...
+			$_oValue = CPSHelp::getOption( $oValue, self::META_DEFAULTVALUE );
+			if ( empty( $_oValue ) ) $_oValue = CPSHelp::getOption( $_arRules, self::META_DEFAULTVALUE );
+			
+			if ( empty( $_oValue ) )
+			{
+				switch ( $_sType )
+				{
+					case 'int':
+						$_arType[ $_sKey ] = $_sType = 'integer';
+						//	Fall through...
+					case 'integer':
+						$_oValue = 0;
+						break;
+					case 'string':
+						$_oValue = '';
+						break;
+					case 'bool':
+						$_arType[ $_sKey ] = $_sType = 'boolean';
+						//	Fall through...
+					case 'boolean':
+						$_oValue = false;
+						break;
+					case 'array':
+						$_oValue = array();
+						break;
+					default:
+						$_oValue = null;
+						break;
+				}
+				
+				//	Set the type...
+				$this->setMetaDataValue( $sKey, self::META_TYPE, $_sType );
+			}
+			else
+			{
+				//	Skip private vars and null strings...
+				if ( ! $bPrivate )
+				{
+					if ( $_sType == 'string' && empty( $_oValue ) )
+					{
+						if ( $_sType != gettype( $_oValue ) && null != $_oValue )
+							throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_sType ) ) ? implode( ', ', $_sType ) : $_sType ) ), 1  );
+					}
+				}
+			}
+		}
+		
+		//	It passed...
+		return $_oValue;
 	}
 
 	/**

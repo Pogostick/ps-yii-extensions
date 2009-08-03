@@ -9,7 +9,7 @@
  * @package psYiiExtensions
  * @subpackage Base
  * @since psYiiExtensions v1.0.4
- * @version $Revision$
+ * @version $SVN: Revision: 254 $
  * @modifiedby $LastChangedBy$
  * @lastmodified  $Date$
  * @license http://www.pogostick.com/license/

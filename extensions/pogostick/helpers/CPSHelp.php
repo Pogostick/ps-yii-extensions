@@ -68,20 +68,51 @@ class CPSHelp
 	}
 
 	/**
-	* Retrieves an option from the given array. $oDefault is set and returned if $sKey is not 'set'
+	* Retrieves an option from the given array. 
+	* 
+	* $oDefault is set and returned if $sKey is not 'set'. Optionally will unset option in array.
 	*
+	* @access public
+	* @static
 	* @param array $arOptions
 	* @param string $sKey
 	* @param mixed $oDefault
-	* @returns mixed|null if not found
-	* @static
+	* @param boolean $bUnset
+	* @returns mixed
 	*/
-	public static function getOption( array $arOptions, $sKey, $oDefault = null )
+	public static function getOption( &$arOptions, $sKey, $oDefault = null, $bUnset = false )
 	{
-		if ( isset( $arOptions[ $sKey ] ) )
-			return $arOptions[ $sKey ];
+		$_oValue = $oDefault;
+		
+		if ( is_array( $arOptions ) )
+		{
+			if ( ! array_key_exists( $sKey, $arOptions ) )
+			{
+				//	Ignore case and look...
+			    $_sNewKey = strtolower( $sKey );
+			    foreach ( $arOptions as $_sKey => $_sValue )
+			    {
+		    		if ( strtolower( $_sKey ) == $_sNewKey )
+		    		{
+		    			//	Set correct key and break
+		    			$sKey = $_sKey;
+		    			break;
+					}
+				}
+	        }
+			
+			if ( isset( $arOptions[ $sKey ] ) )
+			{
+				$_oValue = $arOptions[ $sKey ];
+				if ( $bUnset ) unset( $arOptions[ $sKey ] );
+			}
+			
+			//	Set it in the array if not an unsetter...
+			if ( ! $bUnset ) $arOptions[ $sKey ] = $_oValue;
+		}
 
-		return $arOptions[ $sKey ] = $oDefault;
+		//	Return...
+		return $_oValue;
 	}
 
 	/**

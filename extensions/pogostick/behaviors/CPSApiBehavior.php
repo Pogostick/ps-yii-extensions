@@ -77,6 +77,8 @@ class CPSApiBehavior extends CPSComponentBehavior
 				'requestData' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
 				'requestMap' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
 				'requireApiQueryName' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
+				'testApiKey' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'testAltApiKey' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'userAgent' => array( CPSOptionManager::META_DEFAULTVALUE => 'Pogostick Components for Yii; (+http://www.pogostick.com/yii)', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
@@ -156,7 +158,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 	* @see makeMapItem
 	* @see makeMapArray
 	*/
-	public function addRequestMapping( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, $sApiName = null, $sSubApiName = null )
+	public function addRequestMapping( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, $sApiName = null, $sSubApiName = '/' )
 	{
 		//	Save for next call
 		static $_sLastApiName;

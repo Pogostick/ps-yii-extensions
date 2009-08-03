@@ -46,21 +46,6 @@
 * </html>
 * </code>
 * 
-* In the above example, the 3rd parameter instructs the library to execute the widget's 
-* (@link CWidget::run()) method after it has been initialized. This causes the output to 
-* render. If you wish to run the widget at a later time, use the following code:
-* <code>
-* //	Create an accordian...
-* 
-* $_widget = CPSjqUIWrapper::create( 'accordion', array( 'header' => 'h3' ), false, null, 'cupertino' );
-* 
-* ...
-* 
-* $_widget->run();
-* </code>
-* 
-* 
-*
 * @author Jerry Ablan <jablan@pogostick.com>
 * @version $Id$
 * @filesource
@@ -191,6 +176,21 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		//	Register scripts necessary
 		self::loadScripts( $this );
 
+		//	Fix up datepicker internationalization
+		if ( $this->widgetName == 'datepicker' )
+		{
+			//	Is there a regional attribute? Pull it out and remove...
+			$_sRegion = ( ! $this->isEmpty( $this->regional ) ) ? $this->regional : '';
+			$this->unsetOption( 'regional' );
+
+			//	Not en? Let's load i18n file...
+			if ( ! empty( $_sRegion ) ) $_oCS->registerScriptFile( "http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/i18n/jquery-ui-i18n.min.js" );
+			
+			//	Set defaults for datepicker if this is one...
+			$_sRegion = "$.datepicker.setDefaults($.extend({showMonthAfterYear: false},$.datepicker.regional['{$_sRegion}']));";
+			$_oCS->registerScript( 'ps.reset.datepicker.' . md5( self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id . '#' . $this->target . '.' . time() ), $_sRegion, CClientScript::POS_READY );
+		}
+
 		//	Get the javascript for this widget
 		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id . '#' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );
 
@@ -252,12 +252,11 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 			$_oWidget->theme = self::$m_sCurrentTheme = $sTheme;
 		
 		//	Register scripts necessary
-		$_oCS->registerCoreScript( 'jquery' );
-		$_oCS->registerScriptFile( "{$_oWidget->baseUrl}/js/jquery-ui-1.7.1.min.js" );
+		$_oCS->registerScriptFile( "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js" );
 		$_oCS->registerScriptFile( "{$_oWidget->baseUrl}/js/jquery.pogostick.hover.js", CClientScript::POS_END );
 
 		//	Register css files...
-		$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/{$_oWidget->theme}/ui.all.css", 'screen' );
+		$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css", 'screen' );
 		$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/ui.pogostick.css", 'screen' );
 		
 		//	Restore path

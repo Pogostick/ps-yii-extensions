@@ -135,5 +135,4 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 	{
 		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
 	}
-	
 }

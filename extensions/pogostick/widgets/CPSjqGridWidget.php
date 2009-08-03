@@ -107,10 +107,16 @@ CODE;
 		//	Call daddy...
 		parent::generateJavascript( $sClassName, $arOptions );
 
-		//	Add the pager...
-		$this->script .= ".navGrid('#{$this->pagerId}',{edit:false,add:false,del:false});";
+		//	Strip off semi-colon and add pager...
+		$_sScript = $this->script;
+		if ( $_sScript{ strlen( $_sScript ) - 1 } == ';' )
+		{
+			$_sScript = substr( $_sScript, 0, strlen( $_sScript ) - 1 );
+			$_sScript .= ".navGrid('#{$this->pagerId}',{edit:false,add:false,del:false});";
+		}
 
-		return $this->script;
+		//	Send it on...		
+		return $this->script = $_sScript;
 	}
 
 	/**

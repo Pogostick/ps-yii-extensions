@@ -50,7 +50,7 @@ class CPSApiComponent extends CPSComponent
 	* @param array $arRequestData
 	* @return string
 	*/
-	protected function makeRequest( $sSubType = null, $arRequestData = null )
+	protected function makeRequest( $sSubType = '/', $arRequestData = null, $sMethod = 'GET' )
 	{
 		//	Make sure apiQueryName is set...
 		if ( $this->requireApiQueryName && $this->isEmpty( $this->apiQueryName ) )
@@ -67,8 +67,7 @@ class CPSApiComponent extends CPSComponent
 		$_arRequestData = $this->requestData;
 
 		//	Check data...
-		if ( null != $arRequestData )
-			$_arRequestData = array_merge( $_arRequestData, $arRequestData );
+		if ( null != $arRequestData ) $_arRequestData = array_merge( $_arRequestData, $arRequestData );
 
 		//	Check subtype...
 		if ( ! empty( $sSubType ) && is_array( $this->requestMap[ $this->apiToUse ] ) )
@@ -91,17 +90,36 @@ class CPSApiComponent extends CPSComponent
 		//	First build the url...
 		$_sUrl = $this->apiBaseUrl .
 			( substr( $this->apiBaseUrl, strlen( $this->apiBaseUrl ) - 1, 1 ) != '/' ? '/' : '' ) .
-			( isset( $this->apiSubUrls[ $this->apiToUse ] ) ? $this->apiSubUrls[ $this->apiToUse ] : '' );
+			( ( isset( $this->apiSubUrls[ $this->apiToUse ] ) && '/' != $this->apiSubUrls[ $this->apiToUse ] ) ? $this->apiSubUrls[ $this->apiToUse ] : '' );
 
 		//	Add the API key...
-		if ( $this->requireApiQueryName )
-			$_sQuery = $this->apiQueryName . '=' . $this->apiKey;
+		if ( $this->requireApiQueryName ) $_sQuery = $this->apiQueryName . '=' . $this->apiKey;
 
 		//	Add the request data to the Url...
 		if ( is_array( $this->requestMap ) && ! empty( $sSubType ) )
 		{
-			foreach ( $this->requestMap[ $this->apiToUse ][ $sSubType ] as $_sKey => $_arInfo )
+			$_arRequestMap = $this->requestMap[ $this->apiToUse ][ $sSubType ];
+			$_arDone = array();
+			
+			//	Add any extra requestData parameters unchecked to the query string...
+			foreach ( $_arRequestData as $_sKey => $_sValue )
 			{
+				if ( ! array_key_exists( $_sKey, $_arRequestMap ) ) 
+				{
+					$_sQuery .= '&' . $_sKey . '=' . urlencode( $_sValue );
+					unset( $_arRequestData[ $_sKey ] );
+				}
+			}
+				
+			//	Now build the url...
+			foreach ( $_arRequestMap as $_sKey => $_arInfo )
+			{
+				//	Tag as done...
+				$_arDone[] = $_sKey;
+				
+				//	Is there a default value?
+				if ( isset( $_arInfo[ 'default' ] ) && ! isset( $_arRequestData[ $_sKey ] ) ) $_arRequestData[ $_sKey ] = $_arInfo[ 'default' ];
+				
 				if ( isset( $_arInfo[ 'required' ] ) && $_arInfo[ 'required' ] && ! array_key_exists( $_sKey, $_arRequestData ) )
 				{
 					throw new CException(
@@ -115,8 +133,8 @@ class CPSApiComponent extends CPSComponent
 					);
 				}
 
-				if ( isset( $_arRequestData[ $_sKey ] ) )
-					$_sQuery .= '&' . $_arInfo[ 'name' ] . '=' . urlencode( $_arRequestData[ $_sKey ] );
+				//	Add to query string
+				if ( isset( $_arRequestData[ $_sKey ] ) ) $_sQuery .= '&' . $_arInfo[ 'name' ] . '=' . urlencode( $_arRequestData[ $_sKey ] );
 			}
 		}
 		//	Handle non-requestMap call...
@@ -124,8 +142,7 @@ class CPSApiComponent extends CPSComponent
 		{
 			foreach ( $this->requestData as $_sKey => $_oValue )
 			{
-				if ( isset( $_arRequestData[ $_sKey ] ) )
-					$_sQuery .= '&' . $_sKey . '=' . urlencode( $_arRequestData[ $_sKey ] );
+				if ( isset( $_arRequestData[ $_sKey ] ) ) $_sQuery .= '&' . $_sKey . '=' . urlencode( $_arRequestData[ $_sKey ] );
 			}
 		}
 
@@ -134,7 +151,7 @@ class CPSApiComponent extends CPSComponent
 		$this->beforeApiCall( $_oEvent );
 
 		//	Ok, we've build our request, now let's get the results...
-		$_sResults = $this->makeHttpRequest( $_sUrl, $_sQuery, 'GET', $this->userAgent );
+		$_sResults = $this->makeHttpRequest( $_sUrl, $_sQuery, $sMethod, $this->userAgent );
 
 		//	Handle events...
 		$_oEvent->urlResults = $_sResults;
@@ -157,7 +174,7 @@ class CPSApiComponent extends CPSComponent
 		$this->requestComplete( $_oEvent );
 
 		//	Return results...
-		return( $_sResults );
+		return $_sResults;
 	}
 
 	//********************************************************************************

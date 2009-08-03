@@ -9,12 +9,10 @@
  */
 
 /**
- * CPS provides
- *
  * @author Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
  * @package psYiiExtensions
- * @subpackage Widgets
+ * @subpackage Helpers
  * @since 1.0.0
  */
 class CPSActiveWidgets extends CHtml
@@ -42,6 +40,33 @@ class CPSActiveWidgets extends CHtml
 	const CODEDD = 'activeCodeDropDownList';
 	const JQUI = 'CPSjqUIWrapper';
 
+	private static $m_arInputMap = array( 
+		self::TEXTAREA => 'textarea',
+		self::TEXT => 'text',
+		self::HIDDEN => 'hidden',
+		self::PASSWORD => 'password',
+		self::FILE => 'file',
+		self::RADIO => 'radio',
+		self::CHECK => 'checkbox',
+	);
+	
+	//********************************************************************************
+	//* Member variables
+	//********************************************************************************
+	
+	/**
+	* The default class for active fields
+	* 
+	* @var string
+	*/
+	protected static $m_sOnClass = null;
+	/**
+	* The default class for inactive fields
+	* 
+	* @var string
+	*/
+	protected static $m_sOffClass = null;
+	
 	//********************************************************************************
 	//* Public methods
 	//********************************************************************************
@@ -62,19 +87,25 @@ class CPSActiveWidgets extends CHtml
 	*/
 	public static function simpleActiveBlock( $eFieldType, $oModel, $sColName, $arOptions = array(), $sLabel = null, $arLabelOptions = array(), $arData = null, $arWidgetOptions = array() )
 	{
-		$_sHtml = '';
+		//	Get append Html		
+		$_sHtml = CPSHelp::getOption( $arOptions, '_appendHtml', '', true );
 		
-		if ( isset( $arOptions[ '_appendHtml' ] ) )
-		{
-			$_sHtml = $arOptions[ '_appendHtml' ];
-			unset( $arOptions[ '_appendHtml' ] );
-		}
+		//	Need an id for div tag
+		if ( ! isset( $arOptions[ 'id' ] ) ) $arOptions[ 'id' ] = self::getIdByName( self::resolveName( $oModel, $sColName ) );
 		
-		$_sOut = '<div class="simple">';
-		$_sOut .= self::activeLabelEx( $oModel, ( null == $sLabel ) ? $sColName : $sLabel, $arLabelOptions );
+		//	Preset class for hover effects if enabled...
+		if ( isset( self::$m_sOffClass ) && ! isset( $arOptions[ 'class' ] ) ) $arOptions[ 'class' ] = self::$m_sOffClass;
+
+		if ( null == $oModel )		
+			$_sOut = self::label( $sLabel, $sName, $arLabelOptions );
+		else
+			$_sOut = self::activeLabelEx( $oModel, ( null == $sLabel ) ? $sColName : $sLabel, $arLabelOptions );
+			
 		$_sOut .= self::activeField( $eFieldType, $oModel, $sColName, $arOptions, $arWidgetOptions, $arData );
 		$_sOut .= $_sHtml;
-		$_sOut .= '</div>';
+
+		//	Construct the div...
+		$_sOut = '<div id="PIF_' . $arOptions[ 'id' ] . '" class="simple">' . $_sOut . '</div>';
 
 		return $_sOut;
 	}
@@ -98,21 +129,61 @@ class CPSActiveWidgets extends CHtml
 	public static function activeField( $eFieldType, $oModel, $sColName, $arHtmlOptions = array(), $arWidgetOptions = array(), $arData = null )
 	{
 		//	Stuff to put after widget
-		$_sAppendHtml = '';
-		
-		if ( isset( $arHtmlOptions[ '_appendHtml' ] ) )
-		{
-			$_sAppendHtml = $arHtmlOptions[ '_appendHtml' ];
-			unset( $arHtmlOptions[ '_appendHtml' ] );
-		}
+		$_sAppendHtml = CPSHelp::getOption( $arHtmlOptions, '_appendHtml', '', true );
 		
 		//	Auto set id and name if they aren't already...
-		if ( ! isset( $arHtmlOptions[ 'name' ] ) ) $arHtmlOptions[ 'name' ] = self::resolveName( $oModel, $sColName );
+		if ( ! isset( $arHtmlOptions[ 'name' ] ) ) $arHtmlOptions[ 'name' ] = ( null != $oModel ) ? self::resolveName( $oModel, $sColName ) : $sColName;
 		if ( ! isset( $arHtmlOptions[ 'id' ] ) ) $arHtmlOptions[ 'id' ] = self::getIdByName( $arHtmlOptions[ 'name' ] );
+		
+		if ( null == $oModel )
+		{
+			$_oValue = CPSHelp::getOption( $arHtmlOptions, 'value', null, true );
+			
+			//	Handle special types...
+			switch ( $eFieldType )
+			{
+				default:
+					$_sType = CPSHelp::getOption( self::$m_arInputMap, $eFieldType );
+             		break;
 				
+				//	Build a jQuery UI widget
+				case self::JQUI:
+					if ( isset( $arHtmlOptions[ '_widget' ] ) )
+					{
+						$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
+						$arWidgetOptions[ 'id' ] = $arHtmlOptions[ 'id' ];
+						$_sWidget = $arHtmlOptions[ '_widget' ];
+						unset( $arHtmlOptions[ '_widget' ] );
+						CPSjqUIWrapper::create( $_sWidget, $arWidgetOptions );
+						$_sType = 'text';
+					}
+					break;
+				
+				//	WYSIWYG Plug-in
+				case self::WYSIWYG:
+					CPSWysiwygWidget::create( array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
+					$_sType = 'textarea';
+					break;                                                                                
+					
+				//	markItUp! Plug-in
+				case self::MARKITUP:
+					$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
+					$arWidgetOptions[ 'id' ] = $arHtmlOptions[ 'id' ];
+					CPSMarkItUpWidget::create( $arWidgetOptions );
+					$_sType = 'textarea';
+					break;
+			}
+			
+			if ( null != $_sType )
+				return self::inputField( $_sType, $sColName, $_oValue, $arHtmlOptions );
+				
+			return;
+		}
+			
 		//	Handle special types...
 		switch ( $eFieldType )
 		{
+			//	Build a jQuery UI widget
 			case self::JQUI:
 				if ( isset( $arHtmlOptions[ '_widget' ] ) )
 				{
@@ -125,7 +196,12 @@ class CPSActiveWidgets extends CHtml
 				}
 				break;
 			
+			//	Default for text field
 			case self::TEXT:
+				//	Masked input?
+				$_sMask = CPSHelp::getOption( $arHtmlOptions, 'mask', null, true );
+				if ( ! empty( $_sMask ) ) $_oMask = CPSjqMaskedInputWrapper::create( array( 'target' => '#' . $arHtmlOptions[ 'id' ], 'mask' => $_sMask ) );
+				
 				if ( ! isset( $arHtmlOptions[ 'size' ] ) )
 					$arHtmlOptions[ 'size' ] = 60;
 				break;
@@ -134,7 +210,7 @@ class CPSActiveWidgets extends CHtml
 			case self::WYSIWYG:
 				CPSWysiwygWidget::create( array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
 				$eFieldType = self::TEXTAREA;
-				break;
+				break;                                                                                
 				
 			//	markItUp! Plug-in
 			case self::MARKITUP:
@@ -152,9 +228,10 @@ class CPSActiveWidgets extends CHtml
 				
 			//	These guys need data in third parameter
 			case self::DROPDOWN:
-				//	Auto-set prompt
-				if ( ! isset( $arHtmlOptions[ 'noprompt' ] ) )
-					$arHtmlOptions[ 'prompt' ] = 'Select One...';
+				//	Auto-set prompt if not there...
+				if ( ! isset( $arHtmlOptions[ 'noprompt' ] ) ) $arHtmlOptions[ 'prompt' ] = 'Select One...';
+				//	Intentionally fall through to next block...
+				
 			case self::CHECKLIST:
 			case self::RADIOLIST:
 			case self::LISTBOX:
@@ -173,7 +250,7 @@ class CPSActiveWidgets extends CHtml
 	* @param integer $iDefaultUID
 	* @return string
 	*/
-	public static function activeCodeDropDownList( $sAttribute, $sCodeType, $arHtmlOptions = array(), $iDefaultUID = 0 )
+	public static function activeCodeDropDownList( $sAttribute, $sCodeType, &$arHtmlOptions = array(), $iDefaultUID = 0 )
 	{
 		$_oModel = Code::model();
 		
@@ -198,7 +275,7 @@ class CPSActiveWidgets extends CHtml
 	/**
 	* Output a google analytics function...
 	* 
-	* @param string $sId
+	* @param string $sId Your site id for Google Analytics
 	*/
 	public static function googleAnalytics( $sId )
 	{
@@ -211,27 +288,99 @@ document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.
 try {
 var pageTracker = _gat._getTracker("{$sId}");
 pageTracker._trackPageview();
-} catch(err) {}</script>	}
+} catch(err) {}</script>
 HTML;
 	}
+
+	/**
+	* Enables an input highlight effect when a form field is hovered over
+	* 
+	* @param string $sSelector The jQuery/CSS selector(s) to apply effect to
+	* @param array $arOptions Options for the generated scripts/CSS
+	* @access public
+	* @static
+	* @since psYiiExtensions v1.0.5
+	*/
+	public static function enableInputHover( $sSelector, $arOptions = array() )
+	{
+		$_sTempCss = '';
+		
+		//	Basic options...
+		$_sOffClass = self::$m_sOffClass = CPSHelp::getOption( $arOptions, 'offClass', 'idle' );
+		$_sOnClass = self::$m_sOnClass = CPSHelp::getOption( $arOptions, 'onClass', 'activeField' );
+		$_sOffBGColor = CPSHelp::getOption( $arOptions, 'offBackgroundColor', '#ffffff' );
+		$_sOnBGColor = CPSHelp::getOption( $arOptions, 'onBackgroundColor', '#ffffff' );
+		$_sOnBorderColor = CPSHelp::getOption( $arOptions, 'onBorderColor', '#33677F' );
+		$_iOnBorderSize = CPSHelp::getOption( $arOptions, 'onBorderSize', 1 );
+		$_sOffBorderColor = CPSHelp::getOption( $arOptions, 'offBorderColor', '#85b1de' );
+		$_iOffBorderSize = CPSHelp::getOption( $arOptions, 'offBorderSize', 1 );
+		
+		//	Optional background image for non-hovered field
+		$_sFieldImageUrl = CPSHelp::getOption( $arOptions, 'fieldImageUrl' );
+		$_sFieldImageRepeat = CPSHelp::getOption( $arOptions, 'fieldImageRepeat', 'repeat-x' );
+		$_sFieldImagePosition = CPSHelp::getOption( $arOptions, 'fieldImagePosition', 'top' );
+		
+		//	Set up the cool input effects...
+		$_sScript =<<<CODE
+\$("{$sSelector}").addClass("{$_sOffClass}");\$("{$sSelector}").focus(function(){\$(this).addClass("{$_sOnClass}").removeClass("{$_sOffClass}");}).blur(function(){\$(this).removeClass("{$_sOnClass}").addClass("{$_sOffClass}");});
+CODE;
 	
-	//********************************************************************************
-	//* Member Variables
-	//********************************************************************************
+		//	Register script
+		Yii::app()->getClientScript()->registerScript( md5( time() ), $_sScript, CClientScript::POS_READY );
+		
+		$_sCss =<<<CODE
+{$sSelector} input[type="text"]:focus, 
+{$sSelector} input[type="password"]:focus, 
+{$sSelector} select:focus 
+{
+    background-image: none;
+    background-color: {$_sOnBGColor};
+    border: solid {$_iOnBorderSize}px {$_sOnBorderColor};
+}		
 
-	//********************************************************************************
-	//* Property Access Methods
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Magic Method Ovverides
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Public Methods
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Private Methods
-	//********************************************************************************
+.{$_sOnClass}
+{
+	background-image: none;
+    background-color: {$_sOnBGColor};
+    border: solid {$_iOffBorderSize}px {$_sOffBorderColor};
 }
+
+.{$_sOffClass}
+{
+    background-color: {$_sOffBGColor};
+    border: solid {$_iOffBorderSize}px {$_sOffBorderColor};
+CODE;
+
+		if ( ! empty( $_sFieldImageUrl ) ) 
+		{
+			$_sTempCss =<<<CSS
+	background-image: url('{$_sFieldImageUrl}');
+	background-repeat: {$_sFieldImageRepeat};
+	background-position: {$_sFieldImagePosition};
+CSS;
+		}
+
+		//	Add anything else we've appended...	
+		$_sCss .= $_sTempCss . "\n}";
+
+		//	Register CSS
+		Yii::app()->getClientScript()->registerCSS( md5( time() ), $_sCss );
+	}
+	
+	public static function beginFieldset( $sLegend = null, array $arHtmlOptions = array() )
+	{
+		$_sOut = '<FIELDSET>';
+		if ( $sLegend ) $_sOut .= CHtml::tag( 'legend', $arHtmlOptions, $sLegend );
+		return $_sOut;
+	}
+	
+	public static function endFieldSet()
+	{
+		return '</FIELDSET>';
+	}
+}
+
+/**
+* Convenience class to alias CPSActiveWidgets
+*/
+class CPSAW extends CPSActiveWidgets {}

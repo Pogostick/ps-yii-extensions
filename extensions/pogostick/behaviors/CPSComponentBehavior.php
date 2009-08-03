@@ -21,6 +21,14 @@
 class CPSComponentBehavior extends CBehavior
 {
 	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+
+	const	JSON = 0;
+	const	HTTP = 1;
+	const	ASSOC_ARRAY = 2;
+	
+	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
 
@@ -94,10 +102,10 @@ class CPSComponentBehavior extends CBehavior
 		$this->m_oOptions = new CPSOptionManager( $this->m_sInternalName );
 
 		//	Set up our base settings
-			$this->addOptions( self::getBaseOptions() );
+		$this->addOptions( self::getBaseOptions() );
 
 		//	Set the external library path
-		$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick' ) . '/external', true );
+		$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick' ) . DIRECTORY_SEPARATOR . 'external', true );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
@@ -157,6 +165,18 @@ class CPSComponentBehavior extends CBehavior
 	* @see setOptions
 	*/
 	public function setOption( $sKey, $oValue ) {  $this->m_oOptions->setOption( $sKey, $oValue ); }
+
+	/**
+	* Unsets a single option from the array
+	*
+	* @access public
+	* @param string $sKey
+	* @param mixed $oValue
+	* @return null
+	* @see setOptions
+	* @since psYiiExtensions v1.0.5
+	*/
+	public function unsetOption( $sKey ) {  $this->m_oOptions->unsetOption( $sKey ); }
 
 	/**
 	* Returns a reference to the entire reference array
@@ -230,7 +250,7 @@ class CPSComponentBehavior extends CBehavior
 				'checkCallbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
 				'validCallbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'callbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'extLibUrl_' => array( CPSOptionManager::META_DEFAULTVALUE => '/', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'extLibUrl_' => array( CPSOptionManager::META_DEFAULTVALUE => DIRECTORY_SEPARATOR, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 			)
 		);
 	}
@@ -266,10 +286,10 @@ class CPSComponentBehavior extends CBehavior
 	* @param array $arOptions
 	* @return string
 	*/
-	public function makeOptions()
+	public function makeOptions( $arOptions = null, $iFormat = self::JSON )
 	{
 		//	Get the public options...
-		$_arOptions = $this->m_oOptions->getPublicOptions();
+		$_arOptions = ( null == $arOptions ) ? $this->m_oOptions->getPublicOptions() : $arOptions;
 		
 		//	Check them first...
 		$this->checkOptions( $_arOptions );
@@ -278,10 +298,13 @@ class CPSComponentBehavior extends CBehavior
 		$_arCallbacks = $this->callbacks;
 
 		//	Add callbacks to the array...
-		foreach ( $_arCallbacks as $_sKey => $_oValue )
+		if ( is_array( $_arCallbacks ) ) 
 		{
-			if ( ! empty( $_oValue ) )
-				$_arOptions[ "cb_{$_sKey}" ] = $_sKey;
+			foreach ( $_arCallbacks as $_sKey => $_oValue )
+			{
+				if ( ! empty( $_oValue ) )
+					$_arOptions[ "cb_{$_sKey}" ] = $_sKey;
+			}
 		}
 
 		//	Get all the options merged...
@@ -294,9 +317,7 @@ class CPSComponentBehavior extends CBehavior
 			if ( $_sKey != 'callbacks' && isset( $_arOptions[ $_sKey ] ) )
 			{
 				$_sExtName = $this->getOptionsObject()->getMetaDataValue( $_sKey, CPSOptionManager::META_EXTERNALNAME );
-				
-				if ( empty( $_sExtName ) )
-					$_sExtName = $_sKey;
+				if ( empty( $_sExtName ) ) $_sExtName = $_sKey;
 
 				//	Check for callbacks in the inner array (.i.e. "buttons" from jqUI dialog)
 				if ( is_array( $_oValue ) )
@@ -316,37 +337,65 @@ class CPSComponentBehavior extends CBehavior
 				$_arToEncode[ $_sExtName ] = $_oValue;
 			}
 		}
+		
+		$_sEncodedOptions = '';
 
 		if ( sizeof( $_arToEncode ) > 0 )
 		{
-			$_sEncodedOptions = CJavaScript::encode( $_arToEncode );
+			switch ( $iFormat )
+			{
+				case self::JSON:
+					$_sEncodedOptions = CJavaScript::encode( $_arToEncode );
+					break;
+					
+				case self::HTTP:
+					foreach ( $_arToEncode as $_sKey => $_sValue )
+					{
+						if ( ! empty( $_sValue ) ) 
+							$_sEncodedOptions .= '&' . $_sKey . '=' . urlencode( $_sValue );
+					}
+					break;
+					
+				case self::ASSOC_ARRAY:
+					if ( ! empty( $_arCallbacks ) ) throw new CPSException( 'Cannot use type "ASSOC_ARRAY" when callbacks are present.' );
+						
+					$_sEncodedOptions = array();
+					foreach ( $_arToEncode as $_sKey => $_sValue )
+					{
+						if ( ! empty( $_sValue ) ) $_sEncodedOptions[ $_sKey ] = $_sValue;
+					}
+					break;
+			}
 
 			//	Fix up the callbacks...
-			foreach ( $_arCallbacks as $_sKey => $_oValue )
+			if ( is_array( $_arCallbacks ) ) 
 			{
-				$_sQuote = null;
-				
-				//	Indicator to quote key...
-				if ( '!!!' == substr( $_sKey, 0, 3 ) )
+				foreach ( $_arCallbacks as $_sKey => $_oValue )
 				{
-					$_sQuote = "'";
-					$_sKey = substr( $_sKey, 3 );
-				}
-				
-				if ( ! empty( $_oValue ) )
-				{
-					if ( $this->isCBFunction( $_oValue ) )
-						$_sEncodedOptions = str_replace( "'cb_{$_sKey}':'{$_sKey}'", "{$_sQuote}{$_sKey}{$_sQuote}:{$_oValue}", $_sEncodedOptions );
-					else
-						$_sEncodedOptions = str_replace( "'cb_{$_sKey}':'{$_sKey}'", "{$_sKey}:'{$_oValue}'", $_sEncodedOptions );
+					$_sQuote = null;
+					
+					//	Indicator to quote key...
+					if ( '!!!' == substr( $_sKey, 0, 3 ) )
+					{
+						$_sQuote = "'";
+						$_sKey = substr( $_sKey, 3 );
+					}
+					
+					if ( ! empty( $_oValue ) )
+					{
+						if ( $this->isCBFunction( $_oValue ) )
+							$_sEncodedOptions = str_replace( "'cb_{$_sKey}':'{$_sKey}'", "{$_sQuote}{$_sKey}{$_sQuote}:{$_oValue}", $_sEncodedOptions );
+						else
+							$_sEncodedOptions = str_replace( "'cb_{$_sKey}':'{$_sKey}'", "{$_sKey}:'{$_oValue}'", $_sEncodedOptions );
+					}
 				}
 			}
 
-			return( $_sEncodedOptions );
+			return $_sEncodedOptions;
 		}
 
-		return( null );
-	}
+		return null;
+	}                                             
 
 	/**
 	* Checks options for validity based on the meta data rules (if any)
@@ -478,7 +527,6 @@ class CPSComponentBehavior extends CBehavior
 			
 		//	Not there? Throw error...
 		return parent::raiseEvent( $sName, $oEvent );
-		//throw new CException( Yii::t( $this->m_sInternalName, 'Event "{class}.{event}" is not defined.', array( '{class}' => get_class( $this->owner ), '{event}' => $_sOrigName ) ) );
 	}
 
 }
