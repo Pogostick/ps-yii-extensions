@@ -21,6 +21,9 @@ class CPSActiveWidgets extends CHtml
 	//* Constants
 	//********************************************************************************
 	
+	//	Me
+	const ID_PREFIX = 'psaw';
+	
 	/**
 	* These are a list of form elements that can be used along with the methods in this class.
 	*/
@@ -36,10 +39,33 @@ class CPSActiveWidgets extends CHtml
 	const CHECKLIST = 'activeCheckBoxList';
 	const RADIOLIST = 'activeRadioButtonList';
 	const WYSIWYG = 'wysiwyg';
+	const CKEDITOR = 'ckeditor';
 	const MARKITUP = 'markItUp';
 	const CODEDD = 'activeCodeDropDownList';
 	const JQUI = 'CPSjqUIWrapper';
 
+	//	Types of drop downs...
+	const	DD_GENERIC = -1;
+	const	DD_US_STATES = 0;
+	const	DD_MONTH_NUMBERS = 1;
+	const	DD_MONTH_NAMES = 2;
+	const	DD_YEARS = 3;
+	const	DD_CC_TYPES = 4;
+	
+	//	Types of HTML
+	const	HTML = 0;
+	const	XHTML = 1;
+	const	STRICT = 2;
+	const	FRAMESET = 4;
+	const	TRANSITIONAL = 8;
+	const	HTML32 = -1;
+	const	HTML20 = -2;
+	const	LOOSE = -3;
+	
+	//********************************************************************************
+	//* Member variables
+	//********************************************************************************
+	
 	private static $m_arInputMap = array( 
 		self::TEXTAREA => 'textarea',
 		self::TEXT => 'text',
@@ -50,10 +76,26 @@ class CPSActiveWidgets extends CHtml
 		self::CHECK => 'checkbox',
 	);
 	
-	//********************************************************************************
-	//* Member variables
-	//********************************************************************************
+	public static $useIdPrefixes = false;
+	public static $useNamePrefixes = false;
 	
+	public static $idPrefixes = array(
+		'text' => 'txt_',
+		'password' => 'txt_',
+		'textarea' => 'txt_',
+		'radio' => 'radio_',
+		'check' => 'check_',
+		'label' => 'label_',
+		'select' => 'slt_',
+		'file' => 'file_',
+	);
+
+	public static $namePrefixes = array();
+	public static $requiredHtml = null;
+	public static $labelSuffix = ':';
+	public static $formFieldContainer = 'div';
+	public static $formFieldContainerClass = 'input-holder';
+
 	/**
 	* The default class for active fields
 	* 
@@ -209,6 +251,12 @@ class CPSActiveWidgets extends CHtml
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
 				CPSWysiwygWidget::create( array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
+				$eFieldType = self::TEXTAREA;
+				break;                                                                                
+				
+			//	CKEditor Plug-in
+			case self::WYSIWYG:
+				CPSCKEditorWidget::create( array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
 				$eFieldType = self::TEXTAREA;
 				break;                                                                                
 				
@@ -378,9 +426,107 @@ CSS;
 	{
 		return '</FIELDSET>';
 	}
-}
+	
+	public static function dropDown( $eType, $sName, $sLabel = null, $arOptions = array() )
+	{
+		$_sValue = CPSHelp::getOption( $arOptions, 'value', null, true );
+		$_sLabelClass = CPSHelp::getOption( $arOptions, 'labelClass', null, true );
 
-/**
-* Convenience class to alias CPSActiveWidgets
-*/
-class CPSAW extends CPSActiveWidgets {}
+		$_sOut = self::textLabel( $sName, $sLabel, array( 'for' => $sName, '_forType' => 'select', 'class' => $_sLabelClass ) );
+		
+		switch ( $eType )
+		{
+			case self::DD_GENERIC:	//	Options passed in via array
+				$_arOptions = CPSHelp::getOption( $arOptions, 'options', array(), true );
+				break;
+				
+			case self::DD_US_STATES:
+				$_arOptions = require( 'us_state_array.php' );
+				break;
+				
+			case self::DD_MONTH_NUMBERS:
+				if ( $_sValue == null ) $_sValue = date( 'm' );
+				$_arOptions = require( 'month_numbers_array.php' );
+				break;
+				
+			case self::DD_MONTH_NAMES:
+				if ( $_sValue == null ) $_sValue = date( 'm' );
+				$_arOptions = require( 'month_names_array.php' );
+				break;
+				
+			case self::DD_YEARS:
+				if ( $_sValue == null ) $_sValue = date( 'Y' );
+				$_iRange = CPSHelp::getOption( $arOptions, 'range', 5 );
+				$_arOptions = array();
+				
+				for ( $_i = 0; $_i < $_iRange; $_i++ ) 
+					$_arOptions[ ( date( 'Y' ) + $_i ) ] = ( date( 'Y' ) + $_i );
+				break;
+				
+			case self::DD_CC_TYPES:
+				$_arOptions = require( 'cc_types_array.php' );
+				break;
+				
+			default:
+				return false;
+		}
+		
+		if ( ! empty( $_arOptions ) )
+		{
+			$_sInner = '';
+
+			foreach ( $_arOptions as $_sKey => $_sVal )
+			{
+				$_arOpts = array( 'value' => $_sKey );
+				if ( $_sValue == $_sKey ) $_arOpts[ 'selected' ] = 'selected';
+				$_sInner .= self::tag( 'option', null, $_sVal, $_arOpts );
+			}
+
+			$_sOut .= self::tag( 'SELECT', $sName, $_sInner, $arOptions );
+		}
+				
+		return $_sOut;
+	}
+
+	/**
+	* Outputs a <LABEL>. NOTE: Does not add ID and NAME prefixes...
+	* 
+	* @param mixed $sName
+	* @param mixed $sLabel
+	* @param mixed $arOptions
+	*/
+	public static function textLabel( $sName, $sLabel = null, $arOptions = array() )
+	{
+		$_sType = CPSHelp::getOption( $arOptions, '_forType', 'text' );
+		$_bRequired = CPSHelp::getOption( $arOptions, '_required', false );
+		$arOptions[ 'id' ] = self::getIdPrefix( 'label' ) . $sName;
+		return self::tag( 'label', self::getIdPrefix( 'label' ) . $sName, ( ( $sLabel == null ) ? $sName : $sLabel ) . self::getLabelSuffix() . self::getRequiredHtml( $bRequired ), $arOptions );
+	}
+
+	public static function getIdPrefix( $sType )
+	{
+		return ( self::$useIdPrefixes && is_array( self::$idPrefixes ) && self::nvl( self::$idPrefixes[ $sType ] ) ) ? self::$idPrefixes[ $sType ] : null;
+	}
+
+	public static function getNamePrefix( $sType )
+	{
+		return ( self::$useNamePrefixes && is_array( self::$namePrefixes ) && self::nvl( self::$namePrefixes[ $sType ] )  ) ? self::$namePrefixes[ $sType ] : null;
+	}
+	
+	public static function getRequiredHtml()
+	{
+		return self::nvl( self::$requiredHtml );
+	}
+	
+	public static function getLabelSuffix()
+	{
+		return self::nvl( self::$labelSuffix );
+	}
+	
+	public static function nvl( $oVal, $oDefault = null )
+	{
+		if ( isset( $oVal ) && $oVal ) return $oVal;
+		return $oDefault;
+	}
+	
+}
