@@ -5,36 +5,21 @@
 */
 //	All hover and click logic for buttons
 $(".ps-button:not(.ui-state-disabled)")
-.hover(
-	function()
-	{ 
-		$(this).addClass("ui-state-hover"); 
-	},
-	function()
-	{ 
-		$(this).removeClass("ui-state-hover"); 
-	}
-)
+.hover( function() {  $(this).addClass("ui-state-hover");  }, function() {  $(this).removeClass("ui-state-hover"); } )
 .mousedown(
 	function()
 	{
 		$(this).parents('.ps-buttonset-single:first').find(".ps-button.ui-state-active").removeClass("ui-state-active");
 		if ($(this).is('.ui-state-active.ps-button-toggleable, .ps-buttonset-multi .ui-state-active') )
-		{ 
 			$(this).removeClass("ui-state-active"); 
-		}
 		else 
-		{ 
 			$(this).addClass("ui-state-active"); 
-		}	
 	}
 )
 .mouseup(
 	function()
 	{
 		if (!$(this).is('.ps-button-toggleable, .ps-buttonset-single .ps-button,  .ps-buttonset-multi .ps-button') )
-		{
 			$(this).removeClass("ui-state-active");
-		}
 	}
 );
