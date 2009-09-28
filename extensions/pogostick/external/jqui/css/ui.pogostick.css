@@ -18,6 +18,7 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; }
 
 .ps-button-icon-solo { display:block; width:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
+.ps-button-icon-solo-small { padding:6px 10px; -moz-border-radius:3px; display:block; width:0px; height:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
 
 .ps-buttonset { float:left; }
 .ps-buttonset .ps-button { float: left; }

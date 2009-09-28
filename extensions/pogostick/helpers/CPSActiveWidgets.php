@@ -76,9 +76,10 @@ class CPSActiveWidgets extends CHtml
 		self::CHECK => 'checkbox',
 	);
 	
+	/**
+	* Name Prefixes
+	*/
 	public static $useIdPrefixes = false;
-	public static $useNamePrefixes = false;
-	
 	public static $idPrefixes = array(
 		'text' => 'txt_',
 		'password' => 'txt_',
@@ -89,10 +90,21 @@ class CPSActiveWidgets extends CHtml
 		'select' => 'slt_',
 		'file' => 'file_',
 	);
+	public static function getIdPrefix( $sType ) { return ( self::$useIdPrefixes && is_array( self::$idPrefixes ) && self::nvl( self::$idPrefixes[ $sType ] ) ) ? self::$idPrefixes[ $sType ] : null; }
 
+	/**
+	* Name Prefixes
+	*/
+	public static $useNamePrefixes = false;
 	public static $namePrefixes = array();
+	public static function getNamePrefix( $sType ) { return ( self::$useNamePrefixes && is_array( self::$namePrefixes ) && self::nvl( self::$namePrefixes[ $sType ] )  ) ? self::$namePrefixes[ $sType ] : null; }
+	
 	public static $requiredHtml = null;
+	public static function getRequiredHtml() { return self::nvl( self::$requiredHtml ); }
+	
 	public static $labelSuffix = ':';
+	public static function getLabelSuffix() { return self::nvl( self::$labelSuffix ); }
+	
 	public static $formFieldContainer = 'div';
 	public static $formFieldContainerClass = 'input-holder';
 
@@ -131,6 +143,8 @@ class CPSActiveWidgets extends CHtml
 	{
 		//	Get append Html		
 		$_sHtml = CPSHelp::getOption( $arOptions, '_appendHtml', '', true );
+		$_sDivClass = CPSHelp::getOption( $arOptions, '_divClass', null, true );
+		if ( ! $_sDivClass & $eFieldType == self::CHECK ) $_sDivClass = 'chk_label';
 		
 		//	Need an id for div tag
 		if ( ! isset( $arOptions[ 'id' ] ) ) $arOptions[ 'id' ] = self::getIdByName( self::resolveName( $oModel, $sColName ) );
@@ -139,7 +153,7 @@ class CPSActiveWidgets extends CHtml
 		if ( isset( self::$m_sOffClass ) && ! isset( $arOptions[ 'class' ] ) ) $arOptions[ 'class' ] = self::$m_sOffClass;
 
 		if ( null == $oModel )		
-			$_sOut = self::label( $sLabel, $sName, $arLabelOptions );
+			$_sOut = self::label( $sLabel, $arOptions[ 'id' ], $arLabelOptions );
 		else
 			$_sOut = self::activeLabelEx( $oModel, ( null == $sLabel ) ? $sColName : $sLabel, $arLabelOptions );
 			
@@ -147,7 +161,7 @@ class CPSActiveWidgets extends CHtml
 		$_sOut .= $_sHtml;
 
 		//	Construct the div...
-		$_sOut = '<div id="PIF_' . $arOptions[ 'id' ] . '" class="simple">' . $_sOut . '</div>';
+		$_sOut = '<div id="PIF_' . $arOptions[ 'id' ] . '" class="simple ' . $_sDivClass . '">' . $_sOut . '</div>';
 
 		return $_sOut;
 	}
@@ -255,8 +269,8 @@ class CPSActiveWidgets extends CHtml
 				break;                                                                                
 				
 			//	CKEditor Plug-in
-			case self::WYSIWYG:
-				CPSCKEditorWidget::create( array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
+			case self::CKEDITOR:
+				CPSCKEditorWidget::create( array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $arHtmlOptions[ 'id' ], 'name' => $arHtmlOptions[ 'name' ] ) ) );
 				$eFieldType = self::TEXTAREA;
 				break;                                                                                
 				
@@ -503,30 +517,288 @@ CSS;
 		return self::tag( 'label', self::getIdPrefix( 'label' ) . $sName, ( ( $sLabel == null ) ? $sName : $sLabel ) . self::getLabelSuffix() . self::getRequiredHtml( $bRequired ), $arOptions );
 	}
 
-	public static function getIdPrefix( $sType )
+	/****
+	* Output a jQuery UI icon, icon button, or plain button
+	* 
+	* @param string $sLabel
+	* @param string $sLink
+	* @param array $arOptions
+	*/
+	public static function jquiButton( $sLabel, $sLink, $arOptions = array() )
 	{
-		return ( self::$useIdPrefixes && is_array( self::$idPrefixes ) && self::nvl( self::$idPrefixes[ $sType ] ) ) ? self::$idPrefixes[ $sType ] : null;
+		static $_bRegistered = false;
+		$_sSize = $_sIconPos = $_bIconOnly = null;
+
+		$_sLink = is_array( $sLink ) ? CHtml::normalizeUrl( $sLink ) : $sLink;
+		$_sId = CPSHelp::getOption( $arOptions, 'id', CPSHelp::getWidgetId( self::ID_PREFIX . '.jqbtn' ), true );
+		$_sFormId = CPSHelp::getOption( $arOptions, 'formId', null, true );
+
+		if ( $_sIcon = CPSHelp::getOption( $arOptions, 'icon', null, true ) ) 
+		{
+			$_bIconOnly = CPSHelp::getOption( $arOptions, 'iconOnly', false, true );
+			$_sIcon = "<span class=\"ui-icon ui-icon-{$_sIcon}\"></span>";
+			if ( $sLabel && ! $_bIconOnly ) 
+				$_sIconPos = "ps-button-icon-" . CPSHelp::getOption( $arOptions, 'iconPosition', 'left', true );
+			else
+			{
+				$_sSize = CPSHelp::getOption( $arOptions, 'iconSize', null, true );
+				$_sIconPos = 'ps-button-icon-solo' . ( ( $_sSize ) ? '-' . $_sSize : '' );
+			}
+		}
+
+		if ( $_sOnClick = CPSHelp::getOption( $arOptions, 'click', null, true ) ) 
+			$_sOnClick = 'onClick="' . $_sOnClick . '"';
+		else
+		{
+			if ( $_sConfirm = CPSHelp::getOption( $arOptions, 'confirm', null, true ) ) 
+			{
+				$_sHref = $_sLink;
+				$_sForm = ( $_sFormId ) ? "document.getElementById(\"{$_sFormId}\")" : 'this.form';
+				$_sConfirm = str_replace( "'", "''", str_replace( '"', '""', $_sConfirm ) );
+				$_sOnClick = "return confirmAction({$_sForm},'{$_sConfirm}','{$_sLink}','{$_sHref}');";
+				$_sLink = '#';
+
+				if ( ! $_bRegistered )
+				{
+					$_sScript = <<<HTML
+function confirmAction( oForm, sMessage, sHref )
+{
+	jConfirm( sMessage, 'Please Confirm Your Action', function( bVal ) {
+		if ( bVal )
+		{
+			if ( sHref == '_submit_' ) return oForm.submit();
+			window.location.href = sHref;
+			return true;
+		}
+
+		return false;
+	});
+}
+HTML;
+					//	Register scripts
+					Yii::app()->clientScript->registerScript( CPSHelp::getWidgetId( self::ID_PREFIX . '.cas.' ), $_sScript, CClientScript::POS_END );
+					$_bRegistered = true;
+				}
+			}
+			else
+			{
+				if ( $_sLink == '_submit_' )
+				{
+					$_sLink = '#';
+					$_sOnClick = "return \$(" . ( $_sFormId ? "'#{$_sFormId}'" : "'div.yiiForm>form'" ) . ").submit();";
+				}
+			}
+		}
+		
+		//	Set our link options
+		$arOptions['title'] = $sLabel;
+		$arOptions['class'] = "ps-button {$_sIconPos} ui-state-default ui-corner-all";
+		if ( $_sOnClick ) $arOptions['onclick'] = $_sOnClick;
+	
+		//	Generate the link
+		return self::link( ( $_sIcon . $sLabel ), $_sLink, $arOptions );
 	}
 
-	public static function getNamePrefix( $sType )
-	{
-		return ( self::$useNamePrefixes && is_array( self::$namePrefixes ) && self::nvl( self::$namePrefixes[ $sType ] )  ) ? self::$namePrefixes[ $sType ] : null;
-	}
-	
-	public static function getRequiredHtml()
-	{
-		return self::nvl( self::$requiredHtml );
-	}
-	
-	public static function getLabelSuffix()
-	{
-		return self::nvl( self::$labelSuffix );
-	}
-	
+	/**
+	* Returns an input field NAME prefix
+	* 
+	* @param string $sType
+	*/
 	public static function nvl( $oVal, $oDefault = null )
 	{
 		if ( isset( $oVal ) && $oVal ) return $oVal;
 		return $oDefault;
 	}
 	
+	/**
+	* Formats the created and modified dates 
+	* 
+	* @param mixed $oModel
+	*/
+	public static function showDates( $oModel, $sDateFormat = 'D, j M Y, h:i:s A', $sCreatedColumn = 'created', $sModifiedColumn = 'modified' )
+	{
+		$_sOut = null;
+		
+		if ( $oModel->hasAttribute( $sCreatedColumn ) && $oModel->hasAttribute( $sModifiedColumn ) )
+		{
+			$_sOut = '<div class="form-footer">';
+			$_sOut .= 'Created: <span>' . date( $sDateFormat, strtotime( $oModel[ $sCreatedColumn ] ) ) . '</span>&nbsp;&nbsp;&nbsp;Modified: <span>' . date( $sDateFormat, strtotime( $oModel[ $sModifiedColumn ] ) ) . '</span>';
+			$_sOut .= '</div>';
+		}
+		
+		return $_sOut;
+	}
+	
+	//********************************************************************************
+	//* Data Grid Builder
+	//********************************************************************************
+	
+	public static function buildDataGrid( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array() )
+	{
+		$_sOut = self::beginDataGrid( $arModel, $oSort, $arColumns, ! empty( $arActions ) );
+		$_sOut .= self::getDataGridRows( $arModel, $arColumns, $arActions, $sDataName );
+		$_sOut .= self::endDataGrid();
+		
+		if ( $oPages ) Yii::app()->controller->widget( 'CLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
+		
+		return $_sOut;
+	}
+
+	public static function buildDatalList( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array() )
+	{
+		if ( $oPages ) Yii::app()->controller->widget( 'CLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
+		$_sOut = self::tag( 'div', array( 'class' => 'item' ), self::getDataListRows( $arModel, $arColumns ) );
+		if ( $oPages ) Yii::app()->controller->widget( 'CLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
+		
+		return $_sOut;
+	}
+
+	/**
+	* Creates a data grid
+	* 
+	* @param CModel $oModel
+	* @param CSort $oSort
+	* @param array $arColumns
+	* @param boolean $bAddActions
+	* @return string
+	*/
+	public static function beginDataGrid( $oModel, $oSort = null, $arColumns = array(), $bAddActions = true )
+	{
+		$_sHeaders = null;
+		
+		foreach ( $arColumns as $_sColumn )
+			$_sHeaders .= self::tag( 'th', array(), ( $oSort ) ? $oSort->link( $_sColumn ) : $_sColumn );
+
+		if ( $bAddActions ) $_sHeaders .= self::tag( 'th', array(), 'Actions' );
+			
+		return self::tag( 'table', array( 'class' => 'dataGrid' ), self::tag( 'tr', array(), $_sHeaders ), false );
+	}
+	
+	/***
+	* Builds all rows for a dataGrid
+	* If a column name is prefixed with an '@', it will be stripped and the column will be a link to the 'update' view
+	* 
+	* @param array $arModel
+	* @param array $arColumns
+	* @param array $arActions
+	* @param string $sDataName
+	* @return string
+	*/
+	public static function getDataGridRows( $arModel, $arColumns = array(), $arActions = null, $sDataName = 'item' )
+	{
+		$_sOut = empty( $arModel ) ? '<tr><td style="text-align:center" colspan="' . sizeof( $arColumns ) . '">No Records Found</td></tr>' : null;
+		if ( null === $arActions ) $arActions = array( 'edit', 'delete' );
+
+		foreach ( $arModel as $_iIndex => $_oModel )
+		{
+			$_sActions = $_sTD = null;
+			$_sPK = $_oModel->getTableSchema()->primaryKey;
+			
+			//	Build columns
+			foreach ( $arColumns as $_sColumn )
+			{
+				$_bLink = false;
+
+				if ( $_sColumn{0} == '@' )
+				{
+					$_bLink = true;
+					$_sColumn = substr( $_sColumn, 1, strlen( $_sColumn ) - 1 );
+				}
+				
+				$_sColumn = ( $_bLink || $_sPK == $_sColumn ) ?
+					CHtml::link( $_oModel->{$_sColumn}, array( 'update', $_sPK => $_oModel->{$_sPK} ) ) 
+					:
+					CHtml::encode( $_oModel->{$_sColumn} );
+
+				$_sTD .= self::tag( 'td', array(), $_sColumn );
+			}
+				
+			//	Build actions...
+			if ( null !== $arActions && is_array( $arActions ) )
+			{
+				foreach ( $arActions as $_sAction )
+				{
+					switch ( $_sAction )
+					{
+						case 'edit':
+							$_sActions .= PS::jquiButton( 'Edit', array( 'update', $_oModel->getTableSchema()->primaryKey => $_oModel->{$_oModel->getTableSchema()->primaryKey} ), array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
+							break;
+							
+						case 'delete':
+							$_sActions .= PS::jquiButton( 'Delete', array( 'delete', $_oModel->getTableSchema()->primaryKey => $_oModel->{$_oModel->getTableSchema()->primaryKey} ),
+								array(
+									'confirm' => "Do you really want to delete this {$sDataName}?",
+									'iconOnly' => true, 
+									'icon' => 'trash', 
+									'iconSize' => 'small'
+								)
+							);
+							break;
+					}
+				}
+				
+				$_sTD .= self::tag( 'td', array(), $_sActions );
+			}
+			
+			$_sOut = self::tag( 'tr', array(), $_sTD );
+		}
+		
+		return $_sOut;
+	}
+	
+	/***
+	* Builds a row for a data list
+	* If a column name is prefixed with an '@', it will be stripped and the column will be a link to the 'update' view
+	* 
+	* @param array $arModel
+	* @param array $arColumns
+	* @param array $arActions
+	* @param string $sDataName
+	* @return string
+	*/
+	public static function getDataListRows( $oModel, $arColumns = array() )
+	{
+		$_sTD = $_sOut = null;
+		$_sPK = $oModel->getTableSchema()->primaryKey;
+		
+		//	Build columns
+		
+		foreach ( $arColumns as $_sColumn )
+		{
+			$_bLink = false;
+
+			if ( $_sColumn{0} == '@' )
+			{
+				$_bLink = true;
+				$_sColumn = substr( $_sColumn, 1, strlen( $_sColumn ) - 1 );
+			}
+			
+			$_sOut .= $oModel->getAttributeLabel( $_sColumn );
+			
+			$_sColumn = ( $_bLink || $_sPK == $_sColumn ) ?
+				CHtml::link( $oModel->{$_sColumn}, array( 'update', $_sPK => $oModel->{$_sPK} ) ) 
+				:
+				CHtml::encode( $oModel->{$_sColumn} );
+
+			$_sOut .= $_sColumn;
+		}
+			
+		return $_sOut;
+	}
+	
+	/**
+	* Closes a data grid
+	* 
+	*/
+	public static function endDataGrid()
+	{
+		return '</TABLE>';
+	}
+}
+
+/**
+* Convienience class for CPSActiveWidgets so it's not so much to type...
+*/
+class PS extends CPSActiveWidgets                                                                                                                           
+{
 }

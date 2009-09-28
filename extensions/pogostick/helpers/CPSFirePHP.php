@@ -55,10 +55,19 @@ class CPSFirePHP extends CPSComponent
 	//********************************************************************************
 	
 	/**
+	* Initialize the component...
+	* 
+	*/
+	public function init()
+	{
+		//	Call daddy
+		parent::init();
+	}
+	
+	/**
 	* View FirePHP information
 	* 
 	* @param CView $oView
-	* @param integer $iMode
 	*/
 	function enableConsole( $oView  )
 	{

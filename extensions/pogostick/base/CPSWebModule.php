@@ -37,10 +37,6 @@ class CPSWebModule extends CWebModule
 	public function getAssetUrl() { return $this->m_sAssetUrl; }
 	protected function setAssetUrl( $sUrl ) { $this->m_sAssetUrl = $sUrl; }
 
-	protected $m_sDBTablePrefix = null;
-	public function getDBTablePrefix() { return $this->m_sDBTablePrefix; }
-	public function setDBTablePrefix( $sValue ) { $this->m_sDBTablePrefix = $sValue; }	
-	
 	//	Accessor to app's db...
 	public function getDB() { return Yii::app()->getDB(); }
 

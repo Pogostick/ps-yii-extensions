@@ -18,6 +18,17 @@
  */
 class CPSHelp
 {
+	//********************************************************************************
+	//* Private Members
+	//********************************************************************************
+	
+	/**
+	* Widget prefix
+	* 
+	* @var mixed
+	*/
+	protected static $m_iIDCounter = 0;
+	
 	 /**
 	 * Make an HTTP request
 	 *
@@ -428,5 +439,25 @@ class CPSHelp
 		
 		return "http://www.gravatar.com/avatar/" . md5( strtolower( $sEmailAddress ) ) . ".jpg?s={$iSize}&r={$sRating}";
 	}
-
+	
+	/**
+	* Generate a random ID # for a widget
+	* 
+	* @param string $sPrefix
+	*/
+	public static function getWidgetId( $sPrefix = null )
+	{
+		return $sPrefix . self::$m_iIDCounter++;
+	}
+	
+	/**
+	* Returns an analog to Java System.currentTimeMillis()
+	* 
+	* @returns integer
+	*/
+	public static function currentTimeMillis()
+	{
+		list( $_uSec, $_sec ) = explode( ' ', microtime() );
+		return round( ( ( float )$_uSec + ( float )$_sec) * 1000 );
+	}
 }
