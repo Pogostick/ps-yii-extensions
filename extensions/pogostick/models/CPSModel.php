@@ -26,6 +26,15 @@ class CPSModel extends CActiveRecord
 	//********************************************************************************
 
 	/**
+	* The database application component associated with this object, defaults to db
+	* 
+	* @staticvar CDbConnection
+	*/
+	protected static $m_oDB = null;
+	public function getDbConnection() { return self::$m_oDB ? self::$m_oDB : parent::getDbConnection(); }
+	public static function setDbConnection( CDbConnection $oValue ) { self::$m_oDB = $oValue; }
+	
+	/**
 	 * The associated database table name prefix
 	 * @var string
 	 */
@@ -35,6 +44,7 @@ class CPSModel extends CActiveRecord
 	
 	/**
 	 * The optional name of the created column in the table
+	 * 
 	 * @var string
 	 */
 	protected $m_sCreatedColumn = null;
@@ -43,6 +53,7 @@ class CPSModel extends CActiveRecord
 	
 	/**
 	 * The optional name of the last modified column in the table
+	 * 
 	 * @var string
 	 */
 	protected $m_sLModColumn = null;
@@ -51,11 +62,21 @@ class CPSModel extends CActiveRecord
 	
 	/**
 	* If defined, all deletes are soft
+	* 
 	* @var string
 	*/
 	protected $m_sSoftDeleteColumn = null;
 	public function getSoftDeleteColumn() { return $this->m_sSoftDeleteColumn; }
 	public function setSoftDeleteColumn( $sValue ) { $this->m_sSoftDeleteColumn = $sValue; }	
+	
+	/**
+	* The date/time function to stamp records with
+	* 
+	* @var string
+	*/
+	protected $m_sDateTimeFunction = null;
+	public function getDateTimeFunction() { return $this->m_sDateTimeFunction; }
+	public function setDateTimeFunction( $sValue ) { $this->m_sDateTimeFunction = $sValue; }
 	
 	//********************************************************************************
 	//* Public Methods
@@ -68,7 +89,12 @@ class CPSModel extends CActiveRecord
 	*/
 	public function onBeforeSave( $oEvent )
 	{
-		if ( $_sCol = $this->getCreatedColumn() && $this->isNewRecord && $this->hasAttribute( $_sCol ) ) $this->{$_sCol} = date('c');
+		if ( $_sCol = $this->getCreatedColumn() && $this->isNewRecord && $this->hasAttribute( $_sCol ) ) 
+			$this->{$_sCol} = ( null !== $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+			
+		if ( $_sCol = $this->getLModColumn() && $this->hasAttribute( $_sCol ) ) 
+			$this->{$_sCol} = ( null !== $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+			
 		return parent::onBeforeSave( $oEvent );
 	}
 	
@@ -146,5 +172,13 @@ class CPSModel extends CActiveRecord
 			
     	return array();
     }
+    
+    public function touch()
+    {
+		if ( $this->m_sLModColumn && $this->hasAttribute( $this->m_sLModColumn ) ) 
+			$this->{$this->m_sLModColumn} = ( null !== $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+			
+		return $this->save();
+	}
     
 }

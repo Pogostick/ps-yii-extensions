@@ -58,6 +58,14 @@ abstract class CPSController extends CController
 	protected $m_sModelName = null;
 	public function getModelName() { return $this->m_sModelName; }
 	protected function setModelName( $sValue ) { $this->m_sModelName = $sValue; }	
+
+	/**
+	* @var boolean Try to find proper layout to use
+	* @access protected
+	*/
+	protected $m_bAutoLayout = true;
+	public function getAutoLayout() { return $this->m_bAutoLayout; }
+	public function setAutoLayout( $bValue ) { $this->m_bAutoLayout = $bValue; }
 	
 	/**
 	* @var string The default action for this controller
@@ -96,17 +104,20 @@ abstract class CPSController extends CController
 	public function init()
 	{
 		//	Phone home...
-//		parent::init();
+		parent::init();
 
 		//	Add command mappings...
-//		$this->addCommandToMap( 'delete' );
-//		$this->addCommandToMap( 'undelete' );
+		$this->addCommandToMap( 'delete' );
+		$this->addCommandToMap( 'undelete' );
 
 		//	Set our access rules..
-//		$this->setUserActionList( self::ACCESS_TO_ANY, array( 'login', 'index' ) );
-//		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'admin', 'create', 'delete', 'logout', 'show', 'update' ) );
-//		$this->setUserActionList( self::ACCESS_TO_ADMIN, array() );
-//		$this->setUserActionList( self::ACCESS_TO_NONE, array() );
+		$this->setUserActionList( self::ACCESS_TO_ANY, array( 'login', 'index' ) );
+		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'admin', 'create', 'delete', 'logout', 'show', 'update' ) );
+		$this->setUserActionList( self::ACCESS_TO_ADMIN, array() );
+		$this->setUserActionList( self::ACCESS_TO_NONE, array() );
+		
+		//	Find layout...
+		if ( $this->m_bAutoLayout ) if ( file_exists(Yii::app()->getBasePath().'/views/layouts/'.$this->getId().'.php') ) $this->layout = $this->getId();
 	}
 
 	/**
@@ -118,7 +129,7 @@ abstract class CPSController extends CController
 	{
 		//	Perform access control for CRUD operations
 		return array(
-//			'accessControl',
+			'accessControl',
 		);
 	}
 
