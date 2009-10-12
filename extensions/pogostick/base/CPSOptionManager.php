@@ -658,8 +658,9 @@ class CPSOptionManager
 			//	Is this a valid type for this option?
 			if ( null !== $oValue && null !== $_oVPType )
 			{			
-				if ( ( ! is_array( $_oVPType ) && ( $_sType != $_oVPType ) ) || ( is_array( $_oVPType ) && ! in_array( $_sType, $_oVPType ) ) )
-					throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}". Found type "{z}"', array( '{x}' => $sKey, '{y}' => ( is_array( $_oVPType ) ) ? implode( ', ', $_oVPType ) : $_oVPType, '{z}' => $_sType ) ), 1 );
+				$_sVPTypeList = ( is_array( $_oVPType ) ) ? implode( ', ', $_oVPType ) : $_oVPType;
+				if ( $_sVPTypeList && ( ! is_array( $_oVPType ) && $_sType != $_oVPType || ( is_array( $_oVPType ) && ! in_array( $_sType, $_oVPType ) ) ) )
+					throw new CException( Yii::t( __CLASS__, '"{x}" must be of type "{y}". Found type "{z}"', array( '{x}' => $sKey, '{y}' => $_sVPTypeList, '{z}' => $_sType ) ), 1 );
 
 				//	Check if this is a valid value for this option
 				if ( null !== ( $_arValid = $this->getMetaDataValue( $sKey, self::META_ALLOWED ) ) )
