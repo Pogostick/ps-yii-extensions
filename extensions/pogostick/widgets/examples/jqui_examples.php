@@ -5,13 +5,13 @@
 * @author Jerry Ablan <jablan@pogostick.com>
 * @version SVN: $Id$
 * @package psYiiExtensions
-* @subpackage Widgets
+* @subpackage Examples
 * @since 1.0.2
 */
 /***
 * Example file for CPSjqUIWrapper class
 * 
-* To use this, create render as a view from a controller
+* To use this, render as a view from any controller
 */
 
 //	Create an accordian...
