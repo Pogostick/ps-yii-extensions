@@ -108,18 +108,18 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 		
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "http://cdn.jquerytools.org/1.0.2/jquery.tools.min.js" );
+		$_oCS->registerScriptFile( "http://cdn.jquerytools.org/1.1.2/tiny/jquery.tools.min.js" );
 
 		//	Add for flashembed if we need it...		
-		if ( 'flashembed' == $this->widgetName ) $_oCS->registerScriptFile( "http://static.flowplayer.org/js/flashembed-1.0.3.min.js" );
+		if ( 'flashembed' == $this->widgetName ) $_oCS->registerScriptFile( "http://static.flowplayer.org/js/tools/tools.flashembed-1.0.4.min.js" );
 		
 		//	Register any CSS files for this tool...
 		if ( isset( $this->m_arSupportFiles[ $this->widgetName ] ) )
 		{
 			if ( isset( $this->m_arSupportFiles[ $this->widgetName ][ 'css' ] ) )
 			{
-				foreach ( $this->m_arSupportFiles[ $this->widgetName ][ 'css' ] as $_sFile )
-					$_oCS->registerCssFile( "{$this->baseUrl}/css/{$_sFile}", 'screen' );
+//				foreach ( $this->m_arSupportFiles[ $this->widgetName ][ 'css' ] as $_sFile )
+//					$_oCS->registerCssFile( "{$this->baseUrl}/css/{$_sFile}", 'screen' );
 			}
 		}
 
@@ -146,13 +146,23 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 			$sInsertBeforeOptions = '"div.' . $this->paneClass . ' > div"';
 			
 		//	Expose widget is attached to target as a click event...
-		if ( 'expose' != $this->widgetName )
-			$_sScript = parent::generateJavascript( $sClassName, $arOptions, $sInsertBeforeOptions );
-		else
+		switch ( $this->widgetName )
 		{
-			$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
-			$_sId = ( null != $sClassName ) ? '.' . $sClassName : ( ! $this->isEmpty( $this->target ) ) ? $this->target : '#' . $this->id;
-			$_sScript = "$(\"{$_sId}\").click(function(){\$(this).expose({$_arOptions}).load();});";
+			case 'expose':
+				$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
+				$_sId = ( null != $sClassName ) ? '.' . $sClassName : ( ! $this->isEmpty( $this->target ) ) ? $this->target : '#' . $this->id;
+				$_sScript = "$(\"{$_sId}\").click(function(){\$(this).expose({$_arOptions}).load();});";
+				break;
+			
+			case 'flashembed':
+				$_sSrc = $this->getOption( 'src', null );
+				$_arOptions = $this->makeOptions();
+				$_sScript = 'flashembed("' . $this->target . '", "' . $_sSrc . '", ' . $_arOptions . ');';
+				break;
+				
+			default:
+				$_sScript = parent::generateJavascript( $sClassName, $arOptions, $sInsertBeforeOptions );
+				break;
 		}
 		
 		return $this->script = $_sScript;

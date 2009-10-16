@@ -217,25 +217,26 @@ CODE;
 	*/
 	protected function finalizeCreate( $arOptions = array() )
 	{
-		//	Set variable options...
-		if ( is_array( $arOptions ) )
-		{
-			//	Check for scripts...
-			if ( isset( $arOptions[ '_scripts' ] ) && is_array( $arOptions[ '_scripts' ] ) )
-			{
-				//	Add them and remove from options...
-				$this->addScripts( $arOptions[ '_scripts' ] );
-				unset( $arOptions[ '_scripts' ] );
-			}
-
-			//	Now process the rest of the options...			
-			foreach ( $arOptions as $_sKey => $_oValue )
-				$this->addOption( $_sKey, null, false, $_oValue );
-		}
-		
 		//	Initialize the widget
 		$this->init();
 
+		//	Set variable options...
+		if ( is_array( $arOptions ) )
+		{
+			$_oCS = Yii::app()->getClientScript();
+			
+			//	Check for scripts...
+			foreach ( CPSHelp::getOption( $arOptions, '_scripts', array(), true ) as $_sScript ) $_oCS->registerScriptFile( $this->baseUrl . $_sScript );
+			if ( $_sScript = CPSHelp::getOption( $arOptions, 'script', null, true ) ) $_oCS->registerScriptFile( $this->baseUrl . $_sScript );
+
+			//	Check for css...
+			foreach ( CPSHelp::getOption( $arOptions, '_cssFiles', array(), true ) as $_sCss ) $_oCS->registerCssFile( $this->baseUrl . $_sCss );
+			if ( $_sScript = CPSHelp::getOption( $arOptions, 'cssFile', null, true ) ) $_oCS->registerCssFile( $this->baseUrl . $_sScript );
+
+			//	Now process the rest of the options...			
+			foreach ( $arOptions as $_sKey => $_oValue ) $this->addOption( $_sKey, null, false, $_oValue );
+		}
+		
 		//	Does user want us to run it?
 		if ( $this->autoRun ) $this->run();
 

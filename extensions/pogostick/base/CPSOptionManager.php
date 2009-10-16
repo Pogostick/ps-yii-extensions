@@ -539,11 +539,13 @@ class CPSOptionManager
 	* Retrieves an option value from the options array. If key doesn't exist, it's created as an empty array and returned.
 	*
 	* @param string $sKey
+	* @param mixed $oDefault
+	* @param boolean $bUnset
 	* @return mixed|null if not found
 	* @see getOptions
 	* @see setOption
 	*/
-	public function &getOption( $sKey, $oDefault = null )
+	public function &getOption( $sKey, $oDefault = null, $bUnset = false )
 	{
 		//	Validate the key
 		if ( null == ( $sKey = $this->validateKey( $sKey ) ) )
@@ -553,7 +555,10 @@ class CPSOptionManager
 		if ( ! isset( $this->m_arOptions[ $sKey ] ) )
 			$this->m_arOptions[ $sKey ] = $oDefault;
 
-		return $this->m_arOptions[ $sKey ];
+		$_oRet = $this->m_arOptions[ $sKey ];
+		if ( $bUnset ) $this->unsetOption( $sKey );
+			
+		return $_oRet;
 	}
 
 	/**

@@ -201,7 +201,7 @@ class CPSComponentBehavior extends CBehavior
 	* @return mixed
 	* @see getOptions
 	*/
-	public function &getOption( $sKey ) { return $this->m_oOptions->getOption( $sKey ); }
+	public function &getOption( $sKey, $oDefault = null, $bUnset = false ) { return $this->m_oOptions->getOption( $sKey, $oDefault, $bUnset ); }
 
 	/**
 	* Returns a reference to the entire reference array

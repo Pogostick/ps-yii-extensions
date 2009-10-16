@@ -170,6 +170,9 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	*/
 	public function registerClientScripts()
 	{
+		//	Push stuff to load...
+		if ( $this->script ) $this->pushScriptFile( $this->extLibUrl . $this->script );
+
 		//	Daddy...
 		$_oCS = parent::registerClientScripts();
 		
@@ -190,7 +193,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 			$_sRegion = "$.datepicker.setDefaults($.extend({showMonthAfterYear: false},$.datepicker.regional['{$_sRegion}']));";
 			$_oCS->registerScript( 'ps.reset.datepicker.' . md5( self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id . '#' . $this->target . '.' . time() ), $_sRegion, CClientScript::POS_READY );
 		}
-
+		
 		//	Get the javascript for this widget
 		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id . '#' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );
 
@@ -242,22 +245,18 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
 		
 		//	Set $sTheme if missing...
-		if ( null != $oWidget && null == $sTheme )
-			$sTheme = $oWidget->theme;
+		if ( null != $oWidget && null == $sTheme ) $sTheme = $oWidget->theme;
 
 		//	Check theme overrides...
-		if ( ! self::$m_bMultiTheme && ! empty( self::$m_sCurrentTheme ) )
-			 $_oWidget->theme = self::$m_sCurrentTheme;
-		else
-			$_oWidget->theme = self::$m_sCurrentTheme = $sTheme;
+		$_oWidget->theme = ( ! self::$m_bMultiTheme && ! empty( self::$m_sCurrentTheme ) ) ? self::$m_sCurrentTheme : self::$m_sCurrentTheme = $sTheme;
 		
 		//	Register scripts necessary
 		$_oCS->registerScriptFile( "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js" );
 		$_oCS->registerScriptFile( "{$_oWidget->baseUrl}/js/jquery.pogostick.hover.js", CClientScript::POS_END );
 
 		//	Register css files...
-		$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css", 'screen' );
-		$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/ui.pogostick.css", 'screen' );
+		$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css" );
+		$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/ui.pogostick.css" );
 		
 		//	Restore path
 		$_oWidget->baseUrl = $_sOldPath;

@@ -144,7 +144,7 @@ class CPSActiveWidgets extends CHtml
 		//	Get append Html		
 		$_sHtml = CPSHelp::getOption( $arOptions, '_appendHtml', '', true );
 		$_sDivClass = CPSHelp::getOption( $arOptions, '_divClass', null, true );
-		if ( ! $_sDivClass & $eFieldType == self::CHECK ) $_sDivClass = 'chk_label';
+		if ( ! $_sDivClass & ( $eFieldType == self::CHECK || $eFieldType == self::RADIO || $eFieldType == self::CHECKLIST || $eFieldType == self::RADIOLIST ) ) $_sDivClass = 'chk_label';
 		
 		//	Need an id for div tag
 		if ( ! isset( $arOptions[ 'id' ] ) ) $arOptions[ 'id' ] = self::getIdByName( self::resolveName( $oModel, $sColName ) );
@@ -161,7 +161,7 @@ class CPSActiveWidgets extends CHtml
 		$_sOut .= $_sHtml;
 
 		//	Construct the div...
-		$_sOut = '<div id="PIF_' . $arOptions[ 'id' ] . '" class="simple ' . $_sDivClass . '">' . $_sOut . '</div>';
+		$_sOut = '<div id="PIF_' . $arOptions[ 'id' ] . '" class="simple' . ( $_sDivClass ? ' ' . $_sDivClass : '' ) . '">' . $_sOut . '</div>';
 
 		return $_sOut;
 	}
@@ -600,13 +600,14 @@ HTML;
 	}
 
 	/**
-	* Returns an input field NAME prefix
+	* If value is !set||empty, default is returned
 	* 
-	* @param string $sType
+	* @param mixed $oVal
+	* @param mixed $oDefault
 	*/
 	public static function nvl( $oVal, $oDefault = null )
 	{
-		if ( isset( $oVal ) && $oVal ) return $oVal;
+		if ( isset( $oVal ) && ! empty($oVal) ) return $oVal;
 		return $oDefault;
 	}
 	
@@ -794,6 +795,7 @@ HTML;
 	{
 		return '</TABLE>';
 	}
+	
 }
 
 /**

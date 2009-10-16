@@ -70,6 +70,9 @@ class CPSWidget extends CInputWidget
 	*/
 	protected $m_arBehaviors = null;
 
+	protected $m_arCssFiles = array();
+	protected $m_arScriptFiles = array();
+	
 	//********************************************************************************
 	//* Property Accessors
 	//********************************************************************************
@@ -157,6 +160,29 @@ class CPSWidget extends CInputWidget
 				call_user_method( 'init', $_oBehave );
 		}
 	}
+	
+	/**
+	* Pushes a css file onto the page load stack. 
+	* 
+	* @param string $sPath Path of css relative to doc_root
+	* @param string $sId
+	*/
+	public function pushCssFile( $sPath, $sMedia = 'screen' )
+	{
+		return $this->m_arCssFiles[] = array( $sPath, $sMedia );
+	}
+
+	/**
+	* Pushes a script onto the page load stack. 
+	* 
+	* @param string $sPath Path of script relative to doc_root
+	* @param integer $iPosition
+	* @param string $sId
+	*/
+	public function pushScriptFile( $sPath, $iPosition = CClientScript::POS_HEAD )
+	{
+		$this->m_arScriptFiles[] = array( $sPath, $iPosition );
+	}
 
 	/***
 	* Handles registration of scripts & css files...
@@ -168,8 +194,14 @@ class CPSWidget extends CInputWidget
 		$_oCS = Yii::app()->getClientScript();
 
 		//	Register a special CSS file if we have one...
-		if ( ! $this->isEmpty( $this->cssFile ) )
-			$_oCS->registerCssFile( Yii::app()->baseUrl . "{$this->cssFile}", 'screen' );
+		if ( ! $this->isEmpty( $this->cssFile ) ) $this->pushCssFile( $this->cssFile );
+		if ( ! $this->isEmpty( $this->script ) ) $this->pushScriptFile( $this->script );
+		
+		foreach ( $this->m_arCssFiles as $_arFile )
+			$_oCS->registerCssFile( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
+
+		foreach ( $this->m_arScriptFiles as $_arFile )
+			$_oCS->registerScriptFile( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
 
 		//	Send upstream for convenience
 		return $_oCS;
