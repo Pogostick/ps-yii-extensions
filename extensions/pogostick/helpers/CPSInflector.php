@@ -1,7 +1,8 @@
 <?php
 /**
  * CPSInflector class file.
- *
+ * Blantantly copied from CakePHP's inflector class... links are included below.
+ * 
  * @filesource
  * @link http://www.pogostick.com.com/
  * @copyright Copyright &copy; 2009 Pogostick, LLC
