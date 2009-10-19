@@ -127,8 +127,9 @@ abstract class CPSController extends CController
 	* @param array Extra parameters to pass to the view
 	* @param string The name of the variable to pass to the view. Defaults to 'model'
 	*/
-	public function genericAction( $sActionId, $oModel = null, $arExtraParams = array(), $sModelVarName = 'model' )
+	public function genericAction( $sActionId, $oModel = null, $arExtraParams = array(), $sModelVarName = 'model', $sFlashKey = null, $sFlashValue = null, $sFlashDefaultValue = null )
 	{
+		if ( $sFlashKey ) Yii::app()->user->setFlash( $sFlashKey, $sFlashValue, $sFlashDefaultValue );
 		$this->render( $sActionId, array_merge( $arExtraParams, array( $sModelVarName => ( $oModel ) ? $oModel : $this->loadModel() ) ) );
 	}
 	
@@ -173,7 +174,13 @@ abstract class CPSController extends CController
 		if ( isset( $arData, $arData[ $this->m_sModelName ] ) )
 		{
 			$oModel->setAttributes( $arData[ $this->m_sModelName ] );
-			if ( $oModel->save() ) $this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
+			if ( $oModel->save() ) 
+			{
+				Yii::app()->user->setFlash( 'success', 'Your changes have been saved.' );
+				$this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
+			}
+			else
+				Yii::app()->user->setFlash( 'success', 'Errorrr!!.' );
 		}
 		
 		return false;
@@ -185,12 +192,12 @@ abstract class CPSController extends CController
 	* 
 	* @returns array Element 0 is the results of the find. Element 1 is the pagination object
 	*/
-	protected function loadPaged( $bSort = false )
+	protected function loadPaged( $bSort = false, $oCriteria = null )
 	{
 		$_oSort = $_oCrit = $_oPage = null;
 		
 		//	Make criteria
-		$_oCrit = new CDbCriteria;
+		$_oCrit = CPSHelp::nvl( $oCriteria, new CDbCriteria() );
 		$_oPage = new CPagination( $this->loadCount( $_oCrit ) );
 		$_oPage->pageSize = self::PAGE_SIZE;
 		$_oPage->applyLimit( $_oCrit );

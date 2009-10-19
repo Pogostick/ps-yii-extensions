@@ -1,6 +1,6 @@
 <?php
 /**
- * CPSjqAchtung class file.
+ * CPSjqSelectMenu class file.
  *
  * @filesource
  * @copyright Copyright &copy; 2009 Pogostick, LLC
@@ -14,10 +14,9 @@
  * @lastmodified  $Date$
  */
 /**
- * CPSjqAchtung provides
- * Widget that implements jQuery plug-in {@link http://code.google.com/p/achtung-ui/ Achtung}
+ * Widget that implements jQuery plug-in {@link http://docs.jquery.com/UI SelectMenu}
  */
-class CPSjqAchtung extends CPSjQueryWidget
+class CPSjqSelectMenu extends CPSjQueryWidget
 {
 	//********************************************************************************
 	//* Member Variables
@@ -26,12 +25,11 @@ class CPSjqAchtung extends CPSjQueryWidget
 	/**
 	* The name of this widget
 	*/
-	const PS_WIDGET_NAME = 'achtung';
+	const PS_WIDGET_NAME = 'selectmenu';
 	/**
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
-	* Currently, a CDN is in use and no local files are required...
 	*/
-	const PS_EXTERNAL_PATH = '/jquery-plugins/achtung';
+	const PS_EXTERNAL_PATH = '/jquery-plugins/selectmenu';
 
 	//********************************************************************************
 	//* Property Access Methods
@@ -56,11 +54,9 @@ class CPSjqAchtung extends CPSjQueryWidget
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 		
-		//	Register css
-		$_oCS->registerCssFile( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.css", CClientScript::POS_HEAD );
-		
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.js", CClientScript::POS_HEAD );
+		$_oCS->registerCssFile( $this->baseUrl . '/ui.selectmenu.css' );
+		$_oCS->registerScriptFile( $this->baseUrl . '/ui.selectmenu.js', CClientScript::POS_END );
 
 		//	Get the javascript for this widget
 		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );
@@ -99,7 +95,7 @@ class CPSjqAchtung extends CPSjQueryWidget
 		$_sId = $this->getTargetSelector( $sTargetSelector );
 		
 		$this->script =<<<CODE
-$('{$_sId}').{$this->widgetName}({$_sOptions});
+$('select').{$this->widgetName}({$_sOptions});
 CODE;
 
 		return $this->script;

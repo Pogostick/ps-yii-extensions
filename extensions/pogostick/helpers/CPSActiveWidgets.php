@@ -107,6 +107,13 @@ class CPSActiveWidgets extends CHtml
 	
 	public static $formFieldContainer = 'div';
 	public static $formFieldContainerClass = 'input-holder';
+	
+	/**
+	* Whether or not jQuery Validate is being used...
+	* 
+	* @var boolean
+	*/
+	protected static $m_bValidating = false;
 
 	/**
 	* The default class for active fields
@@ -144,6 +151,8 @@ class CPSActiveWidgets extends CHtml
 		//	Get append Html		
 		$_sHtml = CPSHelp::getOption( $arOptions, '_appendHtml', '', true );
 		$_sDivClass = CPSHelp::getOption( $arOptions, '_divClass', null, true );
+		$_sTransform = CPSHelp::getOption( $arOptions, 'transform', null, true );
+		
 		if ( ! $_sDivClass & ( $eFieldType == self::CHECK || $eFieldType == self::RADIO || $eFieldType == self::CHECKLIST || $eFieldType == self::RADIOLIST ) ) $_sDivClass = 'chk_label';
 		
 		//	Need an id for div tag
@@ -156,7 +165,8 @@ class CPSActiveWidgets extends CHtml
 			$_sOut = self::label( $sLabel, $arOptions[ 'id' ], $arLabelOptions );
 		else
 			$_sOut = self::activeLabelEx( $oModel, ( null == $sLabel ) ? $sColName : $sLabel, $arLabelOptions );
-			
+
+		if ( $_sTransform && $oModel ) $oModel->$sColName = CPSTransform::value( $_sTransform, $oModel->$sColName );
 		$_sOut .= self::activeField( $eFieldType, $oModel, $sColName, $arOptions, $arWidgetOptions, $arData );
 		$_sOut .= $_sHtml;
 
@@ -190,6 +200,15 @@ class CPSActiveWidgets extends CHtml
 		//	Auto set id and name if they aren't already...
 		if ( ! isset( $arHtmlOptions[ 'name' ] ) ) $arHtmlOptions[ 'name' ] = ( null != $oModel ) ? self::resolveName( $oModel, $sColName ) : $sColName;
 		if ( ! isset( $arHtmlOptions[ 'id' ] ) ) $arHtmlOptions[ 'id' ] = self::getIdByName( $arHtmlOptions[ 'name' ] );
+		
+		if ( self::$m_bValidating )
+		{
+			//	Get any additional params for validation
+			$_sClass = CPSHelp::getOption( $arHtmlOptions, '_validate', null, true );
+			if ( $oModel->isAttributeRequired( $sColName, self::$scenario ) ) $_sClass .= ' required';
+			$_sClass .= ' ' . CPSHelp::getOption( $arHtmlOptions, 'class', null );
+			$arHtmlOptions['class'] = trim( $_sClass );
+		}
 		
 		if ( null == $oModel )
 		{
@@ -503,6 +522,33 @@ CSS;
 	}
 
 	/**
+	 * Generates an opening form tag.
+	 * Note, only the open tag is generated. A close tag should be placed manually
+	 * at the end of the form.
+	 * @param mixed the form action URL (see {@link normalizeUrl} for details about this parameter.)
+	 * @param string form method (e.g. post, get)
+	 * @param array additional HTML attributes (see {@link tag}).
+	 * @return string the generated form tag.
+	 * @since 1.0.4
+	 * @see endForm
+	 */
+	public static function beginForm( $sAction = '', $sMethod = 'POST', $arHtmlOptions = array() )
+	{
+		if ( CPSHelp::getOption( $arHtmlOptions, 'validate', false, true ) )
+		{
+			self::$m_bValidating = true;
+			CPSjqValidate::create( array( 'target' => self::getFormSelector( $arHtmlOptions ) ) );
+		}
+		
+		if ( CPSHelp::getOption( $arHtmlOptions, 'selectmenu', false, true ) )
+			CPSjqSelectMenu::create( array( 'target' => self::getFormSelector( $arHtmlOptions ) ) );
+		
+		return parent::beginForm( $sAction, $sMethod, $arHtmlOptions );
+	}
+
+	
+
+	/**
 	* Outputs a <LABEL>. NOTE: Does not add ID and NAME prefixes...
 	* 
 	* @param mixed $sName
@@ -604,6 +650,7 @@ HTML;
 	* 
 	* @param mixed $oVal
 	* @param mixed $oDefault
+	* @deprecated Moved to CPSHelp.php
 	*/
 	public static function nvl( $oVal, $oDefault = null )
 	{
@@ -630,170 +677,17 @@ HTML;
 		return $_sOut;
 	}
 	
-	//********************************************************************************
-	//* Data Grid Builder
-	//********************************************************************************
-	
-	public static function buildDataGrid( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array() )
-	{
-		$_sOut = self::beginDataGrid( $arModel, $oSort, $arColumns, ! empty( $arActions ) );
-		$_sOut .= self::getDataGridRows( $arModel, $arColumns, $arActions, $sDataName );
-		$_sOut .= self::endDataGrid();
-		
-		if ( $oPages ) Yii::app()->controller->widget( 'CLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
-		
-		return $_sOut;
-	}
-
-	public static function buildDatalList( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array() )
-	{
-		if ( $oPages ) Yii::app()->controller->widget( 'CLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
-		$_sOut = self::tag( 'div', array( 'class' => 'item' ), self::getDataListRows( $arModel, $arColumns ) );
-		if ( $oPages ) Yii::app()->controller->widget( 'CLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
-		
-		return $_sOut;
-	}
-
 	/**
-	* Creates a data grid
+	* Retrieves the target selector of a form
 	* 
-	* @param CModel $oModel
-	* @param CSort $oSort
-	* @param array $arColumns
-	* @param boolean $bAddActions
+	* @param array $arHtmlOptions
+	* @param string $sDefaultId
 	* @return string
 	*/
-	public static function beginDataGrid( $oModel, $oSort = null, $arColumns = array(), $bAddActions = true )
+	protected static function getFormSelector( $arHtmlOptions = array(), $sDefaultId = 'div.yiiForm>form' )
 	{
-		$_sHeaders = null;
-		
-		foreach ( $arColumns as $_sColumn )
-			$_sHeaders .= self::tag( 'th', array(), ( $oSort ) ? $oSort->link( $_sColumn ) : $_sColumn );
-
-		if ( $bAddActions ) $_sHeaders .= self::tag( 'th', array(), 'Actions' );
-			
-		return self::tag( 'table', array( 'class' => 'dataGrid' ), self::tag( 'tr', array(), $_sHeaders ), false );
-	}
-	
-	/***
-	* Builds all rows for a dataGrid
-	* If a column name is prefixed with an '@', it will be stripped and the column will be a link to the 'update' view
-	* 
-	* @param array $arModel
-	* @param array $arColumns
-	* @param array $arActions
-	* @param string $sDataName
-	* @return string
-	*/
-	public static function getDataGridRows( $arModel, $arColumns = array(), $arActions = null, $sDataName = 'item' )
-	{
-		$_sOut = empty( $arModel ) ? '<tr><td style="text-align:center" colspan="' . sizeof( $arColumns ) . '">No Records Found</td></tr>' : null;
-		if ( null === $arActions ) $arActions = array( 'edit', 'delete' );
-
-		foreach ( $arModel as $_iIndex => $_oModel )
-		{
-			$_sActions = $_sTD = null;
-			$_sPK = $_oModel->getTableSchema()->primaryKey;
-			
-			//	Build columns
-			foreach ( $arColumns as $_sColumn )
-			{
-				$_bLink = false;
-
-				if ( $_sColumn{0} == '@' )
-				{
-					$_bLink = true;
-					$_sColumn = substr( $_sColumn, 1, strlen( $_sColumn ) - 1 );
-				}
-				
-				$_sColumn = ( $_bLink || $_sPK == $_sColumn ) ?
-					CHtml::link( $_oModel->{$_sColumn}, array( 'update', $_sPK => $_oModel->{$_sPK} ) ) 
-					:
-					CHtml::encode( $_oModel->{$_sColumn} );
-
-				$_sTD .= self::tag( 'td', array(), $_sColumn );
-			}
-				
-			//	Build actions...
-			if ( null !== $arActions && is_array( $arActions ) )
-			{
-				foreach ( $arActions as $_sAction )
-				{
-					switch ( $_sAction )
-					{
-						case 'edit':
-							$_sActions .= PS::jquiButton( 'Edit', array( 'update', $_oModel->getTableSchema()->primaryKey => $_oModel->{$_oModel->getTableSchema()->primaryKey} ), array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
-							break;
-							
-						case 'delete':
-							$_sActions .= PS::jquiButton( 'Delete', array( 'delete', $_oModel->getTableSchema()->primaryKey => $_oModel->{$_oModel->getTableSchema()->primaryKey} ),
-								array(
-									'confirm' => "Do you really want to delete this {$sDataName}?",
-									'iconOnly' => true, 
-									'icon' => 'trash', 
-									'iconSize' => 'small'
-								)
-							);
-							break;
-					}
-				}
-				
-				$_sTD .= self::tag( 'td', array(), $_sActions );
-			}
-			
-			$_sOut = self::tag( 'tr', array(), $_sTD );
-		}
-		
-		return $_sOut;
-	}
-	
-	/***
-	* Builds a row for a data list
-	* If a column name is prefixed with an '@', it will be stripped and the column will be a link to the 'update' view
-	* 
-	* @param array $arModel
-	* @param array $arColumns
-	* @param array $arActions
-	* @param string $sDataName
-	* @return string
-	*/
-	public static function getDataListRows( $oModel, $arColumns = array() )
-	{
-		$_sTD = $_sOut = null;
-		$_sPK = $oModel->getTableSchema()->primaryKey;
-		
-		//	Build columns
-		
-		foreach ( $arColumns as $_sColumn )
-		{
-			$_bLink = false;
-
-			if ( $_sColumn{0} == '@' )
-			{
-				$_bLink = true;
-				$_sColumn = substr( $_sColumn, 1, strlen( $_sColumn ) - 1 );
-			}
-			
-			$_sOut .= $oModel->getAttributeLabel( $_sColumn );
-			
-			$_sColumn = ( $_bLink || $_sPK == $_sColumn ) ?
-				CHtml::link( $oModel->{$_sColumn}, array( 'update', $_sPK => $oModel->{$_sPK} ) ) 
-				:
-				CHtml::encode( $oModel->{$_sColumn} );
-
-			$_sOut .= $_sColumn;
-		}
-			
-		return $_sOut;
-	}
-	
-	/**
-	* Closes a data grid
-	* 
-	*/
-	public static function endDataGrid()
-	{
-		return '</TABLE>';
+		$_sTarget =	CPSHelp::getOption( $arHtmlOptions, 'id', null );
+		return ( $_sTarget == null ) ? $sDefaultId : '#' . $_sTarget;
 	}
 	
 }

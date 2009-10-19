@@ -1,6 +1,6 @@
 <?php
 /**
- * CPSjqAchtung class file.
+ * CPSjqValidate class file.
  *
  * @filesource
  * @copyright Copyright &copy; 2009 Pogostick, LLC
@@ -14,10 +14,9 @@
  * @lastmodified  $Date$
  */
 /**
- * CPSjqAchtung provides
- * Widget that implements jQuery plug-in {@link http://code.google.com/p/achtung-ui/ Achtung}
+ * Widget that implements jQuery plug-in {@link http://bassistance.de/jquery-plugins/jquery-plugin-validation/ Validate}
  */
-class CPSjqAchtung extends CPSjQueryWidget
+class CPSjqValidate extends CPSjQueryWidget
 {
 	//********************************************************************************
 	//* Member Variables
@@ -26,12 +25,12 @@ class CPSjqAchtung extends CPSjQueryWidget
 	/**
 	* The name of this widget
 	*/
-	const PS_WIDGET_NAME = 'achtung';
+	const PS_WIDGET_NAME = 'validate';
 	/**
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	* Currently, a CDN is in use and no local files are required...
 	*/
-	const PS_EXTERNAL_PATH = '/jquery-plugins/achtung';
+	const PS_EXTERNAL_PATH = 'http://ajax.microsoft.com/ajax/jquery.validate/1.5.5/jquery.validate.min.js';
 
 	//********************************************************************************
 	//* Property Access Methods
@@ -54,13 +53,10 @@ class CPSjqAchtung extends CPSjQueryWidget
 		$_oCS = parent::registerClientScripts();
 		
 		//	Reset the baseUrl for our own scripts
-		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
-		
-		//	Register css
-		$_oCS->registerCssFile( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.css", CClientScript::POS_HEAD );
+		$this->baseUrl = self::PS_EXTERNAL_PATH;
 		
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.js", CClientScript::POS_HEAD );
+		$_oCS->registerScriptFile( $this->baseUrl, CClientScript::POS_HEAD );
 
 		//	Get the javascript for this widget
 		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );

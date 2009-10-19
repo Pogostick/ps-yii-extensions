@@ -1,0 +1,108 @@
+<?php
+/**
+ * CPSDataList class file.
+ *
+ * @filesource
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @author Jerry Ablan <jablan@pogostick.com>
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @package psYiiExtensions
+ * @subpackage widgets
+ * @since v1.0.6
+ * @version SVN: $Revision$
+ * @modifiedby $LastChangedBy$
+ * @lastmodified  $Date$
+ */
+class CPSDataList
+{
+	//********************************************************************************
+	//* Member Variables
+	//********************************************************************************
+	
+	/**
+	* Transformation mapping
+	* 
+	* @var mixed
+	*/
+	protected static $m_arTransform = array(
+		'@' => 'linkTransform',
+		'?' => 'boolTransform',
+		'#' => 'timeTransform',
+	);
+
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
+
+	public static function create( $sDataName, $oModel, $arColumns = array(), $arActions = array() )
+	{
+		return CHtml::tag( 'div', array( 'class' => 'item' ), self::getDataListRows( $oModel, $arColumns ) );
+	}
+
+	/***
+	* Builds a row for a data list
+	* If a column name is prefixed with an '@', it will be stripped and the column will be a link to the 'update' view
+	* 
+	* @param array $arModel
+	* @param array $arColumns
+	* @param array $arActions
+	* @param string $sDataName
+	* @return string
+	*/
+	public static function getDataListRows( $oModel, $arColumns = array() )
+	{
+		$_sActions = $_bValue = $_sTD = $_sOut = null;
+		$_sPK = $oModel->getTableSchema()->primaryKey;
+			
+		//	Build columns
+		foreach ( $arColumns as $_sColumn )
+		{
+			$_bLink = false;
+			$_oValue = null;
+
+			foreach ( self::$m_arTransform as $_sChar => $_sMethod )
+			{
+				if ( $_sColumn{0} == $_sChar )
+				{
+					list( $_sColumn, $_oValue, $_bLink ) = self::$_sMethod( $oModel, $_sColumn );
+					break;
+				}
+			}
+
+			if ( ! $_oValue ) $_oValue = $_oModel->{$_sColumn};
+				
+			$_sOut .= $oModel->getAttributeLabel( $_sColumn );
+			
+			$_sColumn = ( $_bLink || $_sPK == $_sColumn ) ?
+				CHtml::link( $_oValue, array( 'update', $_sPK => $oModel->{$_sPK} ) ) 
+				:
+				CHtml::encode( $_oValue );
+
+			$_sOut .= $_sColumn;
+		}
+			
+		return $_sOut;
+	}
+
+	protected static function linkTransform( $oModel, $sColumn )
+	{
+		$_sColumn = substr( $sColumn, 1 );
+		return array( $_sColumn, null, true );
+	}
+	
+	protected static function boolTransform( $oModel, $sColumn )
+	{
+		$_sColumn = substr( $sColumn, 1 );
+		$_oValue = $oModel->{$_sColumn};
+		$_oValue = ( ! $_oValue || $_oValue = 'N' || $_oValue = 'n' || $_oValue == 0 ) ? 'No' : 'Yes';
+		return array( $_sColumn, $_oValue, false );
+	}
+	
+	protected static function timeTransform( $oModel, $sColumn )
+	{
+		$_sColumn = substr( $sColumn, 1 );
+		$_oValue = date( "F d, Y", $oModel->{$_sColumn} );
+		return array( $_sColumn, $_oValue, false );
+	}
+	
+}

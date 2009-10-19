@@ -31,7 +31,7 @@ class CPSModel extends CActiveRecord
 	* @staticvar CDbConnection
 	*/
 	protected static $m_oDB = null;
-	public function getDbConnection() { return PS::nvl( self::$m_oDB, parent::getDbConnection() ); }
+	public function getDbConnection() { return CPSHelp::nvl( self::$m_oDB, parent::getDbConnection() ); }
 	public static function setDbConnection( CDbConnection $oValue ) { self::$m_oDB = $oValue; }
 	
 	/**

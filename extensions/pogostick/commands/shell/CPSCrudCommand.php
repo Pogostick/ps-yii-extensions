@@ -8,7 +8,7 @@
  * @link http://www.pogostick.com Pogostick, LLC.
  * @package psYiiExtensions
  * @subpackage Commands
- * @since v1.0.4
+ * @since v1.0.6
  * @version SVN: $Revision$
  * @modifiedby $LastChangedBy$
  * @lastmodified  $Date$
@@ -16,9 +16,9 @@
  
 Yii::import( 'system.cli.commands.shell.CrudCommand' );
 
-define( 'EZPOST_CRUD_TEMPLATES', Yii::app()->basePath . '/modules/ezpost/views/crud_templates' );
+define( 'POGOSTICK_CRUD_TEMPLATES', Yii::app()->basePath . '/templates/crud' );
 
-class EZPostCrudCommand extends CrudCommand
+class CPSCrudCommand extends CrudCommand
 {
-	public $templatePath = EZPOST_CRUD_TEMPLATES;
+	public $templatePath = POGOSTICK_CRUD_TEMPLATES;
 }

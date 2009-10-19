@@ -1,13 +1,17 @@
 <?
 echo <<<HTML
-<?php
+<?
 	Yii::app()->clientScript->registerCssFile( \$this->module->assetUrl . '/css/form.css' );
+	CPSjqToolsWrapper::create( 'tooltip', array( 'target' => '#edit_form :input', 'tip'=>'.tooltip', 'position' => 'center right', 'offset' => array( -2, 10 ), 'effect' => 'fade', 'opacity' => 0.7 ) );
+	Yii::app()->clientScript->registerScript( 'myHideEffect', '\$(".flash").animate({opacity: 1.0}, 3000).fadeOut();', CClientScript::POS_READY );
 ?>
 <div class="yiiForm">
 	<p>Fields with <span class="required">*</span> are required.</p>
 <?
-	echo CPSActiveWidgets::beginForm();
-		echo CPSActiveWidgets::errorSummary( \$model );
+	if ( Yii::app()->user->hasFlash( 'success' ) ) echo '<div class="flash">' . Yii::app()->user->getFlash('success') . '</div>';
+	echo CPSActiveWidgets::beginForm( '', 'POST', array( 'validate' => true, 'selectmenu' => true ) );
+		echo CPSActiveWidgets::errorSummary(\$model);
+
 HTML;
 
 		foreach ( $columns as $name => $column )
@@ -32,18 +36,14 @@ HTML;
 				}
 			}
 			
-			echo 'echo ' . $_sType . "\n";
+			echo "		echo {$_sType};\n";
 		}
 
 echo <<<HTML
-		if ( $update ) 
-		{	
-			echo CPSActiveWidgets::simpleActiveBlock( CPSActiveWidgets::TEXT, \$model, 'created', array( 'disabled' => true ) );
-			echo CPSActiveWidgets::simpleActiveBlock( CPSActiveWidgets::TEXT, \$model, 'modified', array( 'disabled' => true ) );
-		}
-		echo '<br />';
-		echo CHtml::submitButton( 'Save' );
+
+		if ( \$update ) echo CPSActiveWidgets::showDates( \$model );
 	echo CPSActiveWidgets::endForm();
 ?>
 </div>
+
 HTML;

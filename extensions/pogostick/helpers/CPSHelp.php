@@ -460,4 +460,17 @@ class CPSHelp
 		list( $_uSec, $_sec ) = explode( ' ', microtime() );
 		return round( ( ( float )$_uSec + ( float )$_sec) * 1000 );
 	}
+	
+	/**
+	* If value is !set||empty, default is returned
+	* 
+	* @param mixed $oVal
+	* @param mixed $oDefault
+	*/
+	public static function nvl( $oVal, $oDefault = null )
+	{
+		if ( isset( $oVal ) && ! empty($oVal) ) return $oVal;
+		return $oDefault;
+	}
+	
 }

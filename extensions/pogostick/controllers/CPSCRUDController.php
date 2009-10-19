@@ -130,7 +130,7 @@ abstract class CPSCRUDController extends CPSController
 	public function actionUpdate( $arExtraParams = array() )
 	{
 		$_oModel = $this->loadModel();
-		if ( ! $this->saveModel( $_oModel, $_POST ) ) $this->genericAction( 'update', $_oModel, $arExtraParams );
+		if ( ! $this->saveModel( $_oModel, $_POST, 'update' ) ) $this->genericAction( 'update', $_oModel, $arExtraParams );
 	}
 
 	/**
@@ -151,21 +151,12 @@ abstract class CPSCRUDController extends CPSController
 	}
 
 	/**
-	* Lists all models
-	*/
-	public function actionList( $arExtraParams = array() )
-	{
-		@list( $_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadAll( $_oCrit );
-		$this->render( 'list', array_merge( $arExtraParams, array( 'models' => $_arModels, 'pages' => $_oPage ) ) );
-	}
-	
-	/**
 	* Manages all models.
 	*/
-	public function actionAdmin( $arExtraParams = array() )
+	public function actionAdmin( $arExtraParams = array(), $oCriteria = null )
 	{
 		$_oResult = $this->processCommand();
-		list( $_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadPaged( true );
+		if ( $this->m_sModelName ) @list($_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadPaged( true, $oCriteria );
 		$this->render( 'admin', array_merge( $arExtraParams, array( 'models' => $_arModels, 'pages' => $_oPage, 'sort' => $_oSort, 'result' => $_oResult ) ) );
 	}
 
