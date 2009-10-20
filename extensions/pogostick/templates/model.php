@@ -73,4 +73,16 @@ class <?=$className?> extends CPSModel
 <?php endforeach; ?>
 		);
 	}
+
+	/**
+	 * @return array customized tooltips (attribute=>tip)
+	 */
+	public function attributeTooltips()
+	{
+		return array(
+<?php foreach ( $labels as $label ): ?>
+			<?php echo $label.",\n"; ?>
+<?php endforeach; ?>
+		);
+	}
 }
