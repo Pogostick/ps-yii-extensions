@@ -12,13 +12,13 @@ echo <<<HTML
 	echo CPSForm::formHeader( '{$modelClass} List', 
 		array( 
 			'new' => array(
-				'label' => 'New',
+				'label' => 'Add New {$modelClass}',
 				'url' =>  array( 'create' ),
 				'icon' => 'circle-plus',
 			),
 			
 			'return' => array(
-				'label' => 'Folder Manager',
+				'label' => '{$modelClass} Manager',
 				'url' => array( 'admin' ),
 				'icon' => 'arrowreturnthick-1-w',
 			)

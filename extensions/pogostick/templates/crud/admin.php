@@ -1,3 +1,5 @@
+
+
 <?php
 /**
  * This is the template for generating the admin view for crud.

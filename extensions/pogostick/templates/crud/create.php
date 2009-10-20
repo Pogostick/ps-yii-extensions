@@ -11,10 +11,10 @@ echo <<<HTML
 <?php
 	echo CPSForm::formHeader( 'New {$modelClass}', 
 		array( 
-			'save' => array(
-				'label' => 'Save',
-				'url' => 'submit',
-				'icon' => 'disk',
+			'return' => array(
+				'label' => 'Site Manager',
+				'url' => array( 'admin' ),
+				'icon' => 'arrowreturnthick-1-w',
 			),
 
 			'cancel' => array(
@@ -23,11 +23,11 @@ echo <<<HTML
 				'icon' => 'cancel',
 			),
 			
-			'return' => array(
-				'label' => '{$modelClass} Manager',
-				'url' => array( 'admin' ),
-				'icon' => 'arrowreturnthick-1-w',
-			)
+			'save' => array(
+				'label' => 'Save',
+				'url' => '_submit_',
+				'icon' => 'disk',
+			),
 		)
 	);
 

@@ -15,16 +15,16 @@ echo <<<HTML
 <?php
 	echo CPSForm::formHeader( '{$modelClass} : ' . \$model->{$ID}, 
 		array( 
-			'save' => array(
-				'label' => 'Save',
-				'url' =>  '_submit_',
-				'icon' => 'disk',
-			),
-			
 			'cancel' => array(
 				'label' => 'Cancel',
 				'url' =>  array( 'admin' ),
 				'icon' => 'cancel',
+			),
+			
+			'save' => array(
+				'label' => 'Save',
+				'url' =>  '_submit_',
+				'icon' => 'disk',
 			),
 		)
 	);
@@ -39,4 +39,3 @@ echo <<<HTML
 		array( 'header' => '' ) 
 	);
 HTML;
-	

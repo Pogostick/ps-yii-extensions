@@ -40,6 +40,21 @@ class {$controllerClass} extends CPSCRUDController
 		\$this->setModelName( '{$_sClass}' );
 	}
 
+	/**
+	 * Default admin action. Change conditions for your system
+	 *
+	 */
+	public function actionAdmin( \$arExtraParams = array(), \$oCriteria = null )
+	{
+		if ( \$oCriteria === null )
+		{
+			\$oCriteria = new CDbCriteria();
+			\$oCriteria->condition = 'owner_sid = :owner_sid';
+			\$oCriteria->params = array( ':owner_sid' => Yii::app()->user->id );
+		}
+		
+		return parent::actionAdmin( \$arExtraParams, \$oCriteria );
+	}
+
 }
 HTML;
-

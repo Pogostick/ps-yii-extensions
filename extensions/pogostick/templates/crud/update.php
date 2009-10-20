@@ -37,10 +37,10 @@ echo<<<HTML
 		)
 	);
 	
-	echo "<?php echo \$this->renderPartial( '_form', array(
+	echo \$this->renderPartial( '_form', array(
 		'model' => \$model,
 		'_oModel' => \$model,
 		'_bUpdate' => true,
 		'update' => true,
-));
+	));
 HTML;
