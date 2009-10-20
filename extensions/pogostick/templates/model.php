@@ -1,5 +1,19 @@
+<?php
 /**
- * <?=$className?> class file.
+ * This is the template for generating a model class file.
+ * The following variables are available in this template:
+ * - $className: the class name
+ * - $tableName: the table name
+ * - $columns: a list of table column schema objects
+ * - $rules: a list of validation rules (string)
+ * - $labels: a list of labels (string)
+ * - $relations: a  list of relations (string)
+ */
+
+echo <<<HTML
+<?php
+/**
+ * $className class file.
  *
  * @filesource
  * @copyright Copyright &copy; 2009 Pogostick, LLC.
@@ -8,26 +22,29 @@
  * @package psYiiExtensions
  * @subpackage models
  * @since v1.0.6
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @version SVN: \$Revision\$
+ * @modifiedby \$LastChangedBy\$
+ * @lastmodified  \$Date\$
  */
-class <?=$className?> extends CPSModel
+class $className extends CPSModel
 {
 	/**
-	* The followings are the available columns in table '<?php echo $tableName; ?>':
-<?php foreach($columns as $column): ?>
-	* @var <?php echo $column->type.' $'.$column->name."\n"; ?>
-<?php endforeach; ?>
+	* The followings are the available columns in table '$tableName':
+
+HTML;
+	
+	foreach ( $columns as $column ) echo '	* @var ' . $column->type . ' $' . $column->name . "\n";
+
+echo <<<HTML
 	*/
 	 
 	/**
 	* Returns the static model of the specified AR class.
 	* @return CActiveRecord the static model class
 	*/
-	public static function model( $sClassName = __CLASS__ )
+	public static function model( \$sClassName = __CLASS__ )
 	{
-		return parent::model( $sClassName );
+		return parent::model( \$sClassName );
 	}
 	
 	/**
@@ -35,7 +52,7 @@ class <?=$className?> extends CPSModel
 	*/
 	public function tableName()
 	{
-		return self::getTablePrefix() . '<?php echo $tableName; ?>';
+		return self::getTablePrefix() . '$tableName';
 	}
 
 	/**
@@ -44,9 +61,12 @@ class <?=$className?> extends CPSModel
 	public function rules()
 	{
 		return array(
-<?php foreach($rules as $rule): ?>
-			<?php echo $rule.",\n"; ?>
-<?php endforeach; ?>
+
+HTML;
+
+	foreach ( $rules as $rule ) echo '			' . $rule . ",\n";
+	
+echo <<<HTML
 		);
 	}
 
@@ -56,9 +76,12 @@ class <?=$className?> extends CPSModel
 	public function relations()
 	{
 		return array(
-<?php foreach($relations as $name=>$relation): ?>
-			<?php echo "'$name' => $relation,\n"; ?>
-<?php endforeach; ?>
+
+HTML;
+
+	foreach ( $relations as $name => $relation ) echo "			'$name' => $relation,\n";
+	
+echo <<<HTML
 		);
 	}
 
@@ -68,9 +91,12 @@ class <?=$className?> extends CPSModel
 	public function attributeLabels()
 	{
 		return array(
-<?php foreach ( $labels as $label ): ?>
-			<?php echo $label.",\n"; ?>
-<?php endforeach; ?>
+
+HTML;
+
+	foreach ( $labels as $column => $label ) echo "			'$column' => '$label',\n";
+	
+echo <<<HTML
 		);
 	}
 
@@ -80,9 +106,14 @@ class <?=$className?> extends CPSModel
 	public function attributeTooltips()
 	{
 		return array(
-<?php foreach ( $labels as $label ): ?>
-			<?php echo $label.",\n"; ?>
-<?php endforeach; ?>
+
+HTML;
+
+	foreach ( $labels as $column => $label ) echo "			'$column' => '$label',\n";
+	
+echo <<<HTML
 		);
 	}
 }
+
+HTML;

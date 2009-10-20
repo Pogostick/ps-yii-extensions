@@ -152,7 +152,20 @@ class CPSActiveWidgets extends CHtml
 		$_sHtml = CPSHelp::getOption( $arOptions, '_appendHtml', '', true );
 		$_sDivClass = CPSHelp::getOption( $arOptions, '_divClass', null, true );
 		$_sTransform = CPSHelp::getOption( $arOptions, 'transform', null, true );
+		$_sTitle = CPSHelp::getOption( $arOptions, 'title', null );
 		
+		//	Do auto-tooltipping...
+		if ( ! $_sTitle && $oModel )
+		{
+			if ( $_arTemp = $oModel->attributeTooltips() )
+			{
+				if ( isset( $_arTemp[$sColName] ) ) 
+				{
+					$arOptions['title'] = $_arTemp[ $sColName ];
+				}
+			}
+		}
+
 		if ( ! $_sDivClass & ( $eFieldType == self::CHECK || $eFieldType == self::RADIO || $eFieldType == self::CHECKLIST || $eFieldType == self::RADIOLIST ) ) $_sDivClass = 'chk_label';
 		
 		//	Need an id for div tag
@@ -167,7 +180,9 @@ class CPSActiveWidgets extends CHtml
 			$_sOut = self::activeLabelEx( $oModel, ( null == $sLabel ) ? $sColName : $sLabel, $arLabelOptions );
 
 		if ( $_sTransform && $oModel ) $oModel->$sColName = CPSTransform::value( $_sTransform, $oModel->$sColName );
+		
 		$_sOut .= self::activeField( $eFieldType, $oModel, $sColName, $arOptions, $arWidgetOptions, $arData );
+		
 		$_sOut .= $_sHtml;
 
 		//	Construct the div...
@@ -210,7 +225,7 @@ class CPSActiveWidgets extends CHtml
 			$arHtmlOptions['class'] = trim( $_sClass );
 		}
 		
-		if ( null == $oModel )
+		if ( null === $oModel )
 		{
 			$_oValue = CPSHelp::getOption( $arHtmlOptions, 'value', null, true );
 			
@@ -663,14 +678,14 @@ HTML;
 	* 
 	* @param mixed $oModel
 	*/
-	public static function showDates( $oModel, $sDateFormat = 'D, j M Y, h:i:s A', $sCreatedColumn = 'created', $sModifiedColumn = 'modified' )
+	public static function showDates( $oModel, $sCreatedColumn = 'created', $sModifiedColumn = 'modified', $sDateFormat = 'm/d/Y h:i:s A' )
 	{
 		$_sOut = null;
 		
 		if ( $oModel->hasAttribute( $sCreatedColumn ) && $oModel->hasAttribute( $sModifiedColumn ) )
 		{
 			$_sOut = '<div class="form-footer">';
-			$_sOut .= 'Created: <span>' . date( $sDateFormat, strtotime( $oModel[ $sCreatedColumn ] ) ) . '</span>&nbsp;&nbsp;&nbsp;Modified: <span>' . date( $sDateFormat, strtotime( $oModel[ $sModifiedColumn ] ) ) . '</span>';
+			$_sOut .= 'Created: <span>' . date( $sDateFormat, ! is_numeric( $oModel->$sCreatedColumn ) ? strtotime( $oModel->$sCreatedColumn ) : $oModel->$sCreatedColumn ) . '</span>&nbsp;&nbsp;&nbsp;Modified: <span>' . date( $sDateFormat, ! is_numeric( $oModel->$sModifiedColumn ) ? strtotime( $oModel->$sModifiedColumn ) : $oModel->$sModifiedColumn ) . '</span>';
 			$_sOut .= '</div>';
 		}
 		

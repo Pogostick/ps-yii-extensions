@@ -16,12 +16,6 @@ echo<<<HTML
 				'icon' => 'circle-plus',
 			),
 			
-			'edit' => array(
-				'label' => 'Edit',
-				'url' =>  array( 'Update' ),
-				'icon' => 'pencil',
-			),
-			
 			'delete' => array(
 				'label' => 'Delete',
 				'url' => array( 'delete' ),
@@ -30,7 +24,7 @@ echo<<<HTML
 			),
 			
 			'return' => array(
-				'label' => 'User Manager',
+				'label' => '{$modelClass} Manager',
 				'url' => array( 'admin' ),
 				'icon' => 'arrowreturnthick-1-w',
 			)

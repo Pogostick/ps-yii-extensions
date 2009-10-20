@@ -2,7 +2,7 @@
 echo <<<HTML
 <?
 	Yii::app()->clientScript->registerCssFile( \$this->module->assetUrl . '/css/form.css' );
-	CPSjqToolsWrapper::create( 'tooltip', array( 'target' => '#ps-edit-form :input[type="text"],#ps-edit-form :input[type="textarea"],#ps-edit-form :input[type="radio"],#ps-edit-form :input[type="checkbox"]', 'tip'=>'.tooltip', 'position' => 'center right', 'offset' => array( -2, 10 ), 'effect' => 'fade', 'opacity' => 0.7 ) );
+	CPSjqToolsWrapper::create( 'tooltip', array( 'target' => '#ps-edit-form :input', 'tip' => '.ps-auto-tooltip', 'position' => 'center right', 'offset' => array( -2, 10 ), 'effect' => 'fade', 'opacity' => 0.7 ) );
 	Yii::app()->clientScript->registerScript( 'psFlashDisplay', '\$(".ps-flash-display").animate({opacity: 1.0}, 3000).fadeOut();', CClientScript::POS_READY );
 ?>
 <div class="yiiForm">
@@ -41,9 +41,9 @@ HTML;
 
 echo <<<HTML
 
-		if ( \$update ) echo CPSActiveWidgets::showDates( \$model, null, \$model->getCreatedColumn(), \$model->getLModColumn() );
+		if ( \$update ) echo CPSActiveWidgets::showDates( \$model, \$model->getCreatedColumn(), \$model->getLModColumn() );
 	echo CPSActiveWidgets::endForm();
 ?>
 </div>
+<div class="ps-auto-tooltip"></div>
 HTML;
-
