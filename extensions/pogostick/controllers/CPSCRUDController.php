@@ -42,7 +42,7 @@ abstract class CPSCRUDController extends CPSController
 		$this->addCommandToMap( 'undelete' );
 
 		//	Set our access rules..
-		$this->setUserActionList( self::ACCESS_TO_ANY, array( 'login', 'index') );
+		$this->setUserActionList( self::ACCESS_TO_ANY, array( 'login', 'index' ) );
 		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'admin', 'create', 'delete', 'logout', 'show', 'update' ) );
 		$this->setUserActionList( self::ACCESS_TO_ADMIN, array() );
 		$this->setUserActionList( self::ACCESS_TO_NONE, array() );
@@ -109,7 +109,11 @@ abstract class CPSCRUDController extends CPSController
 	/**
 	* Shows a model
 	*/
-	public function actionShow() { $this->genericAction( 'show' ); }
+	public function actionShow( $arExtraParams = array() )
+	{ 
+		$_oModel = $this->loadModel();
+		$this->genericAction( 'show', $_oModel, $arExtraParams ); 
+	}
 
 	/**
 	* Creates a new model.
@@ -120,7 +124,8 @@ abstract class CPSCRUDController extends CPSController
 	public function actionCreate( $arExtraParams = array() )
 	{
 		$_oModel = new $this->m_sModelName;
-		if ( ! $this->saveModel( $_oModel, $_POST ) ) $this->genericAction( 'create', $_oModel, $arExtraParams );
+		if ( Yii::app()->request->isPostRequest ) $this->saveModel( $_oModel, $_POST, 'update' );
+		$this->genericAction( 'create', $_oModel, $arExtraParams );
 	}
 	
 	/**
@@ -130,7 +135,8 @@ abstract class CPSCRUDController extends CPSController
 	public function actionUpdate( $arExtraParams = array() )
 	{
 		$_oModel = $this->loadModel();
-		if ( ! $this->saveModel( $_oModel, $_POST, 'update' ) ) $this->genericAction( 'update', $_oModel, $arExtraParams );
+		if ( Yii::app()->request->isPostRequest ) $this->saveModel( $_oModel, $_POST, 'update' );
+		$this->genericAction( 'update', $_oModel, $arExtraParams );
 	}
 
 	/**
@@ -141,13 +147,24 @@ abstract class CPSCRUDController extends CPSController
 	*/
 	public function actionDelete( $sRedirectAction = 'admin' )
 	{
-		if ( Yii::app()->request->isPostRequest && $this->loadModel() )
+		if ( Yii::app()->request->isPostRequest )
 		{
-			$this->loadModel()->delete();
-			$this->redirect( array( $sRedirectAction ) );
+			if ( $this->loadModel() )
+			{
+				$this->loadModel()->delete();
+				$this->redirect( array( $sRedirectAction ) );
+			}
+		}
+		else
+		{
+			if ( isset( $_GET['id'] ) )
+			{
+				$this->loadModel( $_GET['id'] )->delete();
+				$this->redirect( array( $sRedirectAction ) );
+			}
 		}
 		
-		throw new CHttpException( 400, 'Invalid request. Please do not repeat this request again.' );
+		throw new CHttpException( 404, 'Invalid request. Please do not repeat this request again.' );
 	}
 
 	/**
@@ -232,4 +249,43 @@ abstract class CPSCRUDController extends CPSController
 		return $_oResults;
 	}
 
+	/**
+	* Index page
+	* 
+	*/
+	public function actionIndex()
+	{
+		$this->render('index');
+	}
+	
+	/**
+	* Default login
+	* 
+	*/
+	public function actionLogin()
+	{
+		$_oLogin = new LoginForm;
+		
+		if ( isset( $_POST[ 'LoginForm' ] ) )
+		{
+			$_oLogin->attributes = $_POST[ 'LoginForm' ];
+			
+			//	Validate user input and redirect to previous page if valid
+			if ( $_oLogin->validate() ) $this->redirect( Yii::app()->user->returnUrl );
+		}
+		
+		//	Display the login form
+		$this->render( 'login', array( 'form' => $_oLogin ) );
+	}
+	
+	/**
+	* Logout the user
+	* 
+	*/
+	public function actionLogout()
+	{
+		Yii::app()->user->logout();
+		$this->actionIndex();
+	}
+	
 }

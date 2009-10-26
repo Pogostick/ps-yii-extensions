@@ -70,6 +70,15 @@ class CPSModel extends CActiveRecord
 	public function setSoftDeleteColumn( $sValue ) { $this->m_sSoftDeleteColumn = $sValue; }	
 	
 	/**
+	* Soft delete indicator (false,true)
+	* 
+	* @var array
+	*/
+	protected $m_arSoftDeleteValue = array( 0, 1 );
+	public function getSoftDeleteValue() { return $this->m_arSoftDeleteValue; }
+	public function setSoftDeleteValue( $arValue ) { $this->m_arSoftDeleteValue = $arValue; }	
+	
+	/**
 	* The date/time function to stamp records with
 	* 
 	* @var string
@@ -83,19 +92,34 @@ class CPSModel extends CActiveRecord
 	//********************************************************************************
 
 	/**
+	* Grab init function for setting values
+	* 
+	*/
+	public function init()
+	{
+		parent::init();
+	}
+	
+	/**
 	* Populates 'created' field if new record
 	* 
 	* @param CEvent $oEvent
 	*/
-	public function onBeforeSave( $oEvent )
+	public function beforeSave()
 	{
-		if ( $_sCol = $this->getCreatedColumn() && $this->isNewRecord && $this->hasAttribute( $_sCol ) ) 
-			$this->{$_sCol} = ( null !== $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+		if ( $this->isNewRecord )
+		{
+			$_sCreated = $this->getCreatedColumn();
+			$_sLMod = $this->getLModColumn();
 			
-		if ( $_sCol = $this->getLModColumn() && $this->hasAttribute( $_sCol ) ) 
-			$this->{$_sCol} = ( null !== $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+			if ( $_sCreated && $this->hasAttribute( $_sCreated ) )
+				$this->{$_sCreated} = ( null === $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
 			
-		return parent::onBeforeSave( $oEvent );
+			if ( $_sLMod && $this->hasAttribute( $_sLMod ) ) 
+				$this->{$_sLMod} = ( null === $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+		}
+			
+		return parent::beforeSave();
 	}
 	
 	/***
@@ -131,7 +155,7 @@ class CPSModel extends CActiveRecord
 		{
 			if ( $this->hasAttribute( $_sCol ) )
 			{
-				$this->{$_sCol} = 1;
+				$this->{$_sCol} = $this->m_arSoftDeleteValue[ 1 ];
 				return $this->update();
 			}
 		}
@@ -152,7 +176,7 @@ class CPSModel extends CActiveRecord
 		{
 			if ( $this->hasAttribute( $_sCol ) && $this->{$_sCol} )
 			{
-				$this->{$_sCol} = 0;
+				$this->{$_sCol} = $this->m_arSoftDeleteValue[ 0 ];
 				return $this->update();
 			}
 		}
@@ -167,16 +191,20 @@ class CPSModel extends CActiveRecord
 	*/
     public function defaultScope()
     {
-		if ( $_sCol = $this->m_sSoftDeleteColumn && $this->hasAttribute( $_sCol ) ) 
-			return array( 'condition' => $this->tableName() . '.' . $_sCol . ' = 0', 'alias' => $this->tableName() );
+		if ( ( $_sCol = $this->m_sSoftDeleteColumn ) && $this->hasAttribute( $_sCol ) ) 
+			return array( 'condition' => $this->tableName() . '.' . $_sCol . ' = :softDeleteValue', 'alias' => $this->tableName(), 'params' => array( ':softDeleteValue' => $this->m_arSoftDeleteValue[ 0 ] ) );
 			
     	return array();
     }
-    
+ 
+ 	/**
+ 	* Sets lmod date and saves
+ 	*    
+ 	*/
     public function touch()
     {
 		if ( $this->m_sLModColumn && $this->hasAttribute( $this->m_sLModColumn ) ) 
-			$this->{$this->m_sLModColumn} = ( null !== $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+			$this->{$this->m_sLModColumn} = ( null === $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
 			
 		return $this->save();
 	}

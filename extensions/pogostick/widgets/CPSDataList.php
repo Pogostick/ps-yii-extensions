@@ -36,7 +36,7 @@ class CPSDataList
 
 	public static function create( $sDataName, $oModel, $arColumns = array(), $arActions = array() )
 	{
-		return CHtml::tag( 'div', array( 'class' => 'item' ), self::getDataListRows( $oModel, $arColumns ) );
+		return CHtml::tag( 'table', array( 'class' => 'dataGrid' ), self::getDataListRows( $oModel, $arColumns ) );
 	}
 
 	/***
@@ -69,16 +69,14 @@ class CPSDataList
 				}
 			}
 
-			if ( ! $_oValue ) $_oValue = $_oModel->{$_sColumn};
+			if ( ! $_oValue ) $_oValue = $oModel->{$_sColumn};
 				
-			$_sOut .= $oModel->getAttributeLabel( $_sColumn );
-			
-			$_sColumn = ( $_bLink || $_sPK == $_sColumn ) ?
+			$_oValue = ( $_bLink || $_sPK == $_sColumn ) ?
 				CHtml::link( $_oValue, array( 'update', $_sPK => $oModel->{$_sPK} ) ) 
 				:
 				CHtml::encode( $_oValue );
 
-			$_sOut .= $_sColumn;
+			$_sOut .= '<tr><th class="label">' . CHtml::encode( $oModel->getAttributeLabel( $_sColumn ) ) . '</th><td>' . $_oValue . '</td></tr>';
 		}
 			
 		return $_sOut;

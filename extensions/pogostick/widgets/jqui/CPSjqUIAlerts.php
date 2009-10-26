@@ -66,6 +66,13 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 		return $_oCS;
 	}
 
+	protected function generateJavascript( $sTargetSelector = null, $arOptions = null, $sInsertBeforeOptions = null )
+	{
+		//	Use jQuery UI
+		return '$.alerts.dialogClass = "ui-dialog";';
+		
+	}
+	
 	//********************************************************************************
 	//* Private methods
 	//********************************************************************************

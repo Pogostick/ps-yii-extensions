@@ -155,7 +155,7 @@ class CPSActiveWidgets extends CHtml
 		$_sTitle = CPSHelp::getOption( $arOptions, 'title', null );
 		
 		//	Do auto-tooltipping...
-		if ( ! $_sTitle && $oModel )
+		if ( ! $_sTitle && $oModel && method_exists( $oModel, 'attributeTooltips' ) )
 		{
 			if ( $_arTemp = $oModel->attributeTooltips() )
 			{
@@ -578,6 +578,38 @@ CSS;
 		return self::tag( 'label', self::getIdPrefix( 'label' ) . $sName, ( ( $sLabel == null ) ? $sName : $sLabel ) . self::getLabelSuffix() . self::getRequiredHtml( $bRequired ), $arOptions );
 	}
 
+	/**
+	 * Generates a submit button.
+	 * @param string the button label
+	 * @param array additional HTML attributes. Besides normal HTML attributes, a few special
+	 * attributes are also recognized (see {@link clientChange} and {@link tag} for more details.)
+	 * @return string the generated button tag
+	 * @see clientChange
+	 */
+	public static function submitButton( $sLabel = 'Submit', $arHtmlOptions = array() )
+	{
+		$arHtmlOptions['type'] = 'submit';
+		
+		//	jQUI Button?
+		if ( CPSHelp::getOption( $arHtmlOptions, 'jqui', false, true ) ) return self::jquiButton( $sLabel, '_submit_', $arHtmlOptions );
+
+		//	Otherwise use regular button
+		return self::button($label,$htmlOptions);
+	}
+
+	/**
+	 * Generates a submit button bar.
+	 * @param string the button label
+	 * @param array additional HTML attributes. Besides normal HTML attributes, a few special
+	 * attributes are also recognized (see {@link clientChange} and {@link tag} for more details.)
+	 * @return string the generated button tag
+	 * @see clientChange
+	 */
+	public static function submitButtonBar( $sLabel = 'Submit', $arHtmlOptions = array() )
+	{
+		return '<div class="ps-submit-button-bar">' . self::submitButton( $sLabel, $arHtmlOptions ) . '</div>';
+	}
+
 	/****
 	* Output a jQuery UI icon, icon button, or plain button
 	* 
@@ -589,8 +621,9 @@ CSS;
 	{
 		static $_bRegistered = false;
 		$_sSize = $_sIconPos = $_bIconOnly = null;
-
 		$_sLink = is_array( $sLink ) ? CHtml::normalizeUrl( $sLink ) : $sLink;
+		$_bSubmit = ( $_sLink == '_submit_' || CPSHelp::getOption( $arOptions, 'submit', false, true ) );
+
 		$_sId = CPSHelp::getOption( $arOptions, 'id', CPSHelp::getWidgetId( self::ID_PREFIX . '.jqbtn' ), true );
 		$_sFormId = CPSHelp::getOption( $arOptions, 'formId', null, true );
 
@@ -621,14 +654,14 @@ CSS;
 
 				if ( ! $_bRegistered )
 				{
+					$_sAction = $_bSubmit ? 'return oForm.submit();' : 'window.location.href = sHref;';
 					$_sScript = <<<HTML
 function confirmAction( oForm, sMessage, sHref )
 {
 	jConfirm( sMessage, 'Please Confirm Your Action', function( bVal ) {
 		if ( bVal )
 		{
-			if ( sHref == '_submit_' ) return oForm.submit();
-			window.location.href = sHref;
+			{$_sAction}
 			return true;
 		}
 
@@ -638,12 +671,13 @@ function confirmAction( oForm, sMessage, sHref )
 HTML;
 					//	Register scripts
 					Yii::app()->clientScript->registerScript( CPSHelp::getWidgetId( self::ID_PREFIX . '.cas.' ), $_sScript, CClientScript::POS_END );
+					CPSjqUIAlerts::create( array( 'theme_' => CPSjqUIAlerts::getCurrentTheme() ) );
 					$_bRegistered = true;
 				}
 			}
 			else
 			{
-				if ( $_sLink == '_submit_' )
+				if ( $_bSubmit || $_sLink == '_submit_' )
 				{
 					$_sLink = '#';
 					$_sOnClick = "return \$(" . ( $_sFormId ? "'#{$_sFormId}'" : "'div.yiiForm>form'" ) . ").submit();";
@@ -653,7 +687,8 @@ HTML;
 		
 		//	Set our link options
 		$arOptions['title'] = $sLabel;
-		$arOptions['class'] = "ps-button {$_sIconPos} ui-state-default ui-corner-all";
+		$_sClass = CPSHelp::getOption( $arOptions, 'class', null );
+		$arOptions['class'] = "ps-button {$_sIconPos} ui-state-default ui-corner-all {$_sClass}";
 		if ( $_sOnClick ) $arOptions['onclick'] = $_sOnClick;
 	
 		//	Generate the link
@@ -684,7 +719,7 @@ HTML;
 		
 		if ( $oModel->hasAttribute( $sCreatedColumn ) && $oModel->hasAttribute( $sModifiedColumn ) )
 		{
-			$_sOut = '<div class="form-footer">';
+			$_sOut = '<div class="ps-form-footer">';
 			$_sOut .= 'Created: <span>' . date( $sDateFormat, ! is_numeric( $oModel->$sCreatedColumn ) ? strtotime( $oModel->$sCreatedColumn ) : $oModel->$sCreatedColumn ) . '</span>&nbsp;&nbsp;&nbsp;Modified: <span>' . date( $sDateFormat, ! is_numeric( $oModel->$sModifiedColumn ) ? strtotime( $oModel->$sModifiedColumn ) : $oModel->$sModifiedColumn ) . '</span>';
 			$_sOut .= '</div>';
 		}

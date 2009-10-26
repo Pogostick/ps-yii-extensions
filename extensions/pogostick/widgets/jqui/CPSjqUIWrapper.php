@@ -252,7 +252,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		
 		//	Register scripts necessary
 		$_oCS->registerScriptFile( "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js" );
-		$_oCS->registerScriptFile( "{$_oWidget->baseUrl}/js/jquery.pogostick.hover.js", CClientScript::POS_END );
+		$_oCS->registerScriptFile( $_oWidget->baseUrl . '/js/jquery.pogostick.hover.js', CClientScript::POS_END );
 
 		//	Register css files...
 		$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css" );

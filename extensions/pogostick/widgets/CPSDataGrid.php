@@ -84,11 +84,11 @@ class CPSDataGrid
 					switch ( $_sAction )
 					{
 						case 'edit':
-							$_sActions .= CPSActiveWidgets::jquiButton( 'Edit', array( 'update', $_oModel->getTableSchema()->primaryKey => $_oModel->{$_oModel->getTableSchema()->primaryKey} ), array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
+							$_sActions .= CPSActiveWidgets::jquiButton( 'Edit', array( 'update', $_sPK => $_oModel->{$_sPK} ), array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
 							break;
 							
 						case 'delete':
-							$_sActions .= CPSActiveWidgets::jquiButton( 'Delete', array( 'delete', $_oModel->getTableSchema()->primaryKey => $_oModel->{$_oModel->getTableSchema()->primaryKey} ),
+							$_sActions .= CPSActiveWidgets::jquiButton( 'Delete', array( 'delete', $_sPK => $_oModel->{$_sPK} ),
 								array(
 									'confirm' => "Do you really want to delete this {$sDataName}?",
 									'iconOnly' => true, 

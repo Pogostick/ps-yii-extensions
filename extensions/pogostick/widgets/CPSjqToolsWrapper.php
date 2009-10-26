@@ -108,7 +108,10 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 		
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "http://cdn.jquerytools.org/1.1.2/tiny/jquery.tools.min.js" );
+		$_oCS->registerScriptFile( $this->baseUrl . '/jquery.tools.min.js' );
+		
+//	Uncomment to use CDN		
+//		$_oCS->registerScriptFile( "http://cdn.jquerytools.org/1.1.2/tiny/jquery.tools.min.js" );
 
 		//	Add for flashembed if we need it...		
 		if ( 'flashembed' == $this->widgetName ) $_oCS->registerScriptFile( "http://static.flowplayer.org/js/tools/tools.flashembed-1.0.4.min.js" );

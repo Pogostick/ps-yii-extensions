@@ -100,6 +100,7 @@ abstract class CPSController extends CController
 	protected $m_arUserActionList = array();
 	public function getUserActionList( $eWhich ) { return CPSHelp::getOption( $this->m_arUserActionList, $eWhich ); }
 	public function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = $arValue; }
+	public function addUserAction( $eWhich, $sAction ) { $this->m_arUserActionList[ $eWhich ] = array_merge( $this->m_arUserActionList[ $eWhich ], array( $sAction ) );  }
 	public function addUserActions( $eWhich, $arActions = array() ) { $this->m_arUserActionList[ $eWhich ] = array_merge( $this->m_arUserActionList[ $eWhich ], $arActions );  }
 
 	//********************************************************************************
@@ -148,7 +149,7 @@ abstract class CPSController extends CController
 			$this->m_oModel = $this->load( $_iId );
 
 			//	No data? bug out
-			if ( null === $this->m_oModel ) CHttpException( 404, 'The requested page does not exist.' );
+			if ( null == $this->m_oModel ) $this->redirect( array( $this->defaultAction ) );
 			
 			//	Get the name of this model...
 			$this->m_sModelName = get_class( $this->m_oModel );
@@ -179,8 +180,6 @@ abstract class CPSController extends CController
 				Yii::app()->user->setFlash( 'success', 'Your changes have been saved.' );
 				$this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
 			}
-			else
-				Yii::app()->user->setFlash( 'success', 'Errorrr!!.' );
 		}
 		
 		return false;

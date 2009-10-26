@@ -8,6 +8,7 @@
 .ps-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }
 
 a.ps-button { float:left; }
+a.ps-no-float { float:none; }
 
 /* remove extra button width in IE */
 button.ps-button { width:auto; overflow:visible; }
@@ -28,3 +29,41 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-toolbar { padding: .5em; margin: 0;  }
 .ps-toolbar .ps-buttonset { margin-right:1.5em; padding-left: 1px; }
 .ps-toolbar .ps-button { font-size: 1em;  }
+
+.ps-submit-button-bar {
+	margin:10px 0px;
+}
+
+.ps-flash-display {
+	float:right;
+	font-size:13px;
+	color: yellow;
+	z-index:5;
+	display: inline;
+}
+
+.ps-form-footer {
+	margin:20px 0px 0px 0px;
+}
+
+.ps-data-list-container {
+	display: block;
+}
+
+.ps-data-list-row {
+	display: block;
+}
+
+.ps-data-list-container label {
+	width: 200px;
+	float:left;
+	background: #fff;
+	color: #000;
+}
+
+
+.ps-data-list-row-data span {
+	float:left;
+	background:black;
+	color:white;
+}
