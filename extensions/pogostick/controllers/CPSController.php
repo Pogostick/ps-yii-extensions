@@ -100,8 +100,8 @@ abstract class CPSController extends CController
 	protected $m_arUserActionList = array();
 	public function getUserActionList( $eWhich ) { return CPSHelp::getOption( $this->m_arUserActionList, $eWhich ); }
 	public function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = $arValue; }
-	public function addUserAction( $eWhich, $sAction ) { $this->m_arUserActionList[ $eWhich ] = array_merge( $this->m_arUserActionList[ $eWhich ], array( $sAction ) );  }
-	public function addUserActions( $eWhich, $arActions = array() ) { $this->m_arUserActionList[ $eWhich ] = array_merge( $this->m_arUserActionList[ $eWhich ], $arActions );  }
+	public function addUserAction( $eWhich, $sAction ) { if ( ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) $this->m_arUserActionList[ $eWhich ] = array(); $this->m_arUserActionList[ $eWhich ] = array_merge( $this->m_arUserActionList[ $eWhich ], array( $sAction ) );  }
+	public function addUserActions( $eWhich, $arActions = array() ) { if ( ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) $this->m_arUserActionList[ $eWhich ] = array(); $this->m_arUserActionList[ $eWhich ] = array_merge( $this->m_arUserActionList[ $eWhich ], $arActions );  }
 
 	//********************************************************************************
 	//* Public Methods
@@ -169,12 +169,16 @@ abstract class CPSController extends CController
 	* @param CModel The model to save
 	* @param array The array of data to merge with the model
 	* @param string Where to redirect after a successful save
+	* @param boolean $bAttributesSet If true, attributes will not be set from $arData
 	*/
-	protected function saveModel( $oModel, $arData = array(), $sRedirectAction = 'show' )
+	protected function saveModel( $oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null )
 	{
-		if ( isset( $arData, $arData[ $this->m_sModelName ] ) )
+		$_sModelName = ( $sModelName ? $sModelName : $this->m_sModelName );
+		
+		if ( isset( $arData, $arData[ $_sModelName ] ) )
 		{
-			$oModel->setAttributes( $arData[ $this->m_sModelName ] );
+			if ( ! $bAttributesSet ) $oModel->setAttributes( $arData[ $_sModelName ] );
+			
 			if ( $oModel->save() ) 
 			{
 				Yii::app()->user->setFlash( 'success', 'Your changes have been saved.' );

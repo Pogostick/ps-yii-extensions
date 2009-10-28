@@ -304,7 +304,7 @@ class CPSActiveWidgets extends CHtml
 				
 			//	CKEditor Plug-in
 			case self::CKEDITOR:
-				CPSCKEditorWidget::create( array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $arHtmlOptions[ 'id' ], 'name' => $arHtmlOptions[ 'name' ] ) ) );
+				CPSCKEditorWidget::create( array_merge( $arWidgetOptions, array( 'autoRun' => true, 'target' => $arHtmlOptions[ 'id' ] ) ) );
 				$eFieldType = self::TEXTAREA;
 				break;                                                                                
 				

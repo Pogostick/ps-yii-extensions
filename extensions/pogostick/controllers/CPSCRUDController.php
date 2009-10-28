@@ -23,6 +23,19 @@
 abstract class CPSCRUDController extends CPSController
 {
 	//********************************************************************************
+	//* Member Variables
+	//********************************************************************************
+
+	/**
+	* The name of the Login Form class. Defaults to 'LoginForm'
+	* 	
+	* @var string
+	*/
+	protected $m_sLoginFormClass = null;
+	public function getLoginFormClass() { return $this->m_sLoginFormClass; }
+	public function setLoginFormClass( $sValue ) { $this->m_sLoginFormClass = $sValue; }
+	
+	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 
@@ -264,11 +277,13 @@ abstract class CPSCRUDController extends CPSController
 	*/
 	public function actionLogin()
 	{
-		$_oLogin = new LoginForm;
+		$_sClass = CPSHelp::nvl( $this->m_sLoginFormClass, 'LoginForm' );
+
+		$_oLogin = new $_sClass();
 		
-		if ( isset( $_POST[ 'LoginForm' ] ) )
+		if ( isset( $_POST[ $_sClass ] ) )
 		{
-			$_oLogin->attributes = $_POST[ 'LoginForm' ];
+			$_oLogin->attributes = $_POST[ $_sClass ];
 			
 			//	Validate user input and redirect to previous page if valid
 			if ( $_oLogin->validate() ) $this->redirect( Yii::app()->user->returnUrl );

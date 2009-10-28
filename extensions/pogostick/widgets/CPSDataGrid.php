@@ -49,7 +49,7 @@ class CPSDataGrid
 			$_sHeaders .= CHtml::tag( 'th', array(), ( $oSort ) ? $oSort->link( $_sColumn ) : $_sColumn );
 		}	
 
-		if ( $bAddActions ) $_sHeaders .= CHtml::tag( 'th', array(), 'Actions' );
+		if ( $bAddActions && ! empty( $oModel ) ) $_sHeaders .= CHtml::tag( 'th', array(), 'Actions' );
 			
 		return CHtml::tag( 'table', array( 'class' => 'dataGrid' ), CHtml::tag( 'tr', array(), $_sHeaders ), false );
 	}
@@ -67,6 +67,7 @@ class CPSDataGrid
 	*/
 	public static function getDataGridRows( $arModel, $arColumns = array(), $arActions = null, $sDataName = 'item' )
 	{
+		$_sViewName = null;
 		$_sOut = empty( $arModel ) ? '<tr><td style="text-align:center" colspan="' . sizeof( $arColumns ) . '">No Records Found</td></tr>' : null;
 		if ( null === $arActions ) $arActions = array( 'edit', 'delete' );
 
@@ -81,14 +82,20 @@ class CPSDataGrid
 			{
 				foreach ( $arActions as $_sAction )
 				{
+					if ( is_array( $_sAction ) )
+					{
+						$_sViewName = $_sAction[1];
+						$_sAction = $_sAction[0];
+					}
+					
 					switch ( $_sAction )
 					{
 						case 'edit':
-							$_sActions .= CPSActiveWidgets::jquiButton( 'Edit', array( 'update', $_sPK => $_oModel->{$_sPK} ), array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
+							$_sActions .= CPSActiveWidgets::jquiButton( 'Edit', array( CPSHelp::nvl( $_sViewName, 'update' ), $_sPK => $_oModel->{$_sPK} ), array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
 							break;
 							
 						case 'delete':
-							$_sActions .= CPSActiveWidgets::jquiButton( 'Delete', array( 'delete', $_sPK => $_oModel->{$_sPK} ),
+							$_sActions .= CPSActiveWidgets::jquiButton( 'Delete', array( CPSHelp::nvl( $_sViewName, 'delete' ), $_sPK => $_oModel->{$_sPK} ),
 								array(
 									'confirm' => "Do you really want to delete this {$sDataName}?",
 									'iconOnly' => true, 

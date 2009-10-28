@@ -26,15 +26,6 @@ class CPSModel extends CActiveRecord
 	//********************************************************************************
 
 	/**
-	* The database application component associated with this object, defaults to db
-	* 
-	* @staticvar CDbConnection
-	*/
-	protected static $m_oDB = null;
-	public function getDbConnection() { return CPSHelp::nvl( self::$m_oDB, parent::getDbConnection() ); }
-	public static function setDbConnection( CDbConnection $oValue ) { self::$m_oDB = $oValue; }
-	
-	/**
 	 * The associated database table name prefix
 	 * @var string
 	 */
@@ -105,7 +96,7 @@ class CPSModel extends CActiveRecord
 	* 
 	* @param CEvent $oEvent
 	*/
-	public function beforeSave()
+	public function beforeValidate( $sScenario = null )
 	{
 		if ( $this->isNewRecord )
 		{
@@ -119,7 +110,7 @@ class CPSModel extends CActiveRecord
 				$this->{$_sLMod} = ( null === $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
 		}
 			
-		return parent::beforeSave();
+		return parent::beforeValidate( $sScenario );
 	}
 	
 	/***

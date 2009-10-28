@@ -17,7 +17,7 @@
  * @subpackage Widgets
  * @since 1.0.4
  */
-class CPSCKEditorWidget extends CPSWidget
+class CPSCKEditorWidget extends CPSjQueryWidget
 {
 	//********************************************************************************
 	//* Constants
@@ -81,7 +81,7 @@ class CPSCKEditorWidget extends CPSWidget
 		//	Get the javascript for this widget
 		$_oCS->registerScript( 'ps' . self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
 	}
-
+	
 	//********************************************************************************
 	//* Private methods
 	//********************************************************************************
@@ -95,7 +95,7 @@ class CPSCKEditorWidget extends CPSWidget
 	{
 		//	Get the options...		
 		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
-		$_sId = $sTargetSelector;
+		$_sId = $this->getTargetSelector( $sTargetSelector );
 		
 		//	Jam something in front of options?
 		if ( null != $sInsertBeforeOptions )
@@ -106,7 +106,7 @@ class CPSCKEditorWidget extends CPSWidget
 		}
 
 		$this->script =<<<CODE
-$('{$_sId}').{$this->widgetName}({$_arOptions});
+CKEDITOR.replace('{$_sId}');
 CODE;
 
 		return $this->script;
@@ -123,55 +123,8 @@ CODE;
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjQueryWidget
 	*/
-	public static function create( $sName, array $arOptions = array(), $sClass = __CLASS__ )                  
+	public static function create( array $arOptions = array(), $sClass = __CLASS__ )                  
 	{
-		//	Instantiate...
-		$_oWidget = new $sClass();
-
-		//	Set default options...
-		$_oWidget->widgetName = $sName;
-		$_oWidget->target = CPSHelp::getOption( $arOptions, 'target', null, true );
-		$_oWidget->id = $_oWidget->name = CPSHelp::getOption( $arOptions, 'id', $sName );
-		$_oWidget->name = CPSHelp::getOption( $arOptions, 'name', $_oWidget->id );
-
-		return $_oWidget->finalizeCreate( $arOptions );
+		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
 	}
-
-	/**
-	* Finalize the creation of a widget
-	* 
-	* This allows subclasses to initialize their class then finalize the creation here.
-	* 	
-	* @param CPSjQueryWidget $oWidget The widget to finalize
-	* @param array $arOptions Options for this widget
-	* @returns CPSjQueryWidget
-	*/
-	protected function finalizeCreate( $arOptions = array() )
-	{
-		//	Set variable options...
-		if ( is_array( $arOptions ) )
-		{
-			//	Check for scripts...
-			if ( isset( $arOptions[ '_scripts' ] ) && is_array( $arOptions[ '_scripts' ] ) )
-			{
-				//	Add them and remove from options...
-				$this->addScripts( $arOptions[ '_scripts' ] );
-				unset( $arOptions[ '_scripts' ] );
-			}
-
-			//	Now process the rest of the options...			
-			foreach ( $arOptions as $_sKey => $_oValue )
-				$this->addOption( $_sKey, null, false, $_oValue );
-		}
-		
-		//	Initialize the widget
-		$this->init();
-
-		//	Does user want us to run it?
-		if ( $this->autoRun ) $this->run();
-
-		//	And return...
-		return $this;
-	}
-
 }
