@@ -44,6 +44,7 @@ button.ps-button { width:auto; overflow:visible; }
 
 .ps-form-footer {
 	margin:20px 0px 0px 0px;
+	text-align:right;
 }
 
 .ps-data-list-container {
@@ -61,9 +62,27 @@ button.ps-button { width:auto; overflow:visible; }
 	color: #000;
 }
 
-
 .ps-data-list-row-data span {
 	float:left;
 	background:black;
 	color:white;
 }
+
+.ps-pipe {
+	color: #ccc;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.ps-lpipe {
+	color: #333;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.ps-footer-pipe {
+	color: #ccc;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+

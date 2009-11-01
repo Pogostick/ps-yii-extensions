@@ -269,6 +269,46 @@ class CPSActiveWidgets extends CHtml
 				
 			return;
 		}
+		
+		//	Handle custom drop downs...
+		if ( is_numeric( $eFieldType ) )
+		{
+			switch ( $eFieldType )
+			{
+				case self::DD_GENERIC:	//	Options passed in via array
+					$eFieldType = self::DROPDOWN;
+					break;
+					
+				case self::DD_US_STATES:
+					$eFieldType = self::DROPDOWN;
+					$arData = require( 'us_state_array.php' );
+					break;
+					
+				case self::DD_MONTH_NUMBERS:
+					$eFieldType = self::DROPDOWN;
+					if ( $_oValue == null ) $_oValue = date( 'm' );
+					$arData = require( 'month_numbers_array.php' );
+					break;
+					
+				case self::DD_MONTH_NAMES:
+					$eFieldType = self::DROPDOWN;
+					if ( $_oValue == null ) $_oValue = date( 'm' );
+					$arData = require( 'month_names_array.php' );
+					break;
+					
+				case self::DD_YEARS:
+					if ( $_oValue == null ) $_oValue = date( 'Y' );
+					$_iRange = CPSHelp::getOption( $arOptions, 'range', 5 );
+					
+					$arData = array();
+					for ( $_i = 0, $_iBaseYear = date('Y'); $_i < $_iRange; $_i++ ) $arData[ ( $_iBaseYear + $_i ) ] = ( $_iBaseYear + $_i );
+					break;
+					
+				case self::DD_CC_TYPES:
+					$arData = require( 'cc_types_array.php' );
+					break;
+			}
+		}
 			
 		//	Handle special types...
 		switch ( $eFieldType )
@@ -720,7 +760,7 @@ HTML;
 		if ( $oModel->hasAttribute( $sCreatedColumn ) && $oModel->hasAttribute( $sModifiedColumn ) )
 		{
 			$_sOut = '<div class="ps-form-footer">';
-			$_sOut .= 'Created: <span>' . date( $sDateFormat, ! is_numeric( $oModel->$sCreatedColumn ) ? strtotime( $oModel->$sCreatedColumn ) : $oModel->$sCreatedColumn ) . '</span>&nbsp;&nbsp;&nbsp;Modified: <span>' . date( $sDateFormat, ! is_numeric( $oModel->$sModifiedColumn ) ? strtotime( $oModel->$sModifiedColumn ) : $oModel->$sModifiedColumn ) . '</span>';
+			$_sOut .= '<span>Created:' . date( $sDateFormat, ! is_numeric( $oModel->$sCreatedColumn ) ? strtotime( $oModel->$sCreatedColumn ) : $oModel->$sCreatedColumn ) . '</span><span class="ps-pipe">/</span><span>Modified:' . date( $sDateFormat, ! is_numeric( $oModel->$sModifiedColumn ) ? strtotime( $oModel->$sModifiedColumn ) : $oModel->$sModifiedColumn ) . '</span>';
 			$_sOut .= '</div>';
 		}
 		
@@ -740,6 +780,52 @@ HTML;
 		return ( $_sTarget == null ) ? $sDefaultId : '#' . $_sTarget;
 	}
 	
+	/**
+	 * Generates a radio button list.
+	 * A radio button list is like a {@link checkBoxList check box list}, except that
+	 * it only allows single selection.
+	 * @param string name of the radio button list. You can use this name to retrieve
+	 * the selected value(s) once the form is submitted.
+	 * @param mixed selection of the radio buttons. This can be either a string
+	 * for single selection or an array for multiple selections.
+	 * @param array value-label pairs used to generate the radio button list.
+	 * Note, the values will be automatically HTML-encoded, while the labels will not.
+	 * @param array addtional HTML options. The options will be applied to
+	 * each checkbox input. The following special options are recognized:
+	 * <ul>
+	 * <li>template: string, specifies how each checkbox is rendered. Defaults
+	 * to "{input} {label}", where "{input}" will be replaced by the generated
+	 * radio button input tag while "{label}" be replaced by the corresponding radio button label.</li>
+	 * <li>separator: string, specifies the string that separates the generated radio buttons.</li>
+	 * <li>labelOptions: array, specifies the additional HTML attributes to be rendered
+	 * for every label tag in the list. This option has been available since version 1.0.10.</li>
+	 * </ul>
+	 * @return string the generated radio button list
+	 */
+	public static function radioButtonList($name,$select,$data,$htmlOptions=array())
+	{
+		$template=isset($htmlOptions['template'])?$htmlOptions['template']:'{input} {label}';
+		$separator=isset($htmlOptions['separator'])?$htmlOptions['separator']:"<br/>\n";
+		unset($htmlOptions['template'],$htmlOptions['separator']);
+
+		$labelOptions=isset($htmlOptions['labelOptions'])?$htmlOptions['labelOptions']:array();
+		unset($htmlOptions['labelOptions']);
+
+		$items=array();
+		$baseID=self::getIdByName($name);
+		$id=0;
+		foreach($data as $value=>$label)
+		{
+			$checked=!strcmp($value,$select);
+			$htmlOptions['value']=$value;
+			$htmlOptions['id']=$baseID.'_'.$id++;
+			$option=self::radioButton($name,$checked,$htmlOptions);
+			$label=self::label($label,$htmlOptions['id'],$labelOptions);
+			$items[]=strtr($template,array('{input}'=>$option,'{label}'=>$label));
+		}
+		return implode($separator,$items);
+	}
+
 }
 
 /**
