@@ -592,7 +592,9 @@ CSS;
 		if ( CPSHelp::getOption( $arHtmlOptions, 'validate', false, true ) )
 		{
 			self::$m_bValidating = true;
-			CPSjqValidate::create( array( 'target' => self::getFormSelector( $arHtmlOptions ) ) );
+			$_arValidateOptions = CPSHelp::getOption( $arHtmlOptions, 'validateOptions', array(), true );
+			if ( ! isset( $_arValidateOptions['target'] ) ) $_arValidateOptions['target'] = self::getFormSelector( $arHtmlOptions );
+			CPSjqValidate::create( $_arValidateOptions );
 		}
 		
 		if ( CPSHelp::getOption( $arHtmlOptions, 'selectmenu', false, true ) )

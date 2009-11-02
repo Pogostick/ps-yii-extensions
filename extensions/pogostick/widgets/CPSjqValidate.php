@@ -91,11 +91,24 @@ class CPSjqValidate extends CPSjQueryWidget
 	*/
 	protected function generateJavascript( $sTargetSelector = null, $arOptions = null, $sInsertBeforeOptions = null )
 	{
-		$_sOptions = CPSHelp::getOption( $this->getPublicOptions(), self::PS_WIDGET_NAME, '' );
+		//	Get the options...		
+		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
 		$_sId = $this->getTargetSelector( $sTargetSelector );
 		
+		//	Jam something in front of options?
+		if ( null != $sInsertBeforeOptions )
+		{
+			$_sOptions = $sInsertBeforeOptions;
+			if ( ! empty( $_arOptions ) ) $_sOptions .= ", {$_arOptions}";
+			$_arOptions = $_sOptions;
+		}
+
+		$_sValidate = 'jQuery.validator.addMethod( "phoneUS", function(phone_number, element) { phone_number = phone_number.replace(/\s+/g, ""); return this.optional(element) || phone_number.length > 9 && phone_number.match(/^(1[\s\.-]?)?(\([2-9]\d{2}\)|[2-9]\d{2})[\s\.-]?[2-9]\d{2}[\s\.-]?\d{4}$/);}, "Please specify a valid phone number");';
+		$_sValidate .= 'jQuery.validator.addMethod( "postalcode", function(postalcode, element) { return this.optional(element) || postalcode.match(/(^\d{5}(-\d{4})?$)|(^[ABCEGHJKLMNPRSTVXYabceghjklmnpstvxy]{1}\d{1}[A-Za-z]{1} ?\d{1}[A-Za-z]{1}\d{1})$/);}, "Please specify a valid postal/zip code");';
+		
 		$this->script =<<<CODE
-$('{$_sId}').{$this->widgetName}({$_sOptions});
+{$_sValidate}
+jQuery('{$_sId}').{$this->widgetName}({$_arOptions});
 CODE;
 
 		return $this->script;

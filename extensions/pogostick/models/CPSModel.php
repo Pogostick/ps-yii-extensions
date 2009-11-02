@@ -78,6 +78,15 @@ class CPSModel extends CActiveRecord
 	public function getDateTimeFunction() { return $this->m_sDateTimeFunction; }
 	public function setDateTimeFunction( $sValue ) { $this->m_sDateTimeFunction = $sValue; }
 	
+	/***
+	* Current transaction if any
+	* 
+	* @var CDbTransaction
+	*/
+	protected $m_oTransaction = null;
+	public function getTransaction() { return $this->m_oTransaction; }
+	public function setTransaction( $oValue ) { $this->m_oTransaction = $oValue; }
+	
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -124,10 +133,13 @@ class CPSModel extends CActiveRecord
 	{
 		try
 		{
-			return parent::save( $bRunValidation, $arAttributes );
+			parent::save( $bRunValidation, $arAttributes );
+			$this->commitTransaction();			
+			return true;
 		}
 		catch ( CDbException $_ex )
 		{
+			$this->rollbackTransaction();
 			$this->addError( '', $_ex->getMessage() );
 		}
 		
@@ -199,5 +211,37 @@ class CPSModel extends CActiveRecord
 			
 		return $this->save();
 	}
-    
+	
+	/***
+	* Begins a transaction
+	* 
+	*/
+	public function beginTransaction()
+	{
+		if ( ! $this->m_oTransaction )
+		{
+			$this->m_oTransaction = $this->dbConnection->beginTransaction();
+			return;
+		}
+		
+		throw new CPSException( Yii::t( 'psYiiExtensions', 'Unable to start new transaction. transaction already in progress.' ) );
+	}
+	
+	public function commitTransaction()
+	{
+		if ( $this->m_oTransaction ) 
+		{
+			$this->m_oTransaction->commit();
+			$this->m_oTransaction = null;
+		}
+	}
+
+	public function rollbackTransaction()
+	{
+		if ( $this->m_oTransaction ) 
+		{
+			$this->m_oTransaction->rollBack();
+			$this->m_oTransaction = null;
+		}
+	}
 }

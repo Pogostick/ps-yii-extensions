@@ -77,6 +77,14 @@ abstract class CPSController extends CController
 	public function setAutoLayout( $bValue ) { $this->m_bAutoLayout = $bValue; }
 	
 	/**
+	* @var boolean Try to find missing action
+	* @access protected 
+	*/
+	protected $m_bAutoMissing = true;
+	public function getAutoMissing() { return $this->m_bAutoMissing; }
+	public function setAutoMissing( $bValue ) { $this->m_bAutoMissing = $sValue; }
+	
+	/**
 	* @var string The default action for this controller
 	* @access protected
 	*/
@@ -157,6 +165,17 @@ abstract class CPSController extends CController
 		
 		//	Return our model...
 		return $this->m_oModel;
+	}
+
+	/**
+	* Provide automatic missing action mapping...
+	* 
+	* @param string $sActionId
+	*/
+	public function missingAction( $sActionId )
+	{
+		if ( $this->m_bAutoMissing ) if ( $this->getViewFile( $sActionId ) ) $this->render( $sActionId );
+		parent::missingAction( $sActionId );
 	}
 
 	//********************************************************************************

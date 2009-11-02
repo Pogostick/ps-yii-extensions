@@ -294,7 +294,7 @@ class CPSComponentBehavior extends CBehavior
 		//	Check them first...
 		$this->checkOptions( $_arOptions );
 
-		//	Get our public options...
+		//	Get our public callbacks...
 		$_arCallbacks = $this->callbacks;
 
 		//	Add callbacks to the array...
@@ -324,7 +324,7 @@ class CPSComponentBehavior extends CBehavior
 				{
 					foreach ( $_oValue as $_sKey1 => $_oValue1 )
 					{
-						if ( $this->isCBFunction( $_oValue1 ) )
+						if ( ! is_array( $_oValue1 ) && $this->isCBFunction( $_oValue1 ) )
 						{
 							//	Remove from options and move to callbacks..
 							$_oValue[ 'cb_' . $_sKey1 ] = $_sKey1;
@@ -345,7 +345,7 @@ class CPSComponentBehavior extends CBehavior
 			switch ( $iFormat )
 			{
 				case self::JSON:
-					$_sEncodedOptions = CJavaScript::encode( $_arToEncode );
+					$_sEncodedOptions = json_encode( $_arToEncode );
 					break;
 					
 				case self::HTTP:
@@ -368,7 +368,7 @@ class CPSComponentBehavior extends CBehavior
 			}
 
 			//	Fix up the callbacks...
-			if ( is_array( $_arCallbacks ) ) 
+			if ( is_array( $_arCallbacks ) && ! empty( $_arCallbacks ) ) 
 			{
 				foreach ( $_arCallbacks as $_sKey => $_oValue )
 				{
@@ -384,9 +384,9 @@ class CPSComponentBehavior extends CBehavior
 					if ( ! empty( $_oValue ) )
 					{
 						if ( $this->isCBFunction( $_oValue ) )
-							$_sEncodedOptions = str_replace( "'cb_{$_sKey}':'{$_sKey}'", "{$_sQuote}{$_sKey}{$_sQuote}:{$_oValue}", $_sEncodedOptions );
+							$_sEncodedOptions = str_replace( "\"cb_{$_sKey}\":\"{$_sKey}\"", "{$_sQuote}{$_sKey}{$_sQuote}:{$_oValue}", $_sEncodedOptions );
 						else
-							$_sEncodedOptions = str_replace( "'cb_{$_sKey}':'{$_sKey}'", "{$_sKey}:'{$_oValue}'", $_sEncodedOptions );
+							$_sEncodedOptions = str_replace( "\"cb_{$_sKey}\":\"{$_sKey}\"", "{$_sKey}:'{$_oValue}'", $_sEncodedOptions );
 					}
 				}
 			}

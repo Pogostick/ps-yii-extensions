@@ -10,19 +10,23 @@
  * - $relations: a  list of relations (string)
  */
 
+if ( ! $_sCopyright = Yii::app()->getParams()->{'@copyright'} ) $_sCopyright = 'Copyright &copy; ' . date( 'Y' ) . ' You!';
+if ( ! $_sAuthor = Yii::app()->getParams()->{'@author'} ) $_sAuthor = 'Your Name <your@email.com>';
+if ( ! $_sLink = Yii::app()->getParams()->{'@link'} ) $_sLink = 'http://wwww.you.com';
+if ( ! $_sPackage = Yii::app()->getParams()->{'@package'} ) $_sPackage = Yii::app()->id;
+
 echo <<<HTML
 <?php
 /**
  * $className class file.
  *
  * @filesource
- * @copyright Copyright &copy; 2009 Pogostick, LLC.
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
+ * @copyright {$_sCopyright}
+ * @author {$_sAuthor}
+ * @link {$_sLink}
+ * @package {$_sPackage}
  * @subpackage models
- * @since v1.0.6
- * @version SVN: \$Revision\$
+ * @version \$Revision\$
  * @modifiedby \$LastChangedBy\$
  * @lastmodified  \$Date\$
  */
