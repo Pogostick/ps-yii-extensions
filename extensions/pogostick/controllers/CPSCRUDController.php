@@ -300,7 +300,7 @@ abstract class CPSCRUDController extends CPSController
 	public function actionLogout()
 	{
 		Yii::app()->user->logout();
-		$this->actionIndex();
+		$this->actionLogin();
 	}
 	
 }

@@ -185,14 +185,16 @@ abstract class CPSController extends CController
 	/**
 	* Saves the data in the model
 	* 
-	* @param CModel The model to save
-	* @param array The array of data to merge with the model
-	* @param string Where to redirect after a successful save
+	* @param CModel $oModel The model to save
+	* @param array $arData The array of data to merge with the model
+	* @param string $sRedirectAction Where to redirect after a successful save
 	* @param boolean $bAttributesSet If true, attributes will not be set from $arData
+	* @param string $sModelName Optional model name
+	* @returns boolean
 	*/
 	protected function saveModel( $oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null )
 	{
-		$_sModelName = ( $sModelName ? $sModelName : $this->m_sModelName );
+		$_sModelName = CPSHelp::nvl( $sModelName, $this->m_sModelName );
 		
 		if ( isset( $arData, $arData[ $_sModelName ] ) )
 		{
@@ -201,7 +203,8 @@ abstract class CPSController extends CController
 			if ( $oModel->save() ) 
 			{
 				Yii::app()->user->setFlash( 'success', 'Your changes have been saved.' );
-				$this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
+				if ( $sRedirectAction ) $this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
+				return true;
 			}
 		}
 		

@@ -15,9 +15,6 @@
  */
 /**
  * CPSModel provides base functionality for models
- *
- * @package wui.modules
- * @subpackage ezpost
  */
 class CPSModel extends CActiveRecord
 {
@@ -43,6 +40,15 @@ class CPSModel extends CActiveRecord
 	public function setCreatedColumn( $sValue ) { $this->m_sCreatedColumn = $sValue; }
 	
 	/**
+	 * The optional name of the created by user id column in the table
+	 * 
+	 * @var string
+	 */
+	protected $m_sCreatedByColumn = null;
+	public function getCreatedByColumn() { return $this->m_sCreatedByColumn; }
+	public function setCreatedByColumn( $sValue ) { $this->m_sCreatedByColumn = $sValue; }
+	
+	/**
 	 * The optional name of the last modified column in the table
 	 * 
 	 * @var string
@@ -50,6 +56,15 @@ class CPSModel extends CActiveRecord
 	protected $m_sLModColumn = null;
 	public function getLModColumn() { return $this->m_sLModColumn; }
 	public function setLModColumn( $sValue ) { $this->m_sLModColumn = $sValue; }	
+	
+	/**
+	 * The optional name of the modified by user id column in the table
+	 * 
+	 * @var string
+	 */
+	protected $m_sLModByColumn = null;
+	public function getLModByColumn() { return $this->m_sLModByColumn; }
+	public function setLModByColumn( $sValue ) { $this->m_sLModByColumn = $sValue; }	
 	
 	/**
 	* If defined, all deletes are soft
@@ -92,58 +107,32 @@ class CPSModel extends CActiveRecord
 	//********************************************************************************
 
 	/**
-	* Grab init function for setting values
-	* 
-	*/
-	public function init()
-	{
-		parent::init();
-	}
-	
-	/**
 	* Populates 'created' field if new record
 	* 
 	* @param CEvent $oEvent
 	*/
 	public function beforeValidate( $sScenario = null )
 	{
+		//	Handle created stamp
 		if ( $this->isNewRecord )
 		{
-			$_sCreated = $this->getCreatedColumn();
-			$_sLMod = $this->getLModColumn();
-			
-			if ( $_sCreated && $this->hasAttribute( $_sCreated ) )
+			if ( ( $_sCreated = $this->getCreatedColumn() ) && $this->hasAttribute( $_sCreated ) )
 				$this->{$_sCreated} = ( null === $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
-			
-			if ( $_sLMod && $this->hasAttribute( $_sLMod ) ) 
-				$this->{$_sLMod} = ( null === $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+				
+			//	Handle user id stamp
+			if ( ( $_sCreatedBy = $this->getLModByColumn() ) && $this->hasAttribute( $_sCreatedBy ) ) 
+				$this->{$_sCreatedBy} = Yii::app()->user->getId();
 		}
 			
+		//	Handle lmod stamp
+		if ( ( $_sLMod = $this->getLModColumn() ) && $this->hasAttribute( $_sLMod ) ) 
+			$this->{$_sLMod} = ( null === $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+				
+		//	Handle user id stamp
+		if ( ( $_sLModBy = $this->getLModByColumn() ) && $this->hasAttribute( $_sLModBy ) ) 
+			$this->{$_sLModBy} = Yii::app()->user->getId();
+				
 		return parent::beforeValidate( $sScenario );
-	}
-	
-	/***
-	* Saves the row
-	* 
-	* @param bool $bRunValidation
-	* @param array $arAttributes
-	* @return boolean
-	*/
-	public function save( $bRunValidation = true, $arAttributes = null )
-	{
-		try
-		{
-			parent::save( $bRunValidation, $arAttributes );
-			$this->commitTransaction();			
-			return true;
-		}
-		catch ( CDbException $_ex )
-		{
-			$this->rollbackTransaction();
-			$this->addError( '', $_ex->getMessage() );
-		}
-		
-		return false;
 	}
 	
 	/**
@@ -214,7 +203,7 @@ class CPSModel extends CActiveRecord
 	
 	/***
 	* Begins a transaction
-	* 
+	* @throws CDbException
 	*/
 	public function beginTransaction()
 	{
@@ -224,9 +213,13 @@ class CPSModel extends CActiveRecord
 			return;
 		}
 		
-		throw new CPSException( Yii::t( 'psYiiExtensions', 'Unable to start new transaction. transaction already in progress.' ) );
+		throw new CDbException( Yii::t( 'psYiiExtensions', 'Unable to start new transaction. transaction already in progress.' ) );
 	}
 	
+	/**
+	* Commits the current transaction if any
+	* 
+	*/
 	public function commitTransaction()
 	{
 		if ( $this->m_oTransaction ) 
@@ -236,6 +229,10 @@ class CPSModel extends CActiveRecord
 		}
 	}
 
+	/**
+	* Rolls back the current transaction, if any...
+	* 
+	*/
 	public function rollbackTransaction()
 	{
 		if ( $this->m_oTransaction ) 

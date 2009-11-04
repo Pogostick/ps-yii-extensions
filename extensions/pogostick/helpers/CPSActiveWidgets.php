@@ -153,6 +153,7 @@ class CPSActiveWidgets extends CHtml
 		$_sDivClass = CPSHelp::getOption( $arOptions, '_divClass', null, true );
 		$_sTransform = CPSHelp::getOption( $arOptions, 'transform', null, true );
 		$_sTitle = CPSHelp::getOption( $arOptions, 'title', null );
+		$_bAddColon = CPSHelp::getOption( $arOptions, 'addColon', false );
 		
 		//	Do auto-tooltipping...
 		if ( ! $_sTitle && $oModel && method_exists( $oModel, 'attributeTooltips' ) )
@@ -173,11 +174,15 @@ class CPSActiveWidgets extends CHtml
 		
 		//	Preset class for hover effects if enabled...
 		if ( isset( self::$m_sOffClass ) && ! isset( $arOptions[ 'class' ] ) ) $arOptions[ 'class' ] = self::$m_sOffClass;
-
+		
 		if ( null == $oModel )		
 			$_sOut = self::label( $sLabel, $arOptions[ 'id' ], $arLabelOptions );
 		else
+		{
+			//	Set colons...
+			if ( $_bAddColon ) $arLabelOptions['label'] = CPSHelp::getOption( $arLabelOptions, 'label', $oModel->getAttributeLabel( $sColName ) ) . ':';
 			$_sOut = self::activeLabelEx( $oModel, ( null == $sLabel ) ? $sColName : $sLabel, $arLabelOptions );
+		}
 
 		if ( $_sTransform && $oModel ) $oModel->$sColName = CPSTransform::value( $_sTransform, $oModel->$sColName );
 		
@@ -767,6 +772,73 @@ HTML;
 		}
 		
 		return $_sOut;
+	}
+	
+	/**
+	 * Generates an image button with an optional hover component.
+	 * @param string the button label
+	 * @param string $sHref the destination link
+	 * @param array additional HTML attributes. Besides normal HTML attributes, a few special
+	 * attributes are also recognized (see {@link hoverImage}, {@link clientChange} and {@link tag} for more details.)
+	 * @return string the generated button tag
+	 * @see clientChange
+	 * @see hoverImage
+	 */
+	public static function imageLink( $src, $sHref, $htmlOptions = array() )
+	{
+		if ( $_sHoverImage = CPSHelp::getOption( $htmlOptions, 'hoverImage', null, true ) )
+		{
+			//	Create the script
+			$htmlOptions['id'] = CPSHelp::getOption( $htmlOptions, 'id', self::ID_PREFIX . self::$count++ );
+			
+			$_sScript =<<<HTML
+	jQuery('#{$htmlOptions['id']}').hover(
+		function(){
+			jQuery(this).attr('src','{$_sHoverImage}');
+		},
+		function(){
+			jQuery(this).attr('src','{$src}');
+		}
+	);
+HTML;
+			//	Register the script
+			Yii::app()->getClientScript()->registerScript( 'ib#' . self::ID_PREFIX . self::$count++, $_sScript, CClientScript::POS_READY );
+		}
+
+		return self::tag( 'a', array( 'href' => $sHref ), self::image( $src, null, $htmlOptions ) );
+	}
+	
+	/**
+	 * Generates an image submit button with an optional hover component.
+	 * @param string the button label
+	 * @param array additional HTML attributes. Besides normal HTML attributes, a few special
+	 * attributes are also recognized (see {@link hoverImage}, {@link clientChange} and {@link tag} for more details.)
+	 * @return string the generated button tag
+	 * @see clientChange
+	 * @see hoverImage
+	 */
+	public static function imageButton( $src, $htmlOptions = array() )
+	{
+		if ( $_sHoverImage = CPSHelp::getOption( $htmlOptions, 'hoverImage', null, true ) )
+		{
+			//	Create the script
+			$htmlOptions['id'] = CPSHelp::getOption( $htmlOptions, 'id', self::ID_PREFIX . self::$count++ );
+			
+			$_sScript =<<<HTML
+	jQuery('#{$htmlOptions['id']}').hover(
+		function(){
+			jQuery(this).attr('src','{$_sHoverImage}');
+		},
+		function(){
+			jQuery(this).attr('src','{$src}');
+		}
+	);
+HTML;
+			//	Register the script
+			Yii::app()->getClientScript()->registerScript( 'ib#' . self::ID_PREFIX . self::$count++, $_sScript, CClientScript::POS_READY );
+		}
+
+		return parent::imageButton( $src, $htmlOptions );
 	}
 	
 	/**
