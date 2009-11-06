@@ -14,6 +14,8 @@ if ( ! $_sCopyright = Yii::app()->getParams()->{'@copyright'} ) $_sCopyright = '
 if ( ! $_sAuthor = Yii::app()->getParams()->{'@author'} ) $_sAuthor = 'Your Name <your@email.com>';
 if ( ! $_sLink = Yii::app()->getParams()->{'@link'} ) $_sLink = 'http://wwww.you.com';
 if ( ! $_sPackage = Yii::app()->getParams()->{'@package'} ) $_sPackage = Yii::app()->id;
+if ( ! isset( $baseClass ) ) $baseClass = 'CPSModel';
+if ( ! isset( $dbToUse ) ) $dbToUse = 'db';
 
 echo <<<HTML
 <?php
@@ -30,10 +32,13 @@ echo <<<HTML
  * @modifiedby \$LastChangedBy\$
  * @lastmodified  \$Date\$
  */
-class $className extends CPSModel
+class $className extends $baseClass
 {
 	/**
+	* This model was generated from database component '$dbToUse'
+	*
 	* The followings are the available columns in table '$tableName':
+	*
 
 HTML;
 	
