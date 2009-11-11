@@ -55,7 +55,8 @@ abstract class CPSCRUDController extends CPSController
 		$this->addCommandToMap( 'undelete' );
 
 		//	Set our access rules..
-		$this->setUserActionList( self::ACCESS_TO_ANY, array( 'login', 'index' ) );
+		$this->setUserActionList( self::ACCESS_TO_ANY, array( 'index' ) );
+		$this->setUserActionList( self::ACCESS_TO_GUEST, array( 'login', 'register' ) );
 		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'admin', 'create', 'delete', 'logout', 'show', 'update' ) );
 		$this->setUserActionList( self::ACCESS_TO_ADMIN, array() );
 		$this->setUserActionList( self::ACCESS_TO_NONE, array() );

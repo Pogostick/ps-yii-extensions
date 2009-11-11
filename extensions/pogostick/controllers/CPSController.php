@@ -35,9 +35,10 @@ abstract class CPSController extends CController
 	* @var string Indexes into {@link CPSController:m_arUserActionMap}
 	*/
 	const ACCESS_TO_ANY = 0;
-	const ACCESS_TO_AUTH = 1;
-	const ACCESS_TO_ADMIN = 2;
-	const ACCESS_TO_NONE = 3;
+	const ACCESS_TO_GUEST = 1;
+	const ACCESS_TO_AUTH = 2;
+	const ACCESS_TO_ADMIN = 3;
+	const ACCESS_TO_NONE = 4;
 
 	//********************************************************************************
 	//* Member Variables
@@ -108,6 +109,7 @@ abstract class CPSController extends CController
 	protected $m_arUserActionList = array();
 	public function getUserActionList( $eWhich ) { return CPSHelp::getOption( $this->m_arUserActionList, $eWhich ); }
 	public function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = $arValue; }
+	public function addUserActionRole( $eWhich, $sRole, $sAction ) { $this->m_arUserActionList[ $eWhich ]['roles'][] = $arValue; }
 	public function addUserAction( $eWhich, $sAction ) { if ( ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) $this->m_arUserActionList[ $eWhich ] = array(); $this->m_arUserActionList[ $eWhich ] = array_merge( $this->m_arUserActionList[ $eWhich ], array( $sAction ) );  }
 	public function addUserActions( $eWhich, $arActions = array() ) { if ( ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) $this->m_arUserActionList[ $eWhich ] = array(); $this->m_arUserActionList[ $eWhich ] = array_merge( $this->m_arUserActionList[ $eWhich ], $arActions );  }
 

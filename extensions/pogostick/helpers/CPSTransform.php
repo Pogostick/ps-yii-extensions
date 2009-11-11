@@ -35,6 +35,7 @@ class CPSTransform
 		'@' => 'linkTransform',
 		'?' => 'boolTransform',
 		'#' => 'timeTransform',
+		'!' => 'styleTransform',
 	);
 
 	//********************************************************************************
@@ -77,7 +78,8 @@ class CPSTransform
 				if ( $_sColumn{0} == $_sChar )
 				{
 					$_sRealCol = self::cleanColumn( $_sColumn );
-					list( $_sColumn, $_oValue, $_bLink ) = self::$_sMethod( $_sColumn, $oModel->$_sRealCol );
+					list( $_sColumn, $_oValue, $_bLink, $_arWrapOpts ) = self::$_sMethod( $_sColumn, $oModel->$_sRealCol );
+					$arWrapOptions = array_merge( $arWrapOptions, $_arWrapOpts );
 					break;
 				}
 			}
@@ -101,18 +103,23 @@ class CPSTransform
 	
 	protected static function linkTransform( $sColumn, $oValue = null )
 	{
-		return array( self::cleanColumn( $sColumn ), $oValue, true );
+		return array( self::cleanColumn( $sColumn ), $oValue, true, array() );
 	}
 	
 	protected static function boolTransform( $sColumn, $oValue )
 	{
 		$_oValue = ( empty( $oValue ) || $oValue === 'N' || $oValue === 'n' || $oValue === 0 ) ? 'No' : 'Yes';
-		return array( self::cleanColumn( $sColumn ), $_oValue, false );
+		return array( self::cleanColumn( $sColumn ), $_oValue, false, array() );
 	}
 	
 	protected static function timeTransform( $sColumn, $oValue, $sFormat = 'F d, Y' )
 	{
-		return array( self::cleanColumn( $sColumn ), date( $sFormat, $oValue ), false );
+		return array( self::cleanColumn( $sColumn ), date( $sFormat, $oValue ), false, array() );
+	}
+	
+	protected static function styleTransform( $sColumn, $oValue )
+	{	
+		return array( self::cleanColumn( $sColumn ), date( $sFormat, $oValue ), false, array( 'style' => 'text-align: right;' ) );
 	}
 	
 }
