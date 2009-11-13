@@ -285,7 +285,7 @@ abstract class CPSCRUDController extends CPSController
 		if ( isset( $_POST[ $_sClass ] ) )
 		{
 			$_oLogin->attributes = $_POST[ $_sClass ];
-			
+
 			//	Validate user input and redirect to previous page if valid
 			if ( $_oLogin->validate() ) $this->redirect( Yii::app()->user->returnUrl );
 		}

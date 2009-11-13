@@ -14,17 +14,17 @@ $_sCols = "array( {$_sCols } )";
 echo <<<HTML
 <?php
 	echo CPSForm::formHeader( '{$modelClass} : ' . \$model->{$ID}, 
-		array( 
-			'cancel' => array(
-				'label' => 'Cancel',
-				'url' =>  array( 'admin' ),
-				'icon' => 'cancel',
+		array(
+			'new' => array(
+				'label' => 'Add New {$modelClass}',
+				'url' =>  array( 'create' ),
+				'icon' => 'circle-plus',
 			),
 			
-			'save' => array(
-				'label' => 'Save',
-				'url' =>  '_submit_',
-				'icon' => 'disk',
+			'return' => array(
+				'label' => '{$modelClass} Manager',
+				'url' =>  array( 'admin' ),
+				'icon' => 'arrowreturnthick-1-w',
 			),
 		)
 	);

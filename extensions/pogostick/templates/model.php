@@ -10,10 +10,10 @@
  * - $relations: a  list of relations (string)
  */
 
-if ( ! $_sCopyright = Yii::app()->getParams()->{'@copyright'} ) $_sCopyright = 'Copyright &copy; ' . date( 'Y' ) . ' You!';
-if ( ! $_sAuthor = Yii::app()->getParams()->{'@author'} ) $_sAuthor = 'Your Name <your@email.com>';
-if ( ! $_sLink = Yii::app()->getParams()->{'@link'} ) $_sLink = 'http://wwww.you.com';
-if ( ! $_sPackage = Yii::app()->getParams()->{'@package'} ) $_sPackage = Yii::app()->id;
+if ( ! $_sCopyright = Yii::app()->params['@copyright'] ) $_sCopyright = 'Copyright &copy; ' . date( 'Y' ) . ' You!';
+if ( ! $_sAuthor = Yii::app()->params['@author'] ) $_sAuthor = 'Your Name <your@email.com>';
+if ( ! $_sLink = Yii::app()->params['@link'] ) $_sLink = 'http://wwww.you.com';
+if ( ! $_sPackage = Yii::app()->params['@package'] ) $_sPackage = Yii::app()->id;
 if ( ! isset( $baseClass ) ) $baseClass = 'CPSModel';
 if ( ! isset( $dbToUse ) ) $dbToUse = 'db';
 

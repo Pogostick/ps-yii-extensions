@@ -10,10 +10,16 @@ echo<<<HTML
 <?php
 	echo CPSForm::formHeader( 'Edit : ' . \$model->{$ID}, 
 		array( 
-			'new' => array(
-				'label' => 'New',
-				'url' =>  array( 'create' ),
-				'icon' => 'circle-plus',
+			'save' => array(
+				'label' => 'Save',
+				'url' =>  '_submit_',
+				'icon' => 'disk',
+			),
+			
+			'cancel' => array(
+				'label' => 'Cancel',
+				'url' => array( 'admin' ),
+				'icon' => 'cancel',
 			),
 			
 			'delete' => array(
@@ -22,19 +28,11 @@ echo<<<HTML
 				'confirm' => 'Do you really want to delete this {$modelClass}?',
 				'icon' => 'trash',
 			),
-			
-			'return' => array(
-				'label' => '{$modelClass} Manager',
-				'url' => array( 'admin' ),
-				'icon' => 'arrowreturnthick-1-w',
-			)
 		)
 	);
 	
 	echo \$this->renderPartial( '_form', array(
 		'model' => \$model,
-		'_oModel' => \$model,
-		'_bUpdate' => true,
 		'update' => true,
 	));
 HTML;

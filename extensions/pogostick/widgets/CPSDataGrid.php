@@ -25,7 +25,7 @@ class CPSDataGrid
 		$_sOut .= self::getDataGridRows( $arModel, $arColumns, $arActions, $sDataName );
 		$_sOut .= self::endDataGrid();
 		
-		if ( $oPages ) Yii::app()->controller->widget( 'CLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
+		if ( $oPages ) Yii::app()->controller->widget( 'CPSLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
 		
 		return $_sOut;
 	}
@@ -70,6 +70,8 @@ class CPSDataGrid
 		$_sViewName = null;
 		$_sOut = empty( $arModel ) ? '<tr><td style="text-align:center" colspan="' . sizeof( $arColumns ) . '">No Records Found</td></tr>' : null;
 		if ( null === $arActions ) $arActions = array( 'edit', 'delete' );
+		$_arOptions = CPSHelp::getOption( $arActions, 'options', array(), true );
+		$_sLockColumn = CPSHelp::getOption( $_arOptions, 'lockColumn', null, true );
 
 		foreach ( $arModel as $_iIndex => $_oModel )
 		{
@@ -84,12 +86,30 @@ class CPSDataGrid
 				{
 					if ( is_array( $_sAction ) )
 					{
-						$_sViewName = $_sAction[1];
 						$_sAction = $_sAction[0];
+						$_sViewName = $_sAction[1];
 					}
+					
+					if ( $_sAction == 'lock' && ! $_sLockColumn )
+						continue;
 					
 					switch ( $_sAction )
 					{
+						case 'lock':	//	Special case if model contains lock column
+							$_sLockName = ( ! $_oModel->{$_sLockColumn} ) ? 'Lock' : 'Unlock';
+							$_sIconName = ( $_oModel->{$_sLockColumn} ) ? 'locked' : 'unlocked';
+
+							//	Lock import file
+							$_sActions .= CPSActiveWidgets::jquiButton( $_sLockName, array( CPSHelp::nvl( $_sViewName, 'toggleLock' ), $_sPK => $_oModel->{$_sPK} ),
+								array(
+									'confirm' => "Do you really want to " . strtolower( $_sLockName ) . " this {$sDataName}?",
+									'iconOnly' => true, 
+									'icon' => $_sIconName,
+									'iconSize' => 'small'
+								)
+							);
+							break;
+						
 						case 'edit':
 							$_sActions .= CPSActiveWidgets::jquiButton( 'Edit', array( CPSHelp::nvl( $_sViewName, 'update' ), $_sPK => $_oModel->{$_sPK} ), array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
 							break;
@@ -104,10 +124,14 @@ class CPSDataGrid
 								)
 							);
 							break;
+							
+						default:	//	Catchall for prefab stuff...
+							$_sActions .= str_ireplace( '%%PK_VALUE%%', $_oModel->{$_sPK}, $_sAction );
+							break;
 					}
 				}
 				
-				$_sTD .= CHtml::tag( 'td', array( 'class' => 'grid-actions' ), $_sActions );
+				$_sTD .= CHtml::tag( 'td', array( 'class' => 'grid-actions' ), '<div class="_grid_actions">' . $_sActions . '<hr /></div>' );
 			}
 			
 			$_sOut .= CHtml::tag( 'tr', array(), $_sTD );

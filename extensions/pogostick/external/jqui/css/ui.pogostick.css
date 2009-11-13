@@ -86,3 +86,91 @@ button.ps-button { width:auto; overflow:visible; }
 	padding-right: 15px;
 }
 
+/**
+* Pager Options
+*/
+ul.psPager
+{
+	font-size:11px;
+	border:0;
+	margin:0;
+	padding:0;
+	line-height:100%;
+	display:inline;
+}
+
+ul.psPager li
+{
+	display:inline;
+}
+
+.psPager .ps-button {
+	float:none;
+}
+
+ul.psPager a:hover {
+}
+
+li.ps-link-pager span {
+}
+
+li.ps-link-pager a.ps-button {
+	padding:5px 7px;
+	margin-top:2px;
+	color: #fff;
+}
+
+li.ps-link-pager a.ps-button-icon-right {
+	padding-right: 25px;
+}
+
+li.ps-link-pager a.ps-button-icon-left {
+	padding-left: 25px;
+}
+
+.psPager a {
+	font-size:11px;
+	padding:3px 5px;
+	margin-right:2px;
+	margin-top:0px;
+}
+
+.psPager li a {
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+
+.psPager li a {
+	background-color: #BFFFBF;
+}
+
+ul.psPager a:link, ul.psPager a:visited {
+	border:1px solid #ccc;
+	color:#44616F;
+}
+
+ul.psPager .selected a {
+	background:#285C00 none repeat scroll 0 0;
+}
+
+ul.psPager .selected a
+{
+	background:#2e6ab1;
+	color:#FFFFFF;
+	font-weight:bold;
+}
+
+ul.psPager .hidden a
+{
+	border:solid 1px #DEDEDE;
+	color:#888888;
+}
+
+/**
+ * Hide first and last buttons by default.
+ */
+ul.psPager .first,
+ul.psPager .last
+{
+	display:none;
+}

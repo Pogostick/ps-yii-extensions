@@ -36,6 +36,10 @@ class CPSTransform
 		'?' => 'boolTransform',
 		'#' => 'timeTransform',
 		'!' => 'styleTransform',
+		'<' => 'alignTransform',
+		'|' => 'alignTransform',
+		'>' => 'alignTransform',
+		'.' => 'numberTransform',
 	);
 
 	//********************************************************************************
@@ -44,7 +48,7 @@ class CPSTransform
 	
 	public static function cleanColumn( $sColumn )
 	{
-		if ( in_array( $sColumn{0}, array_keys( self::$m_arTransform ) ) ) $sColumn = substr( $sColumn, 1 );
+		if ( in_array( $sColumn[0], array_keys( self::$m_arTransform ) ) ) $sColumn = substr( $sColumn, 1 );
 		return $sColumn;
 	}
 	
@@ -73,15 +77,12 @@ class CPSTransform
 			$_bLink = false;
 			$_oValue = null;
 
-			foreach ( self::$m_arTransform as $_sChar => $_sMethod )
+			if ( in_array( $_sColumn[0], array_keys( self::$m_arTransform ) ) )
 			{
-				if ( $_sColumn{0} == $_sChar )
-				{
-					$_sRealCol = self::cleanColumn( $_sColumn );
-					list( $_sColumn, $_oValue, $_bLink, $_arWrapOpts ) = self::$_sMethod( $_sColumn, $oModel->$_sRealCol );
-					$arWrapOptions = array_merge( $arWrapOptions, $_arWrapOpts );
-					break;
-				}
+				$_sRealCol = self::cleanColumn( $_sColumn );
+				$_sMethod = self::$m_arTransform[ $_sColumn[0] ];
+				list( $_sColumn, $_oValue, $_bLink, $_arWrapOpts ) = self::$_sMethod( $_sColumn, $oModel->$_sRealCol );
+				$arWrapOptions = array_merge( $arWrapOptions, $_arWrapOpts );
 			}
 
 			if ( ! $_oValue ) $_oValue = $oModel->{$_sColumn};
@@ -119,7 +120,30 @@ class CPSTransform
 	
 	protected static function styleTransform( $sColumn, $oValue )
 	{	
-		return array( self::cleanColumn( $sColumn ), date( $sFormat, $oValue ), false, array( 'style' => 'text-align: right;' ) );
+		return self::alignTransform( $sColumn, $oValue, '>' );
+	}
+	
+	protected static function alignTransform( $sColumn, $oValue )
+	{
+		$_arStyle = array();
+		
+		switch ( $sColumn[0] )
+		{
+			case '|':
+				$_arStyle['style'] = 'text-align:center;';
+				break;
+				
+			case '>':
+				$_arStyle['style'] = 'text-align:right;';
+				break;
+				
+			case '<':
+			default:
+				$_arStyle['style'] = 'text-align:left;';
+				break;
+		}
+		
+		return array( self::cleanColumn( $sColumn ), $oValue, false, $_arStyle );
 	}
 	
 }
