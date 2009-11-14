@@ -86,14 +86,6 @@ abstract class CPSController extends CController
 	public function setAutoMissing( $bValue ) { $this->m_bAutoMissing = $sValue; }
 	
 	/**
-	* @var string The default action for this controller
-	* @access protected
-	*/
-	protected $m_sDefaultAction = 'index';
-	public function getDefaultAction() { return $this->m_sDefaultAction; }
-	public function setDefaultAction( $sValue ) { $this->m_sDefaultAction = $sValue; }	
-	
-	/**
 	* @var array An associative array of POST commands and their applicable methods
 	* @access protected
 	*/
