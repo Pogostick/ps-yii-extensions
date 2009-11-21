@@ -52,6 +52,15 @@ abstract class CPSController extends CController
 	protected $m_sPageHeading = null;
 	public function getPageHeading() { return $this->m_sPageHeading; }
 	public function setPageHeading( $sValue ) { $this->m_sPageHeading = $sValue; }
+	
+	/***
+	* Allows you to change your action prefix
+	* 
+	* @var string
+	*/
+	protected $m_sMethodPrefix = 'action';
+	public function getMethodPrefix() { return $this->m_sMethodPrefix; }
+	public function setMethodPrefix( $sValue ) { $this->m_sMethodPrefix = $sValue; }
 
 	/**
 	* @var CActiveRecord The currently loaded data model instance.
@@ -68,7 +77,7 @@ abstract class CPSController extends CController
 	protected $m_sModelName = null;
 	public function getModelName() { return $this->m_sModelName; }
 	protected function setModelName( $sValue ) { $this->m_sModelName = $sValue; }	
-
+	
 	/**
 	* @var boolean Try to find proper layout to use
 	* @access protected
@@ -99,12 +108,35 @@ abstract class CPSController extends CController
 	* @access protected
 	*/
 	protected $m_arUserActionList = array();
+	protected function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = null; $this->addUserActions( $eWhich, $arValue ); }
 	public function getUserActionList( $eWhich ) { return CPSHelp::getOption( $this->m_arUserActionList, $eWhich ); }
-	public function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = $arValue; }
 	public function addUserActionRole( $eWhich, $sRole, $sAction ) { $this->m_arUserActionList[ $eWhich ]['roles'][] = $arValue; }
-	public function addUserAction( $eWhich, $sAction ) { if ( ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) $this->m_arUserActionList[ $eWhich ] = array(); $this->m_arUserActionList[ $eWhich ] = array_merge( $this->m_arUserActionList[ $eWhich ], array( $sAction ) );  }
-	public function addUserActions( $eWhich, $arActions = array() ) { if ( ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) $this->m_arUserActionList[ $eWhich ] = array(); $this->m_arUserActionList[ $eWhich ] = array_merge( $this->m_arUserActionList[ $eWhich ], $arActions );  }
 
+	public function addUserAction( $eWhich, $sAction ) 
+	{ 
+		if ( ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) 
+			$this->m_arUserActionList[ $eWhich ] = array(); 
+			
+		if ( ! in_array( $sAction, $this->m_arUserActionList[ $eWhich ] ) )
+			$this->m_arUserActionList[ $eWhich ][] = $sAction;
+			
+		//	Make sure we don't lose our error handler...
+		if ( $eWhich == self::ACCESS_TO_ANY )
+		{
+			if ( ! in_array( 'error', $this->m_arUserActionList[ $eWhich ] ) )
+				$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
+		}
+	}
+
+	public function addUserActions( $eWhich, $arActions = array() ) 
+	{ 
+		if ( ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) 
+			$this->m_arUserActionList[ $eWhich ] = array(); 
+			
+		foreach ( $arActions as $_sAction )
+			$this->addUserAction( $eWhich, $_sAction );
+	}
+	
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -119,9 +151,12 @@ abstract class CPSController extends CController
 		parent::init();
 		
 		//	Find layout...
-		if ( $this->m_bAutoLayout ) if ( file_exists(Yii::app()->getBasePath().'/views/layouts/'.$this->getId().'.php') ) $this->layout = $this->getId();
+		if ( $this->m_bAutoLayout ) if ( file_exists( Yii::app()->getBasePath() . '/views/layouts/' . $this->getId() . '.php' ) ) $this->layout = $this->getId();
+		
+		//	Allow errors
+		$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
 	}
-
+	
 	/**
 	* A generic action that renders a page and passes in the model
 	* 
@@ -172,6 +207,44 @@ abstract class CPSController extends CController
 		parent::missingAction( $sActionId );
 	}
 
+	/**
+	* If value is !set||empty, last passed in argument is returned
+	* 
+	* Allows for multiple nvl chains ( nvl(x,y,z,null) ). Copied from CPSHelp::nvl()
+	* for ease of use.
+	* 
+	* @param mixed 
+	* @see CPSHelp::nvl
+	*/
+	public function nvl()
+	{
+		$_oDefault = null;
+		$_iArgs = func_num_args();
+		$_arArgs = func_get_args();
+		
+		for ( $_i = 0; $_i < $_iArgs; $_i++ )
+		{
+			if ( isset( $_arArgs[ $_i ] ) && ! empty( $_arArgs[ $_i ] ) )
+				return $_arArgs[ $_i ];
+				
+			$_oDefault = $_arArgs[ $_i ];
+		}
+
+		return $_oDefault;
+	}
+	
+	/**
+	* Our error handler...
+	* 
+	*/
+	public function actionError()
+	{
+		if ( ! $_oError = Yii::app()->errorHandler->error )
+			throw new CHttpException( 404, 'Page not found.' );
+
+	    $this->render( 'error', array( 'error' => $_oError ) );
+	}
+	
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
@@ -184,11 +257,14 @@ abstract class CPSController extends CController
 	* @param string $sRedirectAction Where to redirect after a successful save
 	* @param boolean $bAttributesSet If true, attributes will not be set from $arData
 	* @param string $sModelName Optional model name
+	* @param string $sSuccessMessage Flash message to set if successful
+	* @param boolean $bNoCommit If true, transaction will not be committed
 	* @returns boolean
 	*/
-	protected function saveModel( $oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null )
+	protected function saveModel( $oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false )
 	{
-		$_sModelName = CPSHelp::nvl( $sModelName, $this->m_sModelName );
+		$_sMessage = CPSHelp::nvl( $sSuccessMessage, 'Your changes have been saved.' );
+		$_sModelName = CPSHelp::nvl( $sModelName, CPSHelp::nvl( $oModel->modelName, $this->m_sModelName ) );
 		
 		if ( isset( $arData, $arData[ $_sModelName ] ) )
 		{
@@ -196,9 +272,15 @@ abstract class CPSController extends CController
 			
 			if ( $oModel->save() ) 
 			{
-				Yii::app()->user->setFlash( 'success', 'Your changes have been saved.' );
-				if ( $sRedirectAction ) $this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
-				return true;
+				if ( ! $bNoCommit && $oModel instanceof CPSModel && $oModel->hasTransaction() ) $oModel->commitTransaction();
+				
+				Yii::app()->user->setFlash( 'success', $_sMessage );
+				
+				if ( $sRedirectAction ) 
+				{
+					$this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
+					return true;
+				}
 			}
 		}
 		
@@ -293,5 +375,5 @@ abstract class CPSController extends CController
 		$_sScopes = ( count( $arScope ) ) ? implode( '->', $arScope ) . '->' : null;
 		return $this->m_sModelName . '::model()->' . $_sScopes;
 	}
-
+	
 }

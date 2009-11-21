@@ -14,13 +14,10 @@
  * @lastmodified  $Date$
  */
 
-//	Need this 
-Yii::import('pogostick.helpers.CPSActiveWidgets'); 
-
 /**
  * CPSTransform provides form helper functions
  */
-class CPSTransform
+class CPSTransform extends CPSHelperBase
 {
 	//********************************************************************************
 	//* Member Variables
@@ -66,9 +63,34 @@ class CPSTransform
 		return $oValue;
 	}
 	
+	protected static function setValue( $oModel, $sColumn, $oValue = null )
+	{
+		return eval( '$oModel->' . self::columnChain( $sColumn ) . ' = \'' . $oValue . '\'; return;' );
+	}
+	
+	protected static function getValue( $oModel, $sColumn )
+	{
+		return eval( 'return $oModel->' . self::columnChain( $sColumn ) . ';' );
+	}
+	
+	protected static function columnChain( $sColumn )
+	{
+		$_sCmd = $sColumn;
+		
+		if ( false !== strpos( $sColumn, '.' ) )
+		{
+			$_sCmd = null;
+			$_arParts = explode( '.', $sColumn );
+			foreach ( $_arParts as $_sPart ) $_sCmd .= ( $_sCmd !== null ? '->' : '' ) . $_sPart;
+		}
+
+		return $_sCmd;
+	}
+	
 	public static function column( $oModel, $arColumns = array(), $sLinkView = 'update', $sWrapTag = 'td', $arWrapOptions = array() )
 	{
 		$_bValue = $_sOut = null;
+		$_arValueMap = array();
 		$_sPK = $oModel->getTableSchema()->primaryKey;
 		
 		//	Build columns
@@ -76,19 +98,35 @@ class CPSTransform
 		{
 			$_bLink = false;
 			$_oValue = null;
+			
+			if ( is_array( $_sColumn ) )
+			{
+				$_sTemp = array_shift( $_sColumn );
+				$_arColOpts = $_sColumn;
+				$_sColumn = $_sTemp;
+			}
+			
+			//	Get column options
+			if ( $_arColOpts ) $_arValueMap = self::getOption( $_arColOpts, 'valueMap', array(), true );
 
+			//	Process column...
 			if ( in_array( $_sColumn[0], array_keys( self::$m_arTransform ) ) )
 			{
 				$_sRealCol = self::cleanColumn( $_sColumn );
 				$_sMethod = self::$m_arTransform[ $_sColumn[0] ];
-				list( $_sColumn, $_oValue, $_bLink, $_arWrapOpts ) = self::$_sMethod( $_sColumn, $oModel->$_sRealCol );
+				list( $_oValue, $_bLink, $_arWrapOpts ) = self::$_sMethod( $_sColumn[0], self::getValue( $oModel, $_sRealCol ) );
 				$arWrapOptions = array_merge( $arWrapOptions, $_arWrapOpts );
 			}
 
-			if ( ! $_oValue ) $_oValue = $oModel->{$_sColumn};
+			if ( ! $_oValue ) $_oValue = self::getValue( $oModel, $_sRealCol );
 			
-			$_sColumn = ( $_bLink || $_sPK == $_sColumn ) ?
-				CHtml::link( $_oValue, array( $sLinkView, $_sPK => $oModel->{$_sPK} ) ) 
+			//	Map value for display...
+			if ( isset( $_oValue ) && in_array( $_oValue, array_keys( $_arValueMap ) ) )
+				if ( isset( $_arValueMap[ $_oValue ] ) ) $_oValue = $_arValueMap[ $_oValue ];
+
+			//	Pretty it up...
+			$_sColumn = ( $_bLink || $_sPK == $_sRealCol ) ?
+				CHtml::link( $_oValue, array( $sLinkView, $_sPK => $oModel->{$_sPK} ) )
 				:
 				CHtml::encode( $_oValue );
 
@@ -102,32 +140,32 @@ class CPSTransform
 	//* Private Methods 
 	//********************************************************************************
 	
-	protected static function linkTransform( $sColumn, $oValue = null )
+	protected static function linkTransform( $sHow, $oValue = null )
 	{
-		return array( self::cleanColumn( $sColumn ), $oValue, true, array() );
+		return array( $oValue, true, array() );
 	}
 	
-	protected static function boolTransform( $sColumn, $oValue )
+	protected static function boolTransform( $sHow, $oValue )
 	{
 		$_oValue = ( empty( $oValue ) || $oValue === 'N' || $oValue === 'n' || $oValue === 0 ) ? 'No' : 'Yes';
-		return array( self::cleanColumn( $sColumn ), $_oValue, false, array() );
+		return array( $_oValue, false, array() );
 	}
 	
-	protected static function timeTransform( $sColumn, $oValue, $sFormat = 'F d, Y' )
+	protected static function timeTransform( $sHow, $oValue, $sFormat = 'F d, Y' )
 	{
-		return array( self::cleanColumn( $sColumn ), date( $sFormat, $oValue ), false, array() );
+		return array( date( $sFormat, $oValue ), false, array() );
 	}
 	
-	protected static function styleTransform( $sColumn, $oValue )
+	protected static function styleTransform( $sHow, $oValue )
 	{	
-		return self::alignTransform( $sColumn, $oValue, '>' );
+		return self::alignTransform( $sHow, $oValue, '>' );
 	}
 	
-	protected static function alignTransform( $sColumn, $oValue )
+	protected static function alignTransform( $sHow, $oValue )
 	{
 		$_arStyle = array();
 		
-		switch ( $sColumn[0] )
+		switch ( $sHow )
 		{
 			case '|':
 				$_arStyle['style'] = 'text-align:center;';
@@ -143,7 +181,7 @@ class CPSTransform
 				break;
 		}
 		
-		return array( self::cleanColumn( $sColumn ), $oValue, false, $_arStyle );
+		return array( $oValue, false, $_arStyle );
 	}
 	
 }

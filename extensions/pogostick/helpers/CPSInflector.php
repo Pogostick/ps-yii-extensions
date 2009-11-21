@@ -16,7 +16,7 @@
  * @package psYiiExtensions
  * @subpackage Helpers
  */
-class CPSInflector
+class CPSInflector extends CPSHelperBase
 {
 	//********************************************************************************
 	//* Constants

@@ -65,8 +65,18 @@ class CPSActiveWidgets extends CHtml
 	//********************************************************************************
 	//* Member variables
 	//********************************************************************************
+
+	/**
+	* Template for hints. They will be displayed right after the div simple/complex tag.
+	* %%HINT%% will be replaced with your hint text.
+	* 
+	* @var string
+	*/
+	protected static $m_sHintTemplate = '<p class="hint">%%HINT%%</p>';
+	public function getHintTemplate() { return self::$m_sHintTemplate; }
+	public function setHintTemplate( $sValue ) { self::$m_sHintTemplate = $sValue; }
 	
-	private static $m_arInputMap = array( 
+	protected static $m_arInputMap = array( 
 		self::TEXTAREA => 'textarea',
 		self::TEXT => 'text',
 		self::HIDDEN => 'hidden',
@@ -100,11 +110,9 @@ class CPSActiveWidgets extends CHtml
 	public static function getNamePrefix( $sType ) { return ( self::$useNamePrefixes && is_array( self::$namePrefixes ) && self::nvl( self::$namePrefixes[ $sType ] )  ) ? self::$namePrefixes[ $sType ] : null; }
 	
 	public static $requiredHtml = null;
-	public static function getRequiredHtml() { return self::nvl( self::$requiredHtml ); }
 	
 	public static $labelSuffix = ':';
-	public static function getLabelSuffix() { return self::nvl( self::$labelSuffix ); }
-	
+
 	public static $formFieldContainer = 'div';
 	public static $formFieldContainerClass = 'input-holder';
 	
@@ -153,7 +161,12 @@ class CPSActiveWidgets extends CHtml
 		$_sDivClass = CPSHelp::getOption( $arOptions, '_divClass', null, true );
 		$_sTransform = CPSHelp::getOption( $arOptions, 'transform', null, true );
 		$_sTitle = CPSHelp::getOption( $arOptions, 'title', null );
-		$_bAddColon = CPSHelp::getOption( $arOptions, 'addColon', false );
+		$_sHint = CPSHelp::getOption( $arOptions, 'hint', null, true );
+		$_arValueMap = CPSHelp::getOption( $arOptions, 'valueMap', array(), true );
+
+		//	Value map...
+		if ( in_array( $oModel->{$sColName}, array_keys( $_arValueMap ) ) && isset( $_arValueMap[$oModel->{$sColName}] ) ) 
+			$arOptions['value'] = $_arValueMap[$oModel->{$sColName}];
 		
 		//	Do auto-tooltipping...
 		if ( ! $_sTitle && $oModel && method_exists( $oModel, 'attributeTooltips' ) )
@@ -179,19 +192,21 @@ class CPSActiveWidgets extends CHtml
 			$_sOut = self::label( $sLabel, $arOptions[ 'id' ], $arLabelOptions );
 		else
 		{
-			//	Set colons...
-			if ( $_bAddColon ) $arLabelOptions['label'] = CPSHelp::getOption( $arLabelOptions, 'label', $oModel->getAttributeLabel( $sColName ) ) . ':';
-			$_sOut = self::activeLabelEx( $oModel, ( null == $sLabel ) ? $sColName : $sLabel, $arLabelOptions );
+			//	Set label name
+			$sLabel = CPSHelp::nvl( $sLabel, CPSHelp::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . self::$labelSuffix;
+			$_sOut = self::activeLabelEx( $oModel, $sLabel, $arLabelOptions );
 		}
 
 		if ( $_sTransform && $oModel ) $oModel->$sColName = CPSTransform::value( $_sTransform, $oModel->$sColName );
 		
 		$_sOut .= self::activeField( $eFieldType, $oModel, $sColName, $arOptions, $arWidgetOptions, $arData );
-		
 		$_sOut .= $_sHtml;
+		
+		//	Any hints?
+		if ( $_sHint ) $_sHint = str_ireplace( '%%HINT%%', $_sHint, self::$m_sHintTemplate );
 
 		//	Construct the div...
-		$_sOut = '<div id="PIF_' . $arOptions[ 'id' ] . '" class="simple' . ( $_sDivClass ? ' ' . $_sDivClass : '' ) . '">' . $_sOut . '</div>';
+		$_sOut = '<div id="PIF_' . $arOptions[ 'id' ] . '" class="simple' . ( $_sDivClass ? ' ' . $_sDivClass : '' ) . '">' . $_sOut . $_sHint . '</div>';
 
 		return $_sOut;
 	}
@@ -508,18 +523,6 @@ CSS;
 		Yii::app()->getClientScript()->registerCSS( md5( time() ), $_sCss );
 	}
 	
-	public static function beginFieldset( $sLegend = null, array $arHtmlOptions = array() )
-	{
-		$_sOut = '<FIELDSET>';
-		if ( $sLegend ) $_sOut .= CHtml::tag( 'legend', $arHtmlOptions, $sLegend );
-		return $_sOut;
-	}
-	
-	public static function endFieldSet()
-	{
-		return '</FIELDSET>';
-	}
-	
 	public static function dropDown( $eType, $sName, $sLabel = null, $arOptions = array() )
 	{
 		$_sValue = CPSHelp::getOption( $arOptions, 'value', null, true );
@@ -654,7 +657,7 @@ CSS;
 	 */
 	public static function submitButtonBar( $sLabel = 'Submit', $arHtmlOptions = array() )
 	{
-		return '<div class="ps-submit-button-bar">' . self::submitButton( $sLabel, $arHtmlOptions ) . '</div>';
+		return '<div class="ps-submit-button-bar">' . self::submitButton( $sLabel, $arHtmlOptions ) . '<hr /></div>';
 	}
 
 	/****
@@ -767,7 +770,7 @@ HTML;
 		if ( $oModel->hasAttribute( $sCreatedColumn ) && $oModel->hasAttribute( $sModifiedColumn ) )
 		{
 			$_sOut = '<div class="ps-form-footer">';
-			$_sOut .= '<span>Created:' . date( $sDateFormat, ! is_numeric( $oModel->$sCreatedColumn ) ? strtotime( $oModel->$sCreatedColumn ) : $oModel->$sCreatedColumn ) . '</span><span class="ps-pipe">/</span><span>Modified:' . date( $sDateFormat, ! is_numeric( $oModel->$sModifiedColumn ) ? strtotime( $oModel->$sModifiedColumn ) : $oModel->$sModifiedColumn ) . '</span>';
+			$_sOut .= '<span><strong>Created:</strong>&nbsp;' . date( $sDateFormat, ! is_numeric( $oModel->$sCreatedColumn ) ? strtotime( $oModel->$sCreatedColumn ) : $oModel->$sCreatedColumn ) . '</span><span class="ps-pipe">/</span><span><strong>Modified:</strong>&nbsp;' . date( $sDateFormat, ! is_numeric( $oModel->$sModifiedColumn ) ? strtotime( $oModel->$sModifiedColumn ) : $oModel->$sModifiedColumn ) . '</span>';
 			$_sOut .= '</div>';
 		}
 		
@@ -900,11 +903,61 @@ HTML;
 		return implode($separator,$items);
 	}
 
-}
+	/**
+	* Create a field set with optional legend
+	* 
+	* @param string $sLegend
+	* @param array $arOptions
+	* @return string
+	*/
+	public static function beginFieldset( $sLegend, $arOptions = array() )
+	{
+		$_arLegendOptions = CPSHelp::getOption( $arOptions, 'legendOptions', array(), true );
+		
+		return self::tag( 'fieldset', $arOptions, ( $sLegend ? self::tag( 'legend', $_arLegendOptions, $sLegend ) : false ), false );
+	}
+	
+	/**
+	* Closes an open fieldset
+	* 
+	* @returns string
+	*/
+	public static function endFieldset()
+	{
+		return self::closeTag( 'fieldset' );
+	}
+	
+	public static function flashHighlight( $sMsg = null )
+	{
+		if ( $sMsg )
+		{
+			return self::tag( 'div', 
+				array( 
+					'class' => 'ui-widget'
+				),
+				self::tag( 'div', 
+					array( 
+						'class' => 'ui-state-highlight ui-corner-all', 
+						'style' => 'padding:1em; margin: 5px 0px 15px 0px;' 
+					), 
+					'<p><span class="ui-icon ui-icon-info" style="float: left; margin-right:10px;"></span>' . $sMsg . '</p>'
+				)
+			);
+		}
+		
+	}
 
-/**
-* Convienience class for CPSActiveWidgets so it's not so much to type...
-*/
-class PS extends CPSActiveWidgets                                                                                                                           
-{
+	/**
+	* Puts up flash div if the flash message specified is set. Defaults to 'success'.
+	* 
+	* @param string $sWhich
+	*/
+	public static function flashMessage( $sWhich = 'success' )
+	{
+		if ( Yii::app()->user->hasFlash( $sWhich ) ) 
+		{
+			Yii::app()->clientScript->registerScript( 'psFlashDisplay', '$(".ps-flash-display").animate({opacity: 1.0}, 3000).fadeOut();', CClientScript::POS_READY );
+			return self::tag( 'div', array( 'class' => 'ps-flash-display' ), Yii::app()->user->getFlash( $sWhich ) );
+		}
+	}
 }

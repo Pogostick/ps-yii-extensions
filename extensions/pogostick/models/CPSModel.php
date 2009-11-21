@@ -15,6 +15,8 @@
  */
 /**
  * CPSModel provides base functionality for models
+ * 
+ * @property-read string $modelName The class name of the model
  */
 class CPSModel extends CActiveRecord
 {
@@ -101,11 +103,57 @@ class CPSModel extends CActiveRecord
 	protected $m_oTransaction = null;
 	public function getTransaction() { return $this->m_oTransaction; }
 	public function setTransaction( $oValue ) { $this->m_oTransaction = $oValue; }
+	public function hasTransaction() { return isset( $this->m_oTransaction ) ? $this->m_oTransaction->active : false; }
+
+	/**
+	* Get's the name of the model class
+	* 
+	* @var string
+	*/
+	protected $m_sModelName = null;
+	public function getModelName() { return $this->m_sModelName; }
 	
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 
+	/**
+	* Returns the static model of the specified AR class.
+	* 
+	* @return CActiveRecord the static model class
+	*/
+	public static function model( $sClassName = __CLASS__ )
+	{
+		return parent::model( $sClassName );
+	}
+
+	/***
+	* Sets our default behaviors
+	* 
+	*/
+	public function behaviors()
+	{
+		return array_merge(
+			parent::behaviors(),
+			array(
+				'psDataFormat' => array(
+					'class' => 'pogostick.behaviors.CPSDataFormatBehavior',
+				),
+			)
+		);
+	}
+
+	/**
+	* Grab our name
+	* 
+	* @param string $sClassName
+	*/
+	public function afterConstruct()
+	{
+		$this->m_sModelName = get_class( $this );
+		parent::afterConstruct();
+	}
+	
 	/**
 	* Populates 'created' field if new record
 	* 
@@ -117,7 +165,7 @@ class CPSModel extends CActiveRecord
 		if ( $this->isNewRecord )
 		{
 			if ( ( $_sCreated = $this->getCreatedColumn() ) && $this->hasAttribute( $_sCreated ) )
-				$this->{$_sCreated} = ( null === $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+				$this->{$_sCreated} = ( null === $this->m_sDateTimeFunction ) ? date('Y-m-d H:i:s') : eval('return ' . $this->m_sDateTimeFunction . ';');
 				
 			//	Handle user id stamp
 			if ( ( $_sCreatedBy = $this->getLModByColumn() ) && $this->hasAttribute( $_sCreatedBy ) ) 
@@ -126,7 +174,7 @@ class CPSModel extends CActiveRecord
 			
 		//	Handle lmod stamp
 		if ( ( $_sLMod = $this->getLModColumn() ) && $this->hasAttribute( $_sLMod ) ) 
-			$this->{$_sLMod} = ( null === $this->m_sDateTimeFunction ) ? date('c') : eval('return ' . $this->m_sDateTimeFunction . ';');
+			$this->{$_sLMod} = ( null === $this->m_sDateTimeFunction ) ? date('Y-m-d H:i:s') : eval('return ' . $this->m_sDateTimeFunction . ';');
 				
 		//	Handle user id stamp
 		if ( ( $_sLModBy = $this->getLModByColumn() ) && $this->hasAttribute( $_sLModBy ) ) 

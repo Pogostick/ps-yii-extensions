@@ -18,6 +18,14 @@
  */
 class CPSLinkPager extends CLinkPager
 {
+	/**
+	* Pager locations
+	*/
+	const TOP_LEFT = 0;
+	const TOP_RIGHT = 1;
+	const BOTTOM_LEFT = 2;
+	const BOTTOM_RIGHT = 3;
+	
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -29,14 +37,23 @@ class CPSLinkPager extends CLinkPager
 	* @access protected
 	*/
 	protected $m_arIcons = array(
-		self::CSS_FIRST_PAGE => array( 'icon' => 'arrowstop-1-e', 'position' => 'left' ),
-		self::CSS_LAST_PAGE => array( 'icon' => 'arrowstop-1-w', 'position' => 'right' ),
-		self::CSS_PREVIOUS_PAGE => array( 'icon' => 'arrow-1-w', 'position' => 'left' ),
-		self::CSS_NEXT_PAGE => array( 'icon' => 'arrow-1-e', 'position' => 'right' ),
+		self::CSS_FIRST_PAGE => array( 'icon' => 'arrowthickstop-1-w', 'position' => 'left' ),
+		self::CSS_LAST_PAGE => array( 'icon' => 'arrowthickstop-1-e', 'position' => 'right' ),
+		self::CSS_PREVIOUS_PAGE => array( 'icon' => 'arrowthick-1-w', 'position' => 'left' ),
+		self::CSS_NEXT_PAGE => array( 'icon' => 'arrowthick-1-e', 'position' => 'right' ),
 		self::CSS_INTERNAL_PAGE => array(),
 		self::CSS_HIDDEN_PAGE => array(),
 		self::CSS_SELECTED_PAGE => array(),
 	);
+	
+	/**
+	* Where to put the pager...
+	* 
+	* @var integer
+	*/
+	protected $m_iPagerLocation = self::TOP_RIGHT;
+	public function getPagerLocation() { return $this->m_iPagerLocation; }
+	public function setPagerLocation( $iValue ) { $this->m_iPagerLocation = $iValue; }
 
 	//********************************************************************************
 	//* Property Access Methods
@@ -83,11 +100,29 @@ class CPSLinkPager extends CLinkPager
 		$this->firstPageLabel = 'First';
 		$this->lastPageLabel = 'Last';
 		
+		$this->maxButtonCount = 5;
+		
 		//	No CSS file, styling provided by jQuery UI and us
 		$this->cssFile = false;
 		
 		//	Our class for paging...
 		$this->htmlOptions['class'] = 'psPager';
+		
+		switch ( $this->getPagerLocation() )
+		{
+			case self::TOP_RIGHT:
+				$this->htmlOptions['class'] .= ' ps-pager-right ps-pager-top';
+				break;
+			case self::BOTTOM_RIGHT:
+				$this->htmlOptions['class'] .= ' ps-pager-right ps-pager-bottom';
+				break;
+			case self::TOP_LEFT:
+				$this->htmlOptions['class'] .= ' ps-pager-left ps-pager-top';
+				break;
+			case self::BOTTOM_LEFT:
+				$this->htmlOptions['class'] .= ' ps-pager-left ps-pager-bottom';
+				break;
+		}
 	}
 	
 	//********************************************************************************

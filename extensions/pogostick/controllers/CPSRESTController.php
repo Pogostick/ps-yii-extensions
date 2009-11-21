@@ -98,6 +98,15 @@ class CPSRESTController extends CPSController
 		$_sActionId = $oAction->getId();
 		$_sMethod = 'request' . $_sActionId;
 		$_arParams = $_REQUEST;
+		$_arUrlParams = array();
+		
+		//	If additional parameters are specified in the URL, convert to parameters...
+		$_sUri = Yii::app()->getRequest()->getRequestUri();
+		$_sUri = str_ireplace( '/' . $this->getId() . '/' . $_sActionId . '/', '', $_sUri );
+		$_arOpts = explode( '/', trim( $_sUri, '/' ) );
+		
+		for ( $_i = 0, $_iSize = count( $_arOpts ); $_i < $_iSize; $_i ++ )
+			$_arUrlParams[ $_i ] = $_arOpts[ $_i ];
 		
 		//	Is it a valid request?
 		if ( method_exists( $this, 'get' . $_sActionId ) )
@@ -114,7 +123,7 @@ class CPSRESTController extends CPSController
 			return $this->missingAction( $_sActionId );
 
 		//	All rest methods echo their output
-		echo call_user_func_array( array( $this, $_sMethod ), $_arParams );
+		echo call_user_func_array( array( $this, $_sMethod ), array_merge( $_arUrlParams, $_arParams ) );
 	}
 
 }

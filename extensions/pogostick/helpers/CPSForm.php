@@ -15,12 +15,12 @@
  */
 
 //	Need this 
-Yii::import('pogostick.helpers.CPSActiveWidgets'); 
+Yii::import( 'pogostick.helpers.CPSActiveWidgets' );
 
 /**
  * CPSForm provides form helper functions
  */
-class CPSForm
+class CPSForm extends CPSHelperBase
 {
 	//********************************************************************************
 	//* Member Variables
@@ -63,9 +63,10 @@ class CPSForm
 	* @param string $sTitle
 	* @param array $arMenuItems
 	* @param string $sDivClass
+	* @param boolean $bShowFlashDiv If true, will output a standard ps-flash-display div
 	* @returns string
 	*/
-	public static function formHeader( $sTitle, $arMenuItems = array(), $sDivClass = 'form-header' )
+	public static function formHeader( $sTitle, $arMenuItems = array(), $sDivClass = 'form-header', $bShowFlashDiv = true )
 	{
 		$_bIcon = false;
 		$_sClass = $_sLink = $_sOut = null;
@@ -74,10 +75,18 @@ class CPSForm
 		foreach ( $arMenuItems as $_sId => $_arItem ) 
 		{
 			$_sOnClick = null;
-			$_sLabel = CPSHelp::getOption( $_arItem, 'label', 'Menu Item', true );
+			$_sAccess = CPSHelp::getOption( $_arItem, 'access', null, true );
+			
+			//	Can user have this item?
+			if ( $_sAccess && $_sAccess != Yii::app()->user->accessRole )
+				continue;
+			
+			$_sLabel = CPSHelp::getOption( $_arItem, 'label', $sTitle, true );
 			$_sLink = CPSActiveWidgets::normalizeUrl( CPSHelp::getOption( $_arItem, 'url', array('#'), true ) );
 			$_sOut .= CPSActiveWidgets::jquiButton( $_sLabel, $_sLink, $_arItem );
 		}
+		
+		if ( $bShowFlashDiv ) $_sOut .= PS::flashMessage();
 		
 		return <<<HTML
 		<div class="{$sDivClass}">

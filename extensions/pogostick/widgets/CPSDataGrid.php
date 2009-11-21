@@ -13,19 +13,78 @@
  * @modifiedby $LastChangedBy$
  * @lastmodified  $Date$
  */
-class CPSDataGrid
+class CPSDataGrid extends CPSHelperBase
 {
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
-
-	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array() )
+	
+    /**
+    * Outputs a data grid with pager on the bottom
+    * 
+    * @param string $sDataName
+    * @param array $arModel
+    * @param array $arColumns
+    * @param array $arActions
+    * @param CSort $oSort
+    * @param CPagination $oPages
+    * @param array $arPagerOptions
+    * @param string $sLinkView
+    */
+	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array(), $sLinkView = 'update' )
 	{
+		//	Build pager...
+		$_oWidget = Yii::app()->controller->createWidget( 'CPSLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
+		
+		//	Build grid...
+		if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) $_oWidget->run();
+		
 		$_sOut = self::beginDataGrid( $arModel, $oSort, $arColumns, ! empty( $arActions ) );
-		$_sOut .= self::getDataGridRows( $arModel, $arColumns, $arActions, $sDataName );
+		$_sOut .= self::getDataGridRows( $arModel, $arColumns, $arActions, $sDataName, $sLinkView );
 		$_sOut .= self::endDataGrid();
 		
-		if ( $oPages ) Yii::app()->controller->widget( 'CPSLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
+		if ( $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_LEFT || $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_RIGHT ) $_oWidget->run();
+		
+		return $_sOut;
+	}
+
+    /**
+    * Outputs a data grid with pager on the bottom
+    * 
+    * @param string $sDataName
+    * @param array $arModel
+    * @param array $arColumns
+    * @param array $arActions
+    * @param CSort $oSort
+    * @param CPagination $oPages
+    * @param array $arPagerOptions
+    * @param string $sLinkView
+    */
+	public static function createEx( $arModel, $arOptions = array() )
+	{
+		$_sDataName = self::getOption( $arOptions, 'dataItemName', 'Your Data' );
+		$_arColumns = self::getOption( $arOptions, 'columns', array() );
+		$_arActions = self::getOption( $arOptions, 'actions', array() );
+		$_oSort = self::getOption( $arOptions, 'sort', null );
+		$_oPages = self::getOption( $arOptions, 'pages', null );
+		$_arPagerOptions = self::getOption( $arOptions, 'pagerOptions', array() );
+		$_sLinkView = self::getOption( $arOptions, 'linkView', 'update' );
+		$_iPagerLocation = self::getOption( $_arPagerOptions, 'location', CPSLinkPager::TOP_RIGHT, true );
+
+		//	Create widget...
+		if ( $_oPages ) $_oWidget = Yii::app()->controller->createWidget( 'CPSLinkPager', array_merge( array( 'pages' => $_oPages ), $_arPagerOptions ) );
+		if ( $_oWidget ) $_oWidget->pagerLocation = self::nvl( $_iPagerLocation, $_oWidget->pagerLocation );
+
+		//	Where do you want it?
+		if ( $_oWidget ) if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) $_oWidget->run();
+		
+		//	Build our grid
+		$_sOut = self::beginDataGrid( $arModel, $_oSort, $_arColumns, ! empty( $_arActions ) );
+		$_sOut .= self::getDataGridRows( $arModel, $_arColumns, $_arActions, $_sDataName, $_sLinkView );
+		$_sOut .= self::endDataGrid();
+		
+		//	Display on the bottom...
+		if ( $_oWidget ) if ( $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_LEFT || $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_RIGHT ) $_oWidget->run();
 		
 		return $_sOut;
 	}
@@ -45,6 +104,7 @@ class CPSDataGrid
 		
 		foreach ( $arColumns as $_sColumn )
 		{
+			if ( is_array( $_sColumn ) ) $_sColumn = array_shift( $_sColumn );
 			$_sColumn = CPSTransform::cleanColumn( $_sColumn );
 			$_sHeaders .= CHtml::tag( 'th', array(), ( $oSort ) ? $oSort->link( $_sColumn ) : $_sColumn );
 		}	
@@ -63,11 +123,12 @@ class CPSDataGrid
 	* @param array $arColumns
 	* @param array $arActions
 	* @param string $sDataName
+	* @param string $sLinkView
 	* @return string
 	*/
-	public static function getDataGridRows( $arModel, $arColumns = array(), $arActions = null, $sDataName = 'item' )
+	public static function getDataGridRows( $arModel, $arColumns = array(), $arActions = null, $sDataName = 'item', $sLinkView = null )
 	{
-		$_sViewName = null;
+		$_sViewName = $sLinkView;
 		$_sOut = empty( $arModel ) ? '<tr><td style="text-align:center" colspan="' . sizeof( $arColumns ) . '">No Records Found</td></tr>' : null;
 		if ( null === $arActions ) $arActions = array( 'edit', 'delete' );
 		$_arOptions = CPSHelp::getOption( $arActions, 'options', array(), true );
@@ -77,17 +138,19 @@ class CPSDataGrid
 		{
 			$_sActions = null;
 			$_sPK = $_oModel->getTableSchema()->primaryKey;
-			$_sTD = CPSTransform::column( $_oModel, $arColumns );
+			$_sTD = CPSTransform::column( $_oModel, $arColumns, $sLinkView );
 				
 			//	Build actions...
 			if ( null !== $arActions && is_array( $arActions ) )
 			{
-				foreach ( $arActions as $_sAction )
+				foreach ( $arActions as $_oParts )
 				{
-					if ( is_array( $_sAction ) )
+					$_sAction = $_oParts;
+					
+					if ( is_array( $_oParts ) )
 					{
-						$_sAction = $_sAction[0];
-						$_sViewName = $_sAction[1];
+						$_sAction = $_oParts[0];
+						$_sViewName = $_oParts[1];
 					}
 					
 					if ( $_sAction == 'lock' && ! $_sLockColumn )
@@ -111,7 +174,7 @@ class CPSDataGrid
 							break;
 						
 						case 'edit':
-							$_sActions .= CPSActiveWidgets::jquiButton( 'Edit', array( CPSHelp::nvl( $_sViewName, 'update' ), $_sPK => $_oModel->{$_sPK} ), array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
+							$_sActions .= CPSActiveWidgets::jquiButton( 'Edit', array( self::nvl( $_sViewName, $sLinkView, 'update' ), $_sPK => $_oModel->{$_sPK} ), array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
 							break;
 							
 						case 'delete':

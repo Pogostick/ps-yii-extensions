@@ -32,7 +32,7 @@ abstract class CPSCRUDController extends CPSController
 	* @var string
 	*/
 	protected $m_sLoginFormClass = null;
-	public function getLoginFormClass() { return $this->m_sLoginFormClass; }
+	public function getLoginFormClass() { return CPSHelp::nvl( $this->m_sLoginFormClass, 'LoginForm' ); }
 	public function setLoginFormClass( $sValue ) { $this->m_sLoginFormClass = $sValue; }
 	
 	//********************************************************************************
@@ -55,11 +55,11 @@ abstract class CPSCRUDController extends CPSController
 		$this->addCommandToMap( 'undelete' );
 
 		//	Set our access rules..
-		$this->setUserActionList( self::ACCESS_TO_ANY, array( 'index' ) );
+		$this->addUserAction( self::ACCESS_TO_ANY, 'index' );
 		$this->setUserActionList( self::ACCESS_TO_GUEST, array( 'login', 'register' ) );
 		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'admin', 'create', 'delete', 'logout', 'show', 'update' ) );
-		$this->setUserActionList( self::ACCESS_TO_ADMIN, array() );
-		$this->setUserActionList( self::ACCESS_TO_NONE, array() );
+		$this->addUserActions( self::ACCESS_TO_ADMIN, array() );
+		$this->addUserActions( self::ACCESS_TO_NONE, array() );
 	}
 
 	/**
@@ -279,7 +279,6 @@ abstract class CPSCRUDController extends CPSController
 	public function actionLogin()
 	{
 		$_sClass = CPSHelp::nvl( $this->m_sLoginFormClass, 'LoginForm' );
-
 		$_oLogin = new $_sClass();
 		
 		if ( isset( $_POST[ $_sClass ] ) )

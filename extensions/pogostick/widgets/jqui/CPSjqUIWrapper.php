@@ -98,7 +98,33 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	* 
 	* @var array
 	*/
-	protected $m_arValidThemes = array( 'base', 'black-tie', 'blitzer', 'cupertino', 'dot-luv', 'excite-bike', 'hot-sneaks', 'humanity', 'mint-choc', 'redmond', 'smoothness', 'south-street', 'start', 'swanky-purse', 'trontastic', 'ui-darkness', 'ui-lightness', 'vader' ); 
+	protected $m_arValidThemes = array( 
+		'base', 
+		'black-tie', 
+		'blitzer', 
+		'cupertino', 
+		'dark-hive',
+		'dot-luv', 
+		'eggplant',
+		'excite-bike', 
+		'flick',
+		'hot-sneaks', 
+		'humanity', 
+		'le-frog', 
+		'mint-choc', 
+		'overcast',
+		'pepper-grinder',
+		'redmond', 
+		'smoothness', 
+		'south-street', 
+		'start', 
+		'sunny',
+		'swanky-purse',
+		'trontastic',
+		'ui-darkness',
+		'ui-lightness',
+		'vader'
+	); 
 	
 	//********************************************************************************
 	//* Property Accessors
@@ -244,19 +270,22 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		$_sOldPath = $_oWidget->baseUrl;
 		$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
 		
-		//	Set $sTheme if missing...
-		if ( null != $oWidget && null == $sTheme ) $sTheme = $oWidget->theme;
-
 		//	Check theme overrides...
-		$_oWidget->theme = ( ! self::$m_bMultiTheme && ! empty( self::$m_sCurrentTheme ) ) ? self::$m_sCurrentTheme : self::$m_sCurrentTheme = $sTheme;
+		$_sTheme = CPSHelp::nvl( $sTheme, $_oWidget->theme, self::$m_sCurrentTheme, Yii::app()->params['theme'] );
+		if ( ! self::$m_bMultiTheme && empty( self::$m_sCurrentTheme ) ) self::$m_sCurrentTheme = $_sTheme;
+
+		$_oWidget->theme = $_sTheme;
 		
 		//	Register scripts necessary
 		$_oCS->registerScriptFile( "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js" );
 		$_oCS->registerScriptFile( $_oWidget->baseUrl . '/js/jquery.pogostick.hover.js', CClientScript::POS_END );
 
-		//	Register css files...
-		$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css" );
-		$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/ui.pogostick.css" );
+		//	Register css files if we have a theme...
+		if ( $_oWidget->theme )
+		{
+			$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css" );
+			$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/ui.pogostick.css" );
+		}
 		
 		//	Restore path
 		$_oWidget->baseUrl = $_sOldPath;

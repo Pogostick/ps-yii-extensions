@@ -1,5 +1,6 @@
 /*
-* Styles for buttons and toolbars for jQuery
+* Buttons and toobars...
+* 
 * Hijacked from Filament Group Labs (http://www.filamentgroup.com/lab/styling_buttons_and_toolbars_with_the_jquery_ui_css_framework/)!
 * Thanks Guys!
 */
@@ -21,6 +22,8 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-button-icon-solo { display:block; width:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
 .ps-button-icon-solo-small { padding:6px 10px; -moz-border-radius:3px; display:block; width:0px; height:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
 
+.ps-button-no-float { float:none !important; }
+
 .ps-buttonset { float:left; }
 .ps-buttonset .ps-button { float: left; }
 .ps-buttonset-single .ps-button, 
@@ -30,23 +33,95 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-toolbar .ps-buttonset { margin-right:1.5em; padding-left: 1px; }
 .ps-toolbar .ps-button { font-size: 1em;  }
 
-.ps-submit-button-bar {
-	margin:10px 0px;
+/**
+* Miscellaneous classes/styles
+*/
+.ps-pipe {
+	color: #ccc;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
+.ps-lpipe {
+	color: #333;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.ps-footer-pipe {
+	color: #ccc;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.ps-wide {
+	width: 200px !important;
+}
+
+.ps-short {
+	width: 100px !important;
+}
+
+.ps-tiny {
+	width: 50px !important;
+}
+
+/**
+* In form submit button bar
+*/
+.ps-submit-button-bar {
+	clear: both;
+	position: relative;
+	display: block;
+	text-align:right;
+	padding-bottom:0px;
+}
+
+.ps-submit-button-bar .ps-button 
+{ 
+	padding-bottom:7px;
+}
+
+.ps-submit-button-bar a.ps-button 
+{ 
+	margin:5px auto 0px auto; 
+	float:none !important; 
+	display: inline-block;
+	padding:5px auto 10px auto;
+}
+
+.ps-submit-button-bar hr {
+	display: block;
+	clear: both; 
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
+}
+
+/**
+* Form header flash display
+*/
 .ps-flash-display {
 	float:right;
 	font-size:13px;
 	color: yellow;
 	z-index:5;
 	display: inline;
+	margin-right:5px;
+	padding-right:5px;
 }
 
+/**
+* Form footers
+*/
 .ps-form-footer {
 	margin:20px 0px 0px 0px;
 	text-align:right;
 }
 
+/**
+* Data lists 
+*/
 .ps-data-list-container {
 	display: block;
 }
@@ -68,66 +143,9 @@ button.ps-button { width:auto; overflow:visible; }
 	color:white;
 }
 
-.ps-pipe {
-	color: #ccc;
-	padding-left: 5px;
-	padding-right: 5px;
-}
-
-.ps-lpipe {
-	color: #333;
-	padding-left: 5px;
-	padding-right: 5px;
-}
-
-.ps-footer-pipe {
-	color: #ccc;
-	padding-left: 15px;
-	padding-right: 15px;
-}
-
 /**
 * Pager Options
 */
-ul.psPager
-{
-	font-size:11px;
-	border:0;
-	margin:0;
-	padding:0;
-	line-height:100%;
-	display:inline;
-}
-
-ul.psPager li
-{
-	display:inline;
-}
-
-.psPager .ps-button {
-	float:none;
-}
-
-ul.psPager a:hover {
-}
-
-li.ps-link-pager span {
-}
-
-li.ps-link-pager a.ps-button {
-	padding:5px 7px;
-	margin-top:2px;
-	color: #fff;
-}
-
-li.ps-link-pager a.ps-button-icon-right {
-	padding-right: 25px;
-}
-
-li.ps-link-pager a.ps-button-icon-left {
-	padding-left: 25px;
-}
-
 .psPager a {
 	font-size:11px;
 	padding:3px 5px;
@@ -141,36 +159,82 @@ li.ps-link-pager a.ps-button-icon-left {
 }
 
 .psPager li a {
-	background-color: #BFFFBF;
 }
 
-ul.psPager a:link, ul.psPager a:visited {
-	border:1px solid #ccc;
-	color:#44616F;
+.psPager .ps-button {
+	float:none;
 }
 
-ul.psPager .selected a {
-	background:#285C00 none repeat scroll 0 0;
-}
-
-ul.psPager .selected a
+ul.psPager
 {
-	background:#2e6ab1;
-	color:#FFFFFF;
-	font-weight:bold;
+	clear: both;
+	font-size:11px;
+	border:0;
+	margin:0 auto;
+	padding:0;
+	display:block;
 }
 
-ul.psPager .hidden a
-{
-	border:solid 1px #DEDEDE;
-	color:#888888;
+ul.psPager.ps-pager-left {
+	float: none;
 }
 
-/**
- * Hide first and last buttons by default.
- */
+ul.psPager.ps-pager-right {
+	float: right;
+}
+
+ul.psPager.ps-pager-top {
+	margin:0px auto 15px auto;
+}
+
+ul.psPager.ps-pager-bottom {
+	margin:15px auto 0px auto;
+}
+
 ul.psPager .first,
 ul.psPager .last
 {
 	display:none;
+}
+
+ul.psPager a:link, 
+ul.psPager a:visited {
+}
+
+ul.psPager .selected a
+{
+	font-weight:bold;
+}
+
+ul.psPager li
+{
+	display:inline;
+}
+
+ul.psPager li.hidden
+{
+	display:none;
+}
+
+ul.psPager a:hover {
+}
+
+ul.psPager li.ps-link-pager span {
+}
+
+ul.psPager li.ps-link-pager li a span.ui-icon {
+	margin-left:0px;
+}
+
+ul.psPager li.ps-link-pager a.ps-button {
+	padding:5px 7px;
+	margin-top:2px;
+}
+
+ul.psPager li.ps-link-pager a.ps-button-icon-right {
+	padding-right: 25px;
+}
+
+ul.psPager li.ps-link-pager a.ps-button-icon-left {
+	padding-left: 25px;
 }

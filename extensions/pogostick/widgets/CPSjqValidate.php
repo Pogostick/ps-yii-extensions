@@ -30,7 +30,8 @@ class CPSjqValidate extends CPSjQueryWidget
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	* Currently, a CDN is in use and no local files are required...
 	*/
-	const PS_EXTERNAL_PATH = 'http://ajax.microsoft.com/ajax/jquery.validate/1.5.5/jquery.validate.min.js';
+	const PS_EXTERNAL_PATH = '/jquery-plugins/validate';
+	const CDN_PATH = 'http://ajax.microsoft.com/ajax/jquery.validate/1.5.5/jquery.validate.min.js';
 
 	//********************************************************************************
 	//* Property Access Methods
@@ -53,10 +54,18 @@ class CPSjqValidate extends CPSjQueryWidget
 		$_oCS = parent::registerClientScripts();
 		
 		//	Reset the baseUrl for our own scripts
-		$this->baseUrl = self::PS_EXTERNAL_PATH;
+		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
+		
+		//	Meta data for goodness...
+		$_oCS->registerScriptFile( $this->extLibUrl . '/jquery-plugins/jquery.metadata.js', CClientScript::POS_HEAD );
 		
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( $this->baseUrl, CClientScript::POS_HEAD );
+		if ( defined( __CLASS__ . '::CDN_PATH' ) )
+			$_oCS->registerScriptFile( self::CDN_PATH, CClientScript::POS_HEAD );
+		else
+			$_oCS->registerScriptFile( $this->baseUrl . '/jquery.validate.min.js', CClientScript::POS_HEAD );
+			
+		$_oCS->registerScriptFile( $this->baseUrl . '/additional-methods.js', CClientScript::POS_HEAD );
 
 		//	Get the javascript for this widget
 		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );
