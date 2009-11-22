@@ -108,6 +108,7 @@ abstract class CPSController extends CController
 	* @access protected
 	*/
 	protected $m_arUserActionList = array();
+	protected function resetUserActionList() { $this->m_arUserActionList = array(); $this->addUserAction( self::ACCESS_TO_ANY, 'error' ); }
 	protected function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = null; $this->addUserActions( $eWhich, $arValue ); }
 	public function getUserActionList( $eWhich ) { return CPSHelp::getOption( $this->m_arUserActionList, $eWhich ); }
 	public function addUserActionRole( $eWhich, $sRole, $sAction ) { $this->m_arUserActionList[ $eWhich ]['roles'][] = $arValue; }
@@ -132,7 +133,7 @@ abstract class CPSController extends CController
 	{ 
 		if ( ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) 
 			$this->m_arUserActionList[ $eWhich ] = array(); 
-			
+		
 		foreach ( $arActions as $_sAction )
 			$this->addUserAction( $eWhich, $_sAction );
 	}
@@ -151,7 +152,7 @@ abstract class CPSController extends CController
 		parent::init();
 		
 		//	Find layout...
-		if ( $this->m_bAutoLayout ) if ( file_exists( Yii::app()->getBasePath() . '/views/layouts/' . $this->getId() . '.php' ) ) $this->layout = $this->getId();
+		if ( $this->m_bAutoLayout && ! isset( $_SERVER['argv'] ) ) if ( file_exists( Yii::app()->getBasePath() . '/views/layouts/' . $this->getId() . '.php' ) ) $this->layout = $this->getId();
 		
 		//	Allow errors
 		$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
@@ -265,7 +266,7 @@ abstract class CPSController extends CController
 	{
 		$_sMessage = CPSHelp::nvl( $sSuccessMessage, 'Your changes have been saved.' );
 		$_sModelName = CPSHelp::nvl( $sModelName, CPSHelp::nvl( $oModel->modelName, $this->m_sModelName ) );
-		
+
 		if ( isset( $arData, $arData[ $_sModelName ] ) )
 		{
 			if ( ! $bAttributesSet ) $oModel->setAttributes( $arData[ $_sModelName ] );
@@ -277,10 +278,9 @@ abstract class CPSController extends CController
 				Yii::app()->user->setFlash( 'success', $_sMessage );
 				
 				if ( $sRedirectAction ) 
-				{
 					$this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
-					return true;
-				}
+
+				return true;
 			}
 		}
 		

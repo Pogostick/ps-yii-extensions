@@ -23,11 +23,12 @@ class CPSHelperBase
 	//********************************************************************************
 	
 	/**
-	* If value is !set||empty, last passed in argument is returned
+	* If value is not set or empty, last passed in argument is returned
 	* 
 	* Allows for multiple nvl chains ( nvl(x,y,z,null) )
 	* 
 	* @param mixed 
+	* @returns mixed
 	*/
 	public static function nvl()
 	{

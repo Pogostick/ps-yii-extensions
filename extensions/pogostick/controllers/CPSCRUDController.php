@@ -69,6 +69,8 @@ abstract class CPSCRUDController extends CPSController
 	*/
 	public function filters()
 	{
+		if ( isset( $_SERVER['argv'] ) ) return array();
+		
 		//	Perform access control for CRUD operations
 		return array(
 			'accessControl',
@@ -84,6 +86,8 @@ abstract class CPSCRUDController extends CPSController
 	{
 		static $_arRules;
 		static $_bInit;
+		
+		if ( isset( $_SERVER['argv'] ) ) return array();
 		
 		//	Build access rule array...
 		if ( ! isset( $_bInit ) )

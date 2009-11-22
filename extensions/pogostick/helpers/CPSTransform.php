@@ -117,6 +117,8 @@ class CPSTransform extends CPSHelperBase
 				list( $_oValue, $_bLink, $_arWrapOpts ) = self::$_sMethod( $_sColumn[0], self::getValue( $oModel, $_sRealCol ) );
 				$arWrapOptions = array_merge( $arWrapOptions, $_arWrapOpts );
 			}
+			else
+				$_sRealCol = $_sColumn;
 
 			if ( ! $_oValue ) $_oValue = self::getValue( $oModel, $_sRealCol );
 			
