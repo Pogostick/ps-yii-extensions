@@ -115,7 +115,7 @@ abstract class CPSController extends CController
 
 	public function addUserAction( $eWhich, $sAction ) 
 	{ 
-		if ( ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) 
+		if ( ! isset( $this->m_arUserActionList[ $eWhich ] ) || ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) 
 			$this->m_arUserActionList[ $eWhich ] = array(); 
 			
 		if ( ! in_array( $sAction, $this->m_arUserActionList[ $eWhich ] ) )

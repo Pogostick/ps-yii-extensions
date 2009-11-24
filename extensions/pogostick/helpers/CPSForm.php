@@ -23,9 +23,19 @@ Yii::import( 'pogostick.helpers.CPSActiveWidgets' );
 class CPSForm extends CPSHelperBase
 {
 	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+	
+	const SEARCH_PREFIX = '##pss_';
+	
+	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
 
+	protected static $m_iIdCount = 0;
+	protected static $m_sSearchFieldLabelTemplate = '<label class="ps-form-search-label" for="{fieldId}">{title}</label>';
+	protected static $m_sSearchFieldTemplate = '{label}<span class="ps-form-search-field ui-widget-container">{field}</span>';
+	
 	//********************************************************************************
 	//* Property Access Methods
 	//********************************************************************************
@@ -71,6 +81,8 @@ class CPSForm extends CPSHelperBase
 		$_bIcon = false;
 		$_sClass = $_sLink = $_sOut = null;
 		
+		$_sFlash = ( $bShowFlashDiv ? PS::flashMessage() : null );
+		
 		//	Create menu
 		foreach ( $arMenuItems as $_sId => $_arItem ) 
 		{
@@ -86,13 +98,48 @@ class CPSForm extends CPSHelperBase
 			$_sOut .= CPSActiveWidgets::jquiButton( $_sLabel, $_sLink, $_arItem );
 		}
 		
-		if ( $bShowFlashDiv ) $_sOut .= PS::flashMessage();
-		
 		return <<<HTML
 		<div class="{$sDivClass}">
 			<h1>{$sTitle}</h1>
 			<p>{$_sOut}</p>
+			<div style="clear:both"></div>{$_sFlash}
 		</div>
+HTML;
+	}
+	
+	/**
+	* Output a generic search bar...
+	* 
+	* @param mixed $arOptions
+	*/
+	public static function searchBar( $arOptions = array() )
+	{
+		$_arFields = CPSHelp::getOption( $arOptions, 'fields', array(), true );
+		$_sDivClass = CPSHelp::getOption( $arOptions, 'class', 'ps-search-bar', true );
+		
+		foreach ( $_arFields as $_sName => $_arField )
+		{
+			$_sTitle = PS::o( $_arField, 'title', 'Search', true );
+			$_eType = PS::o( $_arField, 'type', 'text', true );
+			$_arTypeOptions = PS::o( $_arField, 'typeOptions', array(), true );
+			$_arData = PS::o( $_arField, 'data', array(), true );
+
+			//	Setup some css...
+			$_sClass = PS::o( $_arTypeOptions, 'class', null, true );
+			$_arTypeOptions['class'] = trim( $_sClass );
+			
+			$_arTypeOptions['id'] = PS::o( $_arTypeOptions, 'id', self::SEARCH_PREFIX . ( self::$m_iIdCount++ ) . '_' . $_eType );
+			if ( ! is_numeric( $_eType ) ) $_arTypeOptions['size'] = PS::o( $_arTypeOptions, 'size', '15' );
+
+			if ( $_sTitle ) $_sTitle .= ':';
+			
+			$_sField = PS::activefield( $_eType, null, $_sName, $_arTypeOptions, array(), $_arData );
+			$_sLabel = strtr( self::$m_sSearchFieldLabelTemplate, array( '{fieldId}' => $_arTypeOptions['id'], '{title}' => $_sTitle ) );
+			$_sOut .= strtr( self::$m_sSearchFieldTemplate, array( '{label}' => $_sLabel, '{field}' => $_sField ) );
+		}
+ 
+		return <<<HTML
+		<div class="{$_sDivClass}">{$_sOut}</div>
 HTML;
 	}
 	

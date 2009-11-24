@@ -289,4 +289,28 @@ class CPSModel extends CActiveRecord
 			$this->m_oTransaction = null;
 		}
 	}
+
+	/**
+	* Override of CModel::setAttributes
+	* Populates member variables as well.
+	* 
+	* @param array $arValues
+	* @param string $sScenario
+	*/
+	public function setAttributes( $arValues = array(), $sScenario = '' )
+	{
+		if ( '' === $sScenario ) $sScenario = $this->getScenario();
+		
+		if ( is_array( $arValues ) )
+		{
+			$_arAttributes = array_flip( $this->getSafeAttributeNames( $sScenario ) );
+			
+			foreach ( $arValues as $_sKey => $_oValue )
+			{
+				if ( isset( $_arAttributes[ $_sKey ] ) || $this->hasProperty( $_sKey ) )
+					$this->{$_sKey} = $_oValue;
+			}
+		}
+	}
+
 }

@@ -43,4 +43,19 @@ class PS extends CPSActiveWidgets
 		$_arFieldData = CPSHelp::getOption( $arOptions, 'data', null, true );
 		return parent::simpleActiveBlock( $eFieldType, $oModel, $sColName, $arOptions, $_sLabel, $_arLabelOptions, $_arFieldData, $_arWidgetOptions );
 	}
+	
+	/**
+	* Convienence instance of CPSHelp::getOption
+	* 
+	* @param array $arOptions
+	* @param string $sKey
+	* @param mixed $oDefault
+	* @param boolean $bUnset
+	* @return mixed
+	* @static
+	*/
+	public static function o( &$arOptions = array(), $sKey, $oDefault = null, $bUnset = false )
+	{
+		return CPSHelp::getOption( $arOptions, $sKey, $oDefault, $bUnset );
+	}
 }

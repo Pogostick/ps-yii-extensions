@@ -112,6 +112,60 @@ button.ps-button { width:auto; overflow:visible; }
 }
 
 /**
+* Form header search bar
+*/
+
+.ps-search-bar {
+	display: block;
+	text-align:left;
+	margin-bottom:10px;
+}
+
+.ps-form-search-label {
+	font-size:13px;
+	color: #fff;
+	font-weight:bold;
+}
+
+.ps-form-search-field {
+	margin-right:15px;
+}
+
+.ps-form-search-field-select,
+.ps-form-search-field-text {
+	padding:3px;
+	font-size:13px;
+	font-weight:normal;
+	margin-left:5px;
+}
+
+.ps-form-search-field-text {
+	border:1px solid #ccc;
+	min-width: 150px;
+}
+
+.ps-search-bar .ps-button 
+{ 
+	padding-bottom:7px;
+}
+
+.ps-search-bar a.ps-button 
+{ 
+	margin:5px auto 0px auto; 
+	float:none !important; 
+	display: inline-block;
+	padding:5px auto 10px auto;
+}
+
+.ps-search-bar hr {
+	display: block;
+	clear: both; 
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
+}
+
+/**
 * Form footers
 */
 .ps-form-footer {

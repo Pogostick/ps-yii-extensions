@@ -51,6 +51,7 @@ class CPSActiveWidgets extends CHtml
 	const	DD_MONTH_NAMES = 2;
 	const	DD_YEARS = 3;
 	const	DD_CC_TYPES = 4;
+	const	DD_DAY_NUMBERS = 5;
 	
 	//	Types of HTML
 	const	HTML = 0;
@@ -157,12 +158,12 @@ class CPSActiveWidgets extends CHtml
 	public static function simpleActiveBlock( $eFieldType, $oModel, $sColName, $arOptions = array(), $sLabel = null, $arLabelOptions = array(), $arData = null, $arWidgetOptions = array() )
 	{
 		//	Get append Html		
-		$_sHtml = CPSHelp::getOption( $arOptions, '_appendHtml', '', true );
-		$_sDivClass = CPSHelp::getOption( $arOptions, '_divClass', null, true );
-		$_sTransform = CPSHelp::getOption( $arOptions, 'transform', null, true );
-		$_sTitle = CPSHelp::getOption( $arOptions, 'title', null );
-		$_sHint = CPSHelp::getOption( $arOptions, 'hint', null, true );
-		$_arValueMap = CPSHelp::getOption( $arOptions, 'valueMap', array(), true );
+		$_sHtml = PS::o( $arOptions, '_appendHtml', '', true );
+		$_sDivClass = PS::o( $arOptions, '_divClass', null, true );
+		$_sTransform = PS::o( $arOptions, 'transform', null, true );
+		$_sTitle = PS::o( $arOptions, 'title', null );
+		$_sHint = PS::o( $arOptions, 'hint', null, true );
+		$_arValueMap = PS::o( $arOptions, 'valueMap', array(), true );
 
 		//	Value map...
 		if ( in_array( $oModel->{$sColName}, array_keys( $_arValueMap ) ) && isset( $_arValueMap[$oModel->{$sColName}] ) ) 
@@ -230,7 +231,7 @@ class CPSActiveWidgets extends CHtml
 	public static function activeField( $eFieldType, $oModel, $sColName, $arHtmlOptions = array(), $arWidgetOptions = array(), $arData = null )
 	{
 		//	Stuff to put after widget
-		$_sAppendHtml = CPSHelp::getOption( $arHtmlOptions, '_appendHtml', '', true );
+		$_sAppendHtml = PS::o( $arHtmlOptions, '_appendHtml', '', true );
 		
 		//	Auto set id and name if they aren't already...
 		if ( ! isset( $arHtmlOptions[ 'name' ] ) ) $arHtmlOptions[ 'name' ] = ( null != $oModel ) ? self::resolveName( $oModel, $sColName ) : $sColName;
@@ -239,23 +240,19 @@ class CPSActiveWidgets extends CHtml
 		if ( self::$m_bValidating )
 		{
 			//	Get any additional params for validation
-			$_sClass = CPSHelp::getOption( $arHtmlOptions, '_validate', null, true );
+			$_sClass = PS::o( $arHtmlOptions, '_validate', null, true );
 			if ( $oModel->isAttributeRequired( $sColName, self::$scenario ) ) $_sClass .= ' required';
-			$_sClass .= ' ' . CPSHelp::getOption( $arHtmlOptions, 'class', null );
+			$_sClass .= ' ' . PS::o( $arHtmlOptions, 'class', null );
 			$arHtmlOptions['class'] = trim( $_sClass );
 		}
 		
 		if ( null === $oModel )
 		{
-			$_oValue = CPSHelp::getOption( $arHtmlOptions, 'value', null, true );
+			$_oValue = PS::o( $arHtmlOptions, 'value', null, true );
 			
 			//	Handle special types...
 			switch ( $eFieldType )
 			{
-				default:
-					$_sType = CPSHelp::getOption( self::$m_arInputMap, $eFieldType );
-             		break;
-				
 				//	Build a jQuery UI widget
 				case self::JQUI:
 					if ( isset( $arHtmlOptions[ '_widget' ] ) )
@@ -282,6 +279,25 @@ class CPSActiveWidgets extends CHtml
 					CPSMarkItUpWidget::create( $arWidgetOptions );
 					$_sType = 'textarea';
 					break;
+					
+				default:
+					$_sType = PS::o( self::$m_arInputMap, $eFieldType );
+             		break;
+			}
+
+			if ( is_numeric( $eFieldType ) )
+			{
+				switch ( $eFieldType )
+				{
+					case self::DD_GENERIC:	//	Options passed in via array
+					case self::DD_US_STATES:
+					case self::DD_MONTH_NUMBERS:
+					case self::DD_DAY_NUMBERS:
+					case self::DD_MONTH_NAMES:
+					case self::DD_YEARS:
+					case self::DD_CC_TYPES:
+						return self::dropDown( $eFieldType, $sColName, null, $arHtmlOptions );
+				}
 			}
 			
 			if ( null != $_sType )
@@ -310,6 +326,12 @@ class CPSActiveWidgets extends CHtml
 					$arData = require( 'month_numbers_array.php' );
 					break;
 					
+				case self::DD_DAY_NUMBERS:
+					$eFieldType = self::DROPDOWN;
+					if ( $_oValue == null ) $_oValue = date( 'd' );
+					$arData = require( 'day_numbers_array.php' );
+					break;
+					
 				case self::DD_MONTH_NAMES:
 					$eFieldType = self::DROPDOWN;
 					if ( $_oValue == null ) $_oValue = date( 'm' );
@@ -318,10 +340,11 @@ class CPSActiveWidgets extends CHtml
 					
 				case self::DD_YEARS:
 					if ( $_oValue == null ) $_oValue = date( 'Y' );
-					$_iRange = CPSHelp::getOption( $arOptions, 'range', 5 );
+					$_iRange = PS::o( $arOptions, 'range', 5, true );
+					$_iRangeStart = PS::o( $arOptions, 'rangeStart', date('Y'), true );
 					
 					$arData = array();
-					for ( $_i = 0, $_iBaseYear = date('Y'); $_i < $_iRange; $_i++ ) $arData[ ( $_iBaseYear + $_i ) ] = ( $_iBaseYear + $_i );
+					for ( $_i = 0, $_iBaseYear = $_iRangeStart; $_i < $_iRange; $_i++ ) $arData[ ( $_iBaseYear + $_i ) ] = ( $_iBaseYear + $_i );
 					break;
 					
 				case self::DD_CC_TYPES:
@@ -349,7 +372,7 @@ class CPSActiveWidgets extends CHtml
 			//	Default for text field
 			case self::TEXT:
 				//	Masked input?
-				$_sMask = CPSHelp::getOption( $arHtmlOptions, 'mask', null, true );
+				$_sMask = PS::o( $arHtmlOptions, 'mask', null, true );
 				if ( ! empty( $_sMask ) ) $_oMask = CPSjqMaskedInputWrapper::create( array( 'target' => '#' . $arHtmlOptions[ 'id' ], 'mask' => $_sMask ) );
 				
 				if ( ! isset( $arHtmlOptions[ 'size' ] ) )
@@ -425,7 +448,7 @@ class CPSActiveWidgets extends CHtml
 				$arHtmlOptions[ 'name' ] .= '[]';
 		}
 		
-		return CHtml::tag( 'select', $arHtmlOptions, $_sOptions );
+		return self::tag( 'select', $arHtmlOptions, $_sOptions );
 	}
 	
 	/**
@@ -462,19 +485,19 @@ HTML;
 		$_sTempCss = '';
 		
 		//	Basic options...
-		$_sOffClass = self::$m_sOffClass = CPSHelp::getOption( $arOptions, 'offClass', 'idle' );
-		$_sOnClass = self::$m_sOnClass = CPSHelp::getOption( $arOptions, 'onClass', 'activeField' );
-		$_sOffBGColor = CPSHelp::getOption( $arOptions, 'offBackgroundColor', '#ffffff' );
-		$_sOnBGColor = CPSHelp::getOption( $arOptions, 'onBackgroundColor', '#ffffff' );
-		$_sOnBorderColor = CPSHelp::getOption( $arOptions, 'onBorderColor', '#33677F' );
-		$_iOnBorderSize = CPSHelp::getOption( $arOptions, 'onBorderSize', 1 );
-		$_sOffBorderColor = CPSHelp::getOption( $arOptions, 'offBorderColor', '#85b1de' );
-		$_iOffBorderSize = CPSHelp::getOption( $arOptions, 'offBorderSize', 1 );
+		$_sOffClass = self::$m_sOffClass = PS::o( $arOptions, 'offClass', 'idle' );
+		$_sOnClass = self::$m_sOnClass = PS::o( $arOptions, 'onClass', 'activeField' );
+		$_sOffBGColor = PS::o( $arOptions, 'offBackgroundColor', '#ffffff' );
+		$_sOnBGColor = PS::o( $arOptions, 'onBackgroundColor', '#ffffff' );
+		$_sOnBorderColor = PS::o( $arOptions, 'onBorderColor', '#33677F' );
+		$_iOnBorderSize = PS::o( $arOptions, 'onBorderSize', 1 );
+		$_sOffBorderColor = PS::o( $arOptions, 'offBorderColor', '#85b1de' );
+		$_iOffBorderSize = PS::o( $arOptions, 'offBorderSize', 1 );
 		
 		//	Optional background image for non-hovered field
-		$_sFieldImageUrl = CPSHelp::getOption( $arOptions, 'fieldImageUrl' );
-		$_sFieldImageRepeat = CPSHelp::getOption( $arOptions, 'fieldImageRepeat', 'repeat-x' );
-		$_sFieldImagePosition = CPSHelp::getOption( $arOptions, 'fieldImagePosition', 'top' );
+		$_sFieldImageUrl = PS::o( $arOptions, 'fieldImageUrl' );
+		$_sFieldImageRepeat = PS::o( $arOptions, 'fieldImageRepeat', 'repeat-x' );
+		$_sFieldImagePosition = PS::o( $arOptions, 'fieldImagePosition', 'top' );
 		
 		//	Set up the cool input effects...
 		$_sScript =<<<CODE
@@ -525,15 +548,15 @@ CSS;
 	
 	public static function dropDown( $eType, $sName, $sLabel = null, $arOptions = array() )
 	{
-		$_sValue = CPSHelp::getOption( $arOptions, 'value', null, true );
-		$_sLabelClass = CPSHelp::getOption( $arOptions, 'labelClass', null, true );
+		$_sValue = PS::o( $arOptions, 'value', null, true );
+		$_sLabelClass = PS::o( $arOptions, 'labelClass', null, true );
 
-		$_sOut = self::textLabel( $sName, $sLabel, array( 'for' => $sName, '_forType' => 'select', 'class' => $_sLabelClass ) );
+		if ( $sLabel ) $_sOut = self::label( $sLabel, $sName, $arOptions );
 		
 		switch ( $eType )
 		{
 			case self::DD_GENERIC:	//	Options passed in via array
-				$_arOptions = CPSHelp::getOption( $arOptions, 'options', array(), true );
+				$_arOptions = PS::o( $arOptions, 'options', array(), true );
 				break;
 				
 			case self::DD_US_STATES:
@@ -545,6 +568,11 @@ CSS;
 				$_arOptions = require( 'month_numbers_array.php' );
 				break;
 				
+			case self::DD_DAY_NUMBERS:
+				if ( $_sValue == null ) $_sValue = date( 'd' );
+				$_arOptions = require( 'day_numbers_array.php' );
+				break;
+				
 			case self::DD_MONTH_NAMES:
 				if ( $_sValue == null ) $_sValue = date( 'm' );
 				$_arOptions = require( 'month_names_array.php' );
@@ -552,11 +580,12 @@ CSS;
 				
 			case self::DD_YEARS:
 				if ( $_sValue == null ) $_sValue = date( 'Y' );
-				$_iRange = CPSHelp::getOption( $arOptions, 'range', 5 );
+				$_iRange = PS::o( $arOptions, 'range', 5 );
+				$_iRangeStart = PS::o( $arOptions, 'rangeStart', date('Y'), true );
 				$_arOptions = array();
 				
 				for ( $_i = 0; $_i < $_iRange; $_i++ ) 
-					$_arOptions[ ( date( 'Y' ) + $_i ) ] = ( date( 'Y' ) + $_i );
+					$_arOptions[ ( $_iRangeStart + $_i ) ] = ( $_iRangeStart + $_i );
 				break;
 				
 			case self::DD_CC_TYPES:
@@ -575,10 +604,11 @@ CSS;
 			{
 				$_arOpts = array( 'value' => $_sKey );
 				if ( $_sValue == $_sKey ) $_arOpts[ 'selected' ] = 'selected';
-				$_sInner .= self::tag( 'option', null, $_sVal, $_arOpts );
+				$_sInner .= self::tag( 'option', $_arOpts, $_sVal );
 			}
 
-			$_sOut .= self::tag( 'SELECT', $sName, $_sInner, $arOptions );
+			$arOptions['name'] = $sName;
+			$_sOut .= self::tag( 'SELECT', $arOptions, $_sInner );
 		}
 				
 		return $_sOut;
@@ -597,15 +627,15 @@ CSS;
 	 */
 	public static function beginForm( $sAction = '', $sMethod = 'POST', $arHtmlOptions = array() )
 	{
-		if ( CPSHelp::getOption( $arHtmlOptions, 'validate', false, true ) )
+		if ( PS::o( $arHtmlOptions, 'validate', false, true ) )
 		{
 			self::$m_bValidating = true;
-			$_arValidateOptions = CPSHelp::getOption( $arHtmlOptions, 'validateOptions', array(), true );
+			$_arValidateOptions = PS::o( $arHtmlOptions, 'validateOptions', array(), true );
 			if ( ! isset( $_arValidateOptions['target'] ) ) $_arValidateOptions['target'] = self::getFormSelector( $arHtmlOptions );
 			CPSjqValidate::create( $_arValidateOptions );
 		}
 		
-		if ( CPSHelp::getOption( $arHtmlOptions, 'selectmenu', false, true ) )
+		if ( PS::o( $arHtmlOptions, 'selectmenu', false, true ) )
 			CPSjqSelectMenu::create( array( 'target' => self::getFormSelector( $arHtmlOptions ) ) );
 		
 		return parent::beginForm( $sAction, $sMethod, $arHtmlOptions );
@@ -617,15 +647,15 @@ CSS;
 	* Outputs a <LABEL>. NOTE: Does not add ID and NAME prefixes...
 	* 
 	* @param mixed $sName
-	* @param mixed $sLabel
+	* @param mixed $sLabel     
 	* @param mixed $arOptions
 	*/
 	public static function textLabel( $sName, $sLabel = null, $arOptions = array() )
 	{
-		$_sType = CPSHelp::getOption( $arOptions, '_forType', 'text' );
-		$_bRequired = CPSHelp::getOption( $arOptions, '_required', false );
-		$arOptions[ 'id' ] = self::getIdPrefix( 'label' ) . $sName;
-		return self::tag( 'label', self::getIdPrefix( 'label' ) . $sName, ( ( $sLabel == null ) ? $sName : $sLabel ) . self::getLabelSuffix() . self::getRequiredHtml( $bRequired ), $arOptions );
+		$_sType = PS::o( $arOptions, '_forType', 'text' );
+		$_bRequired = PS::o( $arOptions, '_required', false );
+		$arOptions[ 'id' ] = $arOptions['name'] = self::getIdPrefix( 'label' ) . $sName;
+		return self::tag( 'label', $arOptions, ( ( $sLabel == null ) ? $sName : $sLabel ) . self::$labelSuffix . self::$afterRequiredLabel );
 	}
 
 	/**
@@ -641,7 +671,7 @@ CSS;
 		$arHtmlOptions['type'] = 'submit';
 		
 		//	jQUI Button?
-		if ( CPSHelp::getOption( $arHtmlOptions, 'jqui', false, true ) ) return self::jquiButton( $sLabel, '_submit_', $arHtmlOptions );
+		if ( PS::o( $arHtmlOptions, 'jqui', false, true ) ) return self::jquiButton( $sLabel, '_submit_', $arHtmlOptions );
 
 		//	Otherwise use regular button
 		return self::button($label,$htmlOptions);
@@ -672,29 +702,29 @@ CSS;
 		static $_bRegistered = false;
 		$_sSize = $_sIconPos = $_bIconOnly = null;
 		$_sLink = is_array( $sLink ) ? CHtml::normalizeUrl( $sLink ) : $sLink;
-		$_bSubmit = ( $_sLink == '_submit_' || CPSHelp::getOption( $arOptions, 'submit', false, true ) );
+		$_bSubmit = ( $_sLink == '_submit_' || PS::o( $arOptions, 'submit', false, true ) );
 
-		$_sId = CPSHelp::getOption( $arOptions, 'id', CPSHelp::getWidgetId( self::ID_PREFIX . '.jqbtn' ), true );
-		$_sFormId = CPSHelp::getOption( $arOptions, 'formId', null, true );
+		$_sId = PS::o( $arOptions, 'id', CPSHelp::getWidgetId( self::ID_PREFIX . '.jqbtn' ), true );
+		$_sFormId = PS::o( $arOptions, 'formId', null, true );
 
-		if ( $_sIcon = CPSHelp::getOption( $arOptions, 'icon', null, true ) ) 
+		if ( $_sIcon = PS::o( $arOptions, 'icon', null, true ) ) 
 		{
-			$_bIconOnly = CPSHelp::getOption( $arOptions, 'iconOnly', false, true );
+			$_bIconOnly = PS::o( $arOptions, 'iconOnly', false, true );
 			$_sIcon = "<span class=\"ui-icon ui-icon-{$_sIcon}\"></span>";
 			if ( $sLabel && ! $_bIconOnly ) 
-				$_sIconPos = "ps-button-icon-" . CPSHelp::getOption( $arOptions, 'iconPosition', 'left', true );
+				$_sIconPos = "ps-button-icon-" . PS::o( $arOptions, 'iconPosition', 'left', true );
 			else
 			{
-				$_sSize = CPSHelp::getOption( $arOptions, 'iconSize', null, true );
+				$_sSize = PS::o( $arOptions, 'iconSize', null, true );
 				$_sIconPos = 'ps-button-icon-solo' . ( ( $_sSize ) ? '-' . $_sSize : '' );
 			}
 		}
 
-		if ( $_sOnClick = CPSHelp::getOption( $arOptions, 'click', null, true ) ) 
+		if ( $_sOnClick = PS::o( $arOptions, 'click', null, true ) ) 
 			$_sOnClick = 'onClick="' . $_sOnClick . '"';
 		else
 		{
-			if ( $_sConfirm = CPSHelp::getOption( $arOptions, 'confirm', null, true ) ) 
+			if ( $_sConfirm = PS::o( $arOptions, 'confirm', null, true ) ) 
 			{
 				$_sHref = $_sLink;
 				$_sForm = ( $_sFormId ) ? "document.getElementById(\"{$_sFormId}\")" : 'this.form';
@@ -737,7 +767,7 @@ HTML;
 		
 		//	Set our link options
 		$arOptions['title'] = $sLabel;
-		$_sClass = CPSHelp::getOption( $arOptions, 'class', null );
+		$_sClass = PS::o( $arOptions, 'class', null );
 		$arOptions['class'] = "ps-button {$_sIconPos} ui-state-default ui-corner-all {$_sClass}";
 		if ( $_sOnClick ) $arOptions['onclick'] = $_sOnClick;
 	
@@ -789,10 +819,10 @@ HTML;
 	 */
 	public static function imageLink( $src, $sHref, $htmlOptions = array() )
 	{
-		if ( $_sHoverImage = CPSHelp::getOption( $htmlOptions, 'hoverImage', null, true ) )
+		if ( $_sHoverImage = PS::o( $htmlOptions, 'hoverImage', null, true ) )
 		{
 			//	Create the script
-			$htmlOptions['id'] = CPSHelp::getOption( $htmlOptions, 'id', self::ID_PREFIX . self::$count++ );
+			$htmlOptions['id'] = PS::o( $htmlOptions, 'id', self::ID_PREFIX . self::$count++ );
 			
 			$_sScript =<<<HTML
 	jQuery('#{$htmlOptions['id']}').hover(
@@ -822,10 +852,10 @@ HTML;
 	 */
 	public static function imageButton( $src, $htmlOptions = array() )
 	{
-		if ( $_sHoverImage = CPSHelp::getOption( $htmlOptions, 'hoverImage', null, true ) )
+		if ( $_sHoverImage = PS::o( $htmlOptions, 'hoverImage', null, true ) )
 		{
 			//	Create the script
-			$htmlOptions['id'] = CPSHelp::getOption( $htmlOptions, 'id', self::ID_PREFIX . self::$count++ );
+			$htmlOptions['id'] = PS::o( $htmlOptions, 'id', self::ID_PREFIX . self::$count++ );
 			
 			$_sScript =<<<HTML
 	jQuery('#{$htmlOptions['id']}').hover(
@@ -853,7 +883,7 @@ HTML;
 	*/
 	protected static function getFormSelector( $arHtmlOptions = array(), $sDefaultId = 'div.yiiForm>form' )
 	{
-		$_sTarget =	CPSHelp::getOption( $arHtmlOptions, 'id', null );
+		$_sTarget =	PS::o( $arHtmlOptions, 'id', null );
 		return ( $_sTarget == null ) ? $sDefaultId : '#' . $_sTarget;
 	}
 	
@@ -912,7 +942,7 @@ HTML;
 	*/
 	public static function beginFieldset( $sLegend, $arOptions = array() )
 	{
-		$_arLegendOptions = CPSHelp::getOption( $arOptions, 'legendOptions', array(), true );
+		$_arLegendOptions = PS::o( $arOptions, 'legendOptions', array(), true );
 		
 		return self::tag( 'fieldset', $arOptions, ( $sLegend ? self::tag( 'legend', $_arLegendOptions, $sLegend ) : false ), false );
 	}
