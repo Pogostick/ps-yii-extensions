@@ -286,10 +286,10 @@ class CPSComponentBehavior extends CBehavior
 	* @param array $arOptions
 	* @return string
 	*/
-	public function makeOptions( $arOptions = null, $iFormat = self::JSON )
+	public function makeOptions( $arOptions = null, $iFormat = self::JSON, $bIncludePrivate = false )
 	{
 		//	Get the public options...
-		$_arOptions = ( null == $arOptions ) ? $this->m_oOptions->getPublicOptions() : $arOptions;
+		$_arOptions = PS::nvl( $arOptions, $this->m_oOptions->getAllOptions( ! $bIncludePrivate ) );
 		
 		//	Check them first...
 		$this->checkOptions( $_arOptions );
@@ -404,8 +404,7 @@ class CPSComponentBehavior extends CBehavior
 	*/
 	public function checkOptions( $arOptions = null )
  	{
- 		if ( null == $arOptions ) $arOptions = $this->m_oOptions->getPublicOptions();
-		return $this->getOptionsObject()->checkOptions( $arOptions );
+		return $this->getOptionsObject()->checkOptions( PS::nvl( $arOptions, $this->m_oOptions->getPublicOptions() ) );
 	}
 
 	/**

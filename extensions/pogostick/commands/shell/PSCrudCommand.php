@@ -1,6 +1,6 @@
 <?php
 /**
- * CPSCrudCommand class file.
+ * PSCrudCommand class file.
  *
  * @filesource
  * @copyright Copyright &copy; 2009 Pogostick, LLC
@@ -10,15 +10,12 @@
  * @subpackage Commands
  * @since v1.0.6
  * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
+ * @modifiedby $_sLastChangedBy$
  * @lastmodified  $Date$
  */
  
-Yii::import( 'system.cli.commands.shell.CrudCommand' );
+Yii::import( 'pogostick.commands.CPSCrudCommand' );
 
-define( 'POGOSTICK_CRUD_TEMPLATES', Yii::app()->basePath . '/templates/crud' );
-
-class CPSCrudCommand extends CrudCommand
+class PSCrudCommand extends CPSCrudCommand
 {
-	public $templatePath = POGOSTICK_CRUD_TEMPLATES;
 }

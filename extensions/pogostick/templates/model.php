@@ -8,30 +8,13 @@
  * - $rules: a list of validation rules (string)
  * - $labels: a list of labels (string)
  * - $relations: a  list of relations (string)
+ * - $baseClass: the base class to extend
  */
 
-if ( ! $_sCopyright = Yii::app()->params['@copyright'] ) $_sCopyright = 'Copyright &copy; ' . date( 'Y' ) . ' You!';
-if ( ! $_sAuthor = Yii::app()->params['@author'] ) $_sAuthor = 'Your Name <your@email.com>';
-if ( ! $_sLink = Yii::app()->params['@link'] ) $_sLink = 'http://wwww.you.com';
-if ( ! $_sPackage = Yii::app()->params['@package'] ) $_sPackage = Yii::app()->id;
-if ( ! isset( $baseClass ) ) $baseClass = 'CPSModel';
-if ( ! isset( $dbToUse ) ) $dbToUse = 'db';
+//	Include our header 
+include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_header.php' );
 
 echo <<<HTML
-<?php
-/**
- * $className class file.
- *
- * @filesource
- * @copyright {$_sCopyright}
- * @author {$_sAuthor}
- * @link {$_sLink}
- * @package {$_sPackage}
- * @subpackage models
- * @version \$Revision\$
- * @modifiedby \$LastChangedBy\$
- * @lastmodified  \$Date\$
- */
 class $className extends $baseClass
 {
 	/**

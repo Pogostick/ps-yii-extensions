@@ -52,6 +52,7 @@ class CPSActiveWidgets extends CHtml
 	const	DD_YEARS = 3;
 	const	DD_CC_TYPES = 4;
 	const	DD_DAY_NUMBERS = 5;
+	const	DD_YES_NO = 6;
 	
 	//	Types of HTML
 	const	HTML = 0;
@@ -289,6 +290,10 @@ class CPSActiveWidgets extends CHtml
 			{
 				switch ( $eFieldType )
 				{
+					case self::DD_YES_NO:
+						$arHtmlOptions['options'] = PS::o( $arHtmlOptions, 'options', array( 0 => 'No', 1 => 'Yes' ), true );
+						//	Fall through...
+					
 					case self::DD_GENERIC:	//	Options passed in via array
 					case self::DD_US_STATES:
 					case self::DD_MONTH_NUMBERS:
@@ -313,6 +318,11 @@ class CPSActiveWidgets extends CHtml
 			{
 				case self::DD_GENERIC:	//	Options passed in via array
 					$eFieldType = self::DROPDOWN;
+					break;
+					
+				case self::DD_YES_NO:
+					$eFieldType = self::DROPDOWN;
+					$arData = array( 0 => 'No', 1 => 'Yes' );
 					break;
 					
 				case self::DD_US_STATES:

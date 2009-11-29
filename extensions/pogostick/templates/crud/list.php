@@ -7,8 +7,12 @@
  * - $columns: a list of column schema objects
  */
 
+$className = 'list view';
+ 
+//	Include our header 
+include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_header.php' );
+
 echo <<<HTML
-<?php
 	echo CPSForm::formHeader( '{$modelClass} List', 
 		array( 
 			'new' => array(

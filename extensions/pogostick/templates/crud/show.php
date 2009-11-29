@@ -7,35 +7,30 @@
  * - $columns: a list of column schema objects
  */
 
-$_sCols = null;
-foreach ( $columns as $column )  $_sCols .= ( ( $_sCols ) ? ', ' : '' ) . '\'' . ( $ID ? '@' : '' ) . $column->name . '\'';
-$_sCols = "array( {$_sCols } )";
+$className = 'show view';
+ 
+//	Include our header 
+include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_header.php' );
 
 echo <<<HTML
-<?php
-	echo CPSForm::formHeader( '{$modelClass} : ' . \$model->{$ID}, 
-		array(
+	echo CPSForm::formHeader( 'View {$modelClass}: ' . \$model->{$ID}, 
+		array( 
 			'new' => array(
-				'label' => 'Add New {$modelClass}',
-				'url' =>  array( 'create' ),
-				'icon' => 'circle-plus',
+				'label' => 'New {$modelClass}',
+				'url' =>  '_submit_',
+				'icon' => 'disk',
 			),
 			
 			'return' => array(
 				'label' => '{$modelClass} Manager',
-				'url' =>  array( 'admin' ),
+				'url' => array( 'admin' ),
 				'icon' => 'arrowreturnthick-1-w',
 			),
 		)
 	);
 	
-	echo CPSDataGrid::create( 
-		'{$modelClass}', 
-		\$models, 
-		{$_sCols},
-		array( 'edit', 'delete' ), 
-		\$sort, 
-		\$pages, 
-		array( 'header' => '' ) 
-	);
+	echo \$this->renderPartial( '_form', array(
+		'model' => \$model,
+		'update' => false,
+	));
 HTML;

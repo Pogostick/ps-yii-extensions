@@ -132,5 +132,19 @@ class CPSHelperBase
 	{
 		return self::setOption( $arOptions, $sKey, null );
 	}
+	
+	/**
+	* Returns the number of "interval" between the two dates
+	* 
+	* @param string $dtStart
+	* @param string $dtEnd
+	* @param int $sInterval
+	*/
+	public static function dateDiff( $dtStart, $dtEnd )
+	{
+		$_dtStart = new DateTime( $dtStart );
+		$_dtEnd = new DateTime( $dtEnd );
+		return $_dtEnd->diff( $_dtStart );
+	}
 
 }

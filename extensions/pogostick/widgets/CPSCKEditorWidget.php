@@ -106,7 +106,7 @@ class CPSCKEditorWidget extends CPSjQueryWidget
 		}
 
 		$this->script =<<<CODE
-CKEDITOR.replace('{$_sId}');
+CKEDITOR.replace('{$_sId}',{$_arOptions});
 CODE;
 
 		return $this->script;

@@ -104,6 +104,13 @@ abstract class CPSController extends CController
 	public function addCommandToMap( $sKey, $oValue = null, $eWhich = null ) { $this->m_arCommandMap[ $sKey ] = $oValue; if ( $eWhich ) $this->addUserActions( $eWhich, array( $sKey ) ); }	
 
 	/**
+	* Action queue for keeping track of where we are...
+	* 
+	* @var array
+	*/
+	protected $m_arActionQueue = array();
+	
+	/**
 	* @var array An array of actions permitted by any user
 	* @access protected
 	*/
@@ -302,11 +309,11 @@ abstract class CPSController extends CController
 		$_oPage = new CPagination( $this->loadCount( $_oCrit ) );
 		$_oPage->pageSize = self::PAGE_SIZE;
 		$_oPage->applyLimit( $_oCrit );
-	
+
 		//	Sort...
 		if ( $bSort )
 		{	
-			$_oSort = new CSort( $this->m_sModelName );
+			$_oSort = new CPSSort( $this->m_sModelName );
 			$_oSort->applyOrder( $_oCrit );
 		}
 
@@ -374,6 +381,25 @@ abstract class CPSController extends CController
 	{
 		$_sScopes = ( count( $arScope ) ) ? implode( '->', $arScope ) . '->' : null;
 		return $this->m_sModelName . '::model()->' . $_sScopes;
+	}
+	
+	/**
+	* Pushes an action onto the action queue
+	* 
+	* @param CAction $oAction
+	*/
+	protected function pushAction( $oAction )
+	{
+		array_push( $this->m_arActionQueue, $oAction );
+	}
+	
+	/**
+	* Retrieves the latest pushed action
+	* @return CAction
+	*/
+	protected function popAction()
+	{
+		return array_pop( $this->m_arActionQueue );
 	}
 	
 }

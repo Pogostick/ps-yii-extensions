@@ -6,9 +6,13 @@
  * - $modelClass: the model class name
  * - $columns: a list of column schema objects
  */
+
+$className = 'create view';
  
+//	Include our header 
+include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_header.php' );
+
 echo <<<HTML
-<?php
 	echo CPSForm::formHeader( 'New {$modelClass}', 
 		array( 
 			'save' => array(

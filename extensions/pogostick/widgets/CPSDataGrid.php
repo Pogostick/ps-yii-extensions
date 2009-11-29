@@ -33,14 +33,15 @@ class CPSDataGrid extends CPSHelperBase
     */
 	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array(), $sLinkView = 'update' )
 	{
+		$_sPK = PS::o( $arPagerOptions, 'pk', null, true );
+
 		//	Build pager...
 		$_oWidget = Yii::app()->controller->createWidget( 'CPSLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
-		
 		//	Build grid...
 		if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) $_oWidget->run();
 		
 		$_sOut = self::beginDataGrid( $arModel, $oSort, $arColumns, ! empty( $arActions ) );
-		$_sOut .= self::getDataGridRows( $arModel, $arColumns, $arActions, $sDataName, $sLinkView );
+		$_sOut .= self::getDataGridRows( $arModel, $arColumns, $arActions, $sDataName, $sLinkView, $_sPK );
 		$_sOut .= self::endDataGrid();
 		
 		if ( $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_LEFT || $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_RIGHT ) $_oWidget->run();
@@ -62,6 +63,7 @@ class CPSDataGrid extends CPSHelperBase
     */
 	public static function createEx( $arModel, $arOptions = array() )
 	{
+		$_sPK = PS::o( $arOptions, 'pk', null, true );
 		$_sDataName = self::getOption( $arOptions, 'dataItemName', 'Your Data' );
 		$_arColumns = self::getOption( $arOptions, 'columns', array() );
 		$_arActions = self::getOption( $arOptions, 'actions', array() );
@@ -80,7 +82,7 @@ class CPSDataGrid extends CPSHelperBase
 		
 		//	Build our grid
 		$_sOut = self::beginDataGrid( $arModel, $_oSort, $_arColumns, ! empty( $_arActions ) );
-		$_sOut .= self::getDataGridRows( $arModel, $_arColumns, $_arActions, $_sDataName, $_sLinkView );
+		$_sOut .= self::getDataGridRows( $arModel, $_arColumns, $_arActions, $_sDataName, $_sLinkView, $_sPK );
 		$_sOut .= self::endDataGrid();
 		
 		//	Display on the bottom...
@@ -102,11 +104,12 @@ class CPSDataGrid extends CPSHelperBase
 	{
 		$_sHeaders = null;
 		
-		foreach ( $arColumns as $_sColumn )
+		foreach ( $arColumns as $_sKey => $_oColumn )
 		{
-			if ( is_array( $_sColumn ) ) $_sColumn = array_shift( $_sColumn );
+			$_sColumn = ( is_array( $_oColumn ) ? $_sKey : $_oColumn );
 			$_sColumn = CPSTransform::cleanColumn( $_sColumn );
-			$_sHeaders .= CHtml::tag( 'th', array(), ( $oSort ) ? $oSort->link( $_sColumn ) : $_sColumn );
+			$_sLabel = PS::o( $_oColumn, 'label', ( $oSort ) ? $oSort->link( $_sColumn ) : P::o( $oModel->getAttributeLabel( $_sColumn ), $_sColumn ), true );
+			$_sHeaders .= CHtml::tag( 'th', array(), $_sLabel );
 		}	
 
 		if ( $bAddActions && ! empty( $oModel ) ) $_sHeaders .= CHtml::tag( 'th', array(), 'Actions' );
@@ -126,7 +129,7 @@ class CPSDataGrid extends CPSHelperBase
 	* @param string $sLinkView
 	* @return string
 	*/
-	public static function getDataGridRows( $arModel, $arColumns = array(), $arActions = null, $sDataName = 'item', $sLinkView = null )
+	public static function getDataGridRows( $arModel, $arColumns = array(), $arActions = null, $sDataName = 'item', $sLinkView = null, $sPK = null )
 	{
 		$_sViewName = $sLinkView;
 		$_sOut = empty( $arModel ) ? '<tr><td style="text-align:center" colspan="' . sizeof( $arColumns ) . '">No Records Found</td></tr>' : null;
@@ -137,11 +140,11 @@ class CPSDataGrid extends CPSHelperBase
 		foreach ( $arModel as $_iIndex => $_oModel )
 		{
 			$_sActions = null;
-			$_sPK = $_oModel->getTableSchema()->primaryKey;
+			$_sPK = PS::nvl( $sPK, $_oModel->getTableSchema()->primaryKey );
 			$_sTD = CPSTransform::column( $_oModel, $arColumns, $sLinkView );
 				
 			//	Build actions...
-			if ( null !== $arActions && is_array( $arActions ) )
+			if ( $_sPK && null !== $arActions && is_array( $arActions ) )
 			{
 				foreach ( $arActions as $_oParts )
 				{

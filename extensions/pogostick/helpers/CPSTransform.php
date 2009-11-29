@@ -37,6 +37,7 @@ class CPSTransform extends CPSHelperBase
 		'|' => 'alignTransform',
 		'>' => 'alignTransform',
 		'.' => 'numberTransform',
+		',' => 'currencyTransform',
 	);
 
 	//********************************************************************************
@@ -94,21 +95,22 @@ class CPSTransform extends CPSHelperBase
 		$_sPK = $oModel->getTableSchema()->primaryKey;
 		
 		//	Build columns
-		foreach ( $arColumns as $_sColumn )
+		foreach ( $arColumns as $_sKey => $_oColumn )
 		{
 			$_bLink = false;
 			$_oValue = null;
+			$_sColumn = $_oColumn;
 			
-			if ( is_array( $_sColumn ) )
+			//	Any column options?
+			if ( is_array( $_oColumn ) )
 			{
-				$_sTemp = array_shift( $_sColumn );
-				$_arColOpts = $_sColumn;
-				$_sColumn = $_sTemp;
+				$_sColumn = $_sKey;
+				$_arColOpts = $_oColumn;
+
+				//	Get column options
+				if ( $_arColOpts ) $_arValueMap = self::getOption( $_arColOpts, 'valueMap', array(), true );
 			}
 			
-			//	Get column options
-			if ( $_arColOpts ) $_arValueMap = self::getOption( $_arColOpts, 'valueMap', array(), true );
-
 			//	Process column...
 			if ( in_array( $_sColumn[0], array_keys( self::$m_arTransform ) ) )
 			{
@@ -156,6 +158,16 @@ class CPSTransform extends CPSHelperBase
 	protected static function timeTransform( $sHow, $oValue, $sFormat = 'F d, Y' )
 	{
 		return array( date( $sFormat, $oValue ), false, array() );
+	}
+	
+	protected static function numberTransform( $sHow, $oValue, $iDecimals = 2 )
+	{
+		return self::alignTransform( '>', number_format( doubleval( $oValue ), $iDecimals ) );
+	}
+	
+	protected static function currencyTransform( $sHow, $oValue, $iDecimals = 2 )
+	{
+		return self::alignTransform( '>', '$' . number_format( doubleval( $oValue ), $iDecimals ) );
 	}
 	
 	protected static function styleTransform( $sHow, $oValue )

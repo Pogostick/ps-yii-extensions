@@ -111,11 +111,12 @@ abstract class CPSJobProcess extends CPSComponent
 	/**
 	* Logs a message to the application log
 	* 
-	* @param mixed $sMessage
-	* @param mixed $sCategory
+	* @param string $sMessage
+	* @param string $sLevel
+	* @param string $sCategory
 	* @param boolean $bNoStatus If true, will NOT set status of job with error message
 	*/
-	protected function log( $sMessage, $sCategory = null, $sLevel = 'trace', $bNoStatus = false )
+	protected function log( $sMessage, $sLevel = 'trace', $sCategory = null, $bNoStatus = false )
 	{
 		//	Auto set status 
 		if ( ! $bNoStatus && $sLevel == 'error' ) $this->setStatus( $sMessage );

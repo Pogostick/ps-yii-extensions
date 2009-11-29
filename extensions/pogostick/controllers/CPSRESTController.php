@@ -43,7 +43,8 @@ class CPSRESTController extends CPSController
 	 */
 	public function runAction( $oAction )
 	{
-		$_oPrior = $this->getAction();
+		$this->pushAction( $this->getAction() );
+		
 		$this->setAction( $oAction );
 		
 		if ( $this->beforeAction( $oAction ) )
@@ -51,8 +52,8 @@ class CPSRESTController extends CPSController
 			$this->dispatchRequest( $oAction );
 			$this->afterAction( $oAction );
 		}
-		
-		$this->setAction( $_oPrior );
+
+		$this->setAction( $this->popAction() );
 	}
 
 	/**
@@ -108,18 +109,21 @@ class CPSRESTController extends CPSController
 		for ( $_i = 0, $_iSize = count( $_arOpts ); $_i < $_iSize; $_i ++ )
 			$_arUrlParams[ $_i ] = $_arOpts[ $_i ];
 		
-		//	Is it a valid request?
+		//	Is it a valid GET request?
 		if ( method_exists( $this, 'get' . $_sActionId ) )
 		{
 			$_sMethod = 'get' . $_sActionId;
 			$_arParams = $_GET;
 		}
+		//	Is it a valid POST request?
 		else if ( method_exists( $this, 'post' . $_sActionId ) )
 		{
 			$_sMethod = 'post' . $_sActionId;
 			$_arParams = $_POST;
 		}
+		//	Is it a valid catchall request?
 		else if ( ! method_exists( $this, 'request' . $_sActionId ) )
+			//	No clue what it is, so must be bogus. Hand off to missing action...
 			return $this->missingAction( $_sActionId );
 
 		//	All rest methods echo their output

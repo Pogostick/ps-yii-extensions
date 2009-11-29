@@ -117,16 +117,6 @@ class CPSModel extends CActiveRecord
 	//* Public Methods
 	//********************************************************************************
 
-	/**
-	* Returns the static model of the specified AR class.
-	* 
-	* @return CActiveRecord the static model class
-	*/
-	public static function model( $sClassName = __CLASS__ )
-	{
-		return parent::model( $sClassName );
-	}
-
 	/***
 	* Sets our default behaviors
 	* 
@@ -288,6 +278,22 @@ class CPSModel extends CActiveRecord
 			$this->m_oTransaction->rollBack();
 			$this->m_oTransaction = null;
 		}
+	}
+	
+	/**
+	* Returns the text label for the specified attribute.
+	* @param string the attribute name
+	* @return string the attribute label
+	* @see generateAttributeLabel
+	* @see attributeLabels
+	*/
+	public function getAttributeLabel( $sAttribute )
+	{
+		//	Cache for speed...
+		static $_arLabel = null;
+		if ( null === $_arLabel ) $_arLabel = $this->attributeLabels();
+		
+			return PS::nvl( $_arLabel[ $sAttribute ], $this->generateAttributeLabel( $sAttribute ) );
 	}
 
 	/**

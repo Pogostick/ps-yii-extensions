@@ -58,7 +58,8 @@ class CPSInflector extends CPSHelperBase
 
 		if ( ! $_oInstance )
 		{
-			$_oInstance[ 0 ] =& new CPSInflector();
+			$_oInstance[ 0 ] = new CPSInflector();
+
 			if ( Yii::app()->getParams()->contains( 'inflector' ) )
 			{
 				$_oInstance[ 0 ]->m_arRules = array_merge( $this->m_arRules, app()->getParams()->inflector );

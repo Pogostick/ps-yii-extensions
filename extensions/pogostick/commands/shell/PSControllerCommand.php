@@ -1,6 +1,6 @@
 <?php
 /**
- * PSModelCommand class file.
+ * PSControllerCommand class file.
  * 
  * This is a convenience class to place in your Yii commands directory
  *
@@ -16,8 +16,8 @@
  * @lastmodified  $Date$
  */
  
-Yii::import( 'pogostick.commands.CPSModelCommand' );
+Yii::import( 'pogostick.commands.CPSControllerCommand' );
 
-class PSModelCommand extends CPSModelCommand
+class PSControllerCommand extends CPSControllerCommand
 {
 }

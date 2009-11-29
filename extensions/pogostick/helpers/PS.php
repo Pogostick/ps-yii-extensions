@@ -58,4 +58,17 @@ class PS extends CPSActiveWidgets
 	{
 		return CPSHelp::getOption( $arOptions, $sKey, $oDefault, $bUnset );
 	}
+
+	/**
+	* Returns the number of "interval" between the two dates
+	* 
+	* @param string $dtStart
+	* @param string $dtEnd
+	* @param mixed $sInterval
+	*/
+	public static function dateDiff( $dtStart, $dtEnd )
+	{
+		return CPSHelp::dateDiff( $dtStart, $dtEnd );
+	}
+
 }

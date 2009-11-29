@@ -270,14 +270,29 @@ class CPSOptionManager
 	*/
 	public function getPublicOptions()
 	{
+		return $this->getAllOptions( true );
+	}
+
+	/**
+	* Returns a copy of all options in the internal options array
+	*
+	* @see getOptions
+	* @see getPublicOptions
+	* @returns array
+	*/
+	public function getAllOptions( $bPublicOnly = false )
+	{
 		$_arOptions = array();
 
 		//	Build an array with non-private entities
 		foreach( $this->m_arOptions as $_sKey => $_oValue )
 		{
 			//	Go through metadata, pull out non-private keys
-			if ( $this->isMetaDataKey( $_sKey ) && ! $this->getMetaDataValue( $_sKey, CPSOptionManager::META_PRIVATE ) )
+			if ( $this->isMetaDataKey( $_sKey ) )
 			{
+				if ( $bPublicOnly && $this->getMetaDataValue( $_sKey, CPSOptionManager::META_PRIVATE ) )
+					continue;
+					
 				$_sRealKey = $this->getMetaDataValue( $_sKey, CPSOptionManager::META_KEYNAME );
 
 				//	Validate the key

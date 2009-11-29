@@ -6,9 +6,14 @@
  * - $modelClass: the model class name
  * - $columns: a list of column schema objects
  */
+
+$className = 'update view';
+ 
+//	Include our header 
+include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_header.php' );
+
 echo<<<HTML
-<?php
-	echo CPSForm::formHeader( 'Edit : ' . \$model->{$ID}, 
+	echo CPSForm::formHeader( 'Edit {$modelClass}: ' . \$model->{$ID}, 
 		array( 
 			'save' => array(
 				'label' => 'Save',

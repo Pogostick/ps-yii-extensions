@@ -7,12 +7,18 @@
  * - $columns: a list of column schema objects
  */
 
+//	Build an array for the data grid...
+
 $_sCols = null;
 foreach ( $columns as $column ) $_sCols .= ( ( $_sCols ) ? ', ' : '' ) . '\'' . $column->name . '\'';
 $_sCols = "array( {$_sCols } )";
 	
+//	Include our header...
+$className = 'admin view';
+include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_header.php' );
+
+//	And output the rest...
 echo <<<HTML
-<?php
 	echo CPSForm::formHeader( '{$modelClass} Manager', 
 		array( 'new' => 
 			array(
