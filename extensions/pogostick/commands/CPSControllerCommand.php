@@ -44,7 +44,7 @@ class CPSControllerCommand extends CPSConsoleCommand
 		
 		$this->controllerBaseClass = 'CPSController';
 		$this->controllerTemplateName = 'controller.php';
-		
+
 		$this->name = 'pscontroller';
 	}
 
@@ -56,7 +56,7 @@ class CPSControllerCommand extends CPSConsoleCommand
 	public function run( $arArgs )
 	{
 		//	Process arguments...
-		$this->processArguments( $arArgs );
+		$arArgs = $this->processArguments( $arArgs );
 		
 		//	Check args...
 		if ( ! ( $_sControllerId = array_shift( $arArgs ) ) )
@@ -67,11 +67,14 @@ class CPSControllerCommand extends CPSConsoleCommand
 		}
 		
 		//	Get actions from arguments...
-		$this->actions = array( 'index' );
+		$_arActions = array( 'index' );
 
 		//	The rest of the arguments are actions...		
 		while ( $_sAction = array_shift( $arArgs ) )
-			array_push( $this->actions, $_sAction );
+			array_push( $_arActions, $_sAction );
+
+		//	Set our actions...
+		$this->actions = $_arActions;
 		
 		//	Load the module
 		$_oModule = Yii::app();
@@ -128,7 +131,16 @@ class CPSControllerCommand extends CPSConsoleCommand
 	public function generateController( $sSourceFile, $arParams )
 	{
 		if ( ! is_file( $sSourceFile ) ) $sSourceFile = YII_PATH . '/cli/views/shell/controller/' . basename( $sSourceFile );
-		return $this->renderFile( $sSourceFile, array( 'className' => $arParams[ 0 ], 'actions' => $arParams[ 1 ] ), true );
+		
+		return $this->renderFile( 
+			$sSourceFile, 
+			array( 
+				'className' => $arParams[ 0 ], 
+				'actions' => $arParams[ 1 ], 
+				'baseClass' => $this->controllerBaseClass 
+			), 
+			true
+		);
 	}
 
 	/**
@@ -207,7 +219,7 @@ OPTIONS
   -d, --database               The database component to use. 
                                    Defaults to 'db'
 
-  -b, --base-class             The base class to use for generated models. 
+  -b, --base-class             The base class to use for generated controllers. 
                                    Defaults to 'CPSController'
                                    
   -t, --template-path          The template path to use.

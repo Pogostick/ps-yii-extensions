@@ -293,7 +293,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 	* @param string the directory to be checked
 	* @param integer The directory mode
 	*/
-	public function ensureDirectory( $sTarget, $iMode = 777 )
+	public function ensureDirectory( $sTarget )
 	{
 		$_bResult = true;
 		$_arInfo = pathinfo( $sTarget );
@@ -301,7 +301,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 		if ( ! is_dir( $_arInfo['dirname'] ) )
 		{
 			$this->boldEchoString( strtr( $_arInfo['dirname'], '\\', '/' ), 'Created Directory' );
-			$_bResult = mkdir( $_arInfo['dirname'], $iMode );
+			$_bResult = mkdir( $_arInfo['dirname'] );
 		}
 		
 		return $_bResult;
@@ -415,15 +415,12 @@ abstract class CPSConsoleCommand extends CPSComponent
 		//	Rebuild args...
 		for ( $_i = 0, $_iCount = count( $arArgs ); $_i < $_iCount, $_sArg = $arArgs[ $_i ]; $_i++ )
 		{
-			if ( false === strpos( $_sArg, '=' ) ) 
-				$_sOpt = strtolower( trim( $_sArg ) );
-			else
-				$_sOpt = strtolower( trim( substr( $_sArg, 0, strpos( $_sArg, '=' ) ) ) );
+			$_sOpt = trim( substr( $_sArg, 0, strpos( $_sArg, '=' ) ) );
 
 			if ( $_sOpt[0] == '-' && $_sOpt[1] == '-' )
-				$_arOptions[ substr( $_sOpt, 2 ) ] = str_ireplace( $_sOpt . '=', '', $_sArg );
+				$_arOptions[ substr( $_sOpt, 2 ) ] = str_replace( $_sOpt . '=', '', $_sArg );
 			elseif ( $_sOpt[0] == '-' )
-				$_arOptions[ substr( $_sOpt, 1 ) ] = str_ireplace( $_sOpt . '=', '', $_sArg );
+				$_arOptions[ substr( $_sOpt, 1 ) ] = str_replace( $_sOpt . '=', '', $_sArg );
 			else
 				$_arResults['rebuilt'][] = $arArgs[ $_i ];
 		}
@@ -494,21 +491,17 @@ abstract class CPSConsoleCommand extends CPSComponent
 	protected function processArguments( $arArgs )
 	{
 		//	Set some defaults...
-		$this->databaseName = 'db';
-		$this->baseClass = 'CPSModel';
-		$this->basePath = Yii::getPathOfAlias( 'application.models' );
 		$this->templatePath = PS::nvl( $this->templatePath, YII_PATH . '/cli/views/shell/model' );
 
 		//	Process command line arguments
 		$_sClassName = array_shift( $arArgs );
 		$_arOptions = $this->getopts( $arArgs );
-		$_arClassOptions = $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY );
 		$arArgs = array_merge( array( $_sClassName ), $_arOptions['rebuilt'] );
 
 		//	Set our values based on options...
 		foreach ( $_arOptions['options'] as $_sKey => $_sValue )
 		{
-			switch ( $_sKey )
+			switch ( strtolower( $_sKey ) )
 			{
 				case 'n':
 				case 'template-name':
@@ -537,11 +530,11 @@ abstract class CPSConsoleCommand extends CPSComponent
 					
 				default:
 					//	Look through options..
-					foreach ( $_arClassOptions as $_sOptKey => $_sOptValue )
+					foreach ( $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY, true ) as $_sOptKey => $_sOptValue )
 					{
-						if ( $_sKey == strtolower( $_sOptKey ) || $_sKey == CPSHash::underscorize( $_sOptKey, '-' ) )
+						if ( $_sKey == $_sOptKey || $_sKey == CPSHash::underscorize( $_sOptKey, '-' ) )
 						{
-							$this->setOption( $_sOptKey, $_sOptValue );
+							$this->{$_sOptKey} = $_sValue;
 							break;
 						}
 					}
@@ -617,7 +610,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 	*/
 	protected function displayParameters( $sName, $arExtra = array() )
 	{
-		$_arOptions = array_merge( $arExtra, $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY ) );
+		$_arOptions = array_merge( $arExtra, $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY, true ) );
 		$_iColWidth = $this->colWidth;
 		
 		//	Update column width based on option keys...
@@ -633,11 +626,6 @@ abstract class CPSConsoleCommand extends CPSComponent
 		echo "Working Parameters" . PHP_EOL;
 		echo "============================================================" . PHP_EOL . PHP_EOL;
 
-		echo $this->boldEchoString( $this->databaseName, 'Source DB', true );
-		echo $this->boldEchoString( $this->baseClass, 'Extending', true );
-		echo $this->boldEchoString( $this->force ? 'Yes' : 'No', 'Force Mode', true );
-		echo $this->boldEchoString( $this->templatePath, 'Template Path', true );
-		
 		foreach ( $_arOptions as $_sKey => $_sValue )
 			echo $this->boldEchoString( is_array( $_sValue ) ? implode( ', ', $_sValue ) : $_sValue, $_sKey, true );
 			                  
@@ -657,8 +645,8 @@ abstract class CPSConsoleCommand extends CPSComponent
 				'databaseName_' => array( CPSOptionManager::META_DEFAULTVALUE => 'db', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'basePath_' => array( CPSOptionManager::META_DEFAULTVALUE => Yii::getPathOfAlias( 'application.models' ), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'templatePath_' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'baseClass_' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'templateName_' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'baseClass_' => array( CPSOptionManager::META_DEFAULTVALUE => 'CPSModel', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
 				'colWidth' => array( CPSOptionManager::META_DEFAULTVALUE => self::MIN_COL_WIDTH, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'integer' ) ),
 			)
 		);

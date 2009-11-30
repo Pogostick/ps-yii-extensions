@@ -4,6 +4,7 @@
  * The following variables are available in this template:
  * - $ID: the primary key name
  * - $controllerClass: the controller class name
+ * - $baseClass: The parent class
  * - $modelClass: the model class name
  */
  
@@ -15,7 +16,7 @@ include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_he
  
 //	The rest...
 echo <<<HTML
-class {$controllerClass} extends CPSCRUDController
+class {$controllerClass} extends {$baseClass}
 {
 	//********************************************************************************
 	//* Public Methods

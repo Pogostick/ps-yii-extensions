@@ -40,11 +40,11 @@ class CPSCrudCommand extends CPSControllerCommand
 		$this->addOptions( self::getBaseOptions() );
 
 		//	Set base values
-		$this->actions = array( 'create', 'update', 'admin', '_form' );
+		$this->actions = array( 'index', 'create', 'update', 'admin', '_form' );
 
 		$this->baseClass = 'CPSModel';
 		$this->templateName = 'model.php';
-		
+
 		$this->controllerBaseClass = 'CPSCRUDController';
 		$this->controllerTemplateName = 'controller.php';
 
@@ -135,7 +135,7 @@ class CPSCrudCommand extends CPSControllerCommand
 				'ID' => PS::nvl( $_oModel->tableSchema->primaryKey, '' ),
 				'controllerClass' => $_sControllerClass,
 				'modelClass' => $_sModelClass,
-				'baseClass' => $this->baseClass,
+				'baseClass' => $this->controllerBaseClass,
 				'databaseName' => $this->databaseName,
 			),
 			true
@@ -165,9 +165,14 @@ class CPSCrudCommand extends CPSControllerCommand
 				$_arColumns = $_oTable->columns;
 				
 				if ( isset( $_oTable->primaryKey ) ) unset( $_arColumns[ $_oTable->primaryKey ] );
-				
-				//	No template? Use default
-				if ( ! is_file( $sSource ) ) $sSource = YII_PATH . '/cli/views/shell/crud/' . basename( $sSource );
+
+				//	Check source file...
+				if ( ! is_file( $sSource ) ) 
+				{
+					//	Try our generic view, then default framework
+					if ( ! is_file( $sSource = Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/view.php' ) )
+						$sSource = YII_PATH . '/cli/views/shell/crud/' . basename( $sSource );
+				}
 				
 				return $this->renderFile( $sSource,
 					array(
@@ -266,8 +271,8 @@ OPTIONS
   -d, --database               The database component to use. 
                                    Defaults to 'db'
 
-  -b, --base-class             The base class to use for generated models. 
-                                   Defaults to 'CPSController'
+  -b, --base-class             The base class to use for generated controllers. 
+                                   Defaults to 'CPSCRUDController'
                                    
   -t, --template-path          The template path to use.
   

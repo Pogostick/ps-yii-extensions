@@ -349,6 +349,7 @@ class CPSOptionManager
 
 		//	Set the value in the array...
 		return $this->m_arOptions[ $sKey ] = $oValue;
+
 	}
 
 	/**
@@ -443,6 +444,8 @@ class CPSOptionManager
 
 		//	Sort the array
 		if ( ! $bNoSort ) ksort( $this->m_arOptions );
+		
+//		Yii::trace( 'added option ['.$sKey.'] with a value of ['.$_oValue.'] (' . get_called_class() . ')', __CLASS__ );
 	}
 	
 	/**

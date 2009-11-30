@@ -52,7 +52,7 @@ abstract class CPSController extends CController
 	protected $m_sPageHeading = null;
 	public function getPageHeading() { return $this->m_sPageHeading; }
 	public function setPageHeading( $sValue ) { $this->m_sPageHeading = $sValue; }
-	
+
 	/***
 	* Allows you to change your action prefix
 	* 
