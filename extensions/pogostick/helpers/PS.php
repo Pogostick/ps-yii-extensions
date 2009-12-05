@@ -70,5 +70,5 @@ class PS extends CPSActiveWidgets
 	{
 		return CPSHelp::dateDiff( $dtStart, $dtEnd );
 	}
-
+	
 }

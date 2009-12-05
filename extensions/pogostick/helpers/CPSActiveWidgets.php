@@ -43,6 +43,7 @@ class CPSActiveWidgets extends CHtml
 	const MARKITUP = 'markItUp';
 	const CODEDD = 'activeCodeDropDownList';
 	const JQUI = 'CPSjqUIWrapper';
+	const FG_MENU = 'CPSfgMenu';
 
 	//	Types of drop downs...
 	const	DD_GENERIC = -1;
@@ -195,8 +196,8 @@ class CPSActiveWidgets extends CHtml
 		else
 		{
 			//	Set label name
-			$sLabel = CPSHelp::nvl( $sLabel, CPSHelp::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . self::$labelSuffix;
-			$_sOut = self::activeLabelEx( $oModel, $sLabel, $arLabelOptions );
+			$arLabelOptions['label'] = CPSHelp::nvl( $sLabel, CPSHelp::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . self::$labelSuffix;
+			$_sOut = self::activeLabelEx( $oModel, $sColName, $arLabelOptions );
 		}
 
 		if ( $_sTransform && $oModel ) $oModel->$sColName = CPSTransform::value( $_sTransform, $oModel->$sColName );
@@ -378,6 +379,11 @@ class CPSActiveWidgets extends CHtml
 					$eFieldType = self::TEXT;
 				}
 				break;
+				
+			//	Build a Filament Group menu
+			case self::FG_MENU:
+				CPSfgMenu::create( $arWidgetOptions );
+				return;
 			
 			//	Default for text field
 			case self::TEXT:
@@ -776,6 +782,7 @@ HTML;
 		}
 		
 		//	Set our link options
+		$arOptions['id'] = $_sId;
 		$arOptions['title'] = $sLabel;
 		$_sClass = PS::o( $arOptions, 'class', null );
 		$arOptions['class'] = "ps-button {$_sIconPos} ui-state-default ui-corner-all {$_sClass}";

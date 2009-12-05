@@ -146,5 +146,26 @@ class CPSHelperBase
 		$_dtEnd = new DateTime( $dtEnd );
 		return $_dtEnd->diff( $_dtStart );
 	}
+	
+	/**
+	* Merges an array without overwriting...
+	* @returns array
+	*/
+	public static function smart_array_merge()
+	{
+		$_iCount = func_num_args();
+		$_arResult = array();
+		
+		for ( $_i = 0; $_i < $_iCount; $_i++ )
+		{
+			foreach ( func_get_arg( $_i ) as $_sKey => $_oValue )
+			{
+				if ( isset( $_arResult[ $_sKey ] ) )  $_oValue = $_arResult[ $_sKey ] . ' ' . $_oValue;
+				$_arResult[ $_sKey ] = $_oValue;
+			}
+		}
+		
+		return $_arResult;
+	}
 
 }

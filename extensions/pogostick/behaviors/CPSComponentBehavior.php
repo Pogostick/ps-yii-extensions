@@ -105,7 +105,7 @@ class CPSComponentBehavior extends CBehavior
 		$this->addOptions( self::getBaseOptions() );
 
 		//	Set the external library path
-		$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick' ) . DIRECTORY_SEPARATOR . 'external', true );
+		$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick.external' ), true );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
@@ -286,13 +286,13 @@ class CPSComponentBehavior extends CBehavior
 	* @param array $arOptions
 	* @return string
 	*/
-	public function makeOptions( $arOptions = null, $iFormat = self::JSON, $bIncludePrivate = false )
+	public function makeOptions( $arOptions = null, $iFormat = self::JSON, $bIncludePrivate = false, $bNoCheck = false )
 	{
 		//	Get the public options...
 		$_arOptions = PS::nvl( $arOptions, $this->m_oOptions->getAllOptions( ! $bIncludePrivate ) );
 		
 		//	Check them first...
-		$this->checkOptions( $_arOptions );
+		if ( ! $bNoCheck ) $this->checkOptions( $_arOptions );
 
 		//	Get our public callbacks...
 		$_arCallbacks = $this->callbacks;
@@ -494,7 +494,7 @@ class CPSComponentBehavior extends CBehavior
 	*/
 	protected function isCBFunction( $sValue )
 	{
-		return ( 0 == strncasecmp( $sValue, 'function(', 9 ) || 0 == strncasecmp( $sValue, 'jQuery(', 7 ) || 0 == strncasecmp( $sValue, '$(', 2 ) );
+		return is_string( $sValue ) && ( 0 == strncasecmp( $sValue, 'function(', 9 ) || 0 == strncasecmp( $sValue, 'jQuery(', 7 ) || 0 == strncasecmp( $sValue, '$(', 2 ) );
 	}
 	
 	/**

@@ -53,7 +53,6 @@ class CPSLinkPager extends CLinkPager
 	*/
 	protected $m_iPagerLocation = self::TOP_RIGHT;
 	public function getPagerLocation() { return $this->m_iPagerLocation; }
-	public function setPagerLocation( $iValue ) { $this->m_iPagerLocation = $iValue; }
 
 	//********************************************************************************
 	//* Property Access Methods
@@ -91,9 +90,6 @@ class CPSLinkPager extends CLinkPager
 	*/
 	public function init()
 	{
-		//	Phone home
-		parent::init();
-		
 		//	Override default labels...
 		$this->nextPageLabel = 'Next';
 		$this->prevPageLabel = 'Previous';
@@ -107,8 +103,17 @@ class CPSLinkPager extends CLinkPager
 		
 		//	Our class for paging...
 		$this->htmlOptions['class'] = 'psPager';
+		$this->setPagerLocation( self::TOP_LEFT );
 		
-		switch ( $this->getPagerLocation() )
+		//	Phone home
+		parent::init();
+	}
+	
+	public function setPagerLocation( $eValue )
+	{
+		$this->m_iPagerLocation = $eValue;
+		
+		switch ( $eValue )
 		{
 			case self::TOP_RIGHT:
 				$this->htmlOptions['class'] .= ' ps-pager-right ps-pager-top';
@@ -125,6 +130,41 @@ class CPSLinkPager extends CLinkPager
 		}
 	}
 	
+	/**
+	* Executes the widget.
+	* This overrides the parent implementation by displaying the generated page buttons.
+	*/
+	public function run()
+	{
+		if ( $this->nextPageLabel === null ) $this->nextPageLabel = Yii::t('yii','Next &gt;');
+		if($this->prevPageLabel===null)
+			$this->prevPageLabel=Yii::t('yii','&lt; Previous');
+		if($this->firstPageLabel===null)
+			$this->firstPageLabel=Yii::t('yii','&lt;&lt; First');
+		if($this->lastPageLabel===null)
+			$this->lastPageLabel=Yii::t('yii','Last &gt;&gt;');
+		if($this->header===null)
+			$this->header=Yii::t('yii','Go to page: ');
+
+		$buttons=$this->createPageButtons();
+
+		if(empty($buttons))
+			return;
+
+		$this->registerClientScript();
+
+		$htmlOptions=$this->htmlOptions;
+		if(!isset($htmlOptions['id']))
+			$htmlOptions['id']=$this->getId();
+		if(!isset($htmlOptions['class']))
+			$htmlOptions['class']='yiiPager';
+		echo '<div class="ps-button-bar">';
+			echo $this->header;
+			echo CHtml::tag('ul',$htmlOptions,implode("\n",$buttons));
+			echo $this->footer;
+		echo '</div>';
+	}
+
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************

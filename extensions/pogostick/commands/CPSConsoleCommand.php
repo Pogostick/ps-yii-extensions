@@ -168,58 +168,53 @@ abstract class CPSConsoleCommand extends CPSComponent
 			else
 				$_sContent = file_get_contents( $_sSource );
 
-			if ( null !== $_sContent )
+			if ( is_file( $_sTarget ) )
 			{
-				if ( is_file( $_sTarget ) )
+				if ( ! $this->force && $_sContent === file_get_contents( $_sTarget ) )
 				{
-					if ( ! $this->force && $_sContent === file_get_contents( $_sTarget ) )
-					{
-						$arFileList[ $_sName ][ '_status' ] = 0;
-						$this->boldEchoString( $_sName, 'Unchanged' );
-						continue;
-					}
-					
-					if ( $this->force || $_bOverwriteAll )
-					{
-						$arFileList[ $_sName ][ '_status' ] = 1;
-						$this->boldEchoString( $_sName, ( $this->force ? 'Force ' : '' ) . 'Overwrite' );
-					}
-					else
-					{
-						$this->boldEchoString( $_sName, 'Existing' );
-						$this->echoString( "[\033[1my\033[0mes|\033[1mn\033[0mo|\033[1ma\033[0mll|\033[1mq\033[0muit]", '--> Overwrite?', false, ' ', false, 8 );
-						
-						switch ( substr( strtolower( trim( fgets( STDIN ) ) ), 0, 1 ) )
-						{
-							case 'q':
-								return;
-								
-							case 'a':
-								$_bOverwriteAll = true;
-
-							case 'y':
-								$arFileList[ $_sName ][ '_status' ] = 1;
-								$this->boldEchoString( $_sName, 'Overwriting' );
-								break;
-							
-							case 'n':
-								$arFileList[ $_sName ][ '_status' ] = 0;
-								$this->boldEchoString( $_sName, 'Skipping' );
-								break;
-						}
-					}
+					$arFileList[ $_sName ][ '_status' ] = 0;
+					$this->boldEchoString( $_sName, 'Unchanged' );
+					continue;
+				}
+				
+				if ( $this->force || $_bOverwriteAll )
+				{
+					$arFileList[ $_sName ][ '_status' ] = 1;
+					$this->boldEchoString( $_sName, ( $this->force ? 'Force ' : '' ) . 'Overwrite' );
 				}
 				else
 				{
-					$arFileList[ $_sName ][ '_status' ] = 1;
-					$this->ensureDirectory( dirname( $_sTarget ) );
-					$this->boldEchoString( $_sName, 'Generating' );
+					$this->boldEchoString( $_sName, 'Existing' );
+					$this->echoString( "[\033[1my\033[0mes|\033[1mn\033[0mo|\033[1ma\033[0mll|\033[1mq\033[0muit] ", '--> Overwrite? ', false, ' ', false, 8 );
+					
+					switch ( substr( strtolower( trim( fgets( STDIN ) ) ), 0, 1 ) )
+					{
+						case 'q':
+							return;
+							
+						case 'a':
+							$_bOverwriteAll = true;
+
+						case 'y':
+							$arFileList[ $_sName ][ '_status' ] = 1;
+							$this->boldEchoString( $_sName, 'Overwriting' );
+							break;
+						
+						case 'n':
+							$arFileList[ $_sName ][ '_status' ] = 0;
+							$this->boldEchoString( $_sName, 'Skipping' );
+							break;
+					}
 				}
-				
-				file_put_contents( $_sTarget, $_sContent );
 			}
 			else
-				echo "Unable to retrieve content from template \"" . $_sSource . "\"" . PHP_EOL;
+			{
+				$arFileList[ $_sName ][ '_status' ] = 1;
+				$this->ensureDirectory( dirname( $_sTarget ) );
+				$this->boldEchoString( $_sName, 'Generating' );
+			}
+			
+			@file_put_contents( $_sTarget, $_sContent );
 		}
 		
 		//	Return array with statuses
@@ -266,24 +261,32 @@ abstract class CPSConsoleCommand extends CPSComponent
 	{
 		$_arList = array();
 		$_iDir = opendir( $sSourceDir );
-		
+
 		while ( $_sFile = readdir( $_iDir ) )
 		{
 			//	Ignore parents and svn...
 			if ( $_sFile === '.' || $_sFile === '..' || $_sFile === '.svn' )
 				continue;
-				
+
 			$_sSourcePath = $sSourceDir . DIRECTORY_SEPARATOR . $_sFile;
 			$_sTargetPath = $sTargetDir . DIRECTORY_SEPARATOR . $_sFile;
-			$_sName = $sBaseDir === '' ? $_sFile : $sBaseDir . '/' . $_sFile;
-			
-			$_arList[ $_sName ] = array( 'source' => $_sSourcePath, 'target' => $_sTargetPath );
-			
-			if ( is_dir( $_sSourcePath ) ) $_arList = array_merge( $_arList, $this->buildFileList( $_sSourcePath, $_sTargetPath, $_sName ) );
+			$_sName = $sBaseDir === '' ? $_sFile : $sBaseDir . DIRECTORY_SEPARATOR . $_sFile;
+
+			if ( is_dir( $_sSourcePath ) ) 
+				$_arList = array_merge( $_arList, $this->buildFileList( $_sSourcePath, $_sTargetPath, $_sName ) );
+			else                                      
+			{
+				$_arList[ $_sName ] = array(
+					'source' => $_sSourcePath,
+					'target' => $_sTargetPath,
+					'callback' => array( $this, 'generateFile' ),
+					'params' => array(),
+				);
+			}
 		}
 		
 		closedir( $_iDir );
-		
+
 		return $_arList;
 	}
 
@@ -301,12 +304,24 @@ abstract class CPSConsoleCommand extends CPSComponent
 		if ( ! is_dir( $_arInfo['dirname'] ) )
 		{
 			$this->boldEchoString( strtr( $_arInfo['dirname'], '\\', '/' ), 'Created Directory' );
-			$_bResult = mkdir( $_arInfo['dirname'] );
+			$_bResult = @mkdir( $_arInfo['dirname'] );
 		}
 		
 		return $_bResult;
 	}
 
+    /**
+    * Generates the file
+    * 
+    * @param string $sSource
+    * @param array $arParams
+    * @return string
+    */
+	public function generateFile( $sSource, $arParams )
+	{
+		return $this->renderFile( $sSource, $arParams, true );
+	}
+	
 	/**
 	* Renders a view file.
 	* 

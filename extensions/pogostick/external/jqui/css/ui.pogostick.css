@@ -16,11 +16,14 @@ button.ps-button { width:auto; overflow:visible; }
 
 .ps-button-icon-left { padding-left: 2.1em; }
 .ps-button-icon-right { padding-right: 2.1em; }
+.ps-button-icon-right-wide { padding-right: 8.5em; }
+
 .ps-button-icon-left .ui-icon { right: auto; left: .2em; margin-left: 0; }
 .ps-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; }
+.ps-button-icon-right-wide .ui-icon { left: auto; right: .2em; margin-left: 0; }
 
-.ps-button-icon-solo { display:block; width:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
-.ps-button-icon-solo-small { padding:6px 10px; -moz-border-radius:3px; display:block; width:0px; height:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
+.ps-button-icon-solo { display: inline-block; font-size: 0px; line-height: 0px; width:8px; overflow: hidden; }	 /* solo icon buttons must have block properties for the text-indent to work */	
+.ps-button-icon-solo-small { padding:6px 10px; -moz-border-radius:3px; display: inline-block; font-size: 0px; line-height: 0px; width:0px; height:8px; overflow: hidden; }	 /* solo icon buttons must have block properties for the text-indent to work */	
 
 .ps-button-no-float { float:none !important; }
 
@@ -29,9 +32,12 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-buttonset-single .ps-button, 
 .ps-buttonset-multi .ps-button { margin-right: -1px;}
 
-.ps-toolbar { padding: .5em; margin: 0;  }
+.ps-toolbar { padding: .5em; margin: 0; }
 .ps-toolbar .ps-buttonset { margin-right:1.5em; padding-left: 1px; }
-.ps-toolbar .ps-button { font-size: 1em;  }
+.ps-toolbar .ps-button { font-size: 1em; }
+
+.fg-menu-ipod .fg-menu li { width: 95%; }
+.fg-menu-ipod .ui-widget-content { border:0; }
 
 /**
 * Miscellaneous classes/styles
@@ -70,9 +76,26 @@ button.ps-button { width:auto; overflow:visible; }
 	width: 50px !important;
 }
 
+.ps-hidden { 
+	position: absolute; 
+	top: 0; 
+	left:-9999px; 
+	width:1px; 
+	height:1px; 
+	overflow:hidden; 
+}
+
 /**
 * In form submit button bar
 */
+.ps-button-bar {
+	clear: both;
+	display: block;
+	padding:0;
+	margin:0px;
+	min-width:580px;
+}
+
 .ps-submit-button-bar {
 	clear: both;
 	position: relative;
@@ -440,11 +463,6 @@ div.ps-edit-container div.yiiForm span.cbDivider {
 	width:170px;
 }
 
-div.ps-edit-container div.yiiForm div.wide {
-	margin:5px 0px;
-	font-weight: bold;	
-}
-
 div.ps-edit-container div.yiiForm :disabled {
 	background: transparent;
 	border:0;
@@ -453,7 +471,18 @@ div.ps-edit-container div.yiiForm :disabled {
 	color: #666;
 }
 
-div.yiiForm div.wide span { 
+/**
+* Miscellaneous field widths
+*/
+div.ps-edit-container div.yiiForm input[type="text"].date {
+	width: 70px;
+}
+
+div.ps-edit-container div.yiiForm input[type="text"].datetime {
+	width: 110px;
+}
+
+div.ps-edit-container div.yiiForm div.wide span { 
 	color: #777;
 	font-weight: normal; 
 	font-size: 11px; 
@@ -462,36 +491,7 @@ div.yiiForm div.wide span {
 	padding:0;
 }
 
-
-/**
-* Grids
-*/
-div.ps-edit-container .grid-actions td {
-	text-align: center;
-	min-width:100px;
-}
-
-div.ps-edit-container .grid-actions div._grid_actions {
-	margin:0 auto;
-}
-
-div.ps-edit-container .grid-actions a.ps-button {
-	float:none;
-	display: inline-block;
-}
-	
-div.ps-edit-container .grid-actions ._grid_actions hr {
-	display: block; 
-	clear: left; 
-	margin:0 0;
-	visibility: hidden;
-	width:1px;
-}
-  
-div.ps-edit-container input[type="text"].date {
-	width: 70px;
-}
-
-div.ps-edit-container input[type="text"].datetime {
-	width: 110px;
+div.ps-edit-container div.yiiForm div.wide {
+	margin:5px 0px;
+	font-weight: bold;	
 }

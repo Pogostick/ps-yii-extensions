@@ -73,6 +73,14 @@ class CPSWidget extends CInputWidget
 	protected $m_arCssFiles = array();
 	protected $m_arScriptFiles = array();
 	
+	/**
+	* An id counter for generating unique ids
+	* 
+	* @var integer
+	*/
+	protected static $m_iIdCount = 0;
+	public static function getNextIdCount() { return self::$m_iIdCount++; }
+
 	//********************************************************************************
 	//* Property Accessors
 	//********************************************************************************
@@ -276,7 +284,22 @@ class CPSWidget extends CInputWidget
 
 		return $_oObject;
 	}
+	
+	/**
+	* Given an ID, a unique name is built and returned
+	* 
+	* @param string $sId
+	* @returns string
+	*/
+	public function getUniqueId( $sId = null )
+	{
+		return 'ps.' . PS::nvl( $sId, __CLASS__ ) . '.' . self::getNextIdCount();
+	}
 
+	//********************************************************************************
+	//* Private Methods 
+	//********************************************************************************
+	
 	/**
 	* Generates the javascript code for the widget
 	*

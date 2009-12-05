@@ -76,7 +76,7 @@ class CPSForm extends CPSHelperBase
 	* @param boolean $bShowFlashDiv If true, will output a standard ps-flash-display div
 	* @returns string
 	*/
-	public static function formHeader( $sTitle, $arMenuItems = array(), $sDivClass = 'form-header', $bShowFlashDiv = true )
+	public static function formHeader( $sTitle, $arMenuItems = array(), $sDivClass = 'form-header', $bShowFlashDiv = true, $sHtmlInject = null )
 	{
 		$_bIcon = false;
 		$_sClass = $_sLink = $_sOut = null;
@@ -102,7 +102,7 @@ class CPSForm extends CPSHelperBase
 		<div class="{$sDivClass}">
 			<h1>{$sTitle}</h1>
 			<p>{$_sOut}</p>
-			<div style="clear:both"></div>{$_sFlash}
+			<div style="clear:both"></div>{$_sFlash}{$sHtmlInject}
 		</div>
 HTML;
 	}

@@ -37,7 +37,8 @@ class CPSTransform extends CPSHelperBase
 		'|' => 'alignTransform',
 		'>' => 'alignTransform',
 		'.' => 'numberTransform',
-		',' => 'currencyTransform',
+		'$' => 'currencyTransform',
+		',' => 'integerTransform',
 	);
 
 	//********************************************************************************
@@ -66,11 +67,18 @@ class CPSTransform extends CPSHelperBase
 	
 	protected static function setValue( $oModel, $sColumn, $oValue = null )
 	{
-		return eval( '$oModel->' . self::columnChain( $sColumn ) . ' = \'' . $oValue . '\'; return;' );
+		if ( $oModel->hasAttribute( self::columnChain( $sColumn ) ) )
+		{
+			$_sColumn = self::columnChain( $sColumn );
+			$oModel->{$_sColumn} = $oValue;
+		}
 	}
 	
-	protected static function getValue( $oModel, $sColumn )
+	protected static function getValue( $oModel, $sColumn, $sFormatColumn = null )
 	{
+		if ( ! $oModel instanceof CModel ) 
+			return $oModel[ self::columnChain( PS::nvl( $sFormatColumn, $sColumn ) ) ];
+		
 		return eval( 'return $oModel->' . self::columnChain( $sColumn ) . ';' );
 	}
 	
@@ -92,7 +100,8 @@ class CPSTransform extends CPSHelperBase
 	{
 		$_bValue = $_sOut = null;
 		$_arValueMap = array();
-		$_sPK = $oModel->getTableSchema()->primaryKey;
+		$_bIsModel = ( $oModel instanceof CModel );
+		$_sPK = ( $_bIsModel ) ? $oModel->getTableSchema()->primaryKey : null;
 		
 		//	Build columns
 		foreach ( $arColumns as $_sKey => $_oColumn )
@@ -100,15 +109,23 @@ class CPSTransform extends CPSHelperBase
 			$_bLink = false;
 			$_oValue = null;
 			$_sColumn = $_oColumn;
+			$_sDisplayFormat = null;
 			
 			//	Any column options?
 			if ( is_array( $_oColumn ) )
 			{
-				$_sColumn = $_sKey;
+				$_sColumn = array_shift( $_oColumn );
 				$_arColOpts = $_oColumn;
 
 				//	Get column options
-				if ( $_arColOpts ) $_arValueMap = self::getOption( $_arColOpts, 'valueMap', array(), true );
+				if ( $_arColOpts ) 
+				{
+					$_arValueMap = PS::o( $_arColOpts, 'valueMap', array(), true );
+					$_sDisplayFormat = PS::o( $_arColOpts, 'displayFormat', null, true );
+					
+					//	Anything remaining gets rolled into wrap options
+					$arWrapOptions = CPSHelp::smart_array_merge( $_arColOpts, $arWrapOptions );
+				}
 			}
 			
 			//	Process column...
@@ -116,30 +133,38 @@ class CPSTransform extends CPSHelperBase
 			{
 				$_sRealCol = self::cleanColumn( $_sColumn );
 				$_sMethod = self::$m_arTransform[ $_sColumn[0] ];
-				list( $_oValue, $_bLink, $_arWrapOpts ) = self::$_sMethod( $_sColumn[0], self::getValue( $oModel, $_sRealCol ) );
-				$arWrapOptions = array_merge( $arWrapOptions, $_arWrapOpts );
+				list( $_oValue, $_bLink, $_arWrapOpts ) = self::$_sMethod( $_sColumn[0], self::getValue( $oModel, $_bIsModel ? $_sRealCol : $_sColumn ), $_sDisplayFormat );
+				$arWrapOptions = CPSHelp::smart_array_merge( $arWrapOptions, $_arWrapOpts );
 			}
 			else
 				$_sRealCol = $_sColumn;
 
-			if ( ! $_oValue ) $_oValue = self::getValue( $oModel, $_sRealCol );
+			if ( ! strlen( $_oValue ) ) $_oValue = self::getValue( $oModel, $_sRealCol );
 			
 			//	Map value for display...
 			if ( isset( $_oValue ) && in_array( $_oValue, array_keys( $_arValueMap ) ) )
 				if ( isset( $_arValueMap[ $_oValue ] ) ) $_oValue = $_arValueMap[ $_oValue ];
 
 			//	Pretty it up...
+			if ( is_array( $sLinkView ) )
+			{
+				$_arLink = $sLinkView;
+				$_arLink[ $_sPK ] = $oModel->{$_sPK};
+			}
+			else
+				$_arLink = array( $sLinkView, $_sPK => $oModel->{$_sPK} );
+			
 			$_sColumn = ( $_bLink || $_sPK == $_sRealCol ) ?
-				CHtml::link( $_oValue, array( $sLinkView, $_sPK => $oModel->{$_sPK} ) )
+				CHtml::link( $_oValue, $_arLink )
 				:
-				CHtml::encode( $_oValue );
+				( PS::o( $arWrapOptions, 'encode', true ) ? CHtml::encode( $_oValue ) : $_oValue );
 
 			$_sOut .= ( $sWrapTag ) ? CHtml::tag( $sWrapTag, $arWrapOptions, $_sColumn ) : $_sColumn;
 		}
 
 		return $_sOut;
 	}
-
+	
 	//********************************************************************************
 	//* Private Methods 
 	//********************************************************************************
@@ -157,12 +182,17 @@ class CPSTransform extends CPSHelperBase
 	
 	protected static function timeTransform( $sHow, $oValue, $sFormat = 'F d, Y' )
 	{
-		return array( date( $sFormat, $oValue ), false, array() );
+		return array( date( $sFormat, strtotime( $oValue ) ), false, array() );
 	}
 	
 	protected static function numberTransform( $sHow, $oValue, $iDecimals = 2 )
 	{
 		return self::alignTransform( '>', number_format( doubleval( $oValue ), $iDecimals ) );
+	}
+	
+	protected static function integerTransform( $sHow, $oValue )
+	{
+		return self::numberTransform( $sHow, $oValue, 0 );
 	}
 	
 	protected static function currencyTransform( $sHow, $oValue, $iDecimals = 2 )

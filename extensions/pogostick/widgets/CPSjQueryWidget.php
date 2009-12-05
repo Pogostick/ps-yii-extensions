@@ -58,6 +58,26 @@ class CPSjQueryWidget extends CPSWidget
 	}
 	
 	/**
+	* Returns the external url that was published.
+	* @return string
+	* @static
+	*/
+	public static function getExternalLibraryUrl()
+	{
+		return Yii::app()->getAssetManager()->getPublishedUrl( Yii::getPathOfAlias( 'pogostick.external' ), true );
+	}
+	
+	/**
+	* Returns the path that was published.
+	* @return string
+	* @static
+	*/
+	public static function getExternalLibraryPath()
+	{
+		return Yii::app()->getAssetManager()->getPublishedPath( Yii::getPathOfAlias( 'pogostick.external' ), true );
+	}
+	
+	/**
 	* Adds a user script to the output array
 	* 
 	* @param array $arScript
@@ -199,9 +219,9 @@ CODE;
 
 		//	Set default options...
 		$_oWidget->widgetName = $sName;
-		$_oWidget->target = CPSHelp::getOption( $arOptions, 'target', null, true );
-		$_oWidget->id = $_oWidget->name = CPSHelp::getOption( $arOptions, 'id', $sName );
-		$_oWidget->name = CPSHelp::getOption( $arOptions, 'name', $_oWidget->id );
+		$_oWidget->target = PS::o( $arOptions, 'target', null, true );
+		$_oWidget->id = $_oWidget->name = PS::o( $arOptions, 'id', $sName );
+		$_oWidget->name = PS::o( $arOptions, 'name', $_oWidget->id );
 
 		return $_oWidget->finalizeCreate( $arOptions );
 	}
@@ -226,12 +246,12 @@ CODE;
 			$_oCS = Yii::app()->getClientScript();
 			
 			//	Check for scripts...
-			foreach ( CPSHelp::getOption( $arOptions, '_scripts', array(), true ) as $_sScript ) $_oCS->registerScriptFile( $this->baseUrl . $_sScript );
-			if ( $_sScript = CPSHelp::getOption( $arOptions, 'script', null, true ) ) $_oCS->registerScriptFile( $this->baseUrl . $_sScript );
+			foreach ( PS::o( $arOptions, '_scripts', array(), true ) as $_sScript ) $_oCS->registerScriptFile( $this->baseUrl . $_sScript );
+			if ( $_sScript = PS::o( $arOptions, 'script', null, true ) ) $_oCS->registerScriptFile( $this->baseUrl . $_sScript );
 
 			//	Check for css...
-			foreach ( CPSHelp::getOption( $arOptions, '_cssFiles', array(), true ) as $_sCss ) $_oCS->registerCssFile( $this->baseUrl . $_sCss );
-			if ( $_sScript = CPSHelp::getOption( $arOptions, 'cssFile', null, true ) ) $_oCS->registerCssFile( $this->baseUrl . $_sScript );
+			foreach ( PS::o( $arOptions, '_cssFiles', array(), true ) as $_sCss ) $_oCS->registerCssFile( $this->baseUrl . $_sCss );
+			if ( $_sScript = PS::o( $arOptions, 'cssFile', null, true ) ) $_oCS->registerCssFile( $this->baseUrl . $_sScript );
 
 			//	Now process the rest of the options...			
 			foreach ( $arOptions as $_sKey => $_oValue ) $this->addOption( $_sKey, null, false, $_oValue );

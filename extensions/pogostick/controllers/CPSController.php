@@ -35,10 +35,12 @@ abstract class CPSController extends CController
 	* @var string Indexes into {@link CPSController:m_arUserActionMap}
 	*/
 	const ACCESS_TO_ANY = 0;
+	const ACCESS_TO_ANON = 0;
 	const ACCESS_TO_GUEST = 1;
 	const ACCESS_TO_AUTH = 2;
 	const ACCESS_TO_ADMIN = 3;
 	const ACCESS_TO_NONE = 4;
+	const ACCESS_TO_SUPERADMIN = 5;
 
 	//********************************************************************************
 	//* Member Variables
@@ -309,7 +311,7 @@ abstract class CPSController extends CController
 		$_oPage = new CPagination( $this->loadCount( $_oCrit ) );
 		$_oPage->pageSize = self::PAGE_SIZE;
 		$_oPage->applyLimit( $_oCrit );
-
+		
 		//	Sort...
 		if ( $bSort )
 		{	
