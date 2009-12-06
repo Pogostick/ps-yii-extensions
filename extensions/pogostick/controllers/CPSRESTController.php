@@ -103,8 +103,13 @@ class CPSRESTController extends CPSController
 		
 		//	If additional parameters are specified in the URL, convert to parameters...
 		$_sUri = Yii::app()->getRequest()->getRequestUri();
-		$_sUri = str_ireplace( '/' . $this->getId() . '/' . $_sActionId . '/', '', $_sUri );
-		$_arOpts = explode( '/', trim( $_sUri, '/' ) );
+		$_sUri = str_ireplace( '/' . $this->getId() . '/' . $_sActionId, '', $_sUri );
+		$_sQuery = parse_url( $_sUri, PHP_URL_QUERY );
+		
+		$_arOpts = explode( '/', trim( $_sUri, '/?' ) );
+		
+		if ( count( $_arOpts ) == 1 && false !== strpos( $_arOpts[0], '=' ) )
+			$_arOpts = explode( '=', $_arOpts[0] );
 		
 		for ( $_i = 0, $_iSize = count( $_arOpts ); $_i < $_iSize; $_i ++ )
 			$_arUrlParams[ $_i ] = $_arOpts[ $_i ];

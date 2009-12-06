@@ -224,6 +224,14 @@ button.ps-button { width:auto; overflow:visible; }
 	color:white;
 }
 
+.ps-data-grid-no-data-found {
+	text-align:	center;
+	font-weight: bold;
+	font-size: 15px;
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 10px auto;
+}
+
 /**
 * Pager Options
 */

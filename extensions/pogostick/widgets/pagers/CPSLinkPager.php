@@ -53,6 +53,15 @@ class CPSLinkPager extends CLinkPager
 	*/
 	protected $m_iPagerLocation = self::TOP_RIGHT;
 	public function getPagerLocation() { return $this->m_iPagerLocation; }
+	
+	/**
+	* Header to display for grid
+	* 
+	* @var string
+	*/
+	protected $m_sGridHeader;
+	public function getGridHeader() { return $this->m_sGridHeader; }
+	public function setGridHeader( $sValue ) { $this->m_sGridHeader = $sValue; }
 
 	//********************************************************************************
 	//* Property Access Methods

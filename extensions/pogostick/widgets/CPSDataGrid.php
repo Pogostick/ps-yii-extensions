@@ -15,6 +15,22 @@
  */
 class CPSDataGrid extends CPSHelperBase
 {
+	/**
+	* Columns in this grid
+	* 
+	* @var int
+	*/
+	protected static $m_iColumnCount;
+	
+	/**
+	* Grid options
+	* 
+	* @var array
+	*/
+	protected static $m_arGridOptions = array();
+	public function getGridOptions() { return $this->m_arGridOptions; }
+	public function setGridOptions( $arValue ) { $this->m_arGridOptions = $arValue; }
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -33,6 +49,7 @@ class CPSDataGrid extends CPSHelperBase
     */
 	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array(), $sLinkView = 'update', $bEncode = true )
 	{
+		self::$m_iColumnCount = 0;
 		$_sPK = PS::o( $arPagerOptions, 'pk', null, true );
 		$_sGridHeader = PS::o( $arPagerOptions, 'gridHeader', $sDataName, true );
 		$_bAccordion = PS::o( $arPagerOptions, 'accordion', false, true );
@@ -69,14 +86,22 @@ class CPSDataGrid extends CPSHelperBase
     */
 	public static function createEx( $arModel, $arOptions = array() )
 	{
+		self::$m_arGridOptions = $arOptions;
+		
 		$_sPK = PS::o( $arOptions, 'pk', null, true );
 		$_sDataName = self::getOption( $arOptions, 'dataItemName', 'Your Data' );
 		$_arColumns = self::getOption( $arOptions, 'columns', array() );
 		$_arActions = self::getOption( $arOptions, 'actions', array() );
 		$_oSort = self::getOption( $arOptions, 'sort', null );
 		$_oPages = self::getOption( $arOptions, 'pages', null );
+		$_sGridHeader = PS::o( $arOptions, 'gridHeader', $sDataName, true );
+		$_bAccordion = PS::o( $arOptions, 'accordion', false, true );
+		$_bEncode = PS::o( $arOptions, 'encode', true, true );
+		$_arDivComment = PS::o( $arOptions, 'divComment', array(), true );
 		$_arPagerOptions = self::getOption( $arOptions, 'pagerOptions', array() );
 		$_sLinkView = self::getOption( $arOptions, 'linkView', 'update' );
+		$_sModelName = PS::o( $arOptions, 'modelName', null );
+		
 		$_iPagerLocation = self::getOption( $_arPagerOptions, 'location', CPSLinkPager::TOP_RIGHT, true );
 
 		//	Create widget...
@@ -86,9 +111,12 @@ class CPSDataGrid extends CPSHelperBase
 		//	Where do you want it?
 		if ( $_oWidget ) if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) $_oWidget->run();
 		
+		//	Add accordion header if requested...
+		if ( $_bAccordion ) echo '<h3 class="ui-accordion-header ui-helper-reset ui-state-active ui-corner-top"><span class="ui-icon ui-icon-triangle-1-s" ></span><a href="#"><strong>' . $_sGridHeader . '</strong></a></h3>';
+		
 		//	Build our grid
 		$_sOut = self::beginDataGrid( $arModel, $_oSort, $_arColumns, ! empty( $_arActions ) );
-		$_sOut .= self::getDataGridRows( $arModel, $_arColumns, $_arActions, $_sDataName, $_sLinkView, $_sPK );
+		$_sOut .= self::getDataGridRows( $arModel, $_arColumns, $_arActions, $_sDataName, $_sLinkView, $_sPK, $_bEncode, $_arDivComment );
 		$_sOut .= self::endDataGrid();
 		
 		//	Display on the bottom...
@@ -100,25 +128,34 @@ class CPSDataGrid extends CPSHelperBase
 	/**
 	* Creates a data grid
 	* 
-	* @param CModel $oModel
+	* @param array $arModel
 	* @param CSort $oSort
 	* @param array $arColumns
 	* @param boolean $bAddActions
 	* @return string
 	*/
-	public static function beginDataGrid( $oModel, $oSort = null, $arColumns = array(), $bAddActions = true )
+	public static function beginDataGrid( $arModel, $oSort = null, $arColumns = array(), $bAddActions = true )
 	{
 		$_sHeaders = null;
+		$_oModel = current( $arModel );
+		
+		if ( ! $oModel && null !== ( $_sModelName = PS::o( self::$m_arGridOptions, 'modelName' ) ) )
+			$_oModel = new $_sModelName();
 		
 		foreach ( $arColumns as $_sKey => $_oColumn )
 		{
-			$_sColumn = ( is_array( $_oColumn ) ? $_sKey = array_shift( $_oColumn ) : $_oColumn );
-			$_sColumn = CPSTransform::cleanColumn( $_sColumn );
-			$_sLabel = PS::o( $_oColumn, 'label', ( $oSort ) ? $oSort->link( $_sColumn ) : ( $oModel ? $oModel[0]->getAttributeLabel( $_sColumn ) : $_sColumn ), true );
+			$_sColumn = CPSTransform::cleanColumn( ( is_array( $_oColumn ) ? $_sKey = array_shift( $_oColumn ) : $_oColumn ) );
+			if ( $_oModel ) $_sModelLabel = $_oModel->getAttributeLabel( $_sColumn );
+			$_sLabel = PS::o( $_oColumn, 'label', ( $oSort ) ? $oSort->link( $_sColumn ) : ( $_sModelLabel ? $_sModelLabel : $_sColumn ), true );
 			$_sHeaders .= CHtml::tag( 'th', array(), $_sLabel );
+			self::$m_iColumnCount++;
 		}	
 
-		if ( $bAddActions && ! empty( $oModel ) ) $_sHeaders .= CHtml::tag( 'th', array(), 'Actions' );
+		if ( $bAddActions ) 
+		{
+			$_sHeaders .= CHtml::tag( 'th', array(), 'Actions' );
+			self::$m_iColumnCount++;
+		}
 			
 		return CHtml::tag( 'table', array( 'width' => '100%', 'class' => 'dataGrid' ), CHtml::tag( 'tr', array(), $_sHeaders ), false );
 	}
@@ -137,110 +174,120 @@ class CPSDataGrid extends CPSHelperBase
 	*/
 	public static function getDataGridRows( $arModel, $arColumns = array(), $arActions = null, $sDataName = 'item', $sLinkView = null, $sPK = null, $bEncode = true, $arDivComment = array() )
 	{
-		$_sOut = empty( $arModel ) ? '<tr><td style="text-align:center" colspan="' . sizeof( $arColumns ) . '">No Records Found</td></tr>' : null;
+		$_sOut = null;
 		if ( null === $arActions ) $arActions = array( 'edit', 'delete' );
 		$_arOptions = CPSHelp::getOption( $arActions, 'options', array(), true );
 		$_sLockColumn = CPSHelp::getOption( $_arOptions, 'lockColumn', null, true );
-
-		foreach ( $arModel as $_iIndex => $_oModel )
+		
+		if ( ! $arModel || ( is_array( $arModel ) && ! count( $arModel ) ) ) 
+			$_sOut .= CHtml::tag( 'tr', array(), PS::tag( 'td', array( 'class' => 'ps-data-grid-no-data-found', 'colspan' => self::$m_iColumnCount ), 'No Records Found' ) );
+		else
 		{
-			$_sActions = null;
-			$_sPK = PS::nvl( $sPK, $_oModel->getTableSchema()->primaryKey );
-			$_sTD = CPSTransform::column( $_oModel, $arColumns, $sLinkView, 'td', array( 'encode' => $bEncode ) );
-				
-			//	Build actions...
-			if ( $_sPK && ! empty( $arActions ) )
+			foreach ( $arModel as $_iIndex => $_oModel )
 			{
-				foreach ( $arActions as $_oParts )
+				$_sActions = null;
+				$_sPK = PS::nvl( $sPK, $_oModel->getTableSchema()->primaryKey );
+				$_sTD = CPSTransform::column( $_oModel, $arColumns, $sLinkView, 'td', array( 'encode' => $bEncode ) );
+					
+				//	Build actions...
+				if ( $_sPK && ! empty( $arActions ) )
 				{
-					$_sAction = $_oParts;
-					
-					//	Our default view (update)
-					$_sViewName = PS::nvl( $sLinkView, 'update' );
-
-					//	If action is an array, first element is action, second is view (which can also be an array)
-					if ( is_array( $_oParts ) )
+					foreach ( $arActions as $_oParts )
 					{
-						$_sAction = $_oParts[0];
-						$_sViewName = $_oParts[1];
+						$_sAction = $_oParts;
+						
+						//	Our default view (update)
+						$_sViewName = PS::nvl( $sLinkView, 'update' );
+
+						//	If action is an array, first element is action, second is view (which can also be an array)
+						if ( is_array( $_oParts ) )
+						{
+							$_sAction = $_oParts[0];
+							$_sViewName = $_oParts[1];
+						}
+						
+						//	Skip lock actions on non-lockable columns
+						if ( $_sAction == 'lock' && ! $_sLockColumn )
+							continue;
+							
+						//	Fix up link view array...
+						$_arLink = array( $_sViewName );
+						if ( is_array( $_sViewName ) ) $_arLink = $_sViewName;
+						
+						//	Stuff in the PK(s)
+						$_arLink[ $_sPK ] = $_oModel->{$_sPK};
+						foreach ( $_arLink as $_sKey => $_sValue )
+						{
+							foreach ( array_keys( $_oModel->getAttributes() ) as $_sAttribute )
+							$_arLink[ $_sKey ] = str_ireplace( "%%{$_sAttribute}%%", $_oModel->{$_sAttribute}, $_arLink[ $_sKey ] );
+						}
+
+						//	Add the action
+						switch ( $_sAction )
+						{
+							case 'lock':	//	Special case if model contains lock column
+								$_sLockName = ( ! $_oModel->{$_sLockColumn} ) ? 'Lock' : 'Unlock';
+								$_sIconName = ( $_oModel->{$_sLockColumn} ) ? 'locked' : 'unlocked';
+
+								//	Lock import file
+								$_sActions .= CPSActiveWidgets::jquiButton( $_sLockName, $_arLink,
+									array(
+										'confirm' => "Do you really want to " . strtolower( $_sLockName ) . " this {$sDataName}?",
+										'iconOnly' => true, 
+										'icon' => $_sIconName,
+										'iconSize' => 'small'
+									)
+								);
+								break;
+							
+							case 'view':
+							case 'edit':
+								$_sActions .= CPSActiveWidgets::jquiButton( 'Edit', $_arLink, array( 'iconOnly' => true, 'icon' => $_sAction == 'edit' ? 'pencil' : 'gear', 'iconSize' => 'small' ) );
+								break;
+								
+							case 'delete':
+								$_sActions .= CPSActiveWidgets::jquiButton( 'Delete', array( 'delete', $_sPK => $_oModel->{$_sPK} ),
+									array(
+										'confirm' => "Do you really want to delete this {$sDataName}?",
+										'iconOnly' => true, 
+										'icon' => 'trash', 
+										'iconSize' => 'small'
+									)
+								);
+								break;
+								
+							default:	//	Catchall for prefab stuff...
+								$_sActions .= str_ireplace( '%%PK_VALUE%%', $_oModel->{$_sPK}, $_sAction );
+								break;
+						}
 					}
 					
-					//	Skip lock actions on non-lockable columns
-					if ( $_sAction == 'lock' && ! $_sLockColumn )
-						continue;
-						
-					//	Fix up link view array...
-					$_arLink = array( $_sViewName );
-					if ( is_array( $_sViewName ) ) $_arLink = $_sViewName;
-					
-					//	Stuff in the PK
-					$_arLink[ $_sPK ] = $_oModel->{$_sPK};
-
-					//	Add the action
-					switch ( $_sAction )
-					{
-						case 'lock':	//	Special case if model contains lock column
-							$_sLockName = ( ! $_oModel->{$_sLockColumn} ) ? 'Lock' : 'Unlock';
-							$_sIconName = ( $_oModel->{$_sLockColumn} ) ? 'locked' : 'unlocked';
-
-							//	Lock import file
-							$_sActions .= CPSActiveWidgets::jquiButton( $_sLockName, $_arLink,
-								array(
-									'confirm' => "Do you really want to " . strtolower( $_sLockName ) . " this {$sDataName}?",
-									'iconOnly' => true, 
-									'icon' => $_sIconName,
-									'iconSize' => 'small'
-								)
-							);
-							break;
-						
-						case 'view':
-						case 'edit':
-							$_sActions .= CPSActiveWidgets::jquiButton( 'Edit', $_arLink, array( 'iconOnly' => true, 'icon' => $_sAction == 'edit' ? 'pencil' : 'gear', 'iconSize' => 'small' ) );
-							break;
-							
-						case 'delete':
-							$_sActions .= CPSActiveWidgets::jquiButton( 'Delete', array( 'delete', $_sPK => $_oModel->{$_sPK} ),
-								array(
-									'confirm' => "Do you really want to delete this {$sDataName}?",
-									'iconOnly' => true, 
-									'icon' => 'trash', 
-									'iconSize' => 'small'
-								)
-							);
-							break;
-							
-						default:	//	Catchall for prefab stuff...
-							$_sActions .= str_ireplace( '%%PK_VALUE%%', $_oModel->{$_sPK}, $_sAction );
-							break;
-					}
+					$_sTD .= CHtml::tag( 'td', array( 'class' => 'grid-actions' ), '<div class="_grid_actions">' . $_sActions . '<hr /></div>' );
 				}
 				
-				$_sTD .= CHtml::tag( 'td', array( 'class' => 'grid-actions' ), '<div class="_grid_actions">' . $_sActions . '<hr /></div>' );
-			}
-			
-			$_arRowOpts = array();
-			if ( count( $arDivComment ) && ! empty( $_oModel->{$arDivComment[0]} ) )
-				$_arRowOpts = array( 'class' => $arDivComment[1], 'title' => $_oModel->{$arDivComment[0]} );
-			
-			$_sOut .= CHtml::tag( 'tr', $_arRowOpts, $_sTD );
-			
-			//	Add subrows...
-			if ( ! empty( $_oModel->subRows ) )
-			{
-				foreach ( $_oModel->subRows as $_oRow )
+				$_arRowOpts = array();
+				if ( count( $arDivComment ) && ! empty( $_oModel->{$arDivComment[0]} ) )
+					$_arRowOpts = array( 'class' => $arDivComment[1], 'title' => $_oModel->{$arDivComment[0]} );
+				
+				$_sOut .= CHtml::tag( 'tr', $_arRowOpts, $_sTD );
+				
+				//	Add subrows...
+				if ( ! empty( $_oModel->subRows ) )
 				{
-					$_arInnerOptions = CPSHelp::smart_array_merge( PS::o( $_oRow, '_innerHtmlOptions', array(), true ), array( 'encode' => false ) );
-					$_arOuterOptions = CPSHelp::smart_array_merge( array( 'class' => 'ps-sub-row' ), PS::o( $_oRow, '_outerHtmlOptions', array(), true ) );
-					
-					$_sRow = CPSTransform::column( $_oRow, array_keys( $_oRow ), null, 'td', $_arInnerOptions );
-
-					if ( ! empty( $arActions ) )
+					foreach ( $_oModel->subRows as $_oRow )
 					{
-						$_sRow .= CHtml::tag( 'td', CPSHelp::smart_array_merge( $_arInnerOptions, array( 'class' => 'grid-actions' ) ), '<div class="_grid_actions">&nbsp;<hr /></div>' );
-					}
+						$_arInnerOptions = CPSHelp::smart_array_merge( PS::o( $_oRow, '_innerHtmlOptions', array(), true ), array( 'encode' => false ) );
+						$_arOuterOptions = CPSHelp::smart_array_merge( array( 'class' => 'ps-sub-row' ), PS::o( $_oRow, '_outerHtmlOptions', array(), true ) );
 						
-					$_sOut .= CHtml::tag( 'tr', $_arOuterOptions, $_sRow );
+						$_sRow = CPSTransform::column( $_oRow, array_keys( $_oRow ), null, 'td', $_arInnerOptions );
+
+						if ( ! empty( $arActions ) )
+						{
+							$_sRow .= CHtml::tag( 'td', CPSHelp::smart_array_merge( $_arInnerOptions, array( 'class' => 'grid-actions' ) ), '<div class="_grid_actions">&nbsp;<hr /></div>' );
+						}
+							
+						$_sOut .= CHtml::tag( 'tr', $_arOuterOptions, $_sRow );
+					}
 				}
 			}
 		}
