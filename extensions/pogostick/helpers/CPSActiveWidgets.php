@@ -54,6 +54,7 @@ class CPSActiveWidgets extends CHtml
 	const	DD_CC_TYPES = 4;
 	const	DD_DAY_NUMBERS = 5;
 	const	DD_YES_NO = 6;
+	const	DD_CODE_TABLE = 'activeCodeDropDownList';
 	
 	//	Types of HTML
 	const	HTML = 0;
@@ -69,6 +70,15 @@ class CPSActiveWidgets extends CHtml
 	//* Member variables
 	//********************************************************************************
 
+	/**
+	* Sets the name of the code model for automated code dropdown lists
+	* 
+	* @var string
+	*/
+	protected static $m_sCodeModel = null;
+	public function getCodeModel() { return $this->m_sCodeModel; }
+	public function setCodeModel( $sValue ) { $this->m_sCodeModel = $sValue; }
+	
 	/**
 	* Template for hints. They will be displayed right after the div simple/complex tag.
 	* %%HINT%% will be replaced with your hint text.
@@ -239,17 +249,20 @@ class CPSActiveWidgets extends CHtml
 		if ( ! isset( $arHtmlOptions[ 'name' ] ) ) $arHtmlOptions[ 'name' ] = ( null != $oModel ) ? self::resolveName( $oModel, $sColName ) : $sColName;
 		if ( ! isset( $arHtmlOptions[ 'id' ] ) ) $arHtmlOptions[ 'id' ] = self::getIdByName( $arHtmlOptions[ 'name' ] );
 		
+		//	Are we validating this form? Add required tags automagically
 		if ( self::$m_bValidating )
 		{
 			//	Get any additional params for validation
 			$_sClass = PS::o( $arHtmlOptions, '_validate', null, true );
 			if ( $oModel->isAttributeRequired( $sColName, self::$scenario ) ) $_sClass .= ' required';
-			$_sClass .= ' ' . PS::o( $arHtmlOptions, 'class', null );
+			$_sClass = ' ' . PS::o( $arHtmlOptions, 'class', null );
 			$arHtmlOptions['class'] = trim( $_sClass );
 		}
 		
+		//	Non-model field?
 		if ( null === $oModel )
 		{
+			//	Previously selected value?
 			$_oValue = PS::o( $arHtmlOptions, 'value', null, true );
 			
 			//	Handle special types...
@@ -287,25 +300,11 @@ class CPSActiveWidgets extends CHtml
              		break;
 			}
 
-			if ( is_numeric( $eFieldType ) )
-			{
-				switch ( $eFieldType )
-				{
-					case self::DD_YES_NO:
-						$arHtmlOptions['options'] = PS::o( $arHtmlOptions, 'options', array( 0 => 'No', 1 => 'Yes' ), true );
-						//	Fall through...
-					
-					case self::DD_GENERIC:	//	Options passed in via array
-					case self::DD_US_STATES:
-					case self::DD_MONTH_NUMBERS:
-					case self::DD_DAY_NUMBERS:
-					case self::DD_MONTH_NAMES:
-					case self::DD_YEARS:
-					case self::DD_CC_TYPES:
-						return self::dropDown( $eFieldType, $sColName, null, $arHtmlOptions );
-				}
-			}
+			//	Do drop downs...
+			$arData = self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, $_oValue );
+			return parent::dropDownList( $sColName, null, $arData, $arHtmlOptions );
 			
+			//	Otherwise output the field if we have a type
 			if ( null != $_sType )
 				return self::inputField( $_sType, $sColName, $_oValue, $arHtmlOptions );
 				
@@ -313,57 +312,9 @@ class CPSActiveWidgets extends CHtml
 		}
 		
 		//	Handle custom drop downs...
-		if ( is_numeric( $eFieldType ) )
-		{
-			switch ( $eFieldType )
-			{
-				case self::DD_GENERIC:	//	Options passed in via array
-					$eFieldType = self::DROPDOWN;
-					break;
-					
-				case self::DD_YES_NO:
-					$eFieldType = self::DROPDOWN;
-					$arData = array( 0 => 'No', 1 => 'Yes' );
-					break;
-					
-				case self::DD_US_STATES:
-					$eFieldType = self::DROPDOWN;
-					$arData = require( 'us_state_array.php' );
-					break;
-					
-				case self::DD_MONTH_NUMBERS:
-					$eFieldType = self::DROPDOWN;
-					if ( $_oValue == null ) $_oValue = date( 'm' );
-					$arData = require( 'month_numbers_array.php' );
-					break;
-					
-				case self::DD_DAY_NUMBERS:
-					$eFieldType = self::DROPDOWN;
-					if ( $_oValue == null ) $_oValue = date( 'd' );
-					$arData = require( 'day_numbers_array.php' );
-					break;
-					
-				case self::DD_MONTH_NAMES:
-					$eFieldType = self::DROPDOWN;
-					if ( $_oValue == null ) $_oValue = date( 'm' );
-					$arData = require( 'month_names_array.php' );
-					break;
-					
-				case self::DD_YEARS:
-					if ( $_oValue == null ) $_oValue = date( 'Y' );
-					$_iRange = PS::o( $arOptions, 'range', 5, true );
-					$_iRangeStart = PS::o( $arOptions, 'rangeStart', date('Y'), true );
-					
-					$arData = array();
-					for ( $_i = 0, $_iBaseYear = $_iRangeStart; $_i < $_iRange; $_i++ ) $arData[ ( $_iBaseYear + $_i ) ] = ( $_iBaseYear + $_i );
-					break;
-					
-				case self::DD_CC_TYPES:
-					$arData = require( 'cc_types_array.php' );
-					break;
-			}
-		}
-			
+		if ( self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, $_oValue ) )
+			$eFieldType = self::DROPDOWN;
+		
 		//	Handle special types...
 		switch ( $eFieldType )
 		{
@@ -415,16 +366,10 @@ class CPSActiveWidgets extends CHtml
 				$eFieldType = self::TEXTAREA;
 				break;
 
-			//	Special code drop down. List data is gotten here...
-			case self::CODEDD:
-				$eFieldType = self::DROPDOWN;
-				$arData = CHtml::listData( Code::findByType( ( $arData == null ) ? $sColName : $arData ), 'code_uid', 'code_desc_text' );
-				//	Intentionally fall through to next block...
-				
 			//	These guys need data in third parameter
 			case self::DROPDOWN:
 				//	Auto-set prompt if not there...
-				if ( ! isset( $arHtmlOptions[ 'noprompt' ] ) ) $arHtmlOptions[ 'prompt' ] = 'Select One...';
+				if ( ! isset( $arHtmlOptions[ 'noprompt' ] ) ) $arHtmlOptions[ 'prompt' ] = PS::o( $arHtmlOptions, 'prompt', 'Select One...', true );
 				//	Intentionally fall through to next block...
 				
 			case self::CHECKLIST:
@@ -445,26 +390,46 @@ class CPSActiveWidgets extends CHtml
 	* @param integer $iDefaultUID
 	* @return string
 	*/
-	public static function activeCodeDropDownList( $sAttribute, $sCodeType, &$arHtmlOptions = array(), $iDefaultUID = 0 )
+	public static function activeCodeDropDownList( $sAttribute, &$arHtmlOptions = array(), $iDefaultUID = 0 )
 	{
-		$_oModel = Code::model();
-		
-		CHtml::resolveNameID( $_oModel, $sAttribute, $arHtmlOptions );
-		$_sSel = $_oModel->$attribute;
-		
-		$_sOptions = "\n" . CHtml::listOptions( $iDefaultUID, $_oModel->findAll( "code_type = '$sCodeType'" ), $arHtmlOptions );
-		CHtml::clientChange( 'change', $arHtmlOptions );
-		
-		if ( $_oModel->hasErrors( $sAttribute ) )
-			CHtml::addErrorCss( $arHtmlOptions );
-			
-		if ( isset( $arHtmlOptions[ 'multiple' ] ) )
+		if ( self::$m_sCodeModel )
 		{
-			if ( substr( $arHtmlOptions[ 'name' ], -2 ) !== '[]' )
-				$arHtmlOptions[ 'name' ] .= '[]';
+			$_oModel = new self::$m_sCodeModel();
+			
+			if ( $_oModel instanceof CPSCodeTableModel )
+			{
+				$_sValType = PS::o( $arHtmlOptions, 'codeType', null, true );
+				$_sValAbbr = PS::o( $arHtmlOptions, 'codeAbbr', null, true );
+				if ( ! $_sValAbbr ) $_sValAbbr = PS::o( $arHtmlOptions, 'codeAbbreviation', null, true );
+				$_sValId = PS::o( $arHtmlOptions, 'codeId', null, true );
+				$_sSort = PS::o( $arHtmlOptions, 'sortOrder', 'code_desc_text', true );
+			
+				self::resolveNameID( $_oModel, $sAttribute, $arHtmlOptions );
+				$_sSel = $_oModel->$attribute;
+			
+				if ( $_sValId )
+					$_sOptions = self::listOptions( $iDefaultUID, $_oModel->findById( $_sValId ), $arHtmlOptions );
+				elseif ( ! $_sValAbbr )
+					$_sOptions = self::listOptions( $iDefaultUID, $_oModel->findAllByType( $_sValType, $_sSort ), $arHtmlOptions );
+				elseif ( $_sValAbbr )
+					$_sOptions = self::listOptions( $iDefaultUID, $_oModel->findAllByAbbreviation( $_sValAbbr, $_sValType, $_sSort ), $arHtmlOptions );
+
+				$_sOptions = "\n" . $_sOptions;
+				
+				PS::clientChange( 'change', $arHtmlOptions );
+			
+				if ( $_oModel->hasErrors( $sAttribute ) )
+					PS::addErrorCss( $arHtmlOptions );
+				
+				if ( isset( $arHtmlOptions[ 'multiple' ] ) )
+				{
+					if ( substr( $arHtmlOptions[ 'name' ], -2 ) !== '[]' )
+						$arHtmlOptions[ 'name' ] .= '[]';
+				}
+			
+				return self::tag( 'select', $arHtmlOptions, $_sOptions );
+			}
 		}
-		
-		return self::tag( 'select', $arHtmlOptions, $_sOptions );
 	}
 	
 	/**
@@ -1005,6 +970,85 @@ HTML;
 		{
 			Yii::app()->clientScript->registerScript( 'psFlashDisplay', '$(".ps-flash-display").animate({opacity: 1.0}, 3000).fadeOut();', CClientScript::POS_READY );
 			return self::tag( 'div', array( 'class' => 'ps-flash-display' ), Yii::app()->user->getFlash( $sWhich ) );
+		}
+	}
+	
+	/**
+	* Gets the options for pre-fab select boxes
+	* 
+	* @param mixed $eFieldType
+	* @returns boolean
+	*/
+	protected static function setDropDownValues( $eFieldType, &$arHtmlOptions = array(), &$arData = null, $oSelected = null )
+	{
+		if ( is_numeric( $eFieldType ) )
+		{
+			$_arData = null;
+			$_bHit = true;
+			
+			$_eOrigFieldType = $eFieldType;
+			$eFieldType = self::DROPDOWN;
+		
+			switch ( $_eOrigFieldType )
+			{
+				case self::DROPDOWN:
+					$_arData = $arData;
+					break;
+					
+				case self::DD_GENERIC:	//	Options passed in via array
+					$_arData = $arData;
+					break;
+					
+				case self::DD_YES_NO:
+					$_arData = array( 0 => 'No', 1 => 'Yes' );
+					break;
+					
+				case self::DD_US_STATES:
+					$_arData = require( 'us_state_array.php' );
+					break;
+					
+				case self::DD_MONTH_NUMBERS:
+					if ( $oSelected == null ) $oSelected = date( 'm' );
+					$_arData = require( 'month_numbers_array.php' );
+					break;
+					
+				case self::DD_DAY_NUMBERS:
+					if ( $oSelected == null ) $oSelected = date( 'd' );
+					$_arData = require( 'day_numbers_array.php' );
+					break;
+					
+				case self::DD_MONTH_NAMES:
+					if ( $oSelected == null ) $oSelected = date( 'm' );
+					$_arData = require( 'month_names_array.php' );
+					break;
+					
+				case self::DD_YEARS:
+					if ( $oSelected == null ) $oSelected = date( 'Y' );
+					$_iRange = PS::o( $arHtmlOptions, 'range', 5, true );
+					$_iRangeStart = PS::o( $arHtmlOptions, 'rangeStart', date('Y'), true );
+					
+					$_arData = array();
+					for ( $_i = 0, $_iBaseYear = $_iRangeStart; $_i < $_iRange; $_i++ ) $_arData[ ( $_iBaseYear + $_i ) ] = ( $_iBaseYear + $_i );
+					break;
+					
+				case self::DD_CC_TYPES:
+					$_arData = require( 'cc_types_array.php' );
+					break;
+					
+				//	Special code drop down. List data is gotten here...
+				case self::DD_CODE_TABLE:
+//					$_arData = CHtml::listData( Code::findByType( ( $_arData == null ) ? $sColName : $_arData ), 'code_id', 'code_desc_text' );
+					break;
+					
+				default:
+					$eFieldType = $_eOrigFieldType;
+					$_bHit = false;
+					break;
+			}
+
+			if ( $_bHit ) $arData = $_arData;
+			
+			return $_arData;
 		}
 	}
 }

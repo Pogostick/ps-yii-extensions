@@ -181,7 +181,7 @@ CODE;
 		if ( null != $sTargetSelector )
 		{
 			//	Add a period if one is not there, assume it's a class...
-			if ( $sTargetSelector{0} != '.' && $sTargetSelector != '#' ) $sTargetSelector = ".{$sTargetSelector}";
+			if ( $sTargetSelector[0] != '.' && $sTargetSelector != '#' ) $sTargetSelector = ".{$sTargetSelector}";
 			$_sId = $sTargetSelector;
 		}
 		else

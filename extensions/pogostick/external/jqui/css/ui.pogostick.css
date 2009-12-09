@@ -91,7 +91,7 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-button-bar {
 	clear: both;
 	display: block;
-	padding:0;
+	padding:10px 0px 0px;
 	margin:0px;
 	min-width:580px;
 }
@@ -227,7 +227,7 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-data-grid-no-data-found {
 	text-align:	center;
 	font-weight: bold;
-	font-size: 15px;
+	font-size: 2em;
 	font-family: Arial, Helvetica, sans-serif;
 	margin: 10px auto;
 }
@@ -236,7 +236,6 @@ button.ps-button { width:auto; overflow:visible; }
 * Pager Options
 */
 .psPager a {
-	font-size:11px;
 	padding:3px 5px;
 	margin-right:2px;
 	margin-top:0px;
@@ -257,7 +256,6 @@ button.ps-button { width:auto; overflow:visible; }
 ul.psPager
 {
 	clear: both;
-	font-size:11px;
 	border:0;
 	margin:0 auto;
 	padding:0;

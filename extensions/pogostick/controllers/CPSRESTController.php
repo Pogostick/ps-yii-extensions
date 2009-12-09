@@ -97,42 +97,67 @@ class CPSRESTController extends CPSController
 	protected function dispatchRequest( CAction $oAction )
 	{
 		$_sActionId = $oAction->getId();
-		$_sMethod = 'request' . $_sActionId;
+		$_sMethod = 'request' . ucfirst( $_sActionId );
 		$_arParams = $_REQUEST;
 		$_arUrlParams = array();
-		
+		$_arOpts = array();
+
 		//	If additional parameters are specified in the URL, convert to parameters...
 		$_sUri = Yii::app()->getRequest()->getRequestUri();
-		$_sUri = str_ireplace( '/' . $this->getId() . '/' . $_sActionId, '', $_sUri );
-		$_sQuery = parse_url( $_sUri, PHP_URL_QUERY );
-		
-		$_arOpts = explode( '/', trim( $_sUri, '/?' ) );
-		
-		if ( count( $_arOpts ) == 1 && false !== strpos( $_arOpts[0], '=' ) )
-			$_arOpts = explode( '=', $_arOpts[0] );
-		
-		for ( $_i = 0, $_iSize = count( $_arOpts ); $_i < $_iSize; $_i ++ )
-			$_arUrlParams[ $_i ] = $_arOpts[ $_i ];
-		
-		//	Is it a valid GET request?
-		if ( method_exists( $this, 'get' . $_sActionId ) )
+
+		if ( null != ( $_sUri = trim( str_ireplace( '/' . $this->getId() . '/' . $_sActionId, '', $_sUri ) ) ) )
 		{
-			$_sMethod = 'get' . $_sActionId;
-			$_arParams = $_GET;
+			$_sUri = trim( $_sUri, '/?' );
+			$_arOpts = explode( '/', $_sUri );
+			
+			foreach ( $_arOpts as $_sKey => $_oValue )
+			{
+				if ( false !== strpos( $_oValue, '=' ) )
+				{
+					if ( null != ( $_arTemp = explode( '=', $_oValue ) ) )
+						$_arOpts[ $_arTemp[0] ] = $_arTemp[1];
+						
+					unset( $_arOpts[ $_sKey ] );
+				}
+				else
+					$_arOpts[ $_sKey ] = $_oValue;
+			}
 		}
-		//	Is it a valid POST request?
-		else if ( method_exists( $this, 'post' . $_sActionId ) )
+		
+		//	Any query string? (?x=y&...)
+		if ( null != ( $_sQuery = parse_url( $_sUri, PHP_URL_QUERY ) ) )
+			$_arOpts = array_merge( explode( '=', $_sQuery, $_arOpts ) );
+		
+		//	load into url params
+		foreach ( $_arOpts as $_sKey => $_sValue )
+			if ( ! isset( $_arUrlParams[ $_sKey ] ) ) $_arUrlParams[ $_sKey ] = $_sValue;
+		
+		//	Is it a valid request?
+		$_sType = strtolower( Yii::app()->getRequest()->getRequestType() );
+		$_sMethod = $_sType . ucfirst( $_sActionId );
+		
+		if ( method_exists( $this, $_sMethod ) )
 		{
-			$_sMethod = 'post' . $_sActionId;
-			$_arParams = $_POST;
-		}
+			$_arParams = ( $_sType == 'post' ? $_POST : $_GET );
+			
+			foreach ( $_arParams as $_sKey => $_oValue )
+			{
+				if ( is_array( $_oValue ) )
+				{
+					foreach ( $_oValue as $_sSubKey => $_oSubValue )
+						$_arUrlParams[ $_sSubKey ] = $_oSubValue;
+
+					unset( $_arParams[ $_sKey ] );
+				}
+			}
+		}			
 		//	Is it a valid catchall request?
 		else if ( ! method_exists( $this, 'request' . $_sActionId ) )
 			//	No clue what it is, so must be bogus. Hand off to missing action...
 			return $this->missingAction( $_sActionId );
 
 		//	All rest methods echo their output
-		echo call_user_func_array( array( $this, $_sMethod ), array_merge( $_arUrlParams, $_arParams ) );
+		echo call_user_func_array( array( $this, $_sMethod ), array_values( $_arUrlParams ) );
 	}
 
 }

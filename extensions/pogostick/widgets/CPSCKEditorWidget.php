@@ -96,6 +96,7 @@ class CPSCKEditorWidget extends CPSjQueryWidget
 		//	Get the options...		
 		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
 		$_sId = $this->getTargetSelector( $sTargetSelector );
+		$_sTarget = $this->target;
 		
 		//	Jam something in front of options?
 		if ( null != $sInsertBeforeOptions )

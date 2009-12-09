@@ -283,7 +283,10 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		//	Register css files if we have a theme...
 		if ( $_oWidget->theme )
 		{
-			$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css" );
+//	Uncomment to use CDN			
+//			$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css" );
+
+			$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/{$_oWidget->theme}/ui.all.css" );
 			$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/ui.pogostick.css" );
 		}
 		

@@ -58,8 +58,8 @@ abstract class CPSCRUDController extends CPSController
 		$this->addUserAction( self::ACCESS_TO_ANY, 'index' );
 		$this->setUserActionList( self::ACCESS_TO_GUEST, array( 'login', 'register' ) );
 		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'admin', 'create', 'delete', 'logout', 'show', 'update' ) );
-		$this->addUserActions( self::ACCESS_TO_ADMIN, array() );
-		$this->addUserActions( self::ACCESS_TO_NONE, array() );
+		$this->setUserActionList( self::ACCESS_TO_ADMIN, array() );
+		$this->setUserActionList( self::ACCESS_TO_NONE, array() );
 	}
 
 	/**
@@ -96,21 +96,47 @@ abstract class CPSCRUDController extends CPSController
 			
 			for ( $_i = 0; $_i <= self::ACCESS_TO_NONE; $_i++ )
 			{
+				$_sVerb = $_sValid = null;
+				
 				//	Get the user type
 				switch ( $_i )
 				{
-					case self::ACCESS_TO_ANY: 	$_sVerb = 'allow'; 	$_sValid = '*'; 	break;
-					case self::ACCESS_TO_AUTH: 	$_sVerb = 'allow'; 	$_sValid = '@'; 	break;
-					case self::ACCESS_TO_ADMIN:	$_sVerb = 'allow'; 	$_sValid = 'admin';	break;
-					case self::ACCESS_TO_NONE: 	$_sVerb = 'deny'; 	$_sValid = '*';		break;
+					case self::ACCESS_TO_ANY:
+					case self::ACCESS_TO_ANON:
+						$_sVerb = 'allow'; 	
+						$_sValid = '*'; 	
+						break;
+						
+					case self::ACCESS_TO_GUEST:
+						$_sVerb = 'allow';
+						$_sValid = '?';
+						break;
+
+					case self::ACCESS_TO_AUTH: 	
+						$_sVerb = 'allow'; 	
+						$_sValid = '@'; 	
+						break;
+
+					case self::ACCESS_TO_ADMIN:	
+						$_sVerb = 'allow'; 	
+						$_sValid = 'admin';	
+						break;
+
+					case self::ACCESS_TO_NONE: 	
+						$_sVerb = 'deny'; 	
+						$_sValid = '*';		
+						break;
 				}
 				
 				//	Add to rules array
-				$_arRules[] = array( 
-					$_sVerb, 
-					'actions' => $this->m_arUserActionList[ $_i ],
-					'users' => array( $_sValid )
-				);
+				if ( $_sVerb && $_sValid )
+				{
+					$_arRules[] = array( 
+						$_sVerb, 
+						'actions' => $this->m_arUserActionList[ $_i ],
+						'users' => array( $_sValid )
+					);
+				}
 			}
 			
 			$_bInit = true;
@@ -306,5 +332,5 @@ abstract class CPSCRUDController extends CPSController
 		Yii::app()->user->logout();
 		$this->actionLogin();
 	}
-	
+
 }

@@ -48,6 +48,18 @@ class CPSForm extends CPSHelperBase
 	//* Public Methods
 	//********************************************************************************
 
+	public static function formHeaderEx( $sTitle, $arOptions = array() )
+	{
+		$_arMenuItems = PS::o( $arOptions, 'menuItems', array() );
+		$_sDivClass = PS::o( $arOptions, 'divClass', 'form-header' );
+		$_bShowFlashDiv = PS::o( $arOptions, 'showFlashDiv', true );
+		$_sHtmlInject = PS::o( $arOptions, 'htmlInject', null );
+		$_sSubHeader = PS::o( $arOptions, 'subHeader', null );
+		
+		//	Do the header
+		return self::formHeader( $sTitle, $_arMenuItems, $_sDivClass, $_bShowFlashDiv, $_sHtmlInject ) . $_sSubHeader;
+	}
+	
 	/**
 	* Creates a standard form header
 	* 
@@ -80,8 +92,8 @@ class CPSForm extends CPSHelperBase
 	{
 		$_bIcon = false;
 		$_sClass = $_sLink = $_sOut = null;
-		
 		$_sFlash = ( $bShowFlashDiv ? PS::flashMessage() : null );
+		$_sExtra = 'style="margin-bottom:' . ( $_sFlash ? '32px' : '10px' ) . '";"';
 		
 		//	Create menu
 		foreach ( $arMenuItems as $_sId => $_arItem ) 
@@ -99,7 +111,7 @@ class CPSForm extends CPSHelperBase
 		}
 		
 		return <<<HTML
-		<div class="{$sDivClass}">
+		<div class="{$sDivClass}" {$_sExtra}>
 			<h1>{$sTitle}</h1>
 			<p>{$_sOut}</p>
 			<div style="clear:both"></div>{$_sFlash}{$sHtmlInject}

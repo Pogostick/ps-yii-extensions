@@ -39,8 +39,10 @@ abstract class CPSController extends CController
 	const ACCESS_TO_GUEST = 1;
 	const ACCESS_TO_AUTH = 2;
 	const ACCESS_TO_ADMIN = 3;
-	const ACCESS_TO_NONE = 4;
 	const ACCESS_TO_SUPERADMIN = 5;
+	
+	//	Last...
+	const ACCESS_TO_NONE = 6;
 
 	//********************************************************************************
 	//* Member Variables
@@ -273,8 +275,8 @@ abstract class CPSController extends CController
 	*/
 	protected function saveModel( $oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false )
 	{
-		$_sMessage = CPSHelp::nvl( $sSuccessMessage, 'Your changes have been saved.' );
-		$_sModelName = CPSHelp::nvl( $sModelName, CPSHelp::nvl( $oModel->modelName, $this->m_sModelName ) );
+		$_sMessage = PS::nvl( $sSuccessMessage, 'Your changes have been saved.' );
+		$_sModelName = PS::nvl( $sModelName, PS::nvl( $oModel->modelName, $this->m_sModelName ) );
 
 		if ( isset( $arData, $arData[ $_sModelName ] ) )
 		{
@@ -307,7 +309,7 @@ abstract class CPSController extends CController
 		$_oSort = $_oCrit = $_oPage = null;
 		
 		//	Make criteria
-		$_oCrit = CPSHelp::nvl( $oCriteria, new CDbCriteria() );
+		$_oCrit = PS::nvl( $oCriteria, new CDbCriteria() );
 		$_oPage = new CPagination( $this->loadCount( $_oCrit ) );
 		$_oPage->pageSize = self::PAGE_SIZE;
 		$_oPage->applyLimit( $_oCrit );

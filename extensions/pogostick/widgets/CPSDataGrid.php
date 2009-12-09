@@ -50,6 +50,8 @@ class CPSDataGrid extends CPSHelperBase
 	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array(), $sLinkView = 'update', $bEncode = true )
 	{
 		self::$m_iColumnCount = 0;
+		self::$m_arGridOptions = array();
+		
 		$_sPK = PS::o( $arPagerOptions, 'pk', null, true );
 		$_sGridHeader = PS::o( $arPagerOptions, 'gridHeader', $sDataName, true );
 		$_bAccordion = PS::o( $arPagerOptions, 'accordion', false, true );
@@ -86,7 +88,8 @@ class CPSDataGrid extends CPSHelperBase
     */
 	public static function createEx( $arModel, $arOptions = array() )
 	{
-		self::$m_arGridOptions = $arOptions;
+		self::$m_iColumnCount = 0;
+		self::$m_arGridOptions = array();
 		
 		$_sPK = PS::o( $arOptions, 'pk', null, true );
 		$_sDataName = self::getOption( $arOptions, 'dataItemName', 'Your Data' );
