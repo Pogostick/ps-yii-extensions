@@ -758,16 +758,28 @@ HTML;
 	}
 
 	/**
-	* If value is !set||empty, default is returned
+	* If value is not set or empty, last passed in argument is returned
 	* 
-	* @param mixed $oVal
-	* @param mixed $oDefault
-	* @deprecated Moved to CPSHelp.php
+	* Allows for multiple nvl chains ( nvl(x,y,z,null) )
+	* 
+	* @param mixed 
+	* @returns mixed
 	*/
-	public static function nvl( $oVal, $oDefault = null )
+	public static function nvl()
 	{
-		if ( isset( $oVal ) && ! empty($oVal) ) return $oVal;
-		return $oDefault;
+		$_oDefault = null;
+		$_iArgs = func_num_args();
+		$_arArgs = func_get_args();
+		
+		for ( $_i = 0; $_i < $_iArgs; $_i++ )
+		{
+			if ( isset( $_arArgs[ $_i ] ) && ! empty( $_arArgs[ $_i ] ) )
+				return $_arArgs[ $_i ];
+				
+			$_oDefault = $_arArgs[ $_i ];
+		}
+
+		return $_oDefault;
 	}
 	
 	/**
@@ -991,10 +1003,6 @@ HTML;
 		
 			switch ( $_eOrigFieldType )
 			{
-				case self::DROPDOWN:
-					$_arData = $arData;
-					break;
-					
 				case self::DD_GENERIC:	//	Options passed in via array
 					$_arData = $arData;
 					break;
@@ -1038,6 +1046,10 @@ HTML;
 				//	Special code drop down. List data is gotten here...
 				case self::DD_CODE_TABLE:
 //					$_arData = CHtml::listData( Code::findByType( ( $_arData == null ) ? $sColName : $_arData ), 'code_id', 'code_desc_text' );
+					break;
+					
+				case self::DROPDOWN:
+					$_arData = $arData;
 					break;
 					
 				default:
