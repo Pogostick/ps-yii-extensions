@@ -50,7 +50,7 @@ class CPSDataGrid extends CPSHelperBase
 	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array(), $sLinkView = 'update', $bEncode = true )
 	{
 		self::$m_iColumnCount = 0;
-		self::$m_arGridOptions = array();
+		self::$m_arGridOptions = $arOptions;
 		
 		$_sPK = PS::o( $arPagerOptions, 'pk', null, true );
 		$_sGridHeader = PS::o( $arPagerOptions, 'gridHeader', $sDataName, true );
@@ -89,7 +89,7 @@ class CPSDataGrid extends CPSHelperBase
 	public static function createEx( $arModel, $arOptions = array() )
 	{
 		self::$m_iColumnCount = 0;
-		self::$m_arGridOptions = array();
+		self::$m_arGridOptions = $arOptions;
 		
 		$_sPK = PS::o( $arOptions, 'pk', null, true );
 		$_sDataName = self::getOption( $arOptions, 'dataItemName', 'Your Data' );
@@ -115,7 +115,7 @@ class CPSDataGrid extends CPSHelperBase
 		if ( $_oWidget ) if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) $_oWidget->run();
 		
 		//	Add accordion header if requested...
-		if ( $_bAccordion ) echo '<h3 class="ui-accordion-header ui-helper-reset ui-state-active ui-corner-top"><span class="ui-icon ui-icon-triangle-1-s" ></span><a href="#"><strong>' . $_sGridHeader . '</strong></a></h3>';
+		if ( $_bAccordion ) echo '<h3 class="ui-accordion-header ui-helper-reset ui-state-active ui-corner-top ps-grid-accordion-header"><span class="ui-icon ui-icon-triangle-1-s" ></span><a href="#"><strong>' . $_sGridHeader . '</strong></a></h3>';
 		
 		//	Build our grid
 		$_sOut = self::beginDataGrid( $arModel, $_oSort, $_arColumns, ! empty( $_arActions ) );
@@ -141,10 +141,10 @@ class CPSDataGrid extends CPSHelperBase
 	{
 		$_sHeaders = null;
 		$_oModel = current( $arModel );
-		
-		if ( ! $oModel && null !== ( $_sModelName = PS::o( self::$m_arGridOptions, 'modelName' ) ) )
+
+		if ( ! $_oModel && null != ( $_sModelName = PS::o( self::$m_arGridOptions, 'modelName' ) ) )
 			$_oModel = new $_sModelName();
-		
+
 		foreach ( $arColumns as $_sKey => $_oColumn )
 		{
 			$_sColumn = CPSTransform::cleanColumn( ( is_array( $_oColumn ) ? $_sKey = array_shift( $_oColumn ) : $_oColumn ) );
@@ -269,8 +269,8 @@ class CPSDataGrid extends CPSHelperBase
 				}
 				
 				$_arRowOpts = array();
-				if ( count( $arDivComment ) && ! empty( $_oModel->{$arDivComment[0]} ) )
-					$_arRowOpts = array( 'class' => $arDivComment[1], 'title' => $_oModel->{$arDivComment[0]} );
+				if ( count( $arDivComment ) && $_oModel->hasErrors() )
+					$_arRowOpts = array( 'class' => $arDivComment[1], 'title' => implode( ', ', current( $_oModel->getErrors() ) ) );
 				
 				$_sOut .= CHtml::tag( 'tr', $_arRowOpts, $_sTD );
 				

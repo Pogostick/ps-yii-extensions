@@ -99,9 +99,10 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-submit-button-bar {
 	clear: both;
 	position: relative;
-	display: block;
+	display: inline-block;
 	text-align:right;
 	padding-bottom:0px;
+	margin-bottom: 0px;
 }
 
 .ps-submit-button-bar .ps-button 
@@ -227,8 +228,7 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-data-grid-no-data-found {
 	text-align:	center;
 	font-weight: bold;
-	font-size: 2em;
-	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
 	margin: 10px auto;
 }
 

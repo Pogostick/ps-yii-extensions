@@ -57,7 +57,7 @@ abstract class CPSJobProcess extends CPSComponent
 	protected $m_oJobData = null;
 	public function getJobData() { return $this->m_oJobData; }
 	public function setJobData( $oValue ) { $this->m_oJobData = $oValue; }
-
+	
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -66,15 +66,23 @@ abstract class CPSJobProcess extends CPSComponent
 	* Constructor
 	* 
 	* @param mixed $oJob Either a row from the job queue or data to process
+	* @param boolean $bRun If true, initializes and runs the job
 	* @return CPSJobProcess
 	*/
-	public function __construct( $oJob = null )
+	public function __construct( $oJob = null, $bRun = false )
 	{
 		//	Phone home...
 		parent::__construct();
 		
 		//	Store our data...
 		$this->m_oJobData = $oJob;
+		
+		//	Run?
+		if ( $bRun )
+		{
+			$this->init();
+			$this->run();
+		}
 	}
 	
 	/**
@@ -84,21 +92,50 @@ abstract class CPSJobProcess extends CPSComponent
 	public function run()
 	{
 		$this->m_fStart = CPSHelp::currentTimeMillis();
+
 		$_bResult = $this->process();
+
 		$this->m_fEnd = CPSHelp::currentTimeMillis();
 		
+		if ( $this->m_oJobData ) 
+		{
+			$this->m_oJobData->proc_ind = $this->m_iResultCode;
+			$this->m_oJobData->last_status_text = $this->m_sStatus;
+			$this->m_oJobData->save();
+		}
+
 		return $_bResult;
 	}
 	
 	/**
-	* Returns the total amount of time taken to run process in seconds
+	* Returns the amount of time since the timer was started
 	* @returns float
 	*/
-	public function getProcessTime()
+	public function getProcessingTime( $bRaw = false )
 	{
-		return $this->m_fEnd - $this->m_fStart;
+		$_fSpan = PS::nvl( $this->m_fEnd, CPSHelp::currentTimeMillis() ) - $this->m_fStart;
+		return $bRaw ? $_fSpan : number_format( $_fSpan, 2 ) . 's';
 	}
 	
+	/**
+	* Stops the internal job timer
+	* 
+	*/
+	public function stopTimer()
+	{
+		$this->m_fEnd = CPSHelp::currentTimeMillis();
+	}
+	
+	/**
+	* Starts the internal job timer
+	* 
+	*/
+	public function startTimer()
+	{
+		$this->m_fStart = CPSHelp::currentTimeMillis();
+		$this->m_fEnd = null;
+	}
+
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
@@ -120,6 +157,6 @@ abstract class CPSJobProcess extends CPSComponent
 	{
 		//	Auto set status 
 		if ( ! $bNoStatus && $sLevel == 'error' ) $this->setStatus( $sMessage );
-		Yii::log( $sMessage, $sLevel, CPSHelp::nvl( $sCategory, __CLASS__ ) );
+		Yii::log( $sMessage, $sLevel, PS::nvl( $sCategory, __CLASS__ ) );
 	}
 }

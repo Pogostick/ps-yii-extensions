@@ -668,7 +668,7 @@ CSS;
 	 */
 	public static function submitButtonBar( $sLabel = 'Submit', $arHtmlOptions = array() )
 	{
-		return '<div class="ps-submit-button-bar">' . self::submitButton( $sLabel, $arHtmlOptions ) . '<hr /></div>';
+		return '<div class="ps-submit-button-bar">' . self::submitButton( $sLabel, $arHtmlOptions ) . '</div>';
 	}
 
 	/****
