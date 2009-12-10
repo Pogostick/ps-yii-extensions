@@ -92,8 +92,8 @@ class CPSForm extends CPSHelperBase
 	{
 		$_bIcon = false;
 		$_sClass = $_sLink = $_sOut = null;
-		$_sFlash = ( $bShowFlashDiv ? PS::flashMessage() : null );
-		$_sExtra = 'style="margin-bottom:' . ( $_sFlash ? '32px' : '10px' ) . '";"';
+		$_sFlash = ( $bShowFlashDiv ? PS::flashMessage( 'success', true ) : null );
+		$_sExtra = null;//'style="margin-bottom:' . ( $_sFlash ? '32px' : '10px' ) . '";"';
 		
 		//	Create menu
 		foreach ( $arMenuItems as $_sId => $_arItem ) 
@@ -112,9 +112,9 @@ class CPSForm extends CPSHelperBase
 		
 		return <<<HTML
 		<div class="{$sDivClass}" {$_sExtra}>
-			<h1>{$sTitle}</h1>
-			<p>{$_sOut}</p>
-			<div style="clear:both"></div>{$_sFlash}{$sHtmlInject}
+			<h1 class="ps-form-header-left">{$sTitle}</h1>{$_sFlash}
+			<p style="clear:both;">{$_sOut}</p>
+			<div style="clear:both"></div>{$sHtmlInject}
 		</div>
 HTML;
 	}

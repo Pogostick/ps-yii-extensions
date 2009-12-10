@@ -261,13 +261,13 @@ abstract class CPSCRUDController extends CPSController
 		$_oResults = null;
 		
 		//	Get command's method...
-		$_sCmd = strtolower( CPSHelp::getOption( $arData, $sIndexName ) );
+		$_sCmd = strtolower( PS::o( $arData, $sIndexName ) );
 		
 		//	Do we have a command mapping?
 		if ( in_array( $_sCmd, array_keys( $this->m_arCommandMap ) ) )
 		{
 			//	Get the method name to call...
-			$_sMethod = CPSHelp::getOption( $this->m_arCommandMap, $_sCmd );
+			$_sMethod = PS::o( $this->m_arCommandMap, $_sCmd );
 			
 			//	No method set? Look for methods named command<Command> to process request
 			if ( null === $_sMethod && method_exists( $this, 'command' . ucwords( $_sCmd ) ) )
@@ -284,7 +284,7 @@ abstract class CPSCRUDController extends CPSController
 					else
 						$_GET = array_merge( $_GET, $arData );
 				}
-				
+
 				$_oResults = $this->{$_sMethod}();
 			}
 		}

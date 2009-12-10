@@ -137,6 +137,25 @@ button.ps-button { width:auto; overflow:visible; }
 	display: inline;
 	margin-right:5px;
 	padding-right:5px;
+	height: 22px;
+	font-weight:bold;
+}
+
+.ps-flash-display-left {
+	float:left;
+	font-size:13px;
+	color: yellow;
+	z-index:5;
+	display: inline;
+	margin-left:5px;
+	padding-left:5px;
+	padding-top:4px;
+	font-weight:bold;
+}
+
+h1.ps-form-header-left {
+	float: left;
+	margin-right: 15px;
 }
 
 /**
@@ -263,7 +282,7 @@ ul.psPager
 }
 
 ul.psPager.ps-pager-left {
-	float: none;
+	float: left;
 }
 
 ul.psPager.ps-pager-right {
@@ -281,7 +300,6 @@ ul.psPager.ps-pager-bottom {
 ul.psPager .first,
 ul.psPager .last
 {
-	display:none;
 }
 
 ul.psPager a:link, 
@@ -324,6 +342,13 @@ ul.psPager li.ps-link-pager a.ps-button-icon-right {
 
 ul.psPager li.ps-link-pager a.ps-button-icon-left {
 	padding-left: 25px;
+}
+
+span.ps-link-pager-footer {
+	float: left;
+	font-size: 8pt;
+	margin-left: 15px;
+	vertical-align: bottom;
 }
 
 /**

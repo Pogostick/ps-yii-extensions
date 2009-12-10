@@ -49,6 +49,7 @@ class CPSDataGrid extends CPSHelperBase
     */
 	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array(), $sLinkView = 'update', $bEncode = true )
 	{
+		$_sOut = $_sPager = null;
 		self::$m_iColumnCount = 0;
 		self::$m_arGridOptions = $arOptions;
 		
@@ -58,18 +59,24 @@ class CPSDataGrid extends CPSHelperBase
 		$_arDivComment = PS::o( $arPagerOptions, 'divComment', array(), true );
 
 		//	Build pager...
-		$_oWidget = Yii::app()->controller->createWidget( 'CPSLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) );
+		if ( $_oWidget = Yii::app()->controller->createWidget( 'CPSLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) ) )
+		{
+			$_sPager = $_oWidget->run( true );
 
-		//	Build grid...
-		if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) $_oWidget->run();
+			//	Build grid...
+			if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) 
+				$_sOut .= $_sPager;
+		}
 		
+		//	Accordion header?
 		if ( $_bAccordion ) echo '<h3 class="ui-accordion-header ui-helper-reset ui-state-active ui-corner-top"><span class="ui-icon ui-icon-triangle-1-s" ></span><a href="#"><strong>' . $_sGridHeader . '</strong></a></h3>';
 		
-		$_sOut = self::beginDataGrid( $arModel, $oSort, $arColumns, ! empty( $arActions ) );
+		$_sOut .= self::beginDataGrid( $arModel, $oSort, $arColumns, ! empty( $arActions ) );
 		$_sOut .= self::getDataGridRows( $arModel, $arColumns, $arActions, $sDataName, $sLinkView, $_sPK, $bEncode, $_arDivComment );
 		$_sOut .= self::endDataGrid();
 		
-		if ( $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_LEFT || $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_RIGHT ) $_oWidget->run();
+		if ( $_oWidget && ( $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_LEFT || $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_RIGHT ) )
+			$_sOut .= $_sPager;
 
 		return $_sOut;
 	}
@@ -77,17 +84,13 @@ class CPSDataGrid extends CPSHelperBase
     /**
     * Outputs a data grid with pager on the bottom
     * 
-    * @param string $sDataName
-    * @param array $arModel
-    * @param array $arColumns
-    * @param array $arActions
-    * @param CSort $oSort
-    * @param CPagination $oPages
-    * @param array $arPagerOptions
-    * @param mixed $sLinkView
+    * @param array $arModel Array of models
+    * @param array $arOptions Grid options
+    * @returns string
     */
 	public static function createEx( $arModel, $arOptions = array() )
 	{
+		$_sOut = $_sPager = null;
 		self::$m_iColumnCount = 0;
 		self::$m_arGridOptions = $arOptions;
 		
@@ -108,22 +111,31 @@ class CPSDataGrid extends CPSHelperBase
 		$_iPagerLocation = self::getOption( $_arPagerOptions, 'location', CPSLinkPager::TOP_RIGHT, true );
 
 		//	Create widget...
-		if ( $_oPages ) $_oWidget = Yii::app()->controller->createWidget( 'CPSLinkPager', array_merge( array( 'pages' => $_oPages ), $_arPagerOptions ) );
-		if ( $_oWidget ) $_oWidget->pagerLocation = self::nvl( $_iPagerLocation, $_oWidget->pagerLocation );
-
-		//	Where do you want it?
-		if ( $_oWidget ) if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) $_oWidget->run();
+		if ( $_oPages ) 
+		{
+			$_oWidget = Yii::app()->controller->createWidget( 'CPSLinkPager', array_merge( array( 'pages' => $_oPages ), $_arPagerOptions ) );
 		
+			if ( $_oWidget ) 
+			{
+				$_oWidget->pagerLocation = self::nvl( $_iPagerLocation, $_oWidget->pagerLocation );
+				$_sPager = $_oWidget->run( true );
+				
+				//	Where do you want it?
+				if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) $_sOut .= $_sPager;
+			}
+		}
+
 		//	Add accordion header if requested...
 		if ( $_bAccordion ) echo '<h3 class="ui-accordion-header ui-helper-reset ui-state-active ui-corner-top ps-grid-accordion-header"><span class="ui-icon ui-icon-triangle-1-s" ></span><a href="#"><strong>' . $_sGridHeader . '</strong></a></h3>';
 		
 		//	Build our grid
-		$_sOut = self::beginDataGrid( $arModel, $_oSort, $_arColumns, ! empty( $_arActions ) );
+		$_sOut .= self::beginDataGrid( $arModel, $_oSort, $_arColumns, ! empty( $_arActions ) );
 		$_sOut .= self::getDataGridRows( $arModel, $_arColumns, $_arActions, $_sDataName, $_sLinkView, $_sPK, $_bEncode, $_arDivComment );
 		$_sOut .= self::endDataGrid();
 		
 		//	Display on the bottom...
-		if ( $_oWidget ) if ( $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_LEFT || $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_RIGHT ) $_oWidget->run();
+		if ( $_oWidget && ( $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_LEFT || $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_RIGHT ) ) 
+			$_sOut .= $_sPager;
 		
 		return $_sOut;
 	}

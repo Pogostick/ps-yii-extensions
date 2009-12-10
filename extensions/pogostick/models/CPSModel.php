@@ -228,15 +228,40 @@ class CPSModel extends CActiveRecord
     }
  
  	/**
- 	* Sets lmod date and saves
- 	*    
+ 	* Sets lmod date(s) and saves
+ 	* Will optionally touch other columns. You can pass in a single column name or an array of columns.
+ 	* This is useful for updating not only the lmod column but a last login date for example.
+ 	* Only the columns that have been touched are updated. If no columns are updated, no database action is performed.
+ 	* 
+ 	* @param mixed $oOtherCols The single column name or array of columns to touch in addition to configured lmod column
+ 	* @returns boolean
  	*/
-    public function touch()
+    public function touch( $oOtherCols = null )
     {
+    	$_sTouchVal = ( null === $this->m_sDateTimeFunction ) ? date('Y-m-d H:i:s') : eval('return ' . $this->m_sDateTimeFunction . ';');
+    	$_arUpdate = array();
+    	
+    	//	Any other columns to touch?
+    	if ( null !== $oOtherCols )
+    	{
+    		foreach ( CPSHelp::makeArray( $oOtherCols ) as $_sColumn )
+    		{
+    			if ( $this->hasAttribute( $_sColumn ) )
+    			{
+    				$this->{$_sColumn} = $_sTouchVal;
+    				$_arUpdate[] = $_sColumn;
+				}
+    		}
+		}
+    	
 		if ( $this->m_sLModColumn && $this->hasAttribute( $this->m_sLModColumn ) ) 
+		{
 			$this->{$this->m_sLModColumn} = ( null === $this->m_sDateTimeFunction ) ? date('Y-m-d H:i:s') : eval('return ' . $this->m_sDateTimeFunction . ';');
+    		$_arUpdate[] = $this->m_sLModColumn;
+		}
 			
-		return $this->save();
+		//	Only update if and what we've touched...
+		return count( $_arUpdate ) ? $this->update( $_arUpdate ) : true;
 	}
 	
 	/***

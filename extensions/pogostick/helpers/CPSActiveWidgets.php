@@ -206,7 +206,7 @@ class CPSActiveWidgets extends CHtml
 		else
 		{
 			//	Set label name
-			$arLabelOptions['label'] = CPSHelp::nvl( $sLabel, CPSHelp::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . self::$labelSuffix;
+			$arLabelOptions['label'] = PS::nvl( $sLabel, PS::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . self::$labelSuffix;
 			$_sOut = self::activeLabelEx( $oModel, $sColName, $arLabelOptions );
 		}
 
@@ -486,7 +486,7 @@ HTML;
 CODE;
 	
 		//	Register script
-		Yii::app()->getClientScript()->registerScript( md5( time() ), $_sScript, CClientScript::POS_READY );
+		CPSHelp::registerScript( md5( time() ), $_sScript, CClientScript::POS_READY );
 		
 		$_sCss =<<<CODE
 {$sSelector} input[type="text"]:focus, 
@@ -524,7 +524,7 @@ CSS;
 		$_sCss .= $_sTempCss . "\n}";
 
 		//	Register CSS
-		Yii::app()->getClientScript()->registerCSS( md5( time() ), $_sCss );
+		CPSHelp::registerCSS( md5( time() ), $_sCss );
 	}
 	
 	public static function dropDown( $eType, $sName, $sLabel = null, $arOptions = array() )
@@ -829,7 +829,7 @@ HTML;
 	);
 HTML;
 			//	Register the script
-			Yii::app()->getClientScript()->registerScript( 'ib#' . self::ID_PREFIX . self::$count++, $_sScript, CClientScript::POS_READY );
+			CPSHelp::registerScript( 'ib#' . self::ID_PREFIX . self::$count++, $_sScript, CClientScript::POS_READY );
 		}
 
 		return self::tag( 'a', array( 'href' => $sHref ), self::image( $src, null, $htmlOptions ) );
@@ -862,7 +862,7 @@ HTML;
 	);
 HTML;
 			//	Register the script
-			Yii::app()->getClientScript()->registerScript( 'ib#' . self::ID_PREFIX . self::$count++, $_sScript, CClientScript::POS_READY );
+			CPSHelp::registerScript( 'ib#' . self::ID_PREFIX . self::$count++, $_sScript, CClientScript::POS_READY );
 		}
 
 		return parent::imageButton( $src, $htmlOptions );
@@ -976,12 +976,13 @@ HTML;
 	* 
 	* @param string $sWhich
 	*/
-	public static function flashMessage( $sWhich = 'success' )
+	public static function flashMessage( $sWhich = 'success', $bLeft = false )
 	{
 		if ( Yii::app()->user->hasFlash( $sWhich ) ) 
 		{
-			Yii::app()->clientScript->registerScript( 'psFlashDisplay', '$(".ps-flash-display").animate({opacity: 1.0}, 3000).fadeOut();', CClientScript::POS_READY );
-			return self::tag( 'div', array( 'class' => 'ps-flash-display' ), Yii::app()->user->getFlash( $sWhich ) );
+			$_sDiv = 'ps-flash-display' . ( $bLeft ? '-left' : '' );
+			CPSHelp::registerScript( 'ps.flash.display', '$(".' . $_sDiv . '").animate({opacity: 1.0}, 3000).fadeOut();', CClientScript::POS_READY );
+			return self::tag( 'div', array( 'class' => $_sDiv ), Yii::app()->user->getFlash( $sWhich ) );
 		}
 	}
 	

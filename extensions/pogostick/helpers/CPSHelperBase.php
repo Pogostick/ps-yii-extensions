@@ -19,6 +19,18 @@
 class CPSHelperBase
 {
 	//********************************************************************************
+	//* Private Members
+	//********************************************************************************
+	
+	/**
+	* Cache the client script object for speed
+	* 
+	* @var CClientScript
+	*/
+	protected static $m_oClientScript = null;
+	public static function getClientScript() { return self::nvl( self::$m_oClientScript, self::$m_oClientScript = Yii::app()->getClientScript() ); }
+
+	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 	
@@ -148,6 +160,30 @@ class CPSHelperBase
 	}
 	
 	/**
+	* Returns value (or current date) formatted
+	* 
+	* @param mixed $sDate
+	* @param string $sFormat
+	* @return string
+	*/
+	public static function asDate( $sDate = null, $sFormat = 'Y-m-d' )
+	{
+		return date( $sFormat, $sDate ? strtotime( $sDate ) : time() );
+	}
+	
+	/**
+	* Returns value (or current date/time) formatted
+	* 
+	* @param mixed $sDate
+	* @param string $sFormat
+	* @return string
+	*/
+	public static function asDateTime( $sDate = null, $sFormat = 'Y-m-d H:i:s' )
+	{
+		return date( $sFormat, $sDate ? strtotime( $sDate ) : time() );
+	}
+	
+	/**
 	* Merges an array without overwriting...
 	* @returns array
 	*/
@@ -166,6 +202,81 @@ class CPSHelperBase
 		}
 		
 		return $_arResult;
+	}
+	
+	//********************************************************************************
+	//* Yii Convenience Mappings
+	//********************************************************************************
+	
+	/**
+	* Registers a CSS file
+	* 
+	* @param string URL of the CSS file
+	* @param string media that the CSS file should be applied to. If empty, it means all media types.
+	*/
+	public static function registerCssFile( $sUrl, $sMedia = '' )
+	{
+		self::getClientScript()->registerCssFile( $sUrl, $sMedia );
+	}
+
+	/**
+	* Registers a piece of CSS code.
+	* 
+	* @param string ID that uniquely identifies this piece of CSS code
+	* @param string the CSS code
+	* @param string media that the CSS code should be applied to. If empty, it means all media types.
+	*/
+	public static function registerCss( $sId, $sCss, $sMedia = '' )
+	{
+		self::getClientScript()->registerCss( $sId, $sCss, $sMedia );
+	}
+
+	/**
+	* Registers a javascript file.
+	* 
+	* @param string URL of the javascript file
+	* @param integer the position of the JavaScript code. Valid values include the following:
+	* <ul>
+	* <li>CClientScript::POS_HEAD : the script is inserted in the head section right before the title element.</li>
+	* <li>CClientScript::POS_BEGIN : the script is inserted at the beginning of the body section.</li>
+	* <li>CClientScript::POS_END : the script is inserted at the end of the body section.</li>
+	* </ul>
+	*/
+	public static function registerScriptFile( $sUrl, $ePosition = self::POS_HEAD )
+	{
+		self::getClientScript()->registerScriptFile( $sUrl, $ePosition );
+	}
+
+	/**
+	* Registers a piece of javascript code.
+	* 
+	* @param string ID that uniquely identifies this piece of JavaScript code
+	* @param string the javascript code
+	* @param integer the position of the JavaScript code. Valid values include the following:
+	* <ul>
+	* <li>CClientScript::POS_HEAD : the script is inserted in the head section right before the title element.</li>
+	* <li>CClientScript::POS_BEGIN : the script is inserted at the beginning of the body section.</li>
+	* <li>CClientScript::POS_END : the script is inserted at the end of the body section.</li>
+	* <li>CClientScript::POS_LOAD : the script is inserted in the window.onload() function.</li>
+	* <li>CClientScript::POS_READY : the script is inserted in the jQuery's ready function.</li>
+	* </ul>
+	*/
+	public static function registerScript( $sId, $sScript, $ePosition = CClientScript::POS_READY )
+	{
+		self::getClientScript()->registerScript( $sId, $sScript, $ePosition );
+	}
+
+	/**
+	* Registers a meta tag that will be inserted in the head section (right before the title element) of the resulting page.
+	* 
+	* @param string content attribute of the meta tag
+	* @param string name attribute of the meta tag. If null, the attribute will not be generated
+	* @param string http-equiv attribute of the meta tag. If null, the attribute will not be generated
+	* @param array other options in name-value pairs (e.g. 'scheme', 'lang')
+	*/
+	public static function registerMetaTag( $sContent, $sName = null, $sHttpEquiv = null, $arOptions = array() )
+	{
+		self::getClientScript()->registerMetaTag( $sContent, $sName, $sHttpEquiv, $arOptions );
 	}
 
 }

@@ -143,35 +143,36 @@ class CPSLinkPager extends CLinkPager
 	* Executes the widget.
 	* This overrides the parent implementation by displaying the generated page buttons.
 	*/
-	public function run()
+	public function run( $bReturnString = false )
 	{
-		if ( $this->nextPageLabel === null ) $this->nextPageLabel = Yii::t('yii','Next &gt;');
-		if($this->prevPageLabel===null)
-			$this->prevPageLabel=Yii::t('yii','&lt; Previous');
-		if($this->firstPageLabel===null)
-			$this->firstPageLabel=Yii::t('yii','&lt;&lt; First');
-		if($this->lastPageLabel===null)
-			$this->lastPageLabel=Yii::t('yii','Last &gt;&gt;');
-		if($this->header===null)
-			$this->header=Yii::t('yii','Go to page: ');
+		if ( $this->nextPageLabel === null ) $this->nextPageLabel = Yii::t( 'yii', 'Next &gt;' );
+		if ( $this->prevPageLabel === null ) $this->prevPageLabel = Yii::t( 'yii', '&lt; Previous' );
+		if ( $this->firstPageLabel === null ) $this->firstPageLabel = Yii::t( 'yii', '&lt;&lt; First' );
+		if ( $this->lastPageLabel === null ) $this->lastPageLabel = Yii::t( 'yii', 'Last &gt;&gt;' );
+		
+		if ( $this->header === null ) $this->header = Yii::t( 'yii', 'Go to page: ' );
 
-		$buttons=$this->createPageButtons();
+		$_sButtons = $this->createPageButtons();
 
-		if(empty($buttons))
-			return;
+		if ( empty( $_sButtons ) ) return;
 
 		$this->registerClientScript();
 
-		$htmlOptions=$this->htmlOptions;
-		if(!isset($htmlOptions['id']))
-			$htmlOptions['id']=$this->getId();
-		if(!isset($htmlOptions['class']))
-			$htmlOptions['class']='yiiPager';
-		echo '<div class="ps-button-bar">';
-			echo $this->header;
-			echo CHtml::tag('ul',$htmlOptions,implode("\n",$buttons));
-			echo $this->footer;
-		echo '</div>';
+		$_arHtmlOptions = $this->htmlOptions;
+		$_arHtmlOptions['id'] = PS::o( $_arHtmlOptions, 'id', $this->getId() );
+		$_arHtmlOptions['class'] = PS::o( $_arHtmlOptions, 'class', 'yiiPager' );
+		
+		$_sOut = '<div class="ps-button-bar">';
+			$_sOut .= $this->header;
+			$_sOut .= PS::tag( 'ul', $_arHtmlOptions, implode( "\n", $_sButtons ) );
+			$_sOut .= $this->footer;
+		$_sOut .= '</div>';
+		
+		//	Return results?
+		if ( $bReturnString ) return $_sOut;
+		
+		//	Otherwise just echo...
+		echo $_sOut;
 	}
 
 	//********************************************************************************

@@ -80,7 +80,32 @@ abstract class CPSController extends CController
 	*/
 	protected $m_sModelName = null;
 	public function getModelName() { return $this->m_sModelName; }
-	protected function setModelName( $sValue ) { $this->m_sModelName = $sValue; }	
+	protected function setModelName( $sValue ) 
+	{ 
+		$this->m_sModelName = $sValue; 
+		$this->m_sGlobalSearchStateId = 'PS_' . strtoupper( $this->modelName ) . '_SEARCH_CRIT'; 
+		$this->m_arCurrentSearchCriteria = Yii::app()->getGlobalState( $this->m_sGlobalSearchStateId ); 
+	}
+
+	/**
+	* The id in the global state of our current filter/search criteria
+	* 
+	* @var string
+	*/
+	protected $m_sGlobalSearchStateId = null;
+	
+	/**
+	* Stores the current search criteria
+	* 
+	* @var array
+	*/
+	protected $m_arCurrentSearchCriteria = null;
+	public function getSearchCriteria() { return $this->m_arCurrentSearchCriteria; }
+	public function setSearchCriteria( $arValue ) 
+	{
+		$this->m_arCurrentSearchCriteria = $arValue; 
+		Yii::app()->setGlobalState( $this->m_sGlobalSearchStateId, $arValue ); 
+	}
 	
 	/**
 	* @var boolean Try to find proper layout to use
@@ -167,6 +192,9 @@ abstract class CPSController extends CController
 		
 		//	Allow errors
 		$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
+		
+		//	Pull any search criteria we've stored...
+		if ( $this->getModelName() ) $this->m_arCurrentSearchCriteria = Yii::app()->getGlobalState( $this->m_sGlobalSearchStateId );
 	}
 	
 	/**
@@ -201,7 +229,7 @@ abstract class CPSController extends CController
 			if ( null == $this->m_oModel ) $this->redirect( array( $this->defaultAction ) );
 			
 			//	Get the name of this model...
-			$this->m_sModelName = get_class( $this->m_oModel );
+			$this->setModelName( get_class( $this->m_oModel ) );
 		}
 		
 		//	Return our model...
@@ -307,16 +335,18 @@ abstract class CPSController extends CController
 	protected function loadPaged( $bSort = false, $oCriteria = null )
 	{
 		$_oSort = $_oCrit = $_oPage = null;
-		
+
 		//	Make criteria
 		$_oCrit = PS::nvl( $oCriteria, new CDbCriteria() );
 		$_oPage = new CPagination( $this->loadCount( $_oCrit ) );
-		$_oPage->pageSize = self::PAGE_SIZE;
+		$_oPage->pageSize = PS::nvl( $_REQUEST['perPage'], self::PAGE_SIZE );
+		if ( isset( $_REQUEST, $_REQUEST['page'] ) ) $_oPage->setCurrentPage( intval( $_REQUEST['page'] ) - 1 );
+		if ( isset( $_REQUEST, $_REQUEST['sort'] ) ) $_oCrit->order = $_REQUEST['sort'];
 		$_oPage->applyLimit( $_oCrit );
 		
 		//	Sort...
 		if ( $bSort )
-		{	
+		{
 			$_oSort = new CPSSort( $this->m_sModelName );
 			$_oSort->applyOrder( $_oCrit );
 		}
@@ -405,5 +435,16 @@ abstract class CPSController extends CController
 	{
 		return array_pop( $this->m_arActionQueue );
 	}
-	
+
+	/**
+	* Clears the current search criteria
+	* @returns null 
+	*/
+	protected function clearSearchCriteria()
+	{
+		$this->m_arCurrentSearchCriteria = null;
+		Yii::app()->clearGlobalState( $this->m_sGlobalSearchStateId );
+		
+		return null;
+	}
 }
