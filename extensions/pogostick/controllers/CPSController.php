@@ -447,4 +447,26 @@ abstract class CPSController extends CController
 		
 		return null;
 	}
+
+	/**
+	* Logs a message to the application log
+	* 
+	* @param string $sMessage
+	* @param string $sCategory
+	*/
+	protected function log( $sMessage, $sCategory = __CLASS__, $sLevel = 'trace' )
+	{
+		return Yii::log( $sMessage, $sLevel, $sCategory );
+	}
+	
+	/**
+	* Log helpers
+	* 
+	* @param string $sMessage
+	* @param string $sCategory
+	*/
+	protected function logInfo( $sMessage, $sCategory = __CLASS__ ) { self::log( $sMessage, $sCategory, 'info' ); }
+	protected function logError( $sMessage, $sCategory = __CLASS__ ) { self::log( $sMessage, $sCategory, 'error' ); }
+	protected function logWarning( $sMessage, $sCategory = __CLASS__ ) { self::log( $sMessage, $sCategory, 'warning' ); }
+	protected function logTrace( $sMessage, $sCategory = __CLASS__ ) { self::log( $sMessage, $sCategory, 'trace' ); }
 }
