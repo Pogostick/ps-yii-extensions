@@ -48,9 +48,9 @@ class CPSSort extends CSort
 	*/
 	public function resolveLabel( $sAttribute )
 	{
-		if ( false !== ( $_i = strpos( $sAttribute, '.' ) ) )
+		if ( false !== ( $_i = strpos( $sAttribute, '->' ) ) )
 		{
-			$_sColumn = substr( $sAttribute, $_i + 1 );
+			$_sColumn = substr( $sAttribute, $_i + 2 );
 
 			if ( null === ( $_sLabel = CActiveRecord::model( $this->modelClass )->getAttributeLabel( $sAttribute ) ) )
 			{

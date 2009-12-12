@@ -51,7 +51,7 @@ class CPSLinkPager extends CLinkPager
 	* 
 	* @var integer
 	*/
-	protected $m_iPagerLocation = self::TOP_RIGHT;
+	protected $m_iPagerLocation = self::TOP_LEFT;
 	public function getPagerLocation() { return $this->m_iPagerLocation; }
 	
 	/**
@@ -62,6 +62,15 @@ class CPSLinkPager extends CLinkPager
 	protected $m_sGridHeader;
 	public function getGridHeader() { return $this->m_sGridHeader; }
 	public function setGridHeader( $sValue ) { $this->m_sGridHeader = $sValue; }
+	
+	/**
+	* The class for our pager
+	* 
+	* @var string
+	*/
+	protected $m_sPagerClass = 'ps-pager';
+	public function getPagerClass() { return $this->m_sPagerClass; }
+	public function setPagerClass( $sValue ) { $this->m_sPagerClass = $sValue; }
 
 	//********************************************************************************
 	//* Property Access Methods
@@ -99,6 +108,9 @@ class CPSLinkPager extends CLinkPager
 	*/
 	public function init()
 	{
+		//	Phone home
+		parent::init();
+		
 		//	Override default labels...
 		$this->nextPageLabel = 'Next';
 		$this->prevPageLabel = 'Previous';
@@ -111,13 +123,17 @@ class CPSLinkPager extends CLinkPager
 		$this->cssFile = false;
 		
 		//	Our class for paging...
-		$this->htmlOptions['class'] = 'psPager';
-		$this->setPagerLocation( self::TOP_LEFT );
+		if ( null == PS::nvl( $this->htmlOptions['class'] ) ) $this->htmlOptions['class'] = $this->m_sPagerClass;
 		
-		//	Phone home
-		parent::init();
+		//	Set the pager location
+		$this->setPagerLocation( $this->m_iPagerLocation );
 	}
 	
+	/**
+	* Sets the pager location relative to the grid
+	* 
+	* @param int $eValue
+	*/
 	public function setPagerLocation( $eValue )
 	{
 		$this->m_iPagerLocation = $eValue;
@@ -125,16 +141,16 @@ class CPSLinkPager extends CLinkPager
 		switch ( $eValue )
 		{
 			case self::TOP_RIGHT:
-				$this->htmlOptions['class'] .= ' ps-pager-right ps-pager-top';
+				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-right ps-pager-top';
 				break;
 			case self::BOTTOM_RIGHT:
-				$this->htmlOptions['class'] .= ' ps-pager-right ps-pager-bottom';
+				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-right ps-pager-bottom';
 				break;
 			case self::TOP_LEFT:
-				$this->htmlOptions['class'] .= ' ps-pager-left ps-pager-top';
+				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-left ps-pager-top';
 				break;
 			case self::BOTTOM_LEFT:
-				$this->htmlOptions['class'] .= ' ps-pager-left ps-pager-bottom';
+				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-left ps-pager-bottom';
 				break;
 		}
 	}

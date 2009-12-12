@@ -91,31 +91,60 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-button-bar {
 	clear: both;
 	display: block;
-	padding:10px 0px 0px;
-	margin:0px;
 	min-width:580px;
+	position: relative;
+	padding:0px auto;
+	margin-top:10px;
+}
+
+.ps-button-bar a.ps-button
+{ 
+	float:none !important; 
+	display: inline-block;
 }
 
 .ps-submit-button-bar {
 	clear: both;
+	display: block;
 	position: relative;
-	display: inline-block;
+	padding:0px auto;
+}
+
+.ps-submit-button-bar-right {
 	text-align:right;
-	padding-bottom:0px;
-	margin-bottom: 0px;
+}
+	
+.ps-submit-button-bar-left {
+	text-align:left;
+}
+	
+.ps-submit-button-bar-center {
+	text-align:center;
+}
+	
+.ps-submit-button-bar-border {
+	border-top:1px solid #ccc;
+	margin-top: 5px;
+	padding-top: 10px;
 }
 
-.ps-submit-button-bar .ps-button 
+.ps-submit-button-bar a.ps-button
 { 
-	padding-bottom:7px;
-}
-
-.ps-submit-button-bar a.ps-button 
-{ 
-	margin:5px auto 0px auto; 
 	float:none !important; 
 	display: inline-block;
-	padding:5px auto 10px auto;
+	margin-right:5px;
+	margin-left:5px;
+}
+
+.ps-submit-button-bar a.ps-button, 
+.ps-submit-button-bar-right a.ps-button 
+{ 
+	margin-right:0px;
+}
+
+.ps-submit-button-bar-left a.ps-button 
+{ 
+	margin-left:0px;
 }
 
 .ps-submit-button-bar hr {
@@ -244,6 +273,14 @@ h1.ps-form-header-left {
 	color:white;
 }
 
+.ps-data-grid-sort-arrow {
+	display:inline-block;
+	margin:0 auto;
+	vertical-align:bottom;
+	padding:0px;
+	padding-left:5px;
+}
+
 .ps-data-grid-no-data-found {
 	text-align:	center;
 	font-weight: bold;
@@ -254,92 +291,108 @@ h1.ps-form-header-left {
 /**
 * Pager Options
 */
+.ps-pager a,
 .psPager a {
 	padding:3px 5px;
 	margin-right:2px;
 	margin-top:0px;
 }
 
-.psPager li a {
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-}
-
-.psPager li a {
-}
-
-.psPager .ps-button {
-	float:none;
-}
-
-ul.psPager
-{
-	clear: both;
-	border:0;
-	margin:0 auto;
-	padding:0;
-	display:block;
-}
-
-ul.psPager.ps-pager-left {
-	float: left;
-}
-
-ul.psPager.ps-pager-right {
-	float: right;
-}
-
-ul.psPager.ps-pager-top {
-	margin:0px auto 15px auto;
-}
-
-ul.psPager.ps-pager-bottom {
-	margin:15px auto 0px auto;
-}
-
-ul.psPager .first,
-ul.psPager .last
-{
-}
-
-ul.psPager a:link, 
-ul.psPager a:visited {
-}
-
-ul.psPager .selected a
-{
-	font-weight:bold;
-}
-
+ul.ps-pager li,
 ul.psPager li
 {
 	display:inline;
 }
 
+ul.ps-pager li.hidden,
 ul.psPager li.hidden
 {
 	display:none;
 }
 
+.ps-pager li a,
+.psPager li a {
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+
+.ps-pager .ps-button,
+.psPager .ps-button {
+	float:none;
+}
+
+ul.ps-pager,
+ul.psPager {
+	border:0;
+	margin:0 auto 10px;
+	padding:0;
+	display:block;
+}
+
+ul.ps-pager.ps-pager-left,
+ul.psPager.ps-pager-left {
+	float: left;
+}
+
+ul.ps-pager.ps-pager-right,
+ul.psPager.ps-pager-right {
+	float: right;
+}
+
+ul.ps-pager.ps-pager-top,
+ul.psPager.ps-pager-top {
+	margin:0px auto 10px auto;
+}
+
+ul.ps-pager.ps-pager-bottom,
+ul.psPager.ps-pager-bottom {
+	margin:10px auto 0px auto;
+}
+
+ul.ps-pager .first,
+ul.psPager .first,
+ul.ps-pager .last,
+ul.psPager .last
+{
+}
+
+ul.ps-pager a:link,
+ul.psPager a:link, 
+ul.ps-pager a:visited,
+ul.psPager a:visited {
+}
+
+ul.ps-pager a:hover,
 ul.psPager a:hover {
 }
 
+ul.ps-pager .selected a,
+ul.psPager .selected a
+{
+	font-weight:bold;
+}
+
+ul.ps-pager li.ps-link-pager span,
 ul.psPager li.ps-link-pager span {
 }
 
+ul.ps-pager li.ps-link-pager li a span.ui-icon,
 ul.psPager li.ps-link-pager li a span.ui-icon {
 	margin-left:0px;
 }
 
+ul.ps-pager li.ps-link-pager a.ps-button,
 ul.psPager li.ps-link-pager a.ps-button {
 	padding:5px 7px;
 	margin-top:2px;
 }
 
+ul.ps-pager li.ps-link-pager a.ps-button-icon-right,
 ul.psPager li.ps-link-pager a.ps-button-icon-right {
 	padding-right: 25px;
 }
 
+ul.ps-pager li.ps-link-pager a.ps-button-icon-left,
 ul.psPager li.ps-link-pager a.ps-button-icon-left {
 	padding-left: 25px;
 }
@@ -347,8 +400,8 @@ ul.psPager li.ps-link-pager a.ps-button-icon-left {
 span.ps-link-pager-footer {
 	float: left;
 	font-size: 8pt;
-	margin-left: 15px;
-	vertical-align: bottom;
+	padding-top:15px;
+	padding-left: 10px;
 }
 
 /**

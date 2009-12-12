@@ -58,6 +58,9 @@ class CPSModelCommand extends CPSConsoleCommand
 	*/
 	public function run( $arArgs )
 	{
+		//	Our base path...
+		$_sBasePath = Yii::getPathOfAlias( 'application.models' );
+		
 		//	Process arguments...
 		$arArgs = $this->processArguments( $arArgs );
 		
@@ -88,12 +91,12 @@ class CPSModelCommand extends CPSConsoleCommand
 			if ( ( $_iPos = strrpos( $_sClassName, '.' ) ) !== false )
 			{
 				//	i.e. module.models.* becomes base=module.models, class=*
-				$_sBasePath = Yii::getPathOfAlias( $_sClassName );
+				$_sBasePath = Yii::getPathOfAlias( substr( $_sClassName, 0, $_iPos ) );
 				$_sClassName = substr( $_sClassName, $_iPos + 1 );
 			}
 
 			//	Generate all models
-			if ( $_sClassName === '*' ) 
+			if ( $_sClassName == '*' ) 
 				$this->generateRelations();
 			else
 			{

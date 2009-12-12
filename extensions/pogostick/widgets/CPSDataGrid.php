@@ -161,7 +161,7 @@ class CPSDataGrid extends CPSHelperBase
 		{
 			$_sColumn = CPSTransform::cleanColumn( ( is_array( $_oColumn ) ? $_sKey = array_shift( $_oColumn ) : $_oColumn ) );
 			if ( $_oModel ) $_sModelLabel = $_oModel->getAttributeLabel( $_sColumn );
-			$_sLabel = PS::o( $_oColumn, 'label', ( $oSort ) ? $oSort->link( $_sColumn ) : ( $_sModelLabel ? $_sModelLabel : $_sColumn ), true );
+			$_sLabel = PS::o( $_oColumn, 'label', ( $oSort ) ? self::appendSortArrow( $oSort->link( $_sColumn ) ) : ( $_sModelLabel ? $_sModelLabel : $_sColumn ), true );
 			$_sHeaders .= CHtml::tag( 'th', array(), $_sLabel );
 			self::$m_iColumnCount++;
 		}	
@@ -318,5 +318,30 @@ class CPSDataGrid extends CPSHelperBase
 	{
 		return '</TABLE>';
 	}
-	
+
+	/**
+	* Appends a nice little arrow to a sort link.
+	* 
+	* @param string $sLink
+	*/
+	public static function appendSortArrow( $sLink )
+	{
+		return $sLink;
+		
+		$_iPosNext = stripos( $sLink, '-' );
+		$_iPos = stripos( $sLink, '.desc' );
+		
+		if ( $_iPos !== false && $_iPos < $_iPosNext ) 
+		{
+			$_sDir = 's';
+			$_sTitle = 'Sorted Ascending';
+		}
+		else
+		{
+			$_sTitle = 'Sorted Descending';
+			$_sDir = 'n';
+		}			
+
+		return $sLink . PS::tag( 'span', array( 'title' => $_sTitle, 'class' => "ui-icon ui-icon-arrowthickstop-1-{$_sDir} ps-data-grid-sort-arrow"  ) );
+	}	
 }

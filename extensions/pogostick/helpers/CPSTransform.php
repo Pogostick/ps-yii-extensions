@@ -107,9 +107,8 @@ class CPSTransform extends CPSHelperBase
 		foreach ( $arColumns as $_sKey => $_oColumn )
 		{
 			$_bLink = false;
-			$_oValue = null;
+			$_sDisplayFormat = $_arValueMap = $_oValue = null;
 			$_sColumn = $_oColumn;
-			$_sDisplayFormat = null;
 			
 			//	Any column options?
 			if ( is_array( $_oColumn ) )
@@ -142,7 +141,7 @@ class CPSTransform extends CPSHelperBase
 			if ( ! strlen( $_oValue ) ) $_oValue = self::getValue( $oModel, $_sRealCol );
 			
 			//	Map value for display...
-			if ( isset( $_oValue ) && in_array( $_oValue, array_keys( $_arValueMap ) ) )
+			if ( $_arValueMap && isset( $_oValue ) && in_array( $_oValue, array_keys( $_arValueMap ) ) )
 				if ( isset( $_arValueMap[ $_oValue ] ) ) $_oValue = $_arValueMap[ $_oValue ];
 
 			//	Pretty it up...
@@ -177,7 +176,7 @@ class CPSTransform extends CPSHelperBase
 	protected static function boolTransform( $sHow, $oValue )
 	{
 		$_oValue = ( empty( $oValue ) || $oValue === 'N' || $oValue === 'n' || $oValue === 0 ) ? 'No' : 'Yes';
-		return array( $_oValue, false, array() );
+		return self::alignTransform( '|', $_oValue );
 	}
 	
 	protected static function timeTransform( $sHow, $oValue, $sFormat = 'F d, Y' )
@@ -202,7 +201,7 @@ class CPSTransform extends CPSHelperBase
 	
 	protected static function styleTransform( $sHow, $oValue )
 	{	
-		return self::alignTransform( $sHow, $oValue, '>' );
+		return self::alignTransform( $sHow, $oValue );
 	}
 	
 	protected static function alignTransform( $sHow, $oValue )

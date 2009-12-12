@@ -54,6 +54,9 @@ class CPSActiveWidgets extends CHtml
 	const	DD_CC_TYPES = 4;
 	const	DD_DAY_NUMBERS = 5;
 	const	DD_YES_NO = 6;
+	const	DD_TIME_ZONES = 7;
+	
+	//	Special drop down
 	const	DD_CODE_TABLE = 'activeCodeDropDownList';
 	
 	//	Types of HTML
@@ -301,18 +304,18 @@ class CPSActiveWidgets extends CHtml
 			}
 
 			//	Do drop downs...
-			$arData = self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, $_oValue );
-			return parent::dropDownList( $sColName, null, $arData, $arHtmlOptions );
+			if ( null != ( $arData = self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, $_oValue ) ) )
+				return parent::dropDownList( $sColName, $_oValue, $arData, $arHtmlOptions );
 			
 			//	Otherwise output the field if we have a type
-			if ( null != $_sType )
-				return self::inputField( $_sType, $sColName, $_oValue, $arHtmlOptions );
+			if ( null != $_sType ) return self::inputField( $_sType, $sColName, $_oValue, $arHtmlOptions );
 				
+			//	No clue...
 			return;
 		}
 		
 		//	Handle custom drop downs...
-		if ( self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, $_oValue ) )
+		if ( self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, PS::nvl( $oModel->{$sColName} ) ) )
 			$eFieldType = self::DROPDOWN;
 		
 		//	Handle special types...
@@ -377,7 +380,7 @@ class CPSActiveWidgets extends CHtml
 			case self::LISTBOX:
 				return self::$eFieldType( $oModel, $sColName, $arData, $arHtmlOptions );
 		}
-		
+
 		return self::$eFieldType( $oModel, $sColName, $arHtmlOptions ) . $_sAppendHtml;
 	}
 
@@ -527,59 +530,29 @@ CSS;
 		CPSHelp::registerCSS( md5( time() ), $_sCss );
 	}
 	
+	/**
+	* Generates a generic drop-down select list
+	* 
+	* @param enum $eType
+	* @param string $sName
+	* @param string $sLabel
+	* @param array $arOptions
+	* @return string|boolean
+	*/
 	public static function dropDown( $eType, $sName, $sLabel = null, $arOptions = array() )
 	{
 		$_sValue = PS::o( $arOptions, 'value', null, true );
 		$_sLabelClass = PS::o( $arOptions, 'labelClass', null, true );
 
 		if ( $sLabel ) $_sOut = self::label( $sLabel, $sName, $arOptions );
-		
-		switch ( $eType )
-		{
-			case self::DD_GENERIC:	//	Options passed in via array
-				$_arOptions = PS::o( $arOptions, 'options', array(), true );
-				break;
-				
-			case self::DD_US_STATES:
-				$_arOptions = require( 'us_state_array.php' );
-				break;
-				
-			case self::DD_MONTH_NUMBERS:
-				if ( $_sValue == null ) $_sValue = date( 'm' );
-				$_arOptions = require( 'month_numbers_array.php' );
-				break;
-				
-			case self::DD_DAY_NUMBERS:
-				if ( $_sValue == null ) $_sValue = date( 'd' );
-				$_arOptions = require( 'day_numbers_array.php' );
-				break;
-				
-			case self::DD_MONTH_NAMES:
-				if ( $_sValue == null ) $_sValue = date( 'm' );
-				$_arOptions = require( 'month_names_array.php' );
-				break;
-				
-			case self::DD_YEARS:
-				if ( $_sValue == null ) $_sValue = date( 'Y' );
-				$_iRange = PS::o( $arOptions, 'range', 5 );
-				$_iRangeStart = PS::o( $arOptions, 'rangeStart', date('Y'), true );
-				$_arOptions = array();
-				
-				for ( $_i = 0; $_i < $_iRange; $_i++ ) 
-					$_arOptions[ ( $_iRangeStart + $_i ) ] = ( $_iRangeStart + $_i );
-				break;
-				
-			case self::DD_CC_TYPES:
-				$_arOptions = require( 'cc_types_array.php' );
-				break;
-				
-			default:
-				return false;
-		}
-		
+
+		if ( null == ( $_arOptions = self::getGenericDropDownValues( $eType, $arOptions ) ) )
+			return false;
+
 		if ( ! empty( $_arOptions ) )
 		{
 			$_sInner = '';
+			$_sValue = PS::nvl( PS::o( $arOptions, 'value', null, true ), $_sValue );
 
 			foreach ( $_arOptions as $_sKey => $_sVal )
 			{
@@ -659,16 +632,34 @@ CSS;
 	}
 
 	/**
-	 * Generates a submit button bar.
-	 * @param string the button label
-	 * @param array additional HTML attributes. Besides normal HTML attributes, a few special
-	 * attributes are also recognized (see {@link clientChange} and {@link tag} for more details.)
-	 * @return string the generated button tag
-	 * @see clientChange
-	 */
+	* Generates a submit button bar.
+	* 
+	* Additional HTML options are available for the bar div itself:
+	* 
+	* barClass		The class to apply to the bar's div tag. Defaults to ps-submit-button-bar
+	* noBorder		If true, no border line will be displayed on the top of the bar.
+	* barLeft		If true, submit button will be flush left instead of the default flush right
+	* barCenter		If true, submit button will be centered instead of the default flush right
+	* 
+	* @param string $sLable The button label
+	* @param array $arHtmlOptions HTML options for the submit button. 
+	* @returns string The generated button tag
+	* @see clientChange
+	*/
 	public static function submitButtonBar( $sLabel = 'Submit', $arHtmlOptions = array() )
 	{
-		return '<div class="ps-submit-button-bar">' . self::submitButton( $sLabel, $arHtmlOptions ) . '</div>';
+		//	Get orientation of buttons
+		if ( PS::o( $arHtmlOptions, 'barLeft' ) )
+			$_sDirClass = 'ps-submit-button-bar-left';
+		else if ( PS::o( $arHtmlOptions, 'barCenter' ) )
+			$_sDirClass = 'ps-submit-button-bar-center';
+		else
+			$_sDirClass = 'ps-submit-button-bar-right';
+
+		$_sClass = PS::o( $arHtmlOptions, 'barClass', 'ps-submit-button-bar' ) . ' ' . $_sDirClass;
+		if ( ! $_bNoBorder = PS::o( $arHtmlOptions, 'noBorder', false ) ) $_sClass .= ' ps-submit-button-bar-border';
+		
+		return PS::tag( 'div', array( 'class' => $_sClass ), self::submitButton( $sLabel, $arHtmlOptions ) );
 	}
 
 	/****
@@ -994,18 +985,44 @@ HTML;
 	*/
 	protected static function setDropDownValues( $eFieldType, &$arHtmlOptions = array(), &$arData = null, $oSelected = null )
 	{
-		if ( is_numeric( $eFieldType ) )
+ 		$_arData = null;
+
+		//	One of our generics? Set data, type and return
+		if ( $_arData = self::getGenericDropDownValues( $eFieldType, $arHtmlOptions, $arData ) )
+		{
+			$eFieldType = self::DROPDOWN;
+			$arData = $_arData;
+		}
+		else
+		{
+			//	Generic or dropdown? Set data, type and return
+			if ( $eFieldType == self::DD_GENERIC || $eFieldType == self::DROPDOWN )
+			{
+				$_arData = $arData;
+				$eFieldType = self::DROPDOWN;
+			}
+		}
+		
+		//	Return a copy of the data array
+		return $_arData;
+	}
+	
+	/**
+	* Gets the options for pre-fab select boxes
+	* 
+	* @param mixed $eFieldType
+	* @returns boolean
+	*/
+	protected static function getGenericDropDownValues( $eType, &$arHtmlOptions = array(), &$arData = null )
+	{
+		if ( is_numeric( $eType ) )
 		{
 			$_arData = null;
-			$_bHit = true;
-			
-			$_eOrigFieldType = $eFieldType;
-			$eFieldType = self::DROPDOWN;
 		
-			switch ( $_eOrigFieldType )
+			switch ( $eType )
 			{
-				case self::DD_GENERIC:	//	Options passed in via array
-					$_arData = $arData;
+				case self::DD_GENERIC:
+					$_arData = PS::nvl( $arData, PS::o( $arHtmlOptions, 'data', null ) );
 					break;
 					
 				case self::DD_YES_NO:
@@ -1017,25 +1034,24 @@ HTML;
 					break;
 					
 				case self::DD_MONTH_NUMBERS:
-					if ( $oSelected == null ) $oSelected = date( 'm' );
+					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('m');
 					$_arData = require( 'month_numbers_array.php' );
 					break;
 					
 				case self::DD_DAY_NUMBERS:
-					if ( $oSelected == null ) $oSelected = date( 'd' );
+					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('d');
 					$_arData = require( 'day_numbers_array.php' );
 					break;
 					
 				case self::DD_MONTH_NAMES:
-					if ( $oSelected == null ) $oSelected = date( 'm' );
+					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('m');
 					$_arData = require( 'month_names_array.php' );
 					break;
 					
 				case self::DD_YEARS:
-					if ( $oSelected == null ) $oSelected = date( 'Y' );
+					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('Y');
 					$_iRange = PS::o( $arHtmlOptions, 'range', 5, true );
 					$_iRangeStart = PS::o( $arHtmlOptions, 'rangeStart', date('Y'), true );
-					
 					$_arData = array();
 					for ( $_i = 0, $_iBaseYear = $_iRangeStart; $_i < $_iRange; $_i++ ) $_arData[ ( $_iBaseYear + $_i ) ] = ( $_iBaseYear + $_i );
 					break;
@@ -1044,24 +1060,12 @@ HTML;
 					$_arData = require( 'cc_types_array.php' );
 					break;
 					
-				//	Special code drop down. List data is gotten here...
-				case self::DD_CODE_TABLE:
-//					$_arData = CHtml::listData( Code::findByType( ( $_arData == null ) ? $sColName : $_arData ), 'code_id', 'code_desc_text' );
-					break;
-					
-				case self::DROPDOWN:
-					$_arData = $arData;
-					break;
-					
-				default:
-					$eFieldType = $_eOrigFieldType;
-					$_bHit = false;
+				case self::DD_TIME_ZONES:
+					$_arData = require( 'time_zones_array.php' );
 					break;
 			}
-
-			if ( $_bHit ) $arData = $_arData;
-			
-			return $_arData;
 		}
+		
+		return $_arData;
 	}
 }

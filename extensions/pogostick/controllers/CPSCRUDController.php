@@ -57,7 +57,7 @@ abstract class CPSCRUDController extends CPSController
 		//	Set our access rules..
 		$this->addUserAction( self::ACCESS_TO_ANY, 'index' );
 		$this->setUserActionList( self::ACCESS_TO_GUEST, array( 'login', 'register' ) );
-		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'admin', 'create', 'delete', 'logout', 'show', 'update' ) );
+		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'login', 'logout', 'admin', 'create', 'delete', 'logout', 'show', 'update' ) );
 		$this->setUserActionList( self::ACCESS_TO_ADMIN, array() );
 		$this->setUserActionList( self::ACCESS_TO_NONE, array() );
 	}

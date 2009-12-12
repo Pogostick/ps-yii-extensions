@@ -83,8 +83,8 @@ abstract class CPSController extends CController
 	protected function setModelName( $sValue ) 
 	{ 
 		$this->m_sModelName = $sValue; 
-		$this->m_sGlobalSearchStateId = 'PS_' . strtoupper( $this->modelName ) . '_SEARCH_CRIT'; 
-		$this->m_arCurrentSearchCriteria = Yii::app()->getGlobalState( $this->m_sGlobalSearchStateId ); 
+		$this->m_sGlobalSearchStateId = 'PS_' . strtoupper( $this->modelName ) . '_SEARCH_CRIT';
+		$this->m_arCurrentSearchCriteria = Yii::app()->user->getState( $this->m_sGlobalSearchStateId );
 	}
 
 	/**
@@ -104,7 +104,7 @@ abstract class CPSController extends CController
 	public function setSearchCriteria( $arValue ) 
 	{
 		$this->m_arCurrentSearchCriteria = $arValue; 
-		Yii::app()->setGlobalState( $this->m_sGlobalSearchStateId, $arValue ); 
+		Yii::app()->user->setState( $this->m_sGlobalSearchStateId, $arValue ); 
 	}
 	
 	/**
@@ -194,7 +194,7 @@ abstract class CPSController extends CController
 		$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
 		
 		//	Pull any search criteria we've stored...
-		if ( $this->getModelName() ) $this->m_arCurrentSearchCriteria = Yii::app()->getGlobalState( $this->m_sGlobalSearchStateId );
+		if ( $this->getModelName() ) $this->m_arCurrentSearchCriteria = Yii::app()->user->getState( $this->m_sGlobalSearchStateId );
 	}
 	
 	/**
@@ -341,7 +341,6 @@ abstract class CPSController extends CController
 		$_oPage = new CPagination( $this->loadCount( $_oCrit ) );
 		$_oPage->pageSize = PS::nvl( $_REQUEST['perPage'], self::PAGE_SIZE );
 		if ( isset( $_REQUEST, $_REQUEST['page'] ) ) $_oPage->setCurrentPage( intval( $_REQUEST['page'] ) - 1 );
-		if ( isset( $_REQUEST, $_REQUEST['sort'] ) ) $_oCrit->order = $_REQUEST['sort'];
 		$_oPage->applyLimit( $_oCrit );
 		
 		//	Sort...
@@ -443,7 +442,7 @@ abstract class CPSController extends CController
 	protected function clearSearchCriteria()
 	{
 		$this->m_arCurrentSearchCriteria = null;
-		Yii::app()->clearGlobalState( $this->m_sGlobalSearchStateId );
+		Yii::app()->user->clearState( $this->m_sGlobalSearchStateId );
 		
 		return null;
 	}
