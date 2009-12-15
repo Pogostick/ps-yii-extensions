@@ -107,7 +107,7 @@ class CPSTransform extends CPSHelperBase
 		foreach ( $arColumns as $_sKey => $_oColumn )
 		{
 			$_bLink = false;
-			$_sDisplayFormat = $_arValueMap = $_oValue = null;
+			$_sNullDisplay = $_sDisplayFormat = $_arValueMap = $_oValue = null;
 			$_sColumn = $_oColumn;
 			
 			//	Any column options?
@@ -121,6 +121,7 @@ class CPSTransform extends CPSHelperBase
 				{
 					$_arValueMap = PS::o( $_arColOpts, 'valueMap', array(), true );
 					$_sDisplayFormat = PS::o( $_arColOpts, 'displayFormat', null, true );
+					$_sNullDisplay = PS::o( $_arColOpts, 'nullDisplay', null, true );
 					
 					//	Anything remaining gets rolled into wrap options
 					$arWrapOptions = CPSHelp::smart_array_merge( $_arColOpts, $arWrapOptions );

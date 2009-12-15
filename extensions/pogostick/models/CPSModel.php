@@ -134,46 +134,6 @@ class CPSModel extends CActiveRecord
 	}
 
 	/**
-	* Grab our name
-	* 
-	* @param string $sClassName
-	*/
-	public function afterConstruct()
-	{
-		$this->m_sModelName = get_class( $this );
-		parent::afterConstruct();
-	}
-	
-	/**
-	* Populates 'created' field if new record
-	* 
-	* @param CEvent $oEvent
-	*/
-	public function beforeValidate( $sScenario = null )
-	{
-		//	Handle created stamp
-		if ( $this->isNewRecord )
-		{
-			if ( ( $_sCreated = $this->getCreatedColumn() ) && $this->hasAttribute( $_sCreated ) )
-				$this->{$_sCreated} = ( null === $this->m_sDateTimeFunction ) ? date('Y-m-d H:i:s') : eval('return ' . $this->m_sDateTimeFunction . ';');
-				
-			//	Handle user id stamp
-			if ( ( $_sCreatedBy = $this->getLModByColumn() ) && $this->hasAttribute( $_sCreatedBy ) ) 
-				$this->{$_sCreatedBy} = Yii::app()->user->getId();
-		}
-			
-		//	Handle lmod stamp
-		if ( ( $_sLMod = $this->getLModColumn() ) && $this->hasAttribute( $_sLMod ) ) 
-			$this->{$_sLMod} = ( null === $this->m_sDateTimeFunction ) ? date('Y-m-d H:i:s') : eval('return ' . $this->m_sDateTimeFunction . ';');
-				
-		//	Handle user id stamp
-		if ( ( $_sLModBy = $this->getLModByColumn() ) && $this->hasAttribute( $_sLModBy ) ) 
-			$this->{$_sLModBy} = Yii::app()->user->getId();
-				
-		return parent::beforeValidate( $sScenario );
-	}
-	
-	/**
 	* Soft deletes models that have that feature
 	* 
 	* @returns boolean
@@ -366,7 +326,7 @@ class CPSModel extends CActiveRecord
 	}
 	
 	/**
-	* Outputs a string of UL/LI tags of an array of models suitable
+	* Outputs a string of UL/LI tags from an array of models suitable
 	* for menu structures
 	* 
 	* @param array $arModel
@@ -425,4 +385,69 @@ class CPSModel extends CActiveRecord
     {
 		return PS::showDates( $this, $this->m_sCreatedColumn, $this->m_sLModColumn, 'F M j, Y' );
 	}
+	
+	/***
+	* Returns the errors on this model in a single string suitable for logging.
+	* 
+	* @param string $sAttribute Attribute name. Use null to retrieve errors for all attributes.
+	* @returns string
+	*/
+	public function getErrorsForLogging( $sAttribute = null )
+	{
+		$_sOut = null;
+		$_i = 1;
+		
+		if ( $_arErrors = $this->getErrors( $sAttribute ) )
+		{
+			foreach ( $_arErrors as $_sAttribute => $_arError )
+				$_sOut .= $_i++ . '. [' . $_sAttribute . '] : ' . implode( '|', $_arError ) . '; ';
+		}
+		
+		return $_sOut;
+	}
+
+	//********************************************************************************
+	//* Event Handlers
+	//********************************************************************************
+	
+	/**
+	* Grab our name
+	* 
+	* @param string $sClassName
+	*/
+	public function afterConstruct()
+	{
+		$this->m_sModelName = get_class( $this );
+		parent::afterConstruct();
+	}
+	
+	/**
+	* Populates 'created' field if new record
+	* 
+	* @param CEvent $oEvent
+	*/
+	public function beforeValidate( $sScenario = null )
+	{
+		//	Handle created stamp
+		if ( $this->isNewRecord )
+		{
+			if ( ( $_sCreated = $this->getCreatedColumn() ) && $this->hasAttribute( $_sCreated ) )
+				$this->{$_sCreated} = ( null === $this->m_sDateTimeFunction ) ? date('Y-m-d H:i:s') : eval('return ' . $this->m_sDateTimeFunction . ';');
+				
+			//	Handle user id stamp
+			if ( ( $_sCreatedBy = $this->getLModByColumn() ) && $this->hasAttribute( $_sCreatedBy ) ) 
+				$this->{$_sCreatedBy} = Yii::app()->user->getId();
+		}
+			
+		//	Handle lmod stamp
+		if ( ( $_sLMod = $this->getLModColumn() ) && $this->hasAttribute( $_sLMod ) ) 
+			$this->{$_sLMod} = ( null === $this->m_sDateTimeFunction ) ? date('Y-m-d H:i:s') : eval('return ' . $this->m_sDateTimeFunction . ';');
+				
+		//	Handle user id stamp
+		if ( ( $_sLModBy = $this->getLModByColumn() ) && $this->hasAttribute( $_sLModBy ) ) 
+			$this->{$_sLModBy} = Yii::app()->user->getId();
+				
+		return parent::beforeValidate( $sScenario );
+	}
+	
 }

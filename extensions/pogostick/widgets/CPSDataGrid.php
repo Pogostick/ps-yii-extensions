@@ -191,8 +191,8 @@ class CPSDataGrid extends CPSHelperBase
 	{
 		$_sOut = null;
 		if ( null === $arActions ) $arActions = array( 'edit', 'delete' );
-		$_arOptions = CPSHelp::getOption( $arActions, 'options', array(), true );
-		$_sLockColumn = CPSHelp::getOption( $_arOptions, 'lockColumn', null, true );
+		$_arOptions = PS::o( $arActions, 'options', array(), true );
+		$_sLockColumn = PS::o( $_arOptions, 'lockColumn', null, true );
 		
 		if ( ! $arModel || ( is_array( $arModel ) && ! count( $arModel ) ) ) 
 			$_sOut .= CHtml::tag( 'tr', array(), PS::tag( 'td', array( 'class' => 'ps-data-grid-no-data-found', 'colspan' => self::$m_iColumnCount ), 'No Records Found' ) );
@@ -291,14 +291,14 @@ class CPSDataGrid extends CPSHelperBase
 				{
 					foreach ( $_oModel->subRows as $_oRow )
 					{
-						$_arInnerOptions = CPSHelp::smart_array_merge( PS::o( $_oRow, '_innerHtmlOptions', array(), true ), array( 'encode' => false ) );
-						$_arOuterOptions = CPSHelp::smart_array_merge( array( 'class' => 'ps-sub-row' ), PS::o( $_oRow, '_outerHtmlOptions', array(), true ) );
+						$_arInnerOptions = self::smart_array_merge( PS::o( $_oRow, '_innerHtmlOptions', array(), true ), array( 'encode' => false ) );
+						$_arOuterOptions = self::smart_array_merge( array( 'class' => 'ps-sub-row' ), PS::o( $_oRow, '_outerHtmlOptions', array(), true ) );
 						
 						$_sRow = CPSTransform::column( $_oRow, array_keys( $_oRow ), null, 'td', $_arInnerOptions );
 
 						if ( ! empty( $arActions ) )
 						{
-							$_sRow .= CHtml::tag( 'td', CPSHelp::smart_array_merge( $_arInnerOptions, array( 'class' => 'grid-actions' ) ), '<div class="_grid_actions">&nbsp;<hr /></div>' );
+							$_sRow .= CHtml::tag( 'td', self::smart_array_merge( $_arInnerOptions, array( 'class' => 'grid-actions' ) ), '<div class="_grid_actions">&nbsp;<hr /></div>' );
 						}
 							
 						$_sOut .= CHtml::tag( 'tr', $_arOuterOptions, $_sRow );

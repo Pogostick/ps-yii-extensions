@@ -106,10 +106,16 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior
 	protected function handleEvent( $sWhich, CEvent $oEvent )
 	{
 		static $_arSchema;
+		static $_sSchemeFor;
+		
 		$_oModel = $oEvent->sender;
 		
 		//	Cache for multi event speed
-		if ( ! $_arSchema ) $_arSchema = $_oModel->getMetaData()->columns;
+		if ( $_sSchemaFor != get_class( $_oModel ) )
+		{
+			$_arSchema = $_oModel->getMetaData()->columns;
+			$_sSchemaFor = get_class( $_oModel );
+		}
 		
 		//	Not for us? Pass it through...
 		if ( isset( $this->m_arFormat[ $sWhich ] ) )
