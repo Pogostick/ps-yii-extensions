@@ -13,6 +13,13 @@
  * @modifiedby $LastChangedBy$
  * @lastmodified  $Date$
  */
+
+//	Imports for me...
+Yii::import( 'pogostick.commands.CPSControllerCommand' );
+ 
+/**
+* Command that generates a Pogostick Yii CRUD set
+*/
 class CPSCrudCommand extends CPSControllerCommand
 {
 	//********************************************************************************

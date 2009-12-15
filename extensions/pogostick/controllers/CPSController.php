@@ -13,12 +13,22 @@
  * @modifiedby $LastChangedBy$
  * @lastmodified  $Date$
  */
-
  /**
  * CPSController provides filtered access to resources
  *
  * @package psYiiExtensions
  * @subpackage Controllers
+ * 
+ * @property string $pageHeading
+ * @property string $methodPrefix The prefix for action methods. Defaults to 'action'
+ * @property string $modelName The current model name
+ * @property CPSModel $model The current model
+ * @property array $currentSearchCriteria Stores search criteria from last search
+ * @property boolean $autoLayout If true, uses a layout with the id of this controller
+ * @property boolean $autoMissing If true, searches for a view that matches the name of the action
+ * @property array $commandMap The command mapping for admin commands
+ * @property array $userActionList The actions for this controller
+ * @property-read boolean $isPostRequest True if the current request is a POST
  */
 abstract class CPSController extends CController
 {
@@ -83,16 +93,22 @@ abstract class CPSController extends CController
 	protected function setModelName( $sValue ) 
 	{ 
 		$this->m_sModelName = $sValue; 
-		$this->m_sGlobalSearchStateId = 'PS_' . strtoupper( $this->modelName ) . '_SEARCH_CRIT';
-		$this->m_arCurrentSearchCriteria = Yii::app()->user->getState( $this->m_sGlobalSearchStateId );
+		$this->m_sSearchStateId = 'PS_' . strtoupper( $this->modelName ) . '_SEARCH_CRIT';
+		$this->m_arCurrentSearchCriteria = Yii::app()->user->getState( $this->m_sSearchStateId );
 	}
 
 	/**
-	* The id in the global state of our current filter/search criteria
+	* Convenience access to isPostRequest
+	* @returns boolean
+	*/
+	public function getIsPostRequest() { return Yii::app()->getRequest()->isPostRequest; }
+	
+	/**
+	* The id in the state of our current filter/search criteria
 	* 
 	* @var string
 	*/
-	protected $m_sGlobalSearchStateId = null;
+	protected $m_sSearchStateId = null;
 	
 	/**
 	* Stores the current search criteria
@@ -104,7 +120,7 @@ abstract class CPSController extends CController
 	public function setSearchCriteria( $arValue ) 
 	{
 		$this->m_arCurrentSearchCriteria = $arValue; 
-		Yii::app()->user->setState( $this->m_sGlobalSearchStateId, $arValue ); 
+		Yii::app()->user->setState( $this->m_sSearchStateId, $arValue ); 
 	}
 	
 	/**
@@ -194,7 +210,7 @@ abstract class CPSController extends CController
 		$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
 		
 		//	Pull any search criteria we've stored...
-		if ( $this->getModelName() ) $this->m_arCurrentSearchCriteria = Yii::app()->user->getState( $this->m_sGlobalSearchStateId );
+		if ( $this->getModelName() ) $this->m_arCurrentSearchCriteria = Yii::app()->user->getState( $this->m_sSearchStateId );
 	}
 	
 	/**
@@ -285,6 +301,15 @@ abstract class CPSController extends CController
 	    $this->render( 'error', array( 'error' => $_oError ) );
 	}
 	
+	/**
+	* Convenience access to Yii request
+	* 
+	*/
+	public function getRequest()
+	{
+		return Yii::app()->getRequest();
+	}
+	
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
@@ -301,7 +326,7 @@ abstract class CPSController extends CController
 	* @param boolean $bNoCommit If true, transaction will not be committed
 	* @returns boolean
 	*/
-	protected function saveModel( $oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false )
+	protected function saveModel( &$oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false )
 	{
 		$_sMessage = PS::nvl( $sSuccessMessage, 'Your changes have been saved.' );
 		$_sModelName = PS::nvl( $sModelName, PS::nvl( $oModel->modelName, $this->m_sModelName ) );
@@ -442,7 +467,7 @@ abstract class CPSController extends CController
 	protected function clearSearchCriteria()
 	{
 		$this->m_arCurrentSearchCriteria = null;
-		Yii::app()->user->clearState( $this->m_sGlobalSearchStateId );
+		Yii::app()->user->clearState( $this->m_sSearchStateId );
 		
 		return null;
 	}
@@ -450,10 +475,11 @@ abstract class CPSController extends CController
 	/**
 	* Logs a message to the application log
 	* 
-	* @param string $sMessage
-	* @param string $sCategory
+	* @param string $sMessage The log message
+	* @param string $sCategory The category for this log entry. Defaults to __METHOD__
+	* @param string $sLevel The level of this log. Defaults to 'trace'
 	*/
-	protected function log( $sMessage, $sCategory = __CLASS__, $sLevel = 'trace' )
+	protected function log( $sMessage, $sCategory = __METHOD__, $sLevel = 'trace' )
 	{
 		return Yii::log( $sMessage, $sLevel, $sCategory );
 	}
@@ -461,11 +487,11 @@ abstract class CPSController extends CController
 	/**
 	* Log helpers
 	* 
-	* @param string $sMessage
-	* @param string $sCategory
+	* @param string $sMessage The log message
+	* @param string $sCategory The category for this log entry. Defaults to __METHOD__
 	*/
-	protected function logInfo( $sMessage, $sCategory = __CLASS__ ) { self::log( $sMessage, $sCategory, 'info' ); }
-	protected function logError( $sMessage, $sCategory = __CLASS__ ) { self::log( $sMessage, $sCategory, 'error' ); }
-	protected function logWarning( $sMessage, $sCategory = __CLASS__ ) { self::log( $sMessage, $sCategory, 'warning' ); }
-	protected function logTrace( $sMessage, $sCategory = __CLASS__ ) { self::log( $sMessage, $sCategory, 'trace' ); }
+	protected function logInfo( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'info' ); }
+	protected function logError( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'error' ); }
+	protected function logWarning( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'warning' ); }
+	protected function logTrace( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'trace' ); }
 }

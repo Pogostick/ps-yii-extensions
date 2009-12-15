@@ -265,7 +265,7 @@ class CPSModel extends CActiveRecord
 	}
 	
 	/***
-	* Begins a transaction
+	* Begins a database transaction
 	* @throws CDbException
 	*/
 	public function beginTransaction()
@@ -417,4 +417,12 @@ class CPSModel extends CActiveRecord
 		return PS::tag( 'ul', $_arOpts, $_sOut );
 	}
 	
+    /**
+    * Returns formatted create/lmod dates
+    * 
+    */
+    public function showDates()
+    {
+		return PS::showDates( $this, $this->m_sCreatedColumn, $this->m_sLModColumn, 'F M j, Y' );
+	}
 }

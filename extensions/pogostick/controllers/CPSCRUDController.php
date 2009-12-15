@@ -58,8 +58,6 @@ abstract class CPSCRUDController extends CPSController
 		$this->addUserAction( self::ACCESS_TO_ANY, 'index' );
 		$this->setUserActionList( self::ACCESS_TO_GUEST, array( 'login', 'register' ) );
 		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'login', 'logout', 'admin', 'create', 'delete', 'logout', 'show', 'update' ) );
-		$this->setUserActionList( self::ACCESS_TO_ADMIN, array() );
-		$this->setUserActionList( self::ACCESS_TO_NONE, array() );
 	}
 
 	/**
@@ -133,7 +131,7 @@ abstract class CPSCRUDController extends CPSController
 				{
 					$_arRules[] = array( 
 						$_sVerb, 
-						'actions' => $this->m_arUserActionList[ $_i ],
+						'actions' => PS::o( $this->m_arUserActionList, $_i, array() ),
 						'users' => array( $_sValid )
 					);
 				}

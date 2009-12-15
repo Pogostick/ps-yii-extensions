@@ -13,6 +13,13 @@
  * @modifiedby $LastChangedBy$
  * @lastmodified  $Date$
  */
+ 
+//	Imports for me...
+Yii::import( 'pogostick.commands.CPSConsoleCommand' );
+ 
+/**
+* Command that generates a Pogostick Yii Module
+*/
 class CPSModuleCommand extends CPSConsoleCommand
 {
 	//********************************************************************************

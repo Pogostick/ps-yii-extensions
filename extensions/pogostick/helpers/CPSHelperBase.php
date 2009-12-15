@@ -31,6 +31,18 @@ class CPSHelperBase
 	public static function getClientScript() { return self::nvl( self::$m_oClientScript, self::$m_oClientScript = Yii::app()->getClientScript() ); }
 
 	//********************************************************************************
+	//* Private Constructor
+	//********************************************************************************
+
+	/**
+	* Disallow construction
+	*/
+	private function __constructor()
+	{
+		throw new Exception( 'This class cannot be directly instantiated.', 500 );
+	}
+		
+	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 	

@@ -1,0 +1,41 @@
+#!/bin/sh
+
+#
+# Yii command shell helper script
+#
+# Place in /usr/local/bin or another path that you have set for easy access to yiic.
+#
+# @filesource
+# @author Jerry Ablan <jablan@pogostick.com>
+# @copyright Copyright &copy; 2009 Pogostick, LLC
+# @link http://www.pogostick.com Pogostick, LLC.
+# @package psYiiExtensions
+# @subpackage commands
+# @since v1.0.6
+# @version SVN: $Revision$
+# @modifiedby $LastChangedBy$
+# @lastmodified  $Date$
+#
+
+# Change this to where you installed the psYiiExtension library
+PS_YII_EXTENSION_INSTALL_PATH="/usr/local/psYiiExtensions/extensions/pogostick"
+
+# Get the current directory...
+DOC_ROOT=`pwd`
+
+# Or pass one in on the command line
+if [ -d "$1" ]; then
+    DOC_ROOT=$1
+fi
+
+if [ ! -d "$DOC_ROOT/protected" ]; then
+	echo "This does not appear to be a Yii project. Please run from the root of a Yii project."
+	exit 0
+fi
+
+# Set the path of the PS commands
+YIIC_SHELL_COMMAND_PATH="$PS_YII_EXTENSION_INSTALL_PATH/commands/shell"
+export YIIC_SHELL_COMMAND_PATH
+
+# Call the actual yiic shell...
+php $DOC_ROOT/protected/yiic shell

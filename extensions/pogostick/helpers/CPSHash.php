@@ -32,6 +32,13 @@ class CPSHash extends CPSHelperBase
 	const ALPHA_LOWER_NUMERIC = 5;
 	const NUMERIC = 6;
 
+	/**
+	* Hashing methods
+	*/
+	const MD5 = 1;
+	const SHA1 = 2;
+	const CRC32 = 18;
+	
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -68,6 +75,41 @@ class CPSHash extends CPSHelperBase
 		$_iSize = count( self::$m_arSeed[ $eType ] );
 		for ( $_i = 0; $_i < $iLength; $_i++ ) $_sHash .= self::$m_arSeed[ $eType ][ mt_rand( 0, $_iSize ) ];
 
+		return $_sHash;
+	}
+	
+	/**
+	* Generic hashing method. Will hash any string
+	* 
+	* @param string $sValueToHash
+	* @param integer $eHashType
+	* @param integer $iLength
+	* @param boolean $bRawOutput
+	* @returns string
+	*/
+	public static function hash( $sValueToHash = null, $eHashType = self::SHA1, $iLength = 32, $bRawOutput = false )
+	{
+		$_sValue = PS::nvl( $sValueToHash, self::generate( $iLength ) );
+		
+		switch ( $eHashType )
+		{
+			case self::MD5:
+				$_sHash = md5( $_sValue, $bRawOutput );
+				break;
+				
+			case self::SHA1:
+				$_sHash = sha1( $_sValue, $bRawOutput );
+				break;
+				
+			case self::CRC32:
+				$_sHash = crc32( $_sValue );
+				break;
+
+			default:
+				$_sHash = hash( $eHashType, $_sValue, $bRawOutput );
+				break;
+		}
+		
 		return $_sHash;
 	}
 	

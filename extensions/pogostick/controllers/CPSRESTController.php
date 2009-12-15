@@ -142,12 +142,12 @@ class CPSRESTController extends CPSController
 			
 			foreach ( $_arParams as $_sKey => $_oValue )
 			{
-				if ( is_array( $_oValue ) )
+				if ( ! is_array( $_oValue ) )
+					$_arUrlParams[ $_sKey ] = $_oValue;
+				else				
 				{
 					foreach ( $_oValue as $_sSubKey => $_oSubValue )
 						$_arUrlParams[ $_sSubKey ] = $_oSubValue;
-
-					unset( $_arParams[ $_sKey ] );
 				}
 			}
 		}			

@@ -27,6 +27,7 @@ class CPSActiveWidgets extends CHtml
 	/**
 	* These are a list of form elements that can be used along with the methods in this class.
 	*/
+	const TEXT_DISPLAY = 'inactiveTextDisplay';
 	const TEXTAREA = 'activeTextArea';
 	const TEXT = 'activeTextField';
 	const HIDDEN = 'activeHiddenField';
@@ -57,7 +58,7 @@ class CPSActiveWidgets extends CHtml
 	const	DD_TIME_ZONES = 7;
 	
 	//	Special drop down
-	const	DD_CODE_TABLE = 'activeCodeDropDownList';
+	const 	DD_CODE_TABLE = 'activeCodeDropDownList';
 	
 	//	Types of HTML
 	const	HTML = 0;
@@ -79,8 +80,8 @@ class CPSActiveWidgets extends CHtml
 	* @var string
 	*/
 	protected static $m_sCodeModel = null;
-	public function getCodeModel() { return $this->m_sCodeModel; }
-	public function setCodeModel( $sValue ) { $this->m_sCodeModel = $sValue; }
+	public function getCodeModel() { return self::$m_sCodeModel; }
+	public function setCodeModel( $sValue ) { self::$m_sCodeModel = $sValue; }
 	
 	/**
 	* Template for hints. They will be displayed right after the div simple/complex tag.
@@ -179,7 +180,8 @@ class CPSActiveWidgets extends CHtml
 		$_sTitle = PS::o( $arOptions, 'title', null );
 		$_sHint = PS::o( $arOptions, 'hint', null, true );
 		$_arValueMap = PS::o( $arOptions, 'valueMap', array(), true );
-
+		$_sSuffixToUse = PS::o( $arLabelOptions, 'noSuffix', false, true ) ? '' : self::$labelSuffix;
+		
 		//	Value map...
 		if ( in_array( $oModel->{$sColName}, array_keys( $_arValueMap ) ) && isset( $_arValueMap[$oModel->{$sColName}] ) ) 
 			$arOptions['value'] = $_arValueMap[$oModel->{$sColName}];
@@ -209,7 +211,7 @@ class CPSActiveWidgets extends CHtml
 		else
 		{
 			//	Set label name
-			$arLabelOptions['label'] = PS::nvl( $sLabel, PS::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . self::$labelSuffix;
+			$arLabelOptions['label'] = PS::nvl( $sLabel, PS::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . $_sSuffixToUse;
 			$_sOut = self::activeLabelEx( $oModel, $sColName, $arLabelOptions );
 		}
 
@@ -321,6 +323,11 @@ class CPSActiveWidgets extends CHtml
 		//	Handle special types...
 		switch ( $eFieldType )
 		{
+			case self::TEXT_DISPLAY:
+				$arHtmlOptions['style'] = PS::o( $arHtmlOptions, 'style' ) . ' border:none; background-color: transparent;';
+				$eFieldType = self::TEXT;
+				break;
+				
 			//	Build a jQuery UI widget
 			case self::JQUI:
 				if ( isset( $arHtmlOptions[ '_widget' ] ) )
@@ -393,13 +400,13 @@ class CPSActiveWidgets extends CHtml
 	* @param integer $iDefaultUID
 	* @return string
 	*/
-	public static function activeCodeDropDownList( $sAttribute, &$arHtmlOptions = array(), $iDefaultUID = 0 )
+	public static function activeCodeDropDownList( $oModel, $sAttribute, &$arHtmlOptions = array(), $iDefaultUID = 0 )
 	{
-		if ( self::$m_sCodeModel )
+		if ( null != ( $_sCodeModel = PS::o( $arHtmlOptions, 'codeModel', self::$m_sCodeModel, true ) ) )
 		{
-			$_oModel = new self::$m_sCodeModel();
+			$_oCodeModel = new $_sCodeModel;
 			
-			if ( $_oModel instanceof CPSCodeTableModel )
+			if ( $_oCodeModel instanceof CPSCodeTableModel )
 			{
 				$_sValType = PS::o( $arHtmlOptions, 'codeType', null, true );
 				$_sValAbbr = PS::o( $arHtmlOptions, 'codeAbbr', null, true );
@@ -407,30 +414,20 @@ class CPSActiveWidgets extends CHtml
 				$_sValId = PS::o( $arHtmlOptions, 'codeId', null, true );
 				$_sSort = PS::o( $arHtmlOptions, 'sortOrder', 'code_desc_text', true );
 			
-				self::resolveNameID( $_oModel, $sAttribute, $arHtmlOptions );
-				$_sSel = $_oModel->$attribute;
-			
 				if ( $_sValId )
-					$_sOptions = self::listOptions( $iDefaultUID, $_oModel->findById( $_sValId ), $arHtmlOptions );
+					$_arOptions = self::listData( $_oCodeModel->findById( $_sValId ), 'id', 'code_desc_text' );
 				elseif ( ! $_sValAbbr )
-					$_sOptions = self::listOptions( $iDefaultUID, $_oModel->findAllByType( $_sValType, $_sSort ), $arHtmlOptions );
+					$_arOptions = self::listData( $_oCodeModel->findAllByType( $_sValType, $_sSort ), 'id', 'code_desc_text' );
 				elseif ( $_sValAbbr )
-					$_sOptions = self::listOptions( $iDefaultUID, $_oModel->findAllByAbbreviation( $_sValAbbr, $_sValType, $_sSort ), $arHtmlOptions );
+					$_arOptions = self::listData( $_oCodeModel->findAllByAbbreviation( $_sValAbbr, $_sValType, $_sSort ), 'id', 'code_desc_text' );
 
-				$_sOptions = "\n" . $_sOptions;
-				
-				PS::clientChange( 'change', $arHtmlOptions );
-			
-				if ( $_oModel->hasErrors( $sAttribute ) )
-					PS::addErrorCss( $arHtmlOptions );
-				
 				if ( isset( $arHtmlOptions[ 'multiple' ] ) )
 				{
 					if ( substr( $arHtmlOptions[ 'name' ], -2 ) !== '[]' )
 						$arHtmlOptions[ 'name' ] .= '[]';
 				}
-			
-				return self::tag( 'select', $arHtmlOptions, $_sOptions );
+
+				return self::activeDropDownList( $oModel, $sAttribute, $_arOptions, $arHtmlOptions );
 			}
 		}
 	}
@@ -609,7 +606,9 @@ CSS;
 		$_sType = PS::o( $arOptions, '_forType', 'text' );
 		$_bRequired = PS::o( $arOptions, '_required', false );
 		$arOptions[ 'id' ] = $arOptions['name'] = self::getIdPrefix( 'label' ) . $sName;
-		return self::tag( 'label', $arOptions, ( ( $sLabel == null ) ? $sName : $sLabel ) . self::$labelSuffix . self::$afterRequiredLabel );
+		$_sSuffixToUse = PS::o( $arOptions, 'noSuffix', false, true ) ? '' : $self::$labelSuffix;
+		
+		return self::tag( 'label', $arOptions, ( ( $sLabel == null ) ? $sName : $sLabel ) . $_sSuffixToUse . self::$afterRequiredLabel );
 	}
 
 	/**

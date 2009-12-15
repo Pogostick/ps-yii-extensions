@@ -152,7 +152,7 @@ class CPSDataGrid extends CPSHelperBase
 	public static function beginDataGrid( $arModel, $oSort = null, $arColumns = array(), $bAddActions = true )
 	{
 		$_sHeaders = null;
-		$_oModel = current( $arModel );
+		$_oModel = is_array( $arModel ) && count( arModel ) ? current( $arModel ) : null;
 
 		if ( ! $_oModel && null != ( $_sModelName = PS::o( self::$m_arGridOptions, 'modelName' ) ) )
 			$_oModel = new $_sModelName();
