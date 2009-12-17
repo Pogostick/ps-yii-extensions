@@ -62,18 +62,22 @@ button.ps-button { width:auto; overflow:visible; }
 
 .ps-extra-wide {
 	width: 325px !important;
+	min-width: 325px !important;
 }
 
 .ps-wide {
 	width: 200px !important;
+	min-width: 200px !important;
 }
 
 .ps-short {
 	width: 100px !important;
+	min-width: 100px !important;
 }
 
 .ps-tiny {
 	width: 50px !important;
+	min-width: 50px !important;
 }
 
 .ps-hidden { 

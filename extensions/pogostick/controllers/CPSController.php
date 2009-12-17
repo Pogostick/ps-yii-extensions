@@ -165,6 +165,15 @@ abstract class CPSController extends CController
 	public function getUserActionList( $eWhich ) { return CPSHelp::getOption( $this->m_arUserActionList, $eWhich ); }
 	public function addUserActionRole( $eWhich, $sRole, $sAction ) { $this->m_arUserActionList[ $eWhich ]['roles'][] = $arValue; }
 
+	public function removeUserAction( $eWhich, $sAction ) 
+	{ 
+		if ( ! isset( $this->m_arUserActionList[ $eWhich ] ) || ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) 
+			return;
+
+		if ( in_array( $sAction, $this->m_arUserActionList[ $eWhich ] ) )
+			unset( $this->m_arUserActionList[ $eWhich ][ $sAction ] );
+	}
+
 	public function addUserAction( $eWhich, $sAction ) 
 	{ 
 		if ( ! isset( $this->m_arUserActionList[ $eWhich ] ) || ! is_array( $this->m_arUserActionList[ $eWhich ] ) ) 

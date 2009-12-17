@@ -25,6 +25,14 @@ class CPSModel extends CActiveRecord
 	//********************************************************************************
 
 	/**
+	* Our schema
+	* 
+	* @var array
+	*/
+	protected $m_arSchema;
+	public function getSchema() { return $this->m_arSchema; }
+		
+	/**
 	 * The associated database table name prefix
 	 * @var string
 	 */
@@ -112,6 +120,22 @@ class CPSModel extends CActiveRecord
 	*/
 	protected $m_sModelName = null;
 	public function getModelName() { return $this->m_sModelName; }
+	
+	/**
+	* Access to prior data after a save
+	* 
+	* @var array
+	*/
+	protected $m_arOldAttributes = array();
+	public function getOldAttributes() { return $this->m_arOldAttributes; }
+	
+	/**
+	* Access a single old attribute (i.e. $model->old['create_date'])
+	* 
+	* @param mixed $sAttribute
+	* @return mixed
+	*/
+	public function getOld( $sAttribute ) { return PS::o( $this->m_arOldAttributes, $sAttribute ); }
 	
 	//********************************************************************************
 	//* Public Methods
@@ -297,8 +321,16 @@ class CPSModel extends CActiveRecord
 			
 			foreach ( $arValues as $_sKey => $_oValue )
 			{
-				if ( isset( $_arAttributes[ $_sKey ] ) || $this->hasProperty( $_sKey ) )
+				$_bIsAttribute = isset( $_arAttributes[ $_sKey ] );
+				
+				if ( $_bIsAttribute || $this->hasProperty( $_sKey ) )
+				{
+					//	Mark it changed...
+					if ( $_bIsAttribute && ( $_oOldVal = $this->getAttribute( $sAttribute ) ) != $_oValue )
+						$this->m_arOldAttributes[ $sAttribute ] = $_oOldVal;
+				
 					$this->{$_sKey} = $_oValue;
+				}
 			}
 		}
 	}
@@ -383,7 +415,7 @@ class CPSModel extends CActiveRecord
     */
     public function showDates()
     {
-		return PS::showDates( $this, $this->m_sCreatedColumn, $this->m_sLModColumn, 'F M j, Y' );
+    	if ( ! $this->isNewRecord ) return PS::showDates( $this, $this->m_sCreatedColumn, $this->m_sLModColumn, 'F M j, Y' );
 	}
 	
 	/***
@@ -405,10 +437,120 @@ class CPSModel extends CActiveRecord
 		
 		return $_sOut;
 	}
+	
+	/**
+	* Hijack the method to track changes
+	* 
+	* @param string $sAttribute
+	* @param mixed $oValue
+	* @return boolean
+	*/
+	public function setAttribute( $sAttribute, $oValue )
+	{
+		//	Set old value before we change...
+		$this->m_arOldAttributes[ $sAttribute ] = $this->getAttribute( $sAttribute );
+		
+		//	Set it and forget it!
+		parent::setAttribute( $sAttribute, $oValue );
+	}
+	
+	/**
+	* Returns an array of changed attributes since last save.
+	* @returns array The changed set of attributes or an empty array.
+	*/
+	public function getChangedSet( $arAttributes = array(), $bReturnChanges = false )
+	{
+		$_arOut = array();
+		
+		foreach ( $this->m_arOldAttributes as $_sKey => $_sValue )
+		{
+			//	Only return asked for attributes
+			if ( ! empty( $arAttributes ) && ! in_array( $_sKey, $arAttributes ) )
+				continue;
+				
+			//	This value changed...
+			if ( $_arTemp = $this->checkAttributeChange( $_sKey, $bReturnChanges ) )
+				$_arOut = array_merge( $_arOut, $_arTemp );
+		}
+	
+		return $_arOut;
+	}
+	
+	/**
+	* Returns true if the attribute(s) changed since save
+	* 
+	* @param string|array $oAttributes You may pass in a single attribute or an array of attributes to check
+	* @returns boolean
+	*/
+	public function didChange( $oAttributes )
+	{
+		$_arCheck = $oAttributes;
+		if ( ! is_array( $_arCheck ) ) $_arCheck = array( $_arCheck );
 
+		foreach ( $_arCheck as $_sKey )
+		{
+			if ( $this->checkAttributeChange( $_sKey ) )
+				return true;
+		}
+			
+		return false;
+	}
+
+	//********************************************************************************
+	//* Private Methods
+	//********************************************************************************
+	
+	/**
+	* If attribute has changed, returns array of old/new values.
+	* 
+	* @param string $sAttribute
+	* @returns array
+	*/
+	protected function checkAttributeChange( $sAttribute, $bReturnChanges = false )
+	{
+		//	Don't set until needed and cache for speed
+		if ( ! $this->m_arSchema ) $this->m_arSchema = $this->getMetaData()->columns;
+		
+		$_arOut = array();
+
+		$_oNewValue = PS::nvl( $this->getAttribute( $sAttribute ), 'NULL' );
+		$_oOldValue = PS::nvl( $this->getOld( $sAttribute ), 'NULL' );
+		
+		$_bChanged = ( $_oOldValue != $_oNewValue );
+		
+		//	Make dates look the same for string comparison
+		if ( isset( $this->m_arSchema[ $sAttribute ] ) && ( $this->m_arSchema[ $sAttribute ]->dbType == 'date' || $this->m_arSchema[ $sAttribute ]->dbType == 'datetime' ) )
+		{
+			$_oOldValue = date( 'Y-m-d H:i:s', strtotime( $_oOldValue ) );
+			$_oNewValue = date( 'Y-m-d H:i:s', strtotime( $_oNewValue ) );
+			$_bChanged = ( $_oOldValue != $_oNewValue );
+			
+			Yii::trace( 'Date Compare: (' . $_oOldValue . ' -> ' . $_oNewValue . ')', __METHOD__ );
+		}
+
+		//	Return the change...
+		if ( $_bChanged )
+			$_arOut[ $sAttribute ] = $bReturnChanges ? array( $_oOldValue, $_oNewValue ) : $_oOldValue;
+	
+		return empty( $_arOut ) ? null : $_arOut;
+	}
+	
 	//********************************************************************************
 	//* Event Handlers
 	//********************************************************************************
+	
+	/**
+	* After a row is pulled from the database...
+	* 
+	*/
+	public function afterFind()
+	{
+		//	Get fresh values
+		$this->m_arOldAttributes = $this->getAttributes();
+		
+		//	Let parents have a go...
+		return parent::afterFind();
+	}
 	
 	/**
 	* Grab our name

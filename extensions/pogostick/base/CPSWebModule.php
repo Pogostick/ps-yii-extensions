@@ -65,10 +65,10 @@ class CPSWebModule extends CWebModule
 		if ( ! empty( $this->m_sConfigPath ) ) $this->configure( require( $this->basePath . $this->m_sConfigPath ) );
 		
 		//	Set our asset url...
-		$_oAM = Yii::app()->assetManager;
-		if ( ! $this->assetPath ) $this->assetPath = $_oAM->getBasePath() . DIRECTORY_SEPARATOR . $this->id;
-		if ( ! is_dir( $this->assetPath ) ) @mkdir( $this->assetPath );
-		$this->assetUrl = $_oAM->publish( $this->assetPath, true, -1 );
+		$_oAM = Yii::app()->getAssetManager();
+		if ( ! $this->m_sAssetPath ) $this->m_sAssetPath = $_oAM->getBasePath() . DIRECTORY_SEPARATOR . $this->getId();
+		if ( ! is_dir( $this->m_sAssetPath ) ) @mkdir( $this->m_sAssetPath );
+		$this->m_sAssetUrl = $_oAM->publish( $this->m_sAssetPath, true, -1 );
 		
 		//	Add jquery
 		Yii::app()->clientScript->registerCoreScript( 'jquery' );

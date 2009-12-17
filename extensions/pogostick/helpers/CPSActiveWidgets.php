@@ -56,6 +56,7 @@ class CPSActiveWidgets extends CHtml
 	const	DD_DAY_NUMBERS = 5;
 	const	DD_YES_NO = 6;
 	const	DD_TIME_ZONES = 7;
+	const	DD_YES_NO_ALL = 8;
 	
 	//	Special drop down
 	const 	DD_CODE_TABLE = 'activeCodeDropDownList';
@@ -1026,6 +1027,10 @@ HTML;
 					
 				case self::DD_YES_NO:
 					$_arData = array( 0 => 'No', 1 => 'Yes' );
+					break;
+					
+				case self::DD_YES_NO_ALL:
+					$_arData = array( -1 => 'All', 0 => 'No', 1 => 'Yes' );
 					break;
 					
 				case self::DD_US_STATES:
