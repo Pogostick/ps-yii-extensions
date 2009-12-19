@@ -131,7 +131,7 @@ class CPSTimeStampBehavior extends CActiveRecordBehavior
     		{
     			if ( $this->owner->hasAttribute( $_sColumn ) )
     			{
-    				$this->{$_sColumn} = $_sTouchVal;
+    				$this->owner->setAttribute( $_sColumn, $_sTouchVal );
     				$_arUpdate[] = $_sColumn;
 				}
     		}
