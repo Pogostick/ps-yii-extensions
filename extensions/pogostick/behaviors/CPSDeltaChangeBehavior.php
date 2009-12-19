@@ -29,6 +29,14 @@ class CPSDeltaChangeBehavior extends CActiveRecordBehavior
 	public function getLastAttributes() { return $this->m_arLastAttributes; }
 	public function getLastAttribute( $oWhich ) { return PS::o( $this->m_arLastAttributes, $oWhich ); }
 	
+	/**
+	* If true, comparisons will be done in a case-insensitive manner. Defaults to true.
+	* @var boolean
+	*/
+	protected $m_bCaseInsensitive = true;
+	public function getCaseInsensitive() { return $this->m_bCaseInsensitive; }
+	public function setCaseInsensitive( $bValue ) { $this->m_bCaseInsensitive = $bValue; }
+	
 	//********************************************************************************
 	//*  Event Handlers
 	//********************************************************************************
@@ -45,41 +53,6 @@ class CPSDeltaChangeBehavior extends CActiveRecordBehavior
 		return parent::afterFind( $oEvent );
 	}
 	
-	//********************************************************************************
-	//* Public Methods
-	//********************************************************************************
-	
-	/**
-	* Override of CModel::setAttributes
-	* Populates member variables as well.
-	* 
-	* @param array $arValues
-	* @param string $sScenario
-	*/
-	public function setAttributes( $arValues = array(), $sScenario = '' )
-	{
-		if ( '' === $sScenario ) $sScenario = $this->owner->getScenario();
-		
-		if ( is_array( $arValues ) )
-		{
-			$_arAttributes = array_flip( $this->owner->getSafeAttributeNames( $sScenario ) );
-			
-			foreach ( $arValues as $_sKey => $_oValue )
-			{
-				$_bIsAttribute = isset( $_arAttributes[ $_sKey ] );
-				
-				if ( $_bIsAttribute || $this->owner->hasProperty( $_sKey ) )
-				{
-					//	Mark it changed...
-					if ( $_bIsAttribute && ( $_oOldVal = $this->owner->getAttribute( $sAttribute ) ) != $_oValue )
-						$this->m_arLastAttributes[ $sAttribute ] = $_oOldVal;
-				
-					$this->owner->{$_sKey} = $_oValue;
-				}
-			}
-		}
-	}
-
 	/**
 	* Hijack the method to track changes
 	* 
@@ -151,27 +124,26 @@ class CPSDeltaChangeBehavior extends CActiveRecordBehavior
 	protected function checkAttributeChange( $sAttribute, $bReturnChanges = false )
 	{
 		$_arOut = array();
+		$_bChanged = false;
 		$_arSchema = $this->owner->getSchema();
 
 		$_oNewValue = PS::nvl( $this->owner->getAttribute( $sAttribute ), 'NULL' );
 		$_oOldValue = PS::nvl( $this->getLastAttribute( $sAttribute ), 'NULL' );
 
-		$_bChanged = ( $_oOldValue != $_oNewValue );
-		
 		//	Make dates look the same for string comparison
 		if ( isset( $_arSchema[ $sAttribute ] ) && ( $_arSchema[ $sAttribute ]->dbType == 'date' || $_arSchema[ $sAttribute ]->dbType == 'datetime' ) )
 		{
 			$_oOldValue = date( 'Y-m-d H:i:s', strtotime( $_oOldValue ) );
 			$_oNewValue = date( 'Y-m-d H:i:s', strtotime( $_oNewValue ) );
 			$_bChanged = ( $_oOldValue != $_oNewValue );
-			
+
 			Yii::trace( 'Date Compare: (' . $_oOldValue . ' -> ' . $_oNewValue . ')', __METHOD__ );
 		}
+		else
+			$_bChanged = ( $this->m_bCaseInsensitive ) ? ( 0 != strcasecmp( $_oOldValue, $_oNewValue ) ) : ( 0 != strcmp( $_sOldValue, $_sNewValue ) );
 
 		//	Return the change...
-		if ( $_bChanged )
-			$_arOut[ $sAttribute ] = $bReturnChanges ? array( $_oOldValue, $_oNewValue ) : $_oOldValue;
-	
+		if ( $_bChanged ) $_arOut[ $sAttribute ] = $bReturnChanges ? array( $_oOldValue, $_oNewValue ) : $_oOldValue;
 		return empty( $_arOut ) ? null : $_arOut;
 	}
 	

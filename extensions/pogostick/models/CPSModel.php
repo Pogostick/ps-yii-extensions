@@ -25,12 +25,11 @@ class CPSModel extends CActiveRecord
 	//********************************************************************************
 
 	/**
-	* Our schema
-	* 
+	* Our schema, cached for speed
 	* @var array
 	*/
 	protected $m_arSchema;
-	public function getSchema() { return $this->m_arSchema; }
+	public function getSchema() { return $this->m_arSchema ? $this->m_arSchema : $this->m_arSchema = $this->getMetaData()->columns; }
 		
 	/**
 	 * The associated database table name prefix
@@ -165,6 +164,35 @@ class CPSModel extends CActiveRecord
 		return $_sOut;
 	}
 	
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
+	
+	/**
+	* Override of CModel::setAttributes
+	* Populates member variables as well.
+	* 
+	* @param array $arValues
+	* @param string $sScenario
+	*/
+	public function setAttributes( $arValues = array(), $sScenario = '' )
+	{
+		if ( '' === $sScenario ) $sScenario = $this->owner->getScenario();
+		
+		if ( is_array( $arValues ) )
+		{
+			$_arAttributes = array_flip( $this->owner->getSafeAttributeNames( $sScenario ) );
+			
+			foreach ( $arValues as $_sKey => $_oValue )
+			{
+				$_bIsAttribute = isset( $_arAttributes[ $_sKey ] );
+
+				if ( $_bIsAttribute || ( $this->hasProperty( $_sKey ) && $this->canSetProperty( $_sKey ) ) )
+					$this->setAttribute( $_sKey, $_oValue );
+			}
+		}
+	}
+
 	//********************************************************************************
 	//* Event Handlers
 	//********************************************************************************

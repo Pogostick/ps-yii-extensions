@@ -107,7 +107,7 @@ class CPSTimeStampBehavior extends CActiveRecordBehavior
     */
     public function showDates()
     {
-    	if ( ! $this->owner->isNewRecord ) return PS::showDates( $this->owner, $this->m_sCreatedColumn, $this->m_sLModColumn, 'F M j, Y' );
+    	if ( ! $this->owner->isNewRecord ) return PS::showDates( $this->owner, $this->m_sCreatedColumn, $this->m_sLModColumn, 'D M j, Y' );
 	}
 	
  	/**
