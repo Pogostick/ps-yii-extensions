@@ -177,11 +177,11 @@ class CPSModel extends CActiveRecord
 	*/
 	public function setAttributes( $arValues = array(), $sScenario = '' )
 	{
-		if ( '' === $sScenario ) $sScenario = $this->owner->getScenario();
+		if ( '' === $sScenario ) $sScenario = $this->getScenario();
 		
 		if ( is_array( $arValues ) )
 		{
-			$_arAttributes = array_flip( $this->owner->getSafeAttributeNames( $sScenario ) );
+			$_arAttributes = array_flip( $this->getSafeAttributeNames( $sScenario ) );
 			
 			foreach ( $arValues as $_sKey => $_oValue )
 			{

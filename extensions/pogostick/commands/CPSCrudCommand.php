@@ -183,7 +183,7 @@ class CPSCrudCommand extends CPSControllerCommand
 				
 				return $this->renderFile( $sSource,
 					array(
-						'ID' => PS::nvl( $table->primaryKey, '' ),
+						'ID' => PS::nvl( $_oTable->primaryKey, '' ),
 						'modelClass' => $_sModelClass,
 						'columns' => $_arColumns
 					),
