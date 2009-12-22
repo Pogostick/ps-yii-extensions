@@ -14,6 +14,9 @@
  */
 /**
  * Provides reference between saves for changed columns
+ * 
+ * @property array $lastAttributes The attributes when the model was fresh
+ * @property boolean $caseInsensitive Changes are compared in a case-insensitive manner if true. Defaults to true.
  */
 class CPSDeltaChangeBehavior extends CActiveRecordBehavior
 {
@@ -37,55 +40,78 @@ class CPSDeltaChangeBehavior extends CActiveRecordBehavior
 	public function getCaseInsensitive() { return $this->m_bCaseInsensitive; }
 	public function setCaseInsensitive( $bValue ) { $this->m_bCaseInsensitive = $bValue; }
 	
+	/**
+	* Caches change state.
+	* @var boolean
+	*/
+	protected $m_bIsDirty = false;
+	
 	//********************************************************************************
 	//*  Event Handlers
 	//********************************************************************************
 	
 	/**
 	* After a row is pulled from the database...
+	* @param CEvent $oEvent
 	*/
 	public function afterFind( CEvent $oEvent )
 	{
 		//	Get fresh values
 		$this->m_arLastAttributes = $oEvent->sender->getAttributes();
+		$this->m_bIsDirty = false;
 		
 		//	Let parents have a go...
 		return parent::afterFind( $oEvent );
 	}
+
+	/**
+	* After a row is saved to the database...
+	* @param CEvent $oEvent
+	*/
+	public function afterSave( CEvent $oEvent )
+	{
+		//	Get fresh values
+		$this->m_arLastAttributes = $oEvent->sender->getAttributes();
+		$this->m_bIsDirty = false;
+
+		//	Let parents have a go...
+		return parent::afterFind( $oEvent );
+	}
+
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
 	
 	/**
-	* Hijack the method to track changes
-	* 
-	* @param string $sAttribute
-	* @param mixed $oValue
-	* @return boolean
+	* Reverts a model back to its state before changes were made.
+	* @returns boolean True if reverted.
 	*/
-	public function setAttribute( $sAttribute, $oValue )
+	public function revert()
 	{
-		//	Set old value before we change...
-		$this->m_arLastAttributes[ $sAttribute ] = $this->owner->getAttribute( $sAttribute );
-		
-		//	Set it and forget it!
-		$this->owner->setAttribute( $sAttribute, $oValue );
+		$this->owner->setAttributes( $this->m_arLastAttributes );
 	}
-	
+
 	/**
 	* Returns an array of changed attributes since last save.
 	* @returns array The changed set of attributes or an empty array.
+	* @see didChange
 	*/
 	public function getChangedSet( $arAttributes = array(), $bReturnChanges = false )
 	{
 		$_arOut = array();
-		
-		foreach ( $this->m_arLastAttributes as $_sKey => $_sValue )
-		{
-			//	Only return asked for attributes
-			if ( ! empty( $arAttributes ) && ! in_array( $_sKey, $arAttributes ) )
-				continue;
-				
-			//	This value changed...
-			if ( $_arTemp = $this->checkAttributeChange( $_sKey, $bReturnChanges ) )
-				$_arOut = array_merge( $_arOut, $_arTemp );
+
+		if ( $this->m_bIsDirty )
+		{		
+			foreach ( $this->m_arLastAttributes as $_sKey => $_sValue )
+			{
+				//	Only return asked for attributes
+				if ( ! empty( $arAttributes ) && ! in_array( $_sKey, $arAttributes ) )
+					continue;
+					
+				//	This value changed...
+				if ( $_arTemp = $this->checkAttributeChange( $_sKey, $bReturnChanges ) )
+					$_arOut = array_merge( $_arOut, $_arTemp );
+			}
 		}
 	
 		return $_arOut;
@@ -96,19 +122,27 @@ class CPSDeltaChangeBehavior extends CActiveRecordBehavior
 	* 
 	* @param string|array $oAttributes You may pass in a single attribute or an array of attributes to check
 	* @returns boolean
+	* @see getChangedSet
 	*/
 	public function didChange( $oAttributes )
 	{
-		$_arCheck = $oAttributes;
-		if ( ! is_array( $_arCheck ) ) $_arCheck = array( $_arCheck );
-
-		foreach ( $_arCheck as $_sKey )
+		if ( ! $this->m_bIsDirty )
 		{
-			if ( $this->checkAttributeChange( $_sKey ) )
-				return true;
+			$_arCheck = $oAttributes;
+			if ( ! is_array( $_arCheck ) ) $_arCheck = array( $_arCheck );
+
+			foreach ( $_arCheck as $_sKey )
+			{
+				if ( $this->checkAttributeChange( $_sKey ) )
+				{
+					$this->m_bIsDirty = true;
+					break;
+				}
+			}
 		}
 			
-		return false;
+		//	Return
+		return $this->m_bIsDirty;
 	}
 
 	//********************************************************************************
@@ -121,30 +155,37 @@ class CPSDeltaChangeBehavior extends CActiveRecordBehavior
 	* @param string $sAttribute
 	* @returns array
 	*/
-	protected function checkAttributeChange( $sAttribute, $bReturnChanges = false )
+	protected function checkAttributeChange( $sAttribute, $bReturnChanges = false, $bQuickCheck = false )
 	{
 		$_arOut = array();
 		$_bChanged = false;
-		$_arSchema = $this->owner->getSchema();
+		$_arSchema = ( $this->owner instanceof CPSModel ) ? $this->owner->getSchema() : $this->owner->getMetaData()->columns;
 
+		//	Get old and new values
 		$_oNewValue = PS::nvl( $this->owner->getAttribute( $sAttribute ), 'NULL' );
 		$_oOldValue = PS::nvl( $this->getLastAttribute( $sAttribute ), 'NULL' );
 
 		//	Make dates look the same for string comparison
 		if ( isset( $_arSchema[ $sAttribute ] ) && ( $_arSchema[ $sAttribute ]->dbType == 'date' || $_arSchema[ $sAttribute ]->dbType == 'datetime' ) )
-		{
-			$_oOldValue = date( 'Y-m-d H:i:s', strtotime( $_oOldValue ) );
-			$_oNewValue = date( 'Y-m-d H:i:s', strtotime( $_oNewValue ) );
-			$_bChanged = ( $_oOldValue != $_oNewValue );
-
-			Yii::trace( 'Date Compare: (' . $_oOldValue . ' -> ' . $_oNewValue . ')', __METHOD__ );
-		}
+			$_bChanged = ( strtotime( $_oOldValue ) != strtotime( $_oNewValue ) );
 		else
 			$_bChanged = ( $this->m_bCaseInsensitive ) ? ( 0 != strcasecmp( $_oOldValue, $_oNewValue ) ) : ( 0 != strcmp( $_sOldValue, $_sNewValue ) );
 
-		//	Return the change...
-		if ( $_bChanged ) $_arOut[ $sAttribute ] = $bReturnChanges ? array( $_oOldValue, $_oNewValue ) : $_oOldValue;
-		return empty( $_arOut ) ? null : $_arOut;
+		//	Record the change...
+		if ( $_bChanged ) 
+		{
+			//	Set our global dirty flag
+			if ( ! $this->m_bIsDirty ) $this->m_bIsDirty = true;
+			
+			//	Just wanna know?
+			if ( $bQuickCheck ) return true;
+				
+			//	Store info
+			$_arOut[ $sAttribute ] = $bReturnChanges ? array( $_oOldValue, $_oNewValue ) : $_oOldValue;
+		}
+		
+		//	Return
+		return empty( $_arOut ) ? ( $bQuickCheck ? false : null ) : $_arOut;
 	}
 	
-}                       
+}

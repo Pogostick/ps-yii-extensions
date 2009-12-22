@@ -99,6 +99,11 @@ class CPSModel extends CActiveRecord
 				'psDataFormat' => array(
 					'class' => 'pogostick.behaviors.CPSDataFormatBehavior',
 				),
+				
+				//	Utilities
+				'psUtility' => array(
+					'class' => 'pogostick.behaviors.CPSUtilityBehavior',
+				),
 			)
 		);
 	}
@@ -191,6 +196,18 @@ class CPSModel extends CActiveRecord
 					$this->setAttribute( $_sKey, $_oValue );
 			}
 		}
+	}
+
+	/**
+	 * PHP sleep magic method.
+	 * Take opportunity to flush schema cache...
+	 * @returns array
+	 */
+	public function __sleep()
+	{
+		//	Clean up and phone home...
+		$this->m_arSchema = null;
+		return parent::__sleep();
 	}
 
 	//********************************************************************************

@@ -14,6 +14,8 @@
  */
 /**
  * Provides soft-deleting of records
+ * @property string $softDeleteColumn The attribute which indicates a soft-delete
+ * @property array $softDeleteValue Two item array containing the [false,true] values for soft-deletion. Defaults to array(0,1) ('false' and 'true' respectively).
  */
 class CPSSoftDeleteBehavior extends CActiveRecordBehavior
 {
@@ -23,20 +25,42 @@ class CPSSoftDeleteBehavior extends CActiveRecordBehavior
 
 	/**
 	* If defined, all deletes are soft
-	* 
 	* @var string
 	*/
 	protected $m_sSoftDeleteColumn = null;
-	public function getSoftDeleteColumn() { return $this->m_sSoftDeleteColumn; }
-	public function setSoftDeleteColumn( $sValue ) { $this->m_sSoftDeleteColumn = $sValue; }	
 	
 	/**
-	* Soft delete indicator (false,true)
-	* 
+	* Soft delete indicator [false,true]
 	* @var array
 	*/
 	protected $m_arSoftDeleteValue = array( 0, 1 );
+
+	//********************************************************************************
+	//* Properties
+	//********************************************************************************
+	
+	/**
+	* Returns the soft-delete column for this model
+	* @returns string
+	*/
+	public function getSoftDeleteColumn() { return $this->m_sSoftDeleteColumn; }
+	
+	/**
+	* Sets the soft-delete column for this model
+	* @var string
+	*/
+	public function setSoftDeleteColumn( $sValue ) { $this->m_sSoftDeleteColumn = $sValue; }	
+
+	/**
+	* Returns the soft-delete values for this model [false,true]
+	* @returns array
+	*/
 	public function getSoftDeleteValue() { return $this->m_arSoftDeleteValue; }
+	
+	/**
+	* Sets the soft-delete values for this model
+	* @var array $arValue The true/false values for soft-deletion.
+	*/
 	public function setSoftDeleteValue( $arValue ) { $this->m_arSoftDeleteValue = $arValue; }	
 	
 	//********************************************************************************
@@ -50,19 +74,44 @@ class CPSSoftDeleteBehavior extends CActiveRecordBehavior
 	*/
 	public function beforeDelete( CEvent $oEvent )
 	{
-		//	Can we?
+		//	Pass it on...
 		parent::beforeDelete( $oEvent );
 		
+		//	We want to be the top of the chain...
 		if ( $this->m_sSoftDeleteColumn && $oEvent->isValid && ! $oEvent->handled )
 		{
 			//	Perform a soft delete if this model allows
-			if ( $this->hasAttribute( $this->m_sSoftDeleteColumn ) )
+			if ( $oEvent->sender->hasAttribute( $this->m_sSoftDeleteColumn ) )
 			{
-				$this->setAttribute( $this->m_sSoftDeleteColumn, $this->m_arSoftDeleteValue[ 1 ] );
-				$oEvent->handled = $this->update();
+				$oEvent->isValid = false;
+				$oEvent->handled = true;
+				$oEvent->sender->setAttribute( $this->m_sSoftDeleteColumn, $this->m_arSoftDeleteValue[ 1 ] );
+				if ( ! $oEvent->sender->save() )
+					throw new CDbException( 'Error saving soft delete row.' );
 			}
 		}
 	}
+	
+	/**
+	* Insert our soft-delete criteria
+	* @param CEvent $oEvent
+	*/
+	public function beforeFind( CEvent $oEvent )
+	{
+		if ( $this->m_sSoftDeleteColumn && $this->owner->hasAttribute( $this->m_sSoftDeleteColumn ) ) 
+		{
+			//	Merge in the soft delete indicator
+			$oEvent->sender->getDbCriteria()->mergeWith(
+				array( 
+					'condition' => $this->m_sSoftDeleteColumn . ' = :softDeleteValue', 
+					'params' => array( ':softDeleteValue' => $this->m_arSoftDeleteValue[ 0 ] ),
+				)
+			);
+		}
+
+		//	Pass it on...
+    	return parent::beforeFind( $oEvent );
+    }
 	
 	//********************************************************************************
 	//* Public Methods
@@ -81,7 +130,7 @@ class CPSSoftDeleteBehavior extends CActiveRecordBehavior
 			if ( $this->hasAttribute( $this->m_sSoftDeleteColumn ) )
 			{
 				$this->setAttribute( $this->m_sSoftDeleteColumn, $this->m_arSoftDeleteValue[ 0 ] );
-				return $this->update();
+				return $this->save();
 			}
 		}
 		
@@ -89,16 +138,4 @@ class CPSSoftDeleteBehavior extends CActiveRecordBehavior
 		return false;
 	}
 	
-	/**
-	* Make "active" the default scope...
-	* @returns array
-	*/
-    public function defaultScope()
-    {
-		if ( $this->m_sSoftDeleteColumn && $this->owner->hasAttribute( $this->m_sSoftDeleteColumn ) ) 
-			return array( 'condition' => $this->m_sSoftDeleteColumn . ' = :softDeleteValue', 'params' => array( ':softDeleteValue' => $this->m_arSoftDeleteValue[ 0 ] ) );
-			
-    	return array();
-    }
- 
 }

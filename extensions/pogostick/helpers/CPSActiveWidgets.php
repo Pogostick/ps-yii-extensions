@@ -27,7 +27,6 @@ class CPSActiveWidgets extends CHtml
 	/**
 	* These are a list of form elements that can be used along with the methods in this class.
 	*/
-	const TEXT_DISPLAY = 'inactiveTextDisplay';
 	const TEXTAREA = 'activeTextArea';
 	const TEXT = 'activeTextField';
 	const HIDDEN = 'activeHiddenField';
@@ -46,6 +45,12 @@ class CPSActiveWidgets extends CHtml
 	const JQUI = 'CPSjqUIWrapper';
 	const FG_MENU = 'CPSfgMenu';
 
+	/**
+	* Faux methods for tranformation types
+	*/
+	const CODE_DISPLAY = 'inactiveCodeDisplay';		//	Not a real method, just a placeholder
+	const TEXT_DISPLAY = 'inactiveTextDisplay';		//	Not a real method, just a placeholder
+	
 	//	Types of drop downs...
 	const	DD_GENERIC = -1;
 	const	DD_US_STATES = 0;
@@ -265,12 +270,19 @@ class CPSActiveWidgets extends CHtml
 			$arHtmlOptions['class'] = trim( $_sClass );
 		}
 		
+		//	Get our value...
+		if ( $sColName != ( $_sCleanCol = CPSTransform::cleanColumn( $sColName ) ) )
+		{
+			//	Use our handy transformer...
+			$sColName = $_sCleanCol;
+			$_oValue = CPSTransform::getValue( $oModel, $sColName );
+		}
+		else
+			$_oValue = PS::o( $arHtmlOptions, 'value', $oModel->{$sColName}, true );
+
 		//	Non-model field?
 		if ( null === $oModel )
 		{
-			//	Previously selected value?
-			$_oValue = PS::o( $arHtmlOptions, 'value', null, true );
-			
 			//	Handle special types...
 			switch ( $eFieldType )
 			{
@@ -395,8 +407,8 @@ class CPSActiveWidgets extends CHtml
 	/**
 	* Create a drop downlist filled with codes give a code type.
 	* 
+	* @param CModel $oModel
 	* @param string $sAttribute
-	* @param string $sCodeType
 	* @param array $arHtmlOptions
 	* @param integer $iDefaultUID
 	* @return string
@@ -409,7 +421,7 @@ class CPSActiveWidgets extends CHtml
 			
 			if ( $_oCodeModel instanceof CPSCodeTableModel )
 			{
-				$_sValType = PS::o( $arHtmlOptions, 'codeType', null, true );
+				$_sValType = PS::o( $arHtmlOptions, 'codeType', $sAttribute, true );
 				$_sValAbbr = PS::o( $arHtmlOptions, 'codeAbbr', null, true );
 				if ( ! $_sValAbbr ) $_sValAbbr = PS::o( $arHtmlOptions, 'codeAbbreviation', null, true );
 				$_sValId = PS::o( $arHtmlOptions, 'codeId', null, true );

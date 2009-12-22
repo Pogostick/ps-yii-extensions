@@ -146,6 +146,10 @@ class CPSjQueryWidget extends CPSWidget
 	*/
 	protected function generateJavascript( $sTargetSelector = null, $arOptions = null, $sInsertBeforeOptions = null )
 	{
+		//	Fix up the button image if wanted
+		if ( $this->widgetName == 'datepicker' && $this->hasOption( 'buttonImage' ) && $this->buttonImage === true )
+			$this->buttonImage = $this->getExternalLibraryUrl() . '/jqui/js/images/calendar.gif';
+			
 		//	Get the options...		
 		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
 		$_sId = $this->getTargetSelector( $sTargetSelector );

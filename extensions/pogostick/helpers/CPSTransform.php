@@ -39,6 +39,7 @@ class CPSTransform extends CPSHelperBase
 		'.' => 'numberTransform',
 		'$' => 'currencyTransform',
 		',' => 'integerTransform',
+		'*' => 'codeLookup',
 	);
 
 	//********************************************************************************
@@ -57,7 +58,7 @@ class CPSTransform extends CPSHelperBase
 		{
 			if ( $sType == $_sChar )
 			{
-				list( $_sColumn, $oValue, $_bLink ) = self::$_sMethod( $_sColumn, $oValue );
+				list( $oValue, $_bLink ) = self::$_sMethod( $_sColumn, $oValue );
 				break;
 			}
 		}
@@ -107,7 +108,7 @@ class CPSTransform extends CPSHelperBase
 		foreach ( $arColumns as $_sKey => $_oColumn )
 		{
 			$_bLink = false;
-			$_sNullDisplay = $_sDisplayFormat = $_arValueMap = $_oValue = null;
+			$_bCodeValue = $_sNullDisplay = $_sDisplayFormat = $_arValueMap = $_oValue = null;
 			$_sColumn = $_oColumn;
 			
 			//	Any column options?
@@ -122,6 +123,7 @@ class CPSTransform extends CPSHelperBase
 					$_arValueMap = PS::o( $_arColOpts, 'valueMap', array(), true );
 					$_sDisplayFormat = PS::o( $_arColOpts, 'displayFormat', null, true );
 					$_sNullDisplay = PS::o( $_arColOpts, 'nullDisplay', null, true );
+					$_bCodeValue = PS::o( $_arColOpts, 'codeValue', null, true );
 					
 					//	Anything remaining gets rolled into wrap options
 					$arWrapOptions = CPSHelp::smart_array_merge( $_arColOpts, $arWrapOptions );
@@ -133,7 +135,8 @@ class CPSTransform extends CPSHelperBase
 			{
 				$_sRealCol = self::cleanColumn( $_sColumn );
 				$_sMethod = self::$m_arTransform[ $_sColumn[0] ];
-				list( $_oValue, $_bLink, $_arWrapOpts ) = self::$_sMethod( $_sColumn[0], self::getValue( $oModel, $_bIsModel ? $_sRealCol : $_sColumn ), $_sDisplayFormat );
+				$_oValue = self::getValue( $oModel, $_bIsModel ? $_sRealCol : $_sColumn );
+				list( $_oValue, $_bLink, $_arWrapOpts ) = self::$_sMethod( $_sColumn[0], $_oValue, $_sDisplayFormat );
 				$arWrapOptions = CPSHelp::smart_array_merge( $arWrapOptions, $_arWrapOpts );
 			}
 			else
@@ -203,6 +206,14 @@ class CPSTransform extends CPSHelperBase
 	protected static function styleTransform( $sHow, $oValue )
 	{	
 		return self::alignTransform( $sHow, $oValue );
+	}
+	
+	protected static function codeLookup( $sHow, $oValue )
+	{
+		if ( $_sCodeModel = PS::getCodeModel() )
+			$oValue = $_sCodeModel::getCodeDescription( $oValue );
+
+		return array( $oValue, false, array() );
 	}
 	
 	protected static function alignTransform( $sHow, $oValue )

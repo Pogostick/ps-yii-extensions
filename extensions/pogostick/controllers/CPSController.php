@@ -247,7 +247,7 @@ abstract class CPSController extends CController
 	{
 		if ( null === $this->m_oModel )
 		{
-			$_iId = CPSHelp::getOption( $_GET, 'id', $iId );
+			$_iId = PS::o( $_GET, 'id', $iId );
 			$this->m_oModel = $this->load( $_iId );
 
 			//	No data? bug out
@@ -358,6 +358,21 @@ abstract class CPSController extends CController
 		}
 		
 		return false;
+	}
+	
+	/***
+	* Just like saveModel, but doesn't commit, and never redirects.
+	* 
+	* @param CPSModel $oModel
+	* @param array $arData
+	* @param boolean $bAttributesSet
+	* @param string $sSuccessMessage
+	* @return boolean
+	* @see saveModel
+	*/
+	protected function saveTransactionModel( &$oModel, $arData = array(), $bAttributesSet = false, $sSuccessMessage = null )
+	{
+		return $this->saveModel( $oModel, $arData, false, $bAttributesSet, null, $sSuccessMessage, true );
 	}
 	
 	/**

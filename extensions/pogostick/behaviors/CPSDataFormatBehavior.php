@@ -14,6 +14,7 @@
  */
 /**
  * If attached to a model, fields are formatted per your configuration.
+ * @property CPSSort $defaultSort The default sort for a model.
  */
 class CPSDataFormatBehavior extends CActiveRecordBehavior
 {
@@ -49,20 +50,81 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior
 	);
 	public function getFormat( $sWhich = 'afterFind', $sType = 'date' ) { return PS::nvl( $this->m_arFormat[ $sWhich ][ $sType ], 'm/d/Y' ); }
 	public function setFormat( $sWhich = 'afterValidate', $sType = 'date', $sFormat = 'm/d/Y' ) { $this->m_arFormat[ $sWhich ][ $sType ] = $sFormat; }
+	
+	/**
+	* Default sort
+	* @var string
+	* @see getDefaultSort
+	* @see setDefaultSort
+	*/
+	protected $m_sDefaultSort;
+	/**
+	* Returns the default sort
+	* @returns string
+	* @see setDefaultSort
+	*/
+	public function getDefaultSort() { return $this->m_sDefaultSort; }
+	/**
+	* Sets the default sort
+	* @param string $sValue
+	* @see getDefaultSort
+	*/
+	public function setDefaultSort( $sValue ) { $this->m_sDefaultSort = $sValue; }
 
 	//********************************************************************************
-	//* Public Methods
+	//* Event Handlers
 	//********************************************************************************
 	
 	/**
 	* Apply any formats
-	* 
+	* @param CModelEvent $oEvent
+	*/
+	public function beforeValidate( CModelEvent $oEvent ) 
+	{ 
+		return $this->handleEvent( __FUNCTION__, $oEvent ); 
+	}
+	
+	/**
+	* Apply any formats
 	* @param CEvent $oEvent
 	*/
-	public function beforeValidate( $oEvent ) { return $this->handleEvent( __FUNCTION__, $oEvent ); }
-	public function afterValidate( $oEvent ) { return $this->handleEvent( __FUNCTION__, $oEvent ); }
-	public function beforeFind( $oEvent ) { return $this->handleEvent( __FUNCTION__, $oEvent ); }
-	public function afterFind( $oEvent ) { return $this->handleEvent( __FUNCTION__, $oEvent ); }
+	public function afterValidate( CEvent $oEvent ) 
+	{ 
+		return $this->handleEvent( __FUNCTION__, $oEvent ); 
+	}
+	
+	/**
+	* Apply any formats
+	* @param CEvent $oEvent
+	*/
+	public function beforeFind( CEvent $oEvent ) 
+	{ 
+		//	Is a default sort defined?
+		if ( $this->m_sDefaultSort )
+		{
+			//	Is a sort defined?
+			$_oCrit = $oEvent->sender->getDbCriteria();
+			
+			//	No sort? Set the default
+			if ( null === $_oCrit->sort )
+				$oEvent->sender->getDbCriteria()->mergeWith( new CDbCriteria( array( 'order' => $this->m_sDefaultSort ) ) );
+		}
+		
+		return $this->handleEvent( __FUNCTION__, $oEvent ); 
+	}
+	
+	/**
+	* Apply any formats
+	* @param CEvent $oEvent
+	*/
+	public function afterFind( CEvent $oEvent ) 
+	{ 
+		return $this->handleEvent( __FUNCTION__, $oEvent ); 
+	}
+	
+	//********************************************************************************
+	//* Protected Methods
+	//********************************************************************************
 	
 	/**
 	* Applies the requested format to the value and returns it.

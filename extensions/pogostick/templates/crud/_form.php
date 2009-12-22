@@ -20,6 +20,8 @@ echo <<<HTML
 			array( 
 				'validate' => true, 
 				'validateOptions' => array(
+					'errorClass' => 'ps-validate-error',
+					'ignoreTitle' => true,
 // @todo Place your extra validation options here...
 //					'rules' => array(
 //						'model_name[column_name] => array(

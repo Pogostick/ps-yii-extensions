@@ -412,6 +412,7 @@ span.ps-link-pager-footer {
 */
 
 div.ps-edit-container div.yiiForm {
+	color:#555;
 	margin:15px 10px 5px 0px;
 	padding-top:10px;
 	background-color:#EEFFFF;
@@ -420,7 +421,7 @@ div.ps-edit-container div.yiiForm {
 }
 
 div.ps-edit-container div.yiiForm label {
-	color: #000;
+/*	color: #000;*/
 }
 
 div.ps-edit-container div.yiiForm.ps-wide-form {
@@ -498,7 +499,6 @@ div.ps-edit-container div.yiiForm div.simple label,
 div.ps-edit-container div.yiiForm div.complex span
 {
 	width: 170px;
-	color:#555;
 	font-weight: bold;	
 }
 
@@ -524,11 +524,27 @@ div.ps-edit-container div.yiiForm div.selectList label.cbList {
 	vertical-align:middle;
 }
 
+/**
+* DATEPICKER styling
+*/
+
+div.ps-edit-container div.yiiForm img.ui-datepicker-trigger {
+	padding:0px 0px 2px 5px;
+	margin:0px auto;
+	vertical-align: middle;
+}
+
+/**
+* ERROR STYLES
+*/
+
+/**
+* These style the labels *BEFORE* the form field
+*/
 div.ps-edit-container div.yiiForm div.simple label.error { 
 	color: red; 
 	margin-left:0px;
 	display:inline-block;
-	width:100%;
 }
 
 div.ps-edit-container div.yiiForm label.error { 
@@ -536,7 +552,19 @@ div.ps-edit-container div.yiiForm label.error {
 	color: red; 
 	padding-left:0; 
 	vertical-align: top;
-	text-align:left;
+}
+
+/**
+* This styles the label that is inserted *UNDERNEATH* the form field
+*/
+div.ps-edit-container div.yiiForm label.ps-validate-error { 
+	color: red;
+	margin-left:175px;
+	display:inline-block;
+	text-align: left;
+	width: 100% !important;
+	vertical-align: top;
+	font-size:90%;
 }
 
 div.ps-edit-container div.yiiForm div.simple select.error,
@@ -559,8 +587,13 @@ div.ps-edit-container div.yiiForm :disabled {
 }
 
 /**
-* Miscellaneous field widths
+* WIDTH STYLES
 */
+
+div.ps-edit-container div.yiiForm input[type="text"].hasDatepicker {
+	width: 175px !important;
+}
+
 div.ps-edit-container div.yiiForm input[type="text"].date {
 	width: 70px;
 }

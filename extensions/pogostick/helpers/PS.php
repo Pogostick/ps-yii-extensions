@@ -37,6 +37,14 @@ class PS extends CPSActiveWidgets
 	*/
 	public static function field( $eFieldType, $oModel, $sColName, $arOptions = array() )
 	{
+		//	A little switcheroo...
+		if ( $eFieldType == PS::CODE_DISPLAY )
+		{
+			$eFieldType = PS::TEXT_DISPLAY;
+			$arOptions['transform'] = '*';
+			echo PS::field( PS::HIDDEN, $oModel, $sColName );
+		}
+
 		$_sLabel = CPSHelp::getOption( $arOptions, 'label', null, true );
 		$_arLabelOptions = CPSHelp::getOption( $arOptions, 'labelOptions', array(), true );
 		$_arWidgetOptions = CPSHelp::getOption( $arOptions, 'widgetOptions', array(), true );
@@ -69,6 +77,25 @@ class PS extends CPSActiveWidgets
 	public static function dateDiff( $dtStart, $dtEnd )
 	{
 		return CPSHelp::dateDiff( $dtStart, $dtEnd );
+	}
+	
+	/**
+	* Returns an array suitable as list data from an array of models
+	* 
+	* @param array $arData
+	* @param string $sValueColumn
+	* @param string $sDisplayColumn
+	* @returns array
+	* @static
+	*/
+	public static function asListData( $arData, $sValueColumn, $sDisplayColumn )
+	{
+		$_arOut = array();
+		
+		foreach ( $arData as $_oRow )
+			$_arOut[ $_oRow->getAttribute( $sValueColumn ) ] = $_oRow->getAttribute( $sDisplayColumn );
+			
+		return $_arOut;
 	}
 	
 }
