@@ -1,35 +1,26 @@
 <?php
-/**
- * CPSRESTController class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage Controllers
- * @since v1.0.6
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
-
- /**
+ 
+/**
  * CPSRESTController provides REST functionality
- *
- * @package psYiiExtensions
- * @subpackage Controllers
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	controllers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ * 
+ * @filesource
  */
 class CPSRESTController extends CPSController
 {
-	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Member Variables
-	//********************************************************************************
-	
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -60,6 +51,7 @@ class CPSRESTController extends CPSController
 	 * Creates the action instance based on the action name.
 	 * The action can be either an inline action or an object.
 	 * The latter is created by looking up the action map specified in {@link actions}.
+	 * 
 	 * @param string ID of the action. If empty, the {@link defaultAction default action} will be used.
 	 * @return CAction the action instance, null if the action does not exist.
 	 * @see actions
@@ -68,7 +60,7 @@ class CPSRESTController extends CPSController
 	{
 		$_sActionId = ( $sActionId === '' ) ? $this->defaultAction : $sActionId;
 		$_sMethod = 'request' . $_sActionId;
-		
+
 		//	Is it a valid request?
 		if ( method_exists( $this, 'get' . $_sActionId ) )
 			$_sMethod = 'get' . $_sActionId;
@@ -87,6 +79,7 @@ class CPSRESTController extends CPSController
 	/**
 	 * Runs the named REST action.
 	 * Filters specified via {@link filters()} will be applied.
+	 * 
 	 * @param string $sActionId Action id
 	 * @throws CHttpException if the action does not exist or the action name is not proper.
 	 * @see filters

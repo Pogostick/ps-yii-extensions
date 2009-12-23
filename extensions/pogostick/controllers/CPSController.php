@@ -1,36 +1,25 @@
 <?php
-/**
- * CPSController class file.
- *
- * @filesource
- * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage Controllers
- * @since v1.0.4
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
- */
- /**
- * CPSController provides filtered access to resources
- *
- * @package psYiiExtensions
- * @subpackage Controllers
+/*
+ * This file is part of the psYiiExtensions package.
  * 
- * @property string $pageHeading
- * @property string $methodPrefix The prefix for action methods. Defaults to 'action'
- * @property string $modelName The current model name
- * @property CPSModel $model The current model
- * @property array $currentSearchCriteria Stores search criteria from last search
- * @property boolean $autoLayout If true, uses a layout with the id of this controller
- * @property boolean $autoMissing If true, searches for a view that matches the name of the action
- * @property array $commandMap The command mapping for admin commands
- * @property array $userActionList The actions for this controller
- * @property-read boolean $isPostRequest True if the current request is a POST
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
-abstract class CPSController extends CController
+
+/**
+ * CPSController provides filtered access to resources
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	controllers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.4
+ * 
+ * @filesource
+ */
+abstract class CPSController extends CController implements IPogostick
 {
 	//********************************************************************************
 	//* Constants
@@ -273,32 +262,6 @@ abstract class CPSController extends CController
 	}
 
 	/**
-	* If value is !set||empty, last passed in argument is returned
-	* 
-	* Allows for multiple nvl chains ( nvl(x,y,z,null) ). Copied from CPSHelp::nvl()
-	* for ease of use.
-	* 
-	* @param mixed 
-	* @see CPSHelp::nvl
-	*/
-	public function nvl()
-	{
-		$_oDefault = null;
-		$_iArgs = func_num_args();
-		$_arArgs = func_get_args();
-		
-		for ( $_i = 0; $_i < $_iArgs; $_i++ )
-		{
-			if ( isset( $_arArgs[ $_i ] ) && ! empty( $_arArgs[ $_i ] ) )
-				return $_arArgs[ $_i ];
-				
-			$_oDefault = $_arArgs[ $_i ];
-		}
-
-		return $_oDefault;
-	}
-	
-	/**
 	* Our error handler...
 	* 
 	*/
@@ -317,6 +280,21 @@ abstract class CPSController extends CController
 	public function getRequest()
 	{
 		return Yii::app()->getRequest();
+	}
+	
+	/**
+	* Add our utility behaviors
+	*/
+	public function behaviors()
+	{
+		return array_merge(
+			parent::behaviors(),
+			array(
+				'psUtility' => array(
+					'class' => 'pogostick.behaviors.CPSUtilityBehavior',
+				),
+			)
+		);
 	}
 	
 	//********************************************************************************

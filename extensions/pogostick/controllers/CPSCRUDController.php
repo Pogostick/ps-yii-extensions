@@ -1,24 +1,23 @@
 <?php
-/**
- * CPSCRUDController class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage Controllers
- * @since v1.0.4
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
 
- /**
+/**
  * CPSCRUDController provides standard filtered access to CRUD resources
- *
- * @package psYiiExtensions
- * @subpackage Controllers
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	controllers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.4
+ * 
+ * @filesource
  */
 abstract class CPSCRUDController extends CPSController
 {
