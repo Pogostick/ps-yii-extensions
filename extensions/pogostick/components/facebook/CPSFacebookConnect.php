@@ -1,22 +1,25 @@
 <?php
-/**
- * CPSFacebookConnect class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPSFacebookConnect provides an interface to {@link http://developers.facebook.com/connect.php Facebook Connect}
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN $Id$
+ * 
+ * @package 	psYiiExtensions.components
+ * @subpackage 	facebook
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.3
+ * 
  * @filesource
- * @package psYiiExtensions
- * @subpackage Components
- * @since 1.0.0
+ * 
+ * @todo Quite a bit
  */
 class CPSFacebookConnect extends CPSApiWidget
 {
@@ -30,9 +33,9 @@ class CPSFacebookConnect extends CPSApiWidget
 
 		$this->addOptions(
 			array(
-				'appId' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'callbackUrl' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'xdrUrl' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'appId' => 'string',
+				'callbackUrl' => 'string',
+				'xdrUrl' => 'string',
 			)
 		);
 	}
@@ -76,7 +79,7 @@ JSCRIPT;
 	{
 		$_oCS = parent::registerClientScripts();
 
-		$_oCS->registerScriptFile( 'http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php', CClientScript::POS_HEAD );
+		$_oCS->registerScriptFile( 'http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php', CClientScript::POS_END );
 		$_oCS->registerScript( 'Yii.' . __CLASS__ . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
 	}
 }

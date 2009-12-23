@@ -1,22 +1,24 @@
 <?php
-/**
- * CPSTwitterApi class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPSTwitterApi provides access to the {@link http://apiwiki.twitter.com Twitter API}
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @package psYiiExtensions
- * @subpackage Components
- * @since 1.0.3
- *
+ * 
+ * @package 	psYiiExtensions.components
+ * @subpackage 	twitter
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.3
+ * 
+ * @filesource
+ * 
  * @todo Implement Direct Message API
  * @todo Implement Block APIs
  * @todo Implement Trends API
@@ -72,8 +74,8 @@ class CPSTwitterApi extends CPSOAuthComponent
 		return(
 			array(
 				//	Required settings
-				'userId' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'screenName' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'userId' => 'string:',
+				'screenName' => 'string:',
 			)
 		);
 	}

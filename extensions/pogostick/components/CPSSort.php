@@ -1,17 +1,12 @@
 <?php
-/**
- * CPSSort class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage components
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * Quick little class that only overrides the label mechanism. This allows you to 
  * override the label from the original model in models that have relations.
@@ -32,6 +27,15 @@
  * 			...
  * }
  * </code>
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	components
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ * 
+ * @filesource
  */
 class CPSSort extends CSort
 {
