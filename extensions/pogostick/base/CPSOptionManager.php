@@ -466,7 +466,7 @@ class CPSOptionManager implements IPogostick
 		$_arRules[ self::META_TYPE ] = $_arPattern[ 0 ];
 		if ( isset( $_arPattern[ 1 ] ) ) $_arRules[ self::META_DEFAULTVALUE ] = ( $_arPattern[ 0 ] != 'string' ? eval( 'return ' . $_arPattern[ 1 ] . ';' ) : $_arPattern[ 1 ] );
 		if ( isset( $_arPattern[ 2 ] ) ) $_sExtName = $_arPattern[ 2 ];
-		if ( isset( $_arPattern[ 3 ] ) ) $_arRules[ self::META_REQUIRED ] = $_arPattern[ 3 ];
+		if ( isset( $_arPattern[ 3 ] ) ) $_arRules[ self::META_REQUIRED ] = ( $_arPattern[ 0 ] != 'string' ? eval( 'return ' . $_arPattern[ 3 ] . ';' ) : $_arPattern[ 3 ] );
 		if ( isset( $_arPattern[ 4 ] ) ) $_arRules[ self::META_ALLOWED ] = explode( '|', $_arPattern[ 4 ] );
 		
 		$this->setMetaDataValue( $sKey, self::META_RULES, $_arRules );

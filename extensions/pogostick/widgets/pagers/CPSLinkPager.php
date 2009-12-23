@@ -1,23 +1,32 @@
 <?php
-/**
- * CPSLinkPager class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage widgets.pagers
- * @since v1.0.5
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * Basic link pager with jQuery UI icons
+ * 
+ * @package 	psYiiExtensions.widgets
+ * @subpackage 	pagers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ * 
+ * @todo This is a work in progress
  */
-class CPSLinkPager extends CLinkPager
+class CPSLinkPager extends CLinkPager implements IPogostick
 {
+	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+	
 	/**
 	* Pager locations
 	*/

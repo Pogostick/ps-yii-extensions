@@ -1,63 +1,62 @@
 <?php
-/**
-* CPSjqUIWraqpper class file.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @link http://ps-yii-extensions.googlecode.com
-* @copyright Copyright &copy; 2009 Pogostick, LLC
-* @license http://www.gnu.org/licenses/gpl.html
-*/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
 
 /**
-* The CPSjqUIWraqpper is a wrapper for any jQuery UI widget
-* 
-* This class must be instantiated by using the static method (@link create). 
-* If you do not use that method, the options will not initiate properly.
-* 
-* Here we create an accordion:
-* <code>
-* //	Create an accordian...
-* CPSjqUIWrapper::create( 'accordion', array( 'header' => 'h3' ) );
-* 
-* ...
-* 
-* <html>
-* 
-* ...
-* 
-* <h2 class="demoHeaders">Accordion</h2>
-* <div id="accordion">
-* 	<div>
-* 		<h3><a href="#">First</a></h3>
-* 		<div>Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.</div>
-* 	</div>
-* 	<div>
-* 		<h3><a href="#">Second</a></h3>
-* 		<div>Phasellus mattis tincidunt nibh.</div>
-* 	</div>
-* 	<div>
-* 		<h3><a href="#">Third</a></h3>
-* 		<div>Nam dui erat, auctor a, dignissim quis.</div>
-* 	</div>
-* </div>
-* 
-* ...
-* 
-* </html>
-* </code>
-* 
-* @author Jerry Ablan <jablan@pogostick.com>
-* @version $Id$
-* @filesource
-* @package psYiiExtensions
-* @subpackage Widgets
-* @since 1.0.0
-* 
-* @property $theme The theme to use. Defaults to 'base'
-* @property $imagePath Image path will be automatically set. You can override the default here.
-* @property $currentTheme The currently used theme
-* @property $multiTheme If multiple themes are allowed
-*/
+ * The CPSjqUIWraqpper is a wrapper for any jQuery UI widget
+ * 
+ * This class must be instantiated by using the static method (@link create). 
+ * If you do not use that method, the options will not initiate properly.
+ *
+ * Here we create an accordion:
+ * 
+ * <code>
+ * //	Create an accordian...
+ * CPSjqUIWrapper::create( 'accordion', array( 'header' => 'h3', 'target' => '#accordion' ) );
+ * ...
+ * <html>
+ * ...
+ * 
+ * <h2 class="demoHeaders">Accordion</h2>
+ * <div id="accordion">
+ * 	<div>
+ * 		<h3><a href="#">First</a></h3>
+ * 		<div>Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.</div>
+ * 	</div>
+ * 	<div>
+ * 		<h3><a href="#">Second</a></h3>
+ * 		<div>Phasellus mattis tincidunt nibh.</div>
+ * 	</div>
+ * 	<div>
+ * 		<h3><a href="#">Third</a></h3>
+ * 		<div>Nam dui erat, auctor a, dignissim quis.</div>
+ * 	</div>
+ * </div>
+ * 
+ * ...
+ * 
+ * </html>
+ * </code>
+ * 
+ * @package 	psYiiExtensions.widgets
+ * @subpackage 	jqui
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.0
+ *  
+ * @filesource
+ * 
+ * @property $theme The theme to use. Defaults to 'base'
+ * @property $imagePath Image path will be automatically set. You can override the default here.
+ * @property $currentTheme The currently used theme
+ * @property $multiTheme If multiple themes are allowed
+ */
 class CPSjqUIWrapper extends CPSjQueryWidget
 {
 	//********************************************************************************
@@ -153,8 +152,8 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
 			array(
-				'theme_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string', CPSOptionManager::META_ALLOWED => $this->m_arValidThemes ) ),
-				'imagePath_' => array( CPSOptionManager::META_REQUIRED => false, CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'theme_' => 'string:::true:' . implode( '|', $this->m_arValidThemes ),
+				'imagePath_' => 'string',
 			)
 		);
 	}

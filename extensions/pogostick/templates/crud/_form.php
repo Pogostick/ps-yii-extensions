@@ -1,14 +1,35 @@
-<?
+<?php
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+
+/**
+ * Generic form
+ * 
+ * @package 	psYiiExtensions.templates
+ * @subpackage 	crud
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ */
+
 //	Our header...
 $className = 'form';
 include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_header.php' );
 
 //	The rest
 echo <<<HTML
-	Yii::app()->clientScript->registerCssFile( '/css/form.css' );
+	CPSHelp::_rcf( '/css/form.css' );
 
 	//	I don't like this, I prefer bold-faced labels
-	CHtml::\$afterRequiredLabel = null;
+	PS::\$afterRequiredLabel = null;
 	
 //	Uncomment for automatic tooltips
 //	CPSjqToolsWrapper::create( 'tooltip', array( 'target' => '#ps-edit-form :input', 'tip' => '.ps-auto-tooltip', 'position' => 'center right', 'offset' => array( -2, 10 ), 'effect' => 'fade', 'opacity' => 0.7 ) );
@@ -87,7 +108,7 @@ HTML;
 
 echo <<<HTML
 
-			if ( \$update ) echo PS::showDates( \$model, \$model->getCreatedColumn(), \$model->getLModColumn() );
+			echo \$model->showDates();
 		echo PS::endForm();
 ?>
 	</div>

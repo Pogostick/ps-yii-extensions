@@ -1,21 +1,23 @@
 <?php
-/**
- * CPSMarkItUpWidget class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPSMarkItUpWidget a wrapper to the excellent (@link http://markitup.jaysalvat.com MarkItUp jQuery widget)
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @package psYiiExtensions
- * @subpackage Widgets
- * @since 1.0.0
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	widgets
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.0
+ *  
+ * @filesource
  * 
  * @property $skinToUse The skin to use. Defaults to 'markitup'
  * @property $setToUse The parse set to use. Defaults to 'html'
@@ -55,10 +57,10 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
 			array(
-				'skinToUse_' => array( CPSOptionManager::META_DEFAULTVALUE => 'markitup', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'setToUse_' => array( CPSOptionManager::META_DEFAULTVALUE => 'html', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'settingsToUse_' => array( CPSOptionManager::META_DEFAULTVALUE => 'mySettings', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'multiUseClass_' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'skinToUse_' => 'string:markitup',
+				'setToUse_' => 'string:html',
+				'settingsToUse_' => 'string:mySettings',
+				'multiUseClass_' => 'string',
 			)
 		);
 	}

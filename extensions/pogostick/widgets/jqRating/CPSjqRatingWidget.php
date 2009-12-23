@@ -1,22 +1,24 @@
 <?php
-/**
-* CPSjqRatingWidget class file.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @link http://ps-yii-extensions.googlecode.com
-* @copyright Copyright &copy; 2009 Pogostick, LLC
-* @license http://www.gnu.org/licenses/gpl.html
-*/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
 
 /**
-* The CPSjqRatingWidget allows the {@link http://www.fyneworks.com/jquery/star-rating/ JQ Rating} to be used in Yii.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @version SVN: $Id$
-* @package psYiiExtensions
-* @subpackage Widgets
-* @since 1.0.0
-*/
+ * The CPSjqRatingWidget allows the {@link http://www.fyneworks.com/jquery/star-rating/ JQ Rating} to be used in Yii.
+ * 
+ * @package 	psYiiExtensions.widgets
+ * @subpackage 	jqRating
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.0
+ *  
+ * @filesource
+ */
 class CPSjqRatingWidget extends CPSWidget
 {
 	//********************************************************************************
@@ -25,9 +27,9 @@ class CPSjqRatingWidget extends CPSWidget
 
 	/**
 	* Constructs a CPSjqRatingWidget
-	*
+	* @param CBaseController $oOwner
 	*/
-	public function __construct( $oOwner = null )
+	public function __construct( CBaseController $oOwner = null )
 	{
 		//	Phone home. Call first to get base behaviors loaded...
 		parent::__construct( $oOwner );
@@ -35,20 +37,20 @@ class CPSjqRatingWidget extends CPSWidget
 		//	Add these options in the constructor so the Yii base can pre-fill them from the config files.
 		$this->addOptions(
 			array(
-				'ajaxCallback' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'cancel' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'cancelValue' => array( CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'half' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
-				'hoverTips' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'readOnly' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
-				'required' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
-				'selectValue' => array( CPSOptionManager::META_DEFAULTVALUE => 0, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'double' ) ),
-				'split' => array( CPSOptionManager::META_DEFAULTVALUE => 1, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'integer' ) ),
-				'starClass' => array( CPSOptionManager::META_DEFAULTVALUE => 'start', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'starCount' => array( CPSOptionManager::META_DEFAULTVALUE => 5, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'integer' ) ),
-				'starTitles' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'starValues' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'supressScripts' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean', CPSOptionManager::META_ALLOWED => array( true, false ) ) ),
+				'ajaxCallback' => 'string',
+				'cancel' => 'string',
+				'cancelValue' => 'string',
+				'half' => 'bool:false',
+				'hoverTips' => 'array:array()',
+				'readOnly' => 'bool:false',
+				'required' => 'bool:false',
+				'selectValue' => 'double:0',
+				'split' => 'int:1',
+				'starClass' => 'string:star',
+				'starCount' => 'int:5',
+				'starTitles' => 'array:array()',
+				'starValues' => 'array:array()',
+				'supressScripts' => 'bool:false',
 			)
 		);
 
@@ -97,20 +99,20 @@ class CPSjqRatingWidget extends CPSWidget
 	public function registerClientScripts()
 	{
 		//	Daddy...
-		$_oCS = parent::registerClientScripts();
+		parent::registerClientScripts();
 
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "{$this->baseUrl}/jquery.MetaData.js" );
-		$_oCS->registerScriptFile( "{$this->baseUrl}/jquery.rating.js" );
+		CPSHelp::_rsf( "{$this->baseUrl}/jquery.MetaData.js" );
+		CPSHelp::_rsf( "{$this->baseUrl}/jquery.rating.js" );
 
 		//	Get the javascript for this widget
 		$_sScript = $this->generateJavascript();
 
 		if ( ! $this->supressScripts && ! $this->returnString )
-				$_oCS->registerScript( 'PS.' . __CLASS__ . '#' . $this->id, $_sScript, CClientScript::POS_READY );
+				CPSHelp::_rs( 'PS.' . __CLASS__ . '#' . $this->id, $_sScript, CClientScript::POS_READY );
 
 		//	Register css files...
-		$_oCS->registerCssFile( "{$this->baseUrl}/jquery.rating.css", 'screen' );
+		CPSHelp::_rcf( "{$this->baseUrl}/jquery.rating.css", 'screen' );
 	}
 
 	//********************************************************************************
@@ -133,7 +135,7 @@ class CPSjqRatingWidget extends CPSWidget
 				'dataType' => 'html'
 			);
 
-			$_sCBBody = 'function(value,link){var arTemp = ' . CJavaScript::encode( $_arTemp ) . '; arTemp[\'data\'] = \'value=\'+value+\'&link=\'+link; $.ajax(arTemp);}';
+			$_sCBBody = 'function(value,link){var arTemp = ' . CJavaScript::encode( $_arTemp ) . '; arTemp[\'data\'] = \'value=\'+value+\'&link=\'+link; jQuery.ajax(arTemp);}';
 
 			$this->callbacks[ 'callback' ] = $_sCBBody;
 		}
@@ -141,7 +143,7 @@ class CPSjqRatingWidget extends CPSWidget
 		$_arOptions = $this->makeOptions();
 
 		//	Now rating apply...
-		$this->script .= '$(\'.' . $this->starClass . '\').rating(' . $_arOptions . '); ';
+		$this->script .= 'jQuery(\'.' . $this->starClass . '\').rating(' . $_arOptions . '); ';
 
 		return $this->script;
 	}

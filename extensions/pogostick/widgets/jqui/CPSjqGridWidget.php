@@ -1,25 +1,26 @@
 <?php
-/**
-* CPSjqGridWidget class file.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @link http://ps-yii-extensions.googlecode.com
-* @copyright Copyright &copy; 2009 Pogostick, LLC
-* @license http://www.gnu.org/licenses/gpl.html
-*/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
 
 /**
-* The CPSjqGridWidget allows the {@link http://www.trirand.com/blog/ jqGrid} to be used in Yii.
-*
-* Thanks to {@link http://www.yiiframework.com/forum/index.php?action=profile;u=20 MetaYii} for some ideas on valid options and callbacks.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @version SVN: $Id$
-* @filesource
-* @package psYiiExtensions
-* @subpackage Widgets
-* @since 1.0.1
-*/
+ * The CPSjqGridWidget allows the {@link http://www.trirand.com/blog/ jqGrid} to be used in Yii.
+ *
+ * Thanks to {@link http://www.yiiframework.com/forum/index.php?action=profile;u=20 MetaYii} for some ideas on valid options and callbacks.
+ * 
+ * @package 	psYiiExtensions.widgets
+ * @subpackage 	jqui
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.0
+ *  
+ * @filesource
+ */
 class CPSjqGridWidget extends CPSjqUIWrapper
 {
 	//********************************************************************************
@@ -35,13 +36,13 @@ class CPSjqGridWidget extends CPSjqUIWrapper
 		$_oCS = parent::registerClientScripts();
 		
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "{$this->extLibUrl}/jqGrid/js/i18n/grid.locale-en.js" );
-		$_oCS->registerScriptFile( "{$this->extLibUrl}/jqGrid/js/jquery.jqGrid.min.js" );
+		CPSHelp::_rsf( "{$this->extLibUrl}/jqGrid/js/i18n/grid.locale-en.js" );
+		CPSHelp::_rsf( "{$this->extLibUrl}/jqGrid/js/jquery.jqGrid.min.js" );
 
 		//	Register css files...
-		$_oCS->registerCssFile( "{$this->extLibUrl}/jqGrid/css/ui.jqgrid.css", 'screen' );
+		CPSHelp::_rcf( "{$this->extLibUrl}/jqGrid/css/ui.jqgrid.css", 'screen' );
 		
-		return $_oCS;
+		return CPSHelp::_cs();
 	}
 
 	//********************************************************************************
@@ -85,7 +86,7 @@ CODE;
 		$_arOptions = $this->makeOptions();
 
 		$this->script =<<<CODE
-$('#{$this->id}').{$this->widgetName}({$_arOptions}).navGrid('#{$this->pagerId}',{edit:false,add:false,del:false});
+jQuery('#{$this->id}').{$this->widgetName}({$_arOptions}).navGrid('#{$this->pagerId}',{edit:false,add:false,del:false});
 CODE;
 
 		return $this->script;

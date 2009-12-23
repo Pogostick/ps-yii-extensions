@@ -1,25 +1,28 @@
 <?php
-/**
-* CPSjQueryWidget class file.
-*
-* @filesource
-* @author Jerry Ablan <jablan@pogostick.com>
-* @link http://ps-yii-extensions.googlecode.com
-* @copyright Copyright &copy; 2009 Pogostick, LLC
-* @license http://www.gnu.org/licenses/gpl.html
-* @version SVN: $Id$
-* @package psYiiExtensions
-* @subpackage Widgets
-*/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
 
 /**
-* The ultimate wrapper for any jQuery widget
-* 
-* @author Jerry Ablan <jablan@pogostick.com>
-* @property $autoRun The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
-* @property $widgetName The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
-* @property $target The jQuery selector to which to apply this widget. If $target is not specified, "id" is used and prepended with a "#".
-*/
+ * The ultimate wrapper for any jQuery widget
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	widgets
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.0
+ *  
+ * @filesource
+ * 
+ * @property $autoRun The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
+ * @property $widgetName The name of the widget you'd like to create (i.e. draggable, accordion, etc.)
+ * @property $target The jQuery selector to which to apply this widget. If $target is not specified, "id" is used and prepended with a "#".
+ */
 class CPSjQueryWidget extends CPSWidget
 {
 	//********************************************************************************
@@ -50,9 +53,9 @@ class CPSjQueryWidget extends CPSWidget
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
 			array(
-				'autoRun_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_DEFAULTVALUE => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
-				'widgetName_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'target_' => array( CPSOptionManager::META_REQUIRED => true, CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'autoRun_' => 'bool:true::true',
+				'widgetName_' => 'string:::true',
+				'target_' => 'string:::true',
 			)
 		);
 	}
@@ -127,9 +130,28 @@ class CPSjQueryWidget extends CPSWidget
 		//	Daddy...
 		$_oCS = parent::registerClientScripts();
 
-		//	Additional scripts		
-		foreach ( $this->m_arScripts as $_sScript )
-			$_oCS->registerScript( 'psjqw.script' . $_iScriptCount++ . '.' . md5( $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $_sScript, CClientScript::POS_READY );
+		//	Additional scripts
+		if ( ! empty( $this->m_arScripts ) )
+		{
+			foreach ( $this->m_arScripts as $_sScript )
+				$_oCS->registerScript( 'psjqw.script' . $_iScriptCount++ . '.' . md5( $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $_sScript, CClientScript::POS_READY );
+		}
+		else
+		{
+			if ( ! $this->script )
+			{
+				//	Try and auto-find script file...
+				$_sFilePath = $this->getExternalLibraryPath() . '/jquery-plugins/' . $this->name . '/jquery.' . $this->name;
+				$_sFileUrl = $this->getExternalLibraryUrl() . '/jquery-plugins/' . $this->name . '/jquery.' . $this->name;
+
+				//	See if we have such a plug-in
+				if ( file_exists(  $_sFilePath . '.min.js' ) )
+					$_oCS->registerScriptFile( $_sFileUrl . '.min.js', CClientScript::POS_HEAD );
+				//	Try non-minimized version...
+				else if ( file_exists( $_sFilePath . '.js' ) )
+					$_oCS->registerScriptFile( $_sFileUrl . '.js', CClientScript::POS_HEAD );
+			}
+		}
 
 		//	Don't forget subclasses
 		return $_oCS;
@@ -152,7 +174,7 @@ class CPSjQueryWidget extends CPSWidget
 			
 		//	Get the options...		
 		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
-		$_sId = $this->getTargetSelector( $sTargetSelector );
+		$_sId = 'jQuery' . ( ( null != ( $_sTarget = $this->getTargetSelector( $sTargetSelector ) ) ) ? "('{$_sTarget}')" : null );
 		
 		//	Jam something in front of options?
 		if ( null != $sInsertBeforeOptions )
@@ -163,7 +185,7 @@ class CPSjQueryWidget extends CPSWidget
 		}
 
 		$this->script =<<<CODE
-$('{$_sId}').{$this->widgetName}({$_arOptions});
+{$_sId}.{$this->widgetName}({$_arOptions});
 CODE;
 
 		return $this->script;
@@ -191,7 +213,9 @@ CODE;
 		else
 		{
 			//	Do we have a target element?
-			if ( ! $this->isEmpty( $this->target ) ) 
+			if ( $this->hasOption( 'target' ) && $this->target == '_NONE_' )
+				$_sId = null;
+			else if ( ! $this->isEmpty( $this->target ) ) 
 				$_sId = $this->target;
 			else
 				$_sId = "#{$this->id}";

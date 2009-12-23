@@ -190,22 +190,18 @@ class CPSWidget extends CInputWidget implements IPogostickBehavior
 	*/
 	public function registerClientScripts()
 	{
-		//	Get the clientScript
-		
-		$_oCS = Yii::app()->getClientScript();
-
 		//	Register a special CSS file if we have one...
 		if ( ! $this->isEmpty( $this->cssFile ) ) $this->pushCssFile( $this->cssFile );
 		if ( ! $this->isEmpty( $this->script ) ) $this->pushScriptFile( $this->script );
 		
 		foreach ( $this->m_arCssFiles as $_arFile )
-			$_oCS->registerCssFile( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
+			CPSHelp::_rcf( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
 
 		foreach ( $this->m_arScriptFiles as $_arFile )
-			$_oCS->registerScriptFile( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
+			CPSHelp::_rsf( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
 
 		//	Send upstream for convenience
-		return $_oCS;
+		return CPSHelp::getClientScript();
 	}
 
 	/**
@@ -295,7 +291,6 @@ class CPSWidget extends CInputWidget implements IPogostickBehavior
 	
 	/**
 	* Generates the javascript code for the widget
-	*
 	* @return string
 	*/
 	protected function generateJavascript()
@@ -304,7 +299,6 @@ class CPSWidget extends CInputWidget implements IPogostickBehavior
 
 	/**
 	* Generates the javascript code for the widget
-	*
 	* @return string
 	*/
 	protected function generateHtml()

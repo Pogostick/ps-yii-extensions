@@ -1,21 +1,24 @@
 <?php
-/**
- * CPSImage class file.
- *
- * @filesource
- * @author Jerry Ablan <jablan@pogostick.com>
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage helpers
- * @since v1.0.6
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
-* Image processing utility class.
-* 
+ * Image processing utility class.
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ * 
  * @sproperty integer $thumbnailWidth Width of created thumbnails. Defaults to 75
  * @property integer $thumbnailHeight Height of created thumbnails. Defaults to 75
  * @property string $thumbnailTemplate The template for creating thumbnail file names

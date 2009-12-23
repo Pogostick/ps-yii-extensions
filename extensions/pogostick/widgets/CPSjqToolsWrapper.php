@@ -1,23 +1,24 @@
 <?php
-/**
-* CPSjqToolsWrapper class file.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @link http://ps-yii-extensions.googlecode.com
-* @copyright Copyright &copy; 2009 Pogostick, LLC
-* @license http://www.gnu.org/licenses/gpl.html
-*/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
 
 /**
-* The CPSjqToolsWrapper allows the {@link http://flowplayer.org/tools/index.html jQuery Tools} to be used in Yii.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @version SVN: $Id$
-* @filesource
-* @package psYiiExtensions
-* @subpackage Widgets
-* @since 1.0.4
-*/
+ * The CPSjqToolsWrapper allows the {@link http://flowplayer.org/tools/index.html jQuery Tools} to be used in Yii.
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	widgets
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.4
+ *  
+ * @filesource
+ */
 class CPSjqToolsWrapper extends CPSjQueryWidget
 {
 	//********************************************************************************
@@ -40,7 +41,6 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 	
 	/**
 	* A list of the support files for each tool
-	* 
 	* @var array
 	*/
 	protected $m_arSupportFiles = array();
@@ -57,7 +57,7 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
 			array(
-				'paneClass_' => array( CPSOptionManager::META_REQUIRED => false, CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'paneClass_' => 'string',
 			)
 		);
 		
@@ -95,7 +95,6 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 		}
 	}
 		
-
 	/**                                                                                                                     
 	* Registers the needed CSS and JavaScript.
 	*/
@@ -113,17 +112,15 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 //	Uncomment to use CDN		
 //		$_oCS->registerScriptFile( "http://cdn.jquerytools.org/1.1.2/tiny/jquery.tools.min.js" );
 
-		//	Add for flashembed if we need it...		
+		//	Add for flashembed if we need it...
 		if ( 'flashembed' == $this->widgetName ) $_oCS->registerScriptFile( "http://static.flowplayer.org/js/tools/tools.flashembed-1.0.4.min.js" );
 		
 		//	Register any CSS files for this tool...
-		if ( isset( $this->m_arSupportFiles[ $this->widgetName ] ) )
+		if ( isset( $this->m_arSupportFiles, $this->m_arSupportFiles[ $this->widgetName ], $this->m_arSupportFiles[ $this->widgetName ]['css'] ) )
 		{
-			if ( isset( $this->m_arSupportFiles[ $this->widgetName ][ 'css' ] ) )
-			{
-//				foreach ( $this->m_arSupportFiles[ $this->widgetName ][ 'css' ] as $_sFile )
-//					$_oCS->registerCssFile( "{$this->baseUrl}/css/{$_sFile}", 'screen' );
-			}
+//	I forgot why I commented this out... sorry. It may be needed.			
+//			foreach ( $this->m_arSupportFiles[ $this->widgetName ][ 'css' ] as $_sFile )
+//				$_oCS->registerCssFile( "{$this->baseUrl}/css/{$_sFile}", 'screen' );
 		}
 
 		//	Get the javascript for this widget

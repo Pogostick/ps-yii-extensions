@@ -1,20 +1,23 @@
 <?php
-/**
- * CPSHelp class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://www.pogostick.com.com/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPSHelp provides a slew of static helper methods
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version $Id$
- * @package psYiiExtensions
- * @subpackage Helpers
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.3
+ *  
+ * @filesource
  */
 class CPSHelp extends CPSHelperBase
 {
@@ -40,7 +43,7 @@ class CPSHelp extends CPSHelperBase
 	public function getParameters() { return self::$m_arParams; }
 	public function resetParameters() { self::$m_arParams = array(); }
 	
-	 /**
+	/**
 	 * Make an HTTP request
 	 *
 	 * @param string $sUrl The URL to call

@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+
 /**
  * This is the template for generating the controller class file for crud.
  * The following variables are available in this template:
@@ -6,8 +14,18 @@
  * - $controllerClass: the controller class name
  * - $baseClass: The parent class
  * - $modelClass: the model class name
+ * 
+ * @package 	psYiiExtensions.templates
+ * @subpackage 	crud
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ * 
  */
- 
+
 $_sClass = PS::nvl( $modelClass, $ID );
 $className = $controllerClass . ' class';
 

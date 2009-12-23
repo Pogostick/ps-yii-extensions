@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+
 /**
  * CPSFirePHP class file.
  *
@@ -14,33 +22,25 @@
  * 2.	Turn debug on in /index.php  ie: uncomment defined('YII_DEBUG') or define('YII_DEBUG',true);
  * 
  * 3.	Add as a component to your main.php configuration file: 
+ * 
  * 'firePHP' => array(
  *     'class' => 'pogostick.helpers.CPSFirePHP',
  * ),
  * 
  * 4.	Add Yii::app()->firePHP->enableConsole( $this ); between the <HEAD> tags of your layout file(s). 
  * 
- * You can add a second parameter to this if you just want the log.
- * ie: $firecake->view($this,1);
- * 
  * Credits:
  * --------
  * Converted from original CakePHP FireCake Helper by {@link http://bakery.cakephp.org/articles/view/firecake-helper zomg}
  * 
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
- * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
- */
-
-/**
- * CPSFirePHP provides an interface to FirePHP
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
  * 
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @package psYiiExtensions
- * @subpackage Helpers
- * @since 1.0.4
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.4
+ *  
+ * @filesource
  */
 class CPSFirePHP extends CPSComponent
 {
@@ -55,21 +55,11 @@ class CPSFirePHP extends CPSComponent
 	//********************************************************************************
 	
 	/**
-	* Initialize the component...
-	* 
-	*/
-	public function init()
-	{
-		//	Call daddy
-		parent::init();
-	}
-	
-	/**
 	* View FirePHP information
 	* 
 	* @param CView $oView
 	*/
-	function enableConsole( $oView  )
+	function enableConsole( CView $oView  )
 	{
 		//	Define javascript array
 		$_sScript = "\nvar " . self::JS_NAME . " = new Array();";

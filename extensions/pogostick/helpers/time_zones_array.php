@@ -1,20 +1,24 @@
 <?php
-/**
- * time_zones_array.php file.
- *
- * @filesource
- * @author Jerry Ablan <jablan@pogostick.com>
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage helpers
- * @since v1.0.6
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
 
-//	List of most time zones
+/**
+ * The various time zones on this planet.
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ */
 return array(
 	'-12.0' => '(GMT -12:00) Eniwetok, Kwajalein',
 	'-11.0' => '(GMT -11:00) Midway Island, Samoa',

@@ -11,12 +11,15 @@
 /**
  * CPSOAuthEvent provides specialized events for {@link CPSOAuthBehavior}
  *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @package 	psYiiExtensions
+ * @subpackage 	events
+ * 
+ * @since 		1.0.3
+ * 
  * @filesource
- * @package psYiiExtensions
- * @subpackage Events
- * @since 1.0.3
+ * @property $token The OAuth token
  */
 class CPSOAuthEvent extends CEvent
 {

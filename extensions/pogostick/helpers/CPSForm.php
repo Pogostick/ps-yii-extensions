@@ -1,24 +1,28 @@
 <?php
-/**
- * CPSForm class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage helpers
- * @since v1.0.5
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
 
-//	Need this 
 Yii::import( 'pogostick.helpers.CPSActiveWidgets' );
 
 /**
  * CPSForm provides form helper functions
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.5
+ *  
+ * @filesource
+ * 
+ * @property string $codeModel The name of the code model for code lookups
+ * @property string $hintTemplate The template for displaying hints
  */
 class CPSForm extends CPSHelperBase
 {
@@ -36,14 +40,6 @@ class CPSForm extends CPSHelperBase
 	protected static $m_sSearchFieldLabelTemplate = '<label class="ps-form-search-label" for="{fieldId}">{title}</label>';
 	protected static $m_sSearchFieldTemplate = '{label}<span class="ps-form-search-field ui-widget-container">{field}</span>';
 	
-	//********************************************************************************
-	//* Property Access Methods
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Magic Method Ovverides
-	//********************************************************************************
-
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -87,12 +83,14 @@ class CPSForm extends CPSHelperBase
 	* @param string $sDivClass
 	* @param boolean $bShowFlashDiv If true, will output a standard ps-flash-display div
 	* @returns string
+	* 
+	* @deprecated Use formHeaderEx
 	*/
 	public static function formHeader( $sTitle, $arMenuItems = array(), $sDivClass = 'form-header', $bShowFlashDiv = true, $sHtmlInject = null )
 	{
 		$_bIcon = false;
 		$_sClass = $_sLink = $_sOut = null;
-		$_sFlash = ( $bShowFlashDiv ? PS::flashMessage( 'success', true ) : null );
+		$_sFlash = $bShowFlashDiv ? PS::flashMessage( 'success', true ) : null;
 		$_sExtra = null;//'style="margin-bottom:' . ( $_sFlash ? '32px' : '10px' ) . '";"';
 		
 		//	Create menu
@@ -154,8 +152,5 @@ HTML;
 		<div class="{$_sDivClass}">{$_sOut}</div>
 HTML;
 	}
-	
-	//********************************************************************************
-	//* Private Methods
-	//********************************************************************************
+
 }

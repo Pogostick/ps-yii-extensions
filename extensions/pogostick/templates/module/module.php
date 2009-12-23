@@ -1,10 +1,28 @@
 <?php
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+
 /**
-* This is the template for generating the module class file.
-* The following variables are available in this template:
-* - $moduleID: The ID of this module
-* - $moduleClass: The name of this module
-*/
+ * This is the template for generating the module class file.
+ * The following variables are available in this template:
+ * - $moduleID: The ID of this module
+ * - $moduleClass: The name of this module
+ *
+ * @package 	psYiiExtensions.templates
+ * @subpackage 	module
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ * 
+ */
 
 //	Include our header
 $className = $moduleClass;

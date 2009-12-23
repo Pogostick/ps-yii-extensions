@@ -1,17 +1,25 @@
 <?php
-/**
- * PS.php class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage helpers
- * @since v1.0.6
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
+ */
+
+/**
+ * Base functionality that I want in ALL my helper classes
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ * 
+ * @todo Find a better way to do this
  */
 class PS extends CPSActiveWidgets
 {
@@ -34,8 +42,10 @@ class PS extends CPSActiveWidgets
 	* @param string $sColName
 	* @param array $arOptions
 	* @return string
+	* @static
+	* @access public
 	*/
-	public static function field( $eFieldType, $oModel, $sColName, $arOptions = array() )
+	public static function field( $eFieldType, CModel $oModel, $sColName, $arOptions = array() )
 	{
 		//	A little switcheroo...
 		if ( $eFieldType == PS::CODE_DISPLAY )
@@ -61,10 +71,40 @@ class PS extends CPSActiveWidgets
 	* @param boolean $bUnset
 	* @return mixed
 	* @static
+	* @access public
 	*/
 	public static function o( &$arOptions = array(), $sKey, $oDefault = null, $bUnset = false )
 	{
 		return CPSHelp::getOption( $arOptions, $sKey, $oDefault, $bUnset );
+	}
+	
+	/**
+	* Sets an option in the given array
+	*
+	* @param array $arOptions
+	* @param string $sKey
+	* @param mixed $oValue
+	* @returns mixed The new value of the key
+	* @static
+	* @access public
+	*/
+	public static function so( array $arOptions, $sKey, $oValue = null )
+	{
+		return CPSHelp::setOption( $arOptions, $sKey, $oValue );
+	}
+	
+	/**
+	* Unsets an option in the given array
+	*
+	* @param array $arOptions
+	* @param string $sKey
+	* @returns mixed The new value of the key
+	* @static
+	* @access public
+	*/
+	public static function uo( array $arOptions, $sKey )
+	{
+		return CPSHelp::setOption( $arOptions, $sKey, null );
 	}
 
 	/**
@@ -73,6 +113,9 @@ class PS extends CPSActiveWidgets
 	* @param string $dtStart
 	* @param string $dtEnd
 	* @param mixed $sInterval
+	* @returns DateInterval
+	* @static
+	* @access public
 	*/
 	public static function dateDiff( $dtStart, $dtEnd )
 	{
@@ -83,17 +126,18 @@ class PS extends CPSActiveWidgets
 	* Returns an array suitable as list data from an array of models
 	* 
 	* @param array $arData
+	* @param string $sKeyColumn
 	* @param string $sValueColumn
-	* @param string $sDisplayColumn
 	* @returns array
 	* @static
+	* @access public
 	*/
-	public static function asListData( $arData, $sValueColumn, $sDisplayColumn )
+	public static function asListData( $arData = array(), $sKeyColumn, $sValueColumn )
 	{
 		$_arOut = array();
 		
 		foreach ( $arData as $_oRow )
-			$_arOut[ $_oRow->getAttribute( $sValueColumn ) ] = $_oRow->getAttribute( $sDisplayColumn );
+			$_arOut[ $_oRow->getAttribute( $sKeyColumn ) ] = $_oRow->getAttribute( $sValueColumn );
 			
 		return $_arOut;
 	}

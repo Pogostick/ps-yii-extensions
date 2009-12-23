@@ -1,20 +1,23 @@
 <?php
-/**
- * CPSjqSelectMenu class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage Widgets
- * @since v1.0.5
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * Widget that implements jQuery plug-in {@link http://docs.jquery.com/UI SelectMenu}
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	widgets
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.5
+ *  
+ * @filesource
  */
 class CPSjqSelectMenu extends CPSjQueryWidget
 {
@@ -30,14 +33,6 @@ class CPSjqSelectMenu extends CPSjQueryWidget
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	*/
 	const PS_EXTERNAL_PATH = '/jquery-plugins/selectmenu';
-
-	//********************************************************************************
-	//* Property Access Methods
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Magic Method Ovverides
-	//********************************************************************************
 
 	//********************************************************************************
 	//* Public Methods
@@ -95,7 +90,7 @@ class CPSjqSelectMenu extends CPSjQueryWidget
 		$_sId = $this->getTargetSelector( $sTargetSelector );
 		
 		$this->script =<<<CODE
-$('select').{$this->widgetName}({$_sOptions});
+jQuery('select').{$this->widgetName}({$_sOptions});
 CODE;
 
 		return $this->script;

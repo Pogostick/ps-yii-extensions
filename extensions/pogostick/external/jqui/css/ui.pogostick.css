@@ -1,9 +1,25 @@
 /*
-* Buttons and toobars...
-* 
-* Hijacked from Filament Group Labs (http://www.filamentgroup.com/lab/styling_buttons_and_toolbars_with_the_jquery_ui_css_framework/)!
-* Thanks Guys!
-*/
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ * 
+ * Portions hijacked from Filament Group Labs (http://www.filamentgroup.com/lab/styling_buttons_and_toolbars_with_the_jquery_ui_css_framework/)!
+ */
+
+/**
+ * CSS styles for psYiiExtensions automated widgets and whatnot
+ * 
+ * @package 	psYiiExtensions.external.jqui
+ * @subpackage 	css
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id: CPSController.php 319 2009-12-23 06:23:25Z jerryablan@gmail.com $
+ * @since 		v1.0.3
+ * 
+ * @filesource
+ */
 
 .ps-button { outline: 0; margin:0 4px 0 0; padding: .4em 1em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
 .ps-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }

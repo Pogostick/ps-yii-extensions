@@ -1,24 +1,25 @@
 <?php
-/**
- * CPSgApiWidget class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
- * @package psYiiExtensions
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPSgApiWidget provides access to the {@link http://code.google.com/apis/ajaxsearch/ Google AJAX APIs}
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
+ * 
+ * @package 	psYiiExtensions.widgets
+ * @subpackage 	gApi
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.0
+ *  
  * @filesource
- * @package psYiiExtensions
- * @subpackage Widgets
- * @since 1.0.0
  */
+
 class CPSgApiWidget extends CPSApiWidget
 {
 	//********************************************************************************
@@ -35,18 +36,7 @@ class CPSgApiWidget extends CPSApiWidget
 		parent::__construct();
 
 		//	Our object settings
-		$this->addOption(
-			'apisToLoad',
-			array(
-				CPSOptionManager::META_DEFAULTVALUE => array(),
-				CPSOptionManager::META_RULES =>
-					array(
-						CPSOptionManager::META_TYPE => 'array',
-						CPSOptionManager::META_ALLOWED => array( 'maps', 'search', 'feeds', 'language', 'gdata', 'earth', 'visualization' ),
-					),
-			),
-			true
-		);
+		$this->addOption( 'apisToLoad', 'array:array():::maps|search|feeds|language|gdata|earth|visualization', true );
 
 		//	Log it and check for issues...
 		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
@@ -56,15 +46,20 @@ class CPSgApiWidget extends CPSApiWidget
 	//* Yii Overrides
 	//********************************************************************************
 
+	/**
+	* Runs the widget
+	*/
 	public function run()
 	{
 		parent::run();
-		
 		$this->registerClientScripts();
-		
 		echo $this->generateHtml();
 	}
 
+	/**
+	* Generates the needed javascript
+	* @returns string
+	*/
 	protected function generateJavascript()
 	{
 		$this->script = '';
@@ -73,28 +68,34 @@ class CPSgApiWidget extends CPSApiWidget
 			foreach ( $this->apisToLoad as $_sApi => $_sVersion )
 				$this->script .= "google.load(\"{$_sApi}\", \"{$_sVersion}\");\n";
 
-		return( $this->script );
+		return $this->script;
 	}
 
+	/**
+	* Generates the needed HTML
+	* @returns string
+	* 
+	*/
 	protected function generateHtml()
 	{
-		return( null );
 	}
 
+	/**
+	* Registers the scripts necessary for this widget
+	*/
 	public function registerClientScripts()
 	{
-		$_oCS = parent::registerClientScripts();
+		parent::registerClientScripts();
 
 		$_sApiKey = $this->apiKey;
 
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "http://www.google.com/jsapi?key={$_sApiKey}", CClientScript::POS_HEAD );
-		$_oCS->registerScriptFile( "http://maps.google.com/maps?file=api&v=2&key={$_sApiKey}&sensor=false", CClientScript::POS_HEAD );
-		$_oCS->registerScriptFile( 'http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/1.1/src/markermanager.js', CClientScript::POS_HEAD );
-//		$_oCS->registerScriptFile( 'http://gmaps-utility-library.googlecode.com/svn/trunk/tabbedmaxcontent/1.0/src/tabbedmaxcontent.js', CClientScript::POS_HEAD );
-		$_oCS->registerScriptFile( 'http://gmaps-utility-library.googlecode.com/svn/trunk/extinfowindow/release/src/extinfowindow.js', CClientScript::POS_HEAD );
+		CPSHelp::_rsf( "http://www.google.com/jsapi?key={$_sApiKey}", CClientScript::POS_HEAD );
+		CPSHelp::_rsf( "http://maps.google.com/maps?file=api&v=2&key={$_sApiKey}&sensor=false", CClientScript::POS_HEAD );
+		CPSHelp::_rsf( 'http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/1.1/src/markermanager.js', CClientScript::POS_HEAD );
+		CPSHelp::_rsf( 'http://gmaps-utility-library.googlecode.com/svn/trunk/extinfowindow/release/src/extinfowindow.js', CClientScript::POS_HEAD );
 
-		$_oCS->registerScript( "Yii.{__CLASS__}.#.{$this->id}", $this->generateJavascript(), CClientScript::POS_READY );
-		$_oCS->registerScript( "Yii.{__CLASS__}.#.{$this->id}.onLoad", "initialize();", CClientScript::POS_READY );
+		CPSHelp::_rs( "Yii.{__CLASS__}.#.{$this->id}", $this->generateJavascript(), CClientScript::POS_READY );
+		CPSHelp::_rs( "Yii.{__CLASS__}.#.{$this->id}.onLoad", "initialize();", CClientScript::POS_READY );
 	}
 }

@@ -1,19 +1,23 @@
 <?php
-/**
- * CPSHash class file.
+/*
+ * This file is part of the psYiiExtensions package.
  * 
- * Hash generators
- *
- * @filesource
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage helpers
- * @since v1.0.6
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
+ */
+
+/**
+ * Hash code/password generators
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
  */
 class CPSHash extends CPSHelperBase
 {
@@ -31,6 +35,7 @@ class CPSHash extends CPSHelperBase
 	const ALPHA_NUMERIC = 4;
 	const ALPHA_LOWER_NUMERIC = 5;
 	const NUMERIC = 6;
+	const ALPHA_LOWER_NUMERIC_IDIOTPROOF = 7;
 
 	/**
 	* Hashing methods
@@ -55,6 +60,7 @@ class CPSHash extends CPSHelperBase
 		self::ALPHA_NUMERIC => array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9'),
 		self::ALPHA_LOWER_NUMERIC => array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9'),
 		self::NUMERIC => array('0','1','2','3','4','5','6','7','8','9'),
+		self::ALPHA_LOWER_NUMERIC_IDIOTPROOF => array('a','b','c','d','e','f','g','h','j','k','m','n','p','q','r','s','t','u','v','w','x','y','z','2','3','4','5','6','7','8','9'),
 	);
 	
 	//********************************************************************************
@@ -159,6 +165,7 @@ class CPSHash extends CPSHelperBase
 	* @param string $sModelName
 	* @param string $sAttribute
 	* @param string $sHash
+	* 
 	* @returns boolean
 	*/
 	protected static function isUnique( $sModelName, $sAttribute, $sHash )

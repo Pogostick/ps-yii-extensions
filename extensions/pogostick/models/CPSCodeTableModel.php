@@ -1,19 +1,23 @@
 <?php
-/**
- * CPSCodeTableModel file
+/*
+ * This file is part of the psYiiExtensions package.
  * 
- * Provides a base class for code lookup tables in your database
- *
- * @filesource
- * @author Jerry Ablan <jablan@pogostick.com>
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage models
- * @since v1.0.6
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
+ */
+
+/**
+ * Provides a base class for code lookup tables in your database
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	models
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
  */
 class CPSCodeTableModel extends CPSModel
 {
@@ -91,7 +95,7 @@ class CPSCodeTableModel extends CPSModel
 			$_sModelClass = get_called_class();
 
 		$_arCrit = null;
-		$sOrder = PS::nvl( $sOrder, $_sModelClass::model()->getMetaData()->primaryKey );
+		$sOrder = $_sModelClass::model()->getMetaData()->primaryKey;
 
 		//	Get a single code...
 		if ( null !== $iId ) return $_sModelClass::model()->findByPk( $iId );
@@ -147,29 +151,20 @@ class CPSCodeTableModel extends CPSModel
 	}
 
 	/**
-	* @return array relational rules.
-	*/
-	public function relations()
-	{
-		return array(
-		);
-	}
-
-	/**
 	 * @return array customized attribute labels (name=>label)
 	 */
 	public function attributeLabels()
 	{
 		return array(
 			'id' => 'Id',
-			'code_type_text' => 'Code Type Text',
-			'code_abbr_text' => 'Code Abbr Text',
-			'code_desc_text' => 'Code Desc Text',
-			'parnt_code_id' => 'Parnt Code',
-			'assoc_value_nbr' => 'Assoc Value Nbr',
-			'assoc_text' => 'Assoc Text',
-			'create_date' => 'Create Date',
-			'lmod_date' => 'Lmod Date',
+			'code_type_text' => 'Type',
+			'code_abbr_text' => 'Abbreviation',
+			'code_desc_text' => 'Description',
+			'parnt_code_id' => 'Parent Code Id',
+			'assoc_value_nbr' => 'Associated Number',
+			'assoc_text' => 'Associated Text',
+			'create_date' => 'Created On',
+			'lmod_date' => 'Modified On',
 		);
 	}
 

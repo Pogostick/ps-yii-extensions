@@ -1,20 +1,23 @@
 <?php
-/**
- * CPSjqValidate class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage Widgets
- * @since v1.0.5
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * Widget that implements jQuery plug-in {@link http://bassistance.de/jquery-plugins/jquery-plugin-validation/ Validate}
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	widgets
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.5
+ *  
+ * @filesource
  */
 class CPSjqValidate extends CPSjQueryWidget
 {
@@ -26,20 +29,13 @@ class CPSjqValidate extends CPSjQueryWidget
 	* The name of this widget
 	*/
 	const PS_WIDGET_NAME = 'validate';
+	
 	/**
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	* Currently, a CDN is in use and no local files are required...
 	*/
 	const PS_EXTERNAL_PATH = '/jquery-plugins/validate';
 	const CDN_PATH = 'http://ajax.microsoft.com/ajax/jquery.validate/1.5.5/jquery.validate.min.js';
-
-	//********************************************************************************
-	//* Property Access Methods
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Magic Method Ovverides
-	//********************************************************************************
 
 	//********************************************************************************
 	//* Public Methods

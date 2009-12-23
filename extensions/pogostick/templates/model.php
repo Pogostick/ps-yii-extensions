@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+
 /**
  * This is the template for generating a model class file.
  * The following variables are available in this template:
@@ -9,6 +17,16 @@
  * - $labels: a list of labels (string)
  * - $relations: a  list of relations (string)
  * - $baseClass: the base class to extend
+ *
+ * @package 	psYiiExtensions
+ * @subpackage 	templates
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ * 
  */
 
 //	Include our header 
@@ -17,6 +35,10 @@ include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_he
 echo <<<HTML
 class $className extends $baseClass
 {
+	//********************************************************************************
+	//* Code Information
+	//********************************************************************************
+	
 	/**
 	* This model was generated from database component '$dbToUse'
 	*
@@ -30,6 +52,10 @@ HTML;
 echo <<<HTML
 	*/
 	 
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
+	
 	/**
 	* Returns the static model of the specified AR class.
 	* @return CActiveRecord the static model class

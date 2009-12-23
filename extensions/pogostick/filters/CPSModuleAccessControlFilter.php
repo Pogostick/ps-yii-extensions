@@ -1,25 +1,25 @@
 <?php
-/**
- * CPSModuleAccessControlFilter class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage Filters
- * @since v1.0.4
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * CPSModuleAccessControlFilter provides module-based filtering
- *
- * @package psYiiExtensions
- * @subpackage Filters
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	filters
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.4
+ * 
+ * @filesource
  */
-class CPSModuleAccessControlFilter extends CAccessControlFilter
+class CPSModuleAccessControlFilter extends CAccessControlFilter implements IPogostick
 {
 	//********************************************************************************
 	//* Public Methods
@@ -45,7 +45,7 @@ class CPSModuleAccessControlFilter extends CAccessControlFilter
 		{
 			//	Is allowed?
 			if ( ( $_iAllow = $_oRule->isUserAllowed( $_oUser, $oFilterChain->controller, $oFilterChain->action, $_sIP, $_sVerb ) ) > 0 )
-				break;
+				return true;
 			
 			if ( $_iAllow < 0 )
 			{

@@ -1,22 +1,24 @@
 <?php
-/**
- * CPSTransform class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage helpers
- * @since v1.0.5
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
- * CPSTransform provides form helper functions
- */
+ * CPSTransform provides helper functions for display formatting in grids and forms
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.5
+ *  
+ * @filesource
+*/
 class CPSTransform extends CPSHelperBase
 {
 	//********************************************************************************
@@ -25,8 +27,7 @@ class CPSTransform extends CPSHelperBase
 	
 	/**
 	* Transformation mapping
-	* 
-	* @var mixed
+	* @var array
 	*/
 	protected static $m_arTransform = array(
 		'@' => 'linkTransform',
@@ -41,17 +42,36 @@ class CPSTransform extends CPSHelperBase
 		',' => 'integerTransform',
 		'*' => 'codeLookup',
 	);
+	
+	/**
+	* The currency code to use for currency displays
+	* @var string
+	*/
+	protected static $m_sCurrencyCode = '$';
+	public static function getCurrencyCode() { return self::$m_sCurrencyCode; }
+	public static function setCurrencyCode( $sValue ) { self::$m_sCurrencyCode = $sValue; }
 
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 	
+	/**
+	* Strips off a format character from the front of a column name
+	* @param string $sColumn
+	* @return string
+	*/
 	public static function cleanColumn( $sColumn )
 	{
 		if ( in_array( $sColumn[0], array_keys( self::$m_arTransform ) ) ) $sColumn = substr( $sColumn, 1 );
 		return $sColumn;
 	}
 	
+	/**
+	* Gets the value of a column
+	* @param string $sType
+	* @param mixed $oValue
+	* @returns mixed
+	*/
 	public static function value( $sType, $oValue )
 	{
 		foreach ( self::$m_arTransform as $_sChar => $_sMethod )
@@ -66,7 +86,14 @@ class CPSTransform extends CPSHelperBase
 		return $oValue;
 	}
 	
-	protected static function setValue( $oModel, $sColumn, $oValue = null )
+	/**
+	* Sets the value of a column
+	* 
+	* @param CModel $oModel
+	* @param string $sColumn
+	* @param mixed $oValue
+	*/
+	protected static function setValue( CModel $oModel, $sColumn, $oValue = null )
 	{
 		if ( $oModel->hasAttribute( self::columnChain( $sColumn ) ) )
 		{
@@ -75,6 +102,14 @@ class CPSTransform extends CPSHelperBase
 		}
 	}
 	
+	/**
+	* Retrieves a formatted value
+	* 
+	* @param CModel $oModel
+	* @param string $sColumn
+	* @param string $sFormatColumn
+	* @return mixed
+	*/
 	protected static function getValue( $oModel, $sColumn, $sFormatColumn = null )
 	{
 		if ( ! $oModel instanceof CModel ) 
@@ -83,6 +118,12 @@ class CPSTransform extends CPSHelperBase
 		return eval( 'return $oModel->' . self::columnChain( $sColumn ) . ';' );
 	}
 	
+	/**
+	* Splits apart a complex column name into its components and constructs a 
+	* column chain (i.e. game.long_name becomes game->long_name)
+	* @param string $sColumn
+	* @returns string
+	*/
 	protected static function columnChain( $sColumn )
 	{
 		$_sCmd = $sColumn;
@@ -97,7 +138,17 @@ class CPSTransform extends CPSHelperBase
 		return $_sCmd;
 	}
 	
-	public static function column( $oModel, $arColumns = array(), $sLinkView = 'update', $sWrapTag = 'td', $arWrapOptions = array() )
+	/**
+	* Get a formatted column value
+	* 
+	* @param CModel $oModel
+	* @param array $arColumns
+	* @param string $sLinkView
+	* @param string $sWrapTag
+	* @param array $arWrapOptions
+	* @returns string
+	*/
+	public static function column( CModel $oModel, $arColumns = array(), $sLinkView = 'update', $sWrapTag = 'td', $arWrapOptions = array() )
 	{
 		$_bValue = $_sOut = null;
 		$_arValueMap = array();
@@ -169,45 +220,108 @@ class CPSTransform extends CPSHelperBase
 	}
 	
 	//********************************************************************************
-	//* Private Methods 
+	//* Private Transformation Methods 
 	//********************************************************************************
 	
+	/**
+	* Converts to a link
+	* 
+	* @param string $sHow
+	* @param mixed $oValue
+	* @return array
+	*/
 	protected static function linkTransform( $sHow, $oValue = null )
 	{
 		return array( $oValue, true, array() );
 	}
 	
+	/**
+	* Converts a boolean into a yes/no
+	* Supports 1, 0, y, n, Y, and N
+	* 
+	* @param string $sHow
+	* @param mixed $oValue
+	* @return array
+	*/
 	protected static function boolTransform( $sHow, $oValue )
 	{
 		$_oValue = ( empty( $oValue ) || $oValue === 'N' || $oValue === 'n' || $oValue === 0 ) ? 'No' : 'Yes';
 		return self::alignTransform( '|', $_oValue );
 	}
 	
+	/**
+	* Converts a UNIX timestamp into a readable date.
+	* 
+	* @param string $sHow
+	* @param mixed $oValue
+	* @param string $sFormat The format of the returned date
+	* @return array
+	*/
 	protected static function timeTransform( $sHow, $oValue, $sFormat = 'F d, Y' )
 	{
 		return array( date( $sFormat, strtotime( $oValue ) ), false, array() );
 	}
 	
+	/**
+	* Converts a number into a nice formatted number
+	* 
+	* @param string $sHow
+	* @param mixed $oValue
+	* @param int $iDecimals The number of decimal places to apply
+	* @return array
+	*/
 	protected static function numberTransform( $sHow, $oValue, $iDecimals = 2 )
 	{
 		return self::alignTransform( '>', number_format( doubleval( $oValue ), $iDecimals ) );
 	}
 	
+	/**
+	* Converts an integer into a nice formatted number
+	* 
+	* @param string $sHow
+	* @param mixed $oValue
+	* @return array
+	*/
 	protected static function integerTransform( $sHow, $oValue )
 	{
 		return self::numberTransform( $sHow, $oValue, 0 );
 	}
-	
+
+	/**
+	* Converts a number into a nice formatted currency number
+	* 
+	* @param string $sHow
+	* @param mixed $oValue
+	* @param int $iDecimals The number of decimal places to apply
+	* @return array
+	* 
+	* @todo Convert to use money_format()
+	*/
 	protected static function currencyTransform( $sHow, $oValue, $iDecimals = 2 )
 	{
-		return self::alignTransform( '>', '$' . number_format( doubleval( $oValue ), $iDecimals ) );
+		return self::alignTransform( '>', self::$m_sCurrencyCode . number_format( doubleval( $oValue ), $iDecimals ) );
 	}
 	
+	/**
+	* Generic style transformation
+	* 
+	* @param string $sHow
+	* @param mixed $oValue
+	* @return array
+	*/
 	protected static function styleTransform( $sHow, $oValue )
 	{	
 		return self::alignTransform( $sHow, $oValue );
 	}
 	
+	/**
+	* Generic code replacement. Requires codeModel to be defined.
+	* 
+	* @param string $sHow
+	* @param mixed $oValue
+	* @param int $iDecimals The number of decimal places to apply
+	* @return array
+	*/
 	protected static function codeLookup( $sHow, $oValue )
 	{
 		if ( $_sCodeModel = PS::getCodeModel() )
@@ -216,6 +330,13 @@ class CPSTransform extends CPSHelperBase
 		return array( $oValue, false, array() );
 	}
 	
+	/**
+	* Generic alignment transformations for grids
+	* 
+	* @param string $sHow
+	* @param mixed $oValue
+	* @return array
+	*/
 	protected static function alignTransform( $sHow, $oValue )
 	{
 		$_arStyle = array();

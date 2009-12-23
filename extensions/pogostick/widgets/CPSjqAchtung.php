@@ -1,21 +1,23 @@
 <?php
-/**
- * CPSjqAchtung class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage Widgets
- * @since v1.0.5
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
- * CPSjqAchtung provides
  * Widget that implements jQuery plug-in {@link http://code.google.com/p/achtung-ui/ Achtung}
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	widgets
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
  */
 class CPSjqAchtung extends CPSjQueryWidget
 {
@@ -32,14 +34,6 @@ class CPSjqAchtung extends CPSjQueryWidget
 	* Currently, a CDN is in use and no local files are required...
 	*/
 	const PS_EXTERNAL_PATH = '/jquery-plugins/achtung';
-
-	//********************************************************************************
-	//* Property Access Methods
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Magic Method Ovverides
-	//********************************************************************************
 
 	//********************************************************************************
 	//* Public Methods
@@ -99,7 +93,7 @@ class CPSjqAchtung extends CPSjQueryWidget
 		$_sId = $this->getTargetSelector( $sTargetSelector );
 		
 		$this->script =<<<CODE
-$('{$_sId}').{$this->widgetName}({$_sOptions});
+jQuery('{$_sId}').{$this->widgetName}({$_sOptions});
 CODE;
 
 		return $this->script;

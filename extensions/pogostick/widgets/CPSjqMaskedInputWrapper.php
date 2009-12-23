@@ -1,23 +1,24 @@
 <?php
-/**
-* CPSjqMaskedInputWrapper class file.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @link http://ps-yii-extensions.googlecode.com
-* @copyright Copyright &copy; 2009 Pogostick, LLC
-* @license http://www.gnu.org/licenses/gpl.html
-*/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
 
 /**
-* The CPSjqMaskedInputWrapper allows the {@link http://digitalbush.com/projects/masked-input-plugin/ jQuery Masked Input Plugin} to be used in Yii.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @version SVN: $Id$
-* @filesource
-* @package psYiiExtensions
-* @subpackage Widgets
-* @since psYiiExtensions v1.0.4
-*/
+ * The CPSjqMaskedInputWrapper allows the {@link http://digitalbush.com/projects/masked-input-plugin/ jQuery Masked Input Plugin} to be used in Yii.
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	widgets
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.4
+ *  
+ * @filesource
+ */
 class CPSjqMaskedInputWrapper extends CPSjQueryWidget
 {
 	//********************************************************************************
@@ -80,7 +81,6 @@ class CPSjqMaskedInputWrapper extends CPSjQueryWidget
 	
 	/**
 	* Generates the javascript code for the widget
-	*
 	* @return string
 	*/
 	protected function generateJavascript( $sTargetSelector = null, $arOptions = null, $sInsertBeforeOptions = null )
@@ -89,7 +89,7 @@ class CPSjqMaskedInputWrapper extends CPSjQueryWidget
 		$_sId = $this->getTargetSelector( $sTargetSelector );
 		
 		$this->script =<<<CODE
-$('{$_sId}').{$this->widgetName}("{$_sMask}");
+jQuery('{$_sId}').{$this->widgetName}("{$_sMask}");
 CODE;
 
 		return $this->script;

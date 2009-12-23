@@ -1,22 +1,25 @@
 <?php
-/**
- * CPSHelperBase class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtension
- * @subpackage helpers
- * @since v1.0.6
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * Base functionality that I want in ALL my helper classes
-*/
-class CPSHelperBase
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.5
+ *  
+ * @filesource
+ */
+class CPSHelperBase implements IPogostick
 {
 	//********************************************************************************
 	//* Private Members
@@ -158,24 +161,24 @@ class CPSHelperBase
 	}
 	
 	/**
-	* Returns the number of "interval" between the two dates
+	* Returns the differnce between the two dates
 	* 
 	* @param string $dtStart
 	* @param string $dtEnd
-	* @param int $sInterval
+	* @returns DateInterval
 	*/
-	public static function dateDiff( $dtStart, $dtEnd )
+	public static function dateDiff( $dtStart, $dtEnd, $bAbsolute = false )
 	{
 		$_dtStart = new DateTime( $dtStart );
 		$_dtEnd = new DateTime( $dtEnd );
-		return $_dtEnd->diff( $_dtStart );
+		return $_dtEnd->diff( $_dtStart, $bAbsolute );
 	}
 	
 	/**
 	* Returns value (or current date) formatted
 	* 
 	* @param mixed $sDate
-	* @param string $sFormat
+	* @param string $sFormat The date() format. Defaults to 'Y-m-d'
 	* @return string
 	*/
 	public static function asDate( $sDate = null, $sFormat = 'Y-m-d' )
@@ -187,16 +190,17 @@ class CPSHelperBase
 	* Returns value (or current date/time) formatted
 	* 
 	* @param mixed $sDate
-	* @param string $sFormat
+	* @param string $sFormat The date() format. Defaults to 'Y-m-d H:i:s'
 	* @return string
 	*/
 	public static function asDateTime( $sDate = null, $sFormat = 'Y-m-d H:i:s' )
 	{
-		return date( $sFormat, $sDate ? strtotime( $sDate ) : time() );
+		return self::asDate( $sDate, $sFormat );
 	}
 	
 	/**
-	* Merges an array without overwriting...
+	* Merges an array without overwriting. Accepts multiple array arguments
+	* If an index exists in the target array, it is appended to the value.
 	* @returns array
 	*/
 	public static function smart_array_merge()
@@ -208,7 +212,7 @@ class CPSHelperBase
 		{
 			foreach ( func_get_arg( $_i ) as $_sKey => $_oValue )
 			{
-				if ( isset( $_arResult[ $_sKey ] ) )  $_oValue = $_arResult[ $_sKey ] . ' ' . $_oValue;
+				if ( isset( $_arResult[ $_sKey ] ) ) $_oValue = $_arResult[ $_sKey ] . ' ' . $_oValue;
 				$_arResult[ $_sKey ] = $_oValue;
 			}
 		}
@@ -221,26 +225,27 @@ class CPSHelperBase
 	//********************************************************************************
 	
 	/**
+	* Returns the current clientScript object. Caches for subsequent calls...
+	* @returns CClientScript
+	* @access public
+	* @static
+	*/
+	public static function _cs() 
+	{ 
+		return self::getClientScript();
+	}
+
+	/**
 	* Registers a CSS file
 	* 
 	* @param string URL of the CSS file
 	* @param string media that the CSS file should be applied to. If empty, it means all media types.
+	* @access public
+	* @static
 	*/
-	public static function registerCssFile( $sUrl, $sMedia = '' )
+	public static function _rcf( $sUrl, $sMedia = '' )
 	{
-		self::getClientScript()->registerCssFile( $sUrl, $sMedia );
-	}
-
-	/**
-	* Registers a piece of CSS code.
-	* 
-	* @param string ID that uniquely identifies this piece of CSS code
-	* @param string the CSS code
-	* @param string media that the CSS code should be applied to. If empty, it means all media types.
-	*/
-	public static function registerCss( $sId, $sCss, $sMedia = '' )
-	{
-		self::getClientScript()->registerCss( $sId, $sCss, $sMedia );
+		return self::_cs()->registerCssFile( $sUrl, $sMedia );
 	}
 
 	/**
@@ -253,10 +258,71 @@ class CPSHelperBase
 	* <li>CClientScript::POS_BEGIN : the script is inserted at the beginning of the body section.</li>
 	* <li>CClientScript::POS_END : the script is inserted at the end of the body section.</li>
 	* </ul>
+	* @access public
+	* @static
 	*/
 	public static function registerScriptFile( $sUrl, $ePosition = self::POS_HEAD )
 	{
-		self::getClientScript()->registerScriptFile( $sUrl, $ePosition );
+		return self::_rsf( $sUrl, $ePosition );
+	}
+
+	/**
+	* Registers a CSS file
+	* 
+	* @param string URL of the CSS file
+	* @param string media that the CSS file should be applied to. If empty, it means all media types.
+	* @access public
+	* @static
+	*/
+	public static function registerCssFile( $sUrl, $sMedia = '' )
+	{
+		return self::_rcf( $sUrl, $sMedia );
+	}
+
+	/**
+	* Registers a piece of CSS code.
+	* 
+	* @param string ID that uniquely identifies this piece of CSS code
+	* @param string the CSS code
+	* @param string media that the CSS code should be applied to. If empty, it means all media types.
+	* @access public
+	* @static
+	*/
+	public static function _rc( $sId, $sCss, $sMedia = '' )
+	{
+		return self::_cs()->registerCss( $sId, $sCss, $sMedia );
+	}
+
+	/**
+	* Registers a piece of CSS code.
+	* 
+	* @param string ID that uniquely identifies this piece of CSS code
+	* @param string the CSS code
+	* @param string media that the CSS code should be applied to. If empty, it means all media types.
+	* @access public
+	* @static
+	*/
+	public static function registerCss( $sId, $sCss, $sMedia = '' )
+	{
+		return self::_rc( $sId, $sCss, $sMedia );
+	}
+
+	/**
+	* Registers a javascript file.
+	* 
+	* @param string URL of the javascript file
+	* @param integer the position of the JavaScript code. Valid values include the following:
+	* <ul>
+	* <li>CClientScript::POS_HEAD : the script is inserted in the head section right before the title element.</li>
+	* <li>CClientScript::POS_BEGIN : the script is inserted at the beginning of the body section.</li>
+	* <li>CClientScript::POS_END : the script is inserted at the end of the body section.</li>
+	* </ul>
+	* @access public
+	* @static
+	*/
+	public static function _rsf( $sUrl, $ePosition = CClientScript::POS_HEAD )
+	{
+		self::_cs()->registerScriptFile( $sUrl, $ePosition );
 	}
 
 	/**
@@ -272,10 +338,33 @@ class CPSHelperBase
 	* <li>CClientScript::POS_LOAD : the script is inserted in the window.onload() function.</li>
 	* <li>CClientScript::POS_READY : the script is inserted in the jQuery's ready function.</li>
 	* </ul>
+	* @access public
+	* @static
+	*/
+	public static function _rs( $sId, $sScript, $ePosition = CClientScript::POS_READY )
+	{
+		self::_cs()->registerScript( $sId, $sScript, $ePosition );
+	}
+
+	/**
+	* Registers a piece of javascript code.
+	* 
+	* @param string ID that uniquely identifies this piece of JavaScript code
+	* @param string the javascript code
+	* @param integer the position of the JavaScript code. Valid values include the following:
+	* <ul>
+	* <li>CClientScript::POS_HEAD : the script is inserted in the head section right before the title element.</li>
+	* <li>CClientScript::POS_BEGIN : the script is inserted at the beginning of the body section.</li>
+	* <li>CClientScript::POS_END : the script is inserted at the end of the body section.</li>
+	* <li>CClientScript::POS_LOAD : the script is inserted in the window.onload() function.</li>
+	* <li>CClientScript::POS_READY : the script is inserted in the jQuery's ready function.</li>
+	* </ul>
+	* @access public
+	* @static
 	*/
 	public static function registerScript( $sId, $sScript, $ePosition = CClientScript::POS_READY )
 	{
-		self::getClientScript()->registerScript( $sId, $sScript, $ePosition );
+		return self::_rs( $sId, $sScript, $ePosition );
 	}
 
 	/**
@@ -285,10 +374,27 @@ class CPSHelperBase
 	* @param string name attribute of the meta tag. If null, the attribute will not be generated
 	* @param string http-equiv attribute of the meta tag. If null, the attribute will not be generated
 	* @param array other options in name-value pairs (e.g. 'scheme', 'lang')
+	* @access public
+	* @static
+	*/
+	public static function _rmt( $sContent, $sName = null, $sHttpEquiv = null, $arOptions = array() )
+	{
+		self::_cs()->registerMetaTag( $sContent, $sName, $sHttpEquiv, $arOptions );
+	}
+	
+	/**
+	* Registers a meta tag that will be inserted in the head section (right before the title element) of the resulting page.
+	* 
+	* @param string content attribute of the meta tag
+	* @param string name attribute of the meta tag. If null, the attribute will not be generated
+	* @param string http-equiv attribute of the meta tag. If null, the attribute will not be generated
+	* @param array other options in name-value pairs (e.g. 'scheme', 'lang')
+	* @access public
+	* @static
 	*/
 	public static function registerMetaTag( $sContent, $sName = null, $sHttpEquiv = null, $arOptions = array() )
 	{
-		self::getClientScript()->registerMetaTag( $sContent, $sName, $sHttpEquiv, $arOptions );
+		return self::_rmt( $sContent, $sName, $sHttpEquiv, $arOptions );
 	}
 
 }

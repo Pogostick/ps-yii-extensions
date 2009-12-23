@@ -1,47 +1,57 @@
 <?php
-/**
- * CPSModel class file.
- *
- * @filesource
- * @copyright Copyright &copy; 2009 Pogostick, LLC.
- * @author Jerry Ablan <jablan@pogostick.com>
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage models
- * @since v1.0.0
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * CPSModel provides base functionality for models
  * 
+ * @package 	psYiiExtensions
+ * @subpackage 	models
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ * 
  * @property-read string $modelName The class name of the model
  */
-class CPSModel extends CActiveRecord
+class CPSModel extends CActiveRecord implements IPogostick
 {
 	//********************************************************************************
 	//* Members
 	//********************************************************************************
 
 	/**
+	* Our metadata, cached for speed
+	* @var CDbMetaData
+	*/
+	protected $m_oMetaData;
+	public function getMetaData() { return $this->m_arMetaData ? $this->m_arMetaData : $this->m_arMetaData = $this->getMetaData(); }
+		
+	/**
 	* Our schema, cached for speed
 	* @var array
 	*/
 	protected $m_arSchema;
 	public function getSchema() { return $this->m_arSchema ? $this->m_arSchema : $this->m_arSchema = $this->getMetaData()->columns; }
-		
+
 	/**
-	 * The associated database table name prefix
+	 * The associated database table name prefix.
+	 * If Yii version is greater than 1.0, the dbConnection's table prefix for this model will be set.
 	 * @var string
 	 */
 	protected $m_sTablePrefix = null;
-	public function getTablePrefix() { return $this->m_sTablePrefix; }
-	public function setTablePrefix( $sValue ) { $this->m_sTablePrefix = $sValue; }	
+	public function getTablePrefix() { return ( version_compare( YiiBase::getVersion(), '1.1.0' ) > 0 ) ? $this->getDbConnection()->getTablePrefix() : $this->m_sTablePrefix; }
+	public function setTablePrefix( $sValue ) { ( version_compare( YiiBase::getVersion(), '1.1.0' ) > 0 ) ? $this->getDbConnection()->setTablePrefix( $sValue ) : $this->m_sTablePrefix = $sValue; }
 	
 	/***
 	* Current transaction if any
-	* 
 	* @var CDbTransaction
 	*/
 	protected $m_oTransaction = null;
@@ -80,15 +90,39 @@ class CPSModel extends CActiveRecord
 	* @var string
 	*/
 	protected $m_sModelName = null;
+	/**
+	* Get this model's name.
+	* @returns string
+	*/
 	public function getModelName() { return $this->m_sModelName; }
+	/**
+	* Set this model's name
+	* @param string $sValue
+	*/
+	public function setModelName( $sValue ) { $this->m_sModelName = $sValue; }
 	
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 
 	/***
-	* Sets our default behaviors
+	* Builds a CPSModel and sets the model name
 	* 
+	* @param array $arAttributes
+	* @param string $sScenario
+	* @return CPSModel
+	*/
+	public function __construct( $arAttributes = array(), $sScenario = '' )
+	{
+		parent::__construct( $arAttributes, $sScenario );
+		$this->m_sModelName = ( version_compare( PHP_VERSION, '5.3.0' ) > 0 ) ? get_called_class() : get_class( $this );
+	}
+
+	/***
+	* Sets our default behaviors. 
+	* All CPSModel's have the DataFormat and Utility behaviors added by default.
+	* @returns array
+	* @see CModel::behaviors
 	*/
 	public function behaviors()
 	{
@@ -114,18 +148,15 @@ class CPSModel extends CActiveRecord
 	*/
 	public function beginTransaction()
 	{
-		if ( ! $this->m_oTransaction )
-		{
-			$this->m_oTransaction = $this->dbConnection->beginTransaction();
-			return;
-		}
-		
-		throw new CDbException( Yii::t( 'psYiiExtensions', 'Unable to start new transaction. transaction already in progress.' ) );
+		//	Already in a transaction?
+		if ( $this->m_oTransaction )
+			throw new CDbException( Yii::t( 'psYiiExtensions', 'Unable to start new transaction. transaction already in progress.' ) );
+
+		$this->m_oTransaction = $this->dbConnection->beginTransaction();
 	}
 	
 	/**
 	* Commits the current transaction if any
-	* 
 	*/
 	public function commitTransaction()
 	{
@@ -138,7 +169,6 @@ class CPSModel extends CActiveRecord
 
 	/**
 	* Rolls back the current transaction, if any...
-	* 
 	*/
 	public function rollbackTransaction()
 	{
@@ -151,7 +181,6 @@ class CPSModel extends CActiveRecord
 	
 	/***
 	* Returns the errors on this model in a single string suitable for logging.
-	* 
 	* @param string $sAttribute Attribute name. Use null to retrieve errors for all attributes.
 	* @returns string
 	*/
@@ -169,14 +198,9 @@ class CPSModel extends CActiveRecord
 		return $_sOut;
 	}
 	
-	//********************************************************************************
-	//* Public Methods
-	//********************************************************************************
-	
 	/**
 	* Override of CModel::setAttributes
 	* Populates member variables as well.
-	* 
 	* @param array $arValues
 	* @param string $sScenario
 	*/
@@ -210,18 +234,4 @@ class CPSModel extends CActiveRecord
 		return parent::__sleep();
 	}
 
-	//********************************************************************************
-	//* Event Handlers
-	//********************************************************************************
-	
-	/**
-	* Grab our name
-	* @param string $sClassName
-	*/
-	public function afterConstruct()
-	{
-		$this->m_sModelName = get_class( $this );
-		parent::afterConstruct();
-	}
-	
 }

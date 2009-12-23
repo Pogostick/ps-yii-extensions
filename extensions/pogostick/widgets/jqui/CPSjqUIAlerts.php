@@ -1,23 +1,24 @@
 <?php
-/**
-* CPSjqUIAlerts class file.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @link http://ps-yii-extensions.googlecode.com
-* @copyright Copyright &copy; 2009 Pogostick, LLC
-* @license http://www.gnu.org/licenses/gpl.html
-*/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
 
 /**
-* The CPSjqUIAlerts allows the {@link http://abeautifulsite.net/notebook/87 jQuery Alerts} to be used in Yii.
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @version SVN: $Id$
-* @filesource
-* @package psYiiExtensions
-* @subpackage Widgets
-* @since 1.0.4
-*/
+ * The CPSjqUIAlerts allows the {@link http://abeautifulsite.net/notebook/87 jQuery Alerts} to be used in Yii.
+ * 
+ * @package 	psYiiExtensions.widgets
+ * @subpackage 	jqui
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.4
+ *  
+ * @filesource
+ */
 class CPSjqUIAlerts extends CPSjqUIWrapper
 {
 	//********************************************************************************
@@ -37,6 +38,9 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 	//* Methods
 	//********************************************************************************
 
+	/**
+	* Initialize
+	*/
 	public function init()
 	{
 		parent::init();
@@ -44,7 +48,6 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 		//	Set my name...	
 		$this->widgetName = self::PS_WIDGET_NAME;
 	}
-		
 
 	/**
 	* Registers the needed CSS and JavaScript.
@@ -52,25 +55,32 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 	public function registerClientScripts()
 	{
 		//	Daddy...
-		$_oCS = parent::registerClientScripts();
+		parent::registerClientScripts();
 		
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "{$this->baseUrl}/jquery.alerts.js" );
+		CPSHelp::_rsf( "{$this->baseUrl}/jquery.alerts.js" );
 
 		//	Register css files...
-		$_oCS->registerCssFile( "{$this->baseUrl}/jquery.alerts.css" );
+		CPSHelp::_rcf( "{$this->baseUrl}/jquery.alerts.css" );
 		
-		return $_oCS;
+		return CPSHelp::_cs();
 	}
 
+	/**
+	* Generate our script
+	* 
+	* @param string $sTargetSelector
+	* @param array $arOptions
+	* @param string $sInsertBeforeOptions
+	* @return string
+	*/
 	protected function generateJavascript( $sTargetSelector = null, $arOptions = null, $sInsertBeforeOptions = null )
 	{
 		//	Use jQuery UI
-		return '$.alerts.dialogClass = "ui-dialog";';
-		
+		return 'jQuery.alerts.dialogClass = "ui-dialog";';
 	}
 	
 	//********************************************************************************
@@ -107,9 +117,6 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 		//	Daddy...
 		parent::loadScripts( $oWidget, $sTheme );
 		
-		//	Get script object...
-		$_oCS = Yii::app()->getClientScript();
-		
 		//	Instantiate if needed...
 		$_oWidget = ( null == $oWidget ) ? new CPSjqUIWrapper() : $oWidget;
 
@@ -118,10 +125,10 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 		$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
 		
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "{$_oWidget->baseUrl}/jquery.alerts.js" );
+		CPSHelp::_rsf( "{$_oWidget->baseUrl}/jquery.alerts.js" );
 
 		//	Register css files...
-		$_oCS->registerCssFile( "{$_oWidget->baseUrl}/jquery.alerts.css" );
+		CPSHelp::_rcf( "{$_oWidget->baseUrl}/jquery.alerts.css" );
 		
 		//	Restore path
 		$_oWidget->baseUrl = $_sOldPath;

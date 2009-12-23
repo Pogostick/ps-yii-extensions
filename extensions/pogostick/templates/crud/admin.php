@@ -1,14 +1,30 @@
 <?php
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+
 /**
  * This is the template for generating the admin view for crud.
  * The following variables are available in this template:
  * - $ID: the primary key name
  * - $modelClass: the model class name
  * - $columns: a list of column schema objects
+ * 
+ * @package 	psYiiExtensions.templates
+ * @subpackage 	crud
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
  */
 
 //	Build an array for the data grid...
-
 $_sCols = null;
 foreach ( $columns as $column ) $_sCols .= ( ( $_sCols ) ? ', ' : '' ) . '\'' . $column->name . '\'';
 $_sCols = "array( {$_sCols } )";
@@ -29,14 +45,14 @@ echo <<<HTML
 		)
 	);
 
-	echo CPSDataGrid::create( 
-		'{$modelClass}', 
-		\$models, 
-		{$_sCols},
-		array( 'edit', 'delete' ), 
-		\$sort, 
-		\$pages, 
-		array( 'header' => '' ) 
+	\$_arOpts = array(
+		'actions' => array( 'edit', 'delete' ),
+		'sort' => \$sort,
+		'pages' => \$pages,
+		'columns' => {$_sCols},
+		'pagerOptions' => array( 'header' => '' ),
+		'dataItemName' => '{$modelClass}',
 	);
-
+	
+	echo CPSDataGrid::createEx( \$models, \$_arOpts );
 HTML;

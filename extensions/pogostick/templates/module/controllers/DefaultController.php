@@ -1,7 +1,25 @@
 <?php
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+
 /**
-* This is the template for generating the controller class file.
-*/
+ * This is the template for generating the controller class file.
+ *
+ * @package 	psYiiExtensions.templates.module
+ * @subpackage 	controllers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ * 
+ */
  
 $controllerClass = 'DefaultController';
 $className = $controllerClass . ' class';
@@ -17,12 +35,6 @@ class {$controllerClass} extends CPSController
 	//* Public Methods
 	//********************************************************************************
 	
-	public function init()
-	{
-		//	Phone home...
-		parent::init();
-	}
-
 	/**
 	 * Default admin action. Change conditions for your system
 	 *

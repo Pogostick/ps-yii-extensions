@@ -1,20 +1,30 @@
 <?php
-/**
- * CPSDataGrid class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage widgets
- * @since v1.0.6
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
+ */
+
+/**
+ * Simple data grid
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	widgets
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
  */
 class CPSDataGrid extends CPSHelperBase
 {
+	//********************************************************************************
+	//* Private Members
+	//********************************************************************************
+	
 	/**
 	* Columns in this grid
 	* 
@@ -38,90 +48,41 @@ class CPSDataGrid extends CPSHelperBase
     /**
     * Outputs a data grid with pager on the bottom
     * 
-    * @param string $sDataName
-    * @param array $arModel
-    * @param array $arColumns
-    * @param array $arActions
-    * @param CSort $oSort
-    * @param CPagination $oPages
-    * @param array $arPagerOptions
-    * @param mixed $sLinkView
-    */
-	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array(), $sLinkView = 'update', $bEncode = true )
-	{
-		$_sOut = $_sPager = null;
-		self::$m_iColumnCount = 0;
-		self::$m_arGridOptions = $arOptions;
-		
-		$_sPK = PS::o( $arPagerOptions, 'pk', null, true );
-		$_sGridHeader = PS::o( $arPagerOptions, 'gridHeader', $sDataName, true );
-		$_bAccordion = PS::o( $arPagerOptions, 'accordion', false, true );
-		$_arDivComment = PS::o( $arPagerOptions, 'divComment', array(), true );
-
-		//	Build pager...
-		if ( $_oWidget = Yii::app()->controller->createWidget( 'CPSLinkPager', array_merge( array( 'pages' => $oPages ), $arPagerOptions ) ) )
-		{
-			$_sPager = $_oWidget->run( true );
-
-			//	Build grid...
-			if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) 
-				$_sOut .= $_sPager;
-		}
-		
-		//	Accordion header?
-		if ( $_bAccordion ) echo '<h3 class="ui-accordion-header ui-helper-reset ui-state-active ui-corner-top"><span class="ui-icon ui-icon-triangle-1-s" ></span><a href="#"><strong>' . $_sGridHeader . '</strong></a></h3>';
-		
-		$_sOut .= self::beginDataGrid( $arModel, $oSort, $arColumns, ! empty( $arActions ) );
-		$_sOut .= self::getDataGridRows( $arModel, $arColumns, $arActions, $sDataName, $sLinkView, $_sPK, $bEncode, $_arDivComment );
-		$_sOut .= self::endDataGrid();
-		
-		if ( $_oWidget && ( $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_LEFT || $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_RIGHT ) )
-			$_sOut .= $_sPager;
-
-		return $_sOut;
-	}
-
-    /**
-    * Outputs a data grid with pager on the bottom
-    * 
     * @param array $arModel Array of models
     * @param array $arOptions Grid options
     * @returns string
     */
 	public static function createEx( $arModel, $arOptions = array() )
 	{
+		//	Initialize...
 		$_sOut = $_sPager = null;
 		self::$m_iColumnCount = 0;
 		self::$m_arGridOptions = $arOptions;
 		
-		$_sPK = PS::o( $arOptions, 'pk', null, true );
-		$_sDataName = self::getOption( $arOptions, 'dataItemName', 'Your Data' );
-		$_arColumns = self::getOption( $arOptions, 'columns', array() );
-		$_arActions = self::getOption( $arOptions, 'actions', array() );
-		$_oSort = self::getOption( $arOptions, 'sort', null );
-		$_oPages = self::getOption( $arOptions, 'pages', null );
-		$_sGridHeader = PS::o( $arOptions, 'gridHeader', $sDataName, true );
+		//	Store our model, get our options
+		self::$m_arGridOptions['data'] = $arModel;
+		$_arPagerOptions = self::getOption( $arOptions, 'pagerOptions', array(), true );
+		$_sPagerClass = PS::o( $arOptions, 'pagerClass', 'CPSLinkPager', true );
 		$_bAccordion = PS::o( $arOptions, 'accordion', false, true );
-		$_bEncode = PS::o( $arOptions, 'encode', true, true );
-		$_arDivComment = PS::o( $arOptions, 'divComment', array(), true );
-		$_arPagerOptions = self::getOption( $arOptions, 'pagerOptions', array() );
-		$_sLinkView = self::getOption( $arOptions, 'linkView', 'update' );
-		$_sModelName = PS::o( $arOptions, 'modelName', null );
+		$_sGridHeader = PS::o( $arOptions, 'gridHeader', null, true );
 		
-		$_iPagerLocation = self::getOption( $_arPagerOptions, 'location', CPSLinkPager::TOP_RIGHT, true );
+		//	Only work with CPSLinkPagers
+		if ( ! is_a( $_sPagerClass, 'CPSLinkPager' ) ) $_sPagerClass = 'CPSLinkPager';
+
+		$_iPagerLocation = self::getOption( $_arPagerOptions, 'location', $_sPagerClass::TOP_RIGHT, true );
 
 		//	Create widget...
 		if ( $_oPages ) 
 		{
-			$_oWidget = Yii::app()->controller->createWidget( 'CPSLinkPager', array_merge( array( 'pages' => $_oPages ), $_arPagerOptions ) );
+			$_oWidget = Yii::app()->controller->createWidget( $_sPagerClass, array_merge( array( 'pages' => $_oPages ), $_arPagerOptions ) );
 		
 			if ( $_oWidget ) 
 			{
 				$_oWidget->pagerLocation = self::nvl( $_iPagerLocation, $_oWidget->pagerLocation );
 				$_sPager = $_oWidget->run( true );
-				
+
 				//	Where do you want it?
-				if ( $_oWidget->pagerLocation == CPSLinkPager::TOP_LEFT || $_oWidget->pagerLocation == CPSLinkPager::TOP_RIGHT ) $_sOut .= $_sPager;
+				if ( $_oWidget->pagerLocation == $_sPagerClass::TOP_LEFT || $_oWidget->pagerLocation == $_sPagerClass::TOP_RIGHT ) $_sOut .= $_sPager;
 			}
 		}
 
@@ -129,30 +90,33 @@ class CPSDataGrid extends CPSHelperBase
 		if ( $_bAccordion ) echo '<h3 class="ui-accordion-header ui-helper-reset ui-state-active ui-corner-top ps-grid-accordion-header"><span class="ui-icon ui-icon-triangle-1-s" ></span><a href="#"><strong>' . $_sGridHeader . '</strong></a></h3>';
 		
 		//	Build our grid
-		$_sOut .= self::beginDataGrid( $arModel, $_oSort, $_arColumns, ! empty( $_arActions ) );
-		$_sOut .= self::getDataGridRows( $arModel, $_arColumns, $_arActions, $_sDataName, $_sLinkView, $_sPK, $_bEncode, $_arDivComment );
+		$_sOut .= self::beginDataGrid();
+		$_sOut .= self::getDataGridRows();
 		$_sOut .= self::endDataGrid();
-		
+
 		//	Display on the bottom...
-		if ( $_oWidget && ( $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_LEFT || $_oWidget->pagerLocation == CPSLinkPager::BOTTOM_RIGHT ) ) 
+		if ( $_oWidget && ( $_oWidget->pagerLocation == $_sPagerClass::BOTTOM_LEFT || $_oWidget->pagerLocation == $_sPagerClass::BOTTOM_RIGHT ) ) 
 			$_sOut .= $_sPager;
 		
 		return $_sOut;
 	}
 
 	/**
-	* Creates a data grid
-	* 
-	* @param array $arModel
-	* @param CSort $oSort
-	* @param array $arColumns
-	* @param boolean $bAddActions
+	* Creates a data grid from options
 	* @return string
 	*/
-	public static function beginDataGrid( $arModel, $oSort = null, $arColumns = array(), $bAddActions = true )
+	protected static function beginDataGrid()
 	{
+		$oSort = PS::o( self::$m_arGridOptions, 'sort', null );
+		$arColumns = PS::o( self::$m_arGridOptions, 'columns', array() );
+		$arModel = PS::o( self::$m_arGridOptions, 'data', null );
+		$_arActions = PS::o( self::$m_arGridOptions, 'actions', array() );
+		$bAddActions = ! empty( $_arActions );
+		$_sGridId = PS::o( self::$m_arGridOptions, 'id', null, true );
+		$_sGridClass = PS::o( self::$m_arGridOptions, 'gridClass', 'dataGrid', true );
+		
 		$_sHeaders = null;
-		$_oModel = is_array( $arModel ) && count( arModel ) ? current( $arModel ) : null;
+		$_oModel = is_array( $arModel ) && count( $arModel ) ? current( $arModel ) : null;
 
 		if ( ! $_oModel && null != ( $_sModelName = PS::o( self::$m_arGridOptions, 'modelName' ) ) )
 			$_oModel = new $_sModelName();
@@ -172,27 +136,44 @@ class CPSDataGrid extends CPSHelperBase
 			self::$m_iColumnCount++;
 		}
 			
-		return CHtml::tag( 'table', array( 'width' => '100%', 'class' => 'dataGrid' ), CHtml::tag( 'tr', array(), $_sHeaders ), false );
+		//	Begin our grid
+		$_arTableOpts = array(
+			'class' => $_sGridClass,
+		);
+		
+		if ( $_sGridId ) $_arTableOpts['id'] = $_sGridId;
+		
+		return PS::tag( 'table', $_arTableOpts, PS::tag( 'tr', array(), $_sHeaders ), false );
 	}
 	
 	/***
-	* Builds all rows for a dataGrid
+	* Builds all data rows for a grid
 	* If a column name is prefixed with an '@', it will be stripped and the column will be a link to the 'update' view
 	* If a column name is prefixed with an '?', it will be stripped and the column will be treated as a boolean
 	* 
-	* @param array $arModel
-	* @param array $arColumns
-	* @param array $arActions
-	* @param string $sDataName
-	* @param mixed $sLinkView
-	* @return string
+	* @returns string
 	*/
-	public static function getDataGridRows( $arModel, $arColumns = array(), $arActions = null, $sDataName = 'item', $sLinkView = null, $sPK = null, $bEncode = true, $arDivComment = array() )
+	protected static function getDataGridRows()
 	{
-		$_sOut = null;
-		if ( null === $arActions ) $arActions = array( 'edit', 'delete' );
+		//	Pull are variables from the options
+		$arModel = PS::o( self::$m_arGridOptions, 'data', array() );
+		$sLinkView = PS::o( self::$m_arGridOptions, 'linkView', null );
+		$sDataName = PS::o( self::$m_arGridOptions, 'dataItemName', 'item' );
+		$arColumns = PS::o( self::$m_arGridOptions, 'columns', array() );
+		$arActions = PS::o( self::$m_arGridOptions, 'actions', null );
+		$sPK = PS::o( self::$m_arGridOptions, 'pk', null );
+		$bEncode = PS::o( self::$m_arGridOptions, 'encode', true );
+		$arDivComment = PS::o( self::$m_arGridOptions, 'divComment', array() );
+		$_sRowIdTemplate = PS::o( self::$m_arGridOptions, 'rowIdTemplate', '_grid_row_{pk}' );
+		
+		//	sub options
 		$_arOptions = PS::o( $arActions, 'options', array(), true );
 		$_sLockColumn = PS::o( $_arOptions, 'lockColumn', null, true );
+		
+		//	Build the grid rows
+		$_sOut = null;
+		$_iRow = 0;
+		if ( null === $arActions ) $arActions = array( 'edit', 'delete' );
 		
 		if ( ! $arModel || ( is_array( $arModel ) && ! count( $arModel ) ) ) 
 			$_sOut .= CHtml::tag( 'tr', array(), PS::tag( 'td', array( 'class' => 'ps-data-grid-no-data-found', 'colspan' => self::$m_iColumnCount ), 'No Records Found' ) );
@@ -281,8 +262,18 @@ class CPSDataGrid extends CPSHelperBase
 				}
 				
 				$_arRowOpts = array();
+				
 				if ( count( $arDivComment ) && $_oModel->hasErrors() )
 					$_arRowOpts = array( 'class' => $arDivComment[1], 'title' => implode( ', ', current( $_oModel->getErrors() ) ) );
+					
+				//	Row id template? Fill it in
+				if ( $_sRowIdTemplate ) 
+				{
+					if ( false !== stripos( $_sRowIdTemplate, '{#}' ) )
+						$_arRowOpts['id'] = str_ireplace( '{#}', $_iRow, $_sRowIdTemplate );
+					else if ( false !== stripos( $_sRowIdTemplate, '{pk}' ) && $_sPK )
+						$_arRowOpts['id'] = str_ireplace( '{pk}', $_oModel->{$_sPK}, $_sRowIdTemplate );
+				}
 				
 				$_sOut .= CHtml::tag( 'tr', $_arRowOpts, $_sTD );
 				
@@ -304,6 +295,9 @@ class CPSDataGrid extends CPSHelperBase
 						$_sOut .= CHtml::tag( 'tr', $_arOuterOptions, $_sRow );
 					}
 				}
+				
+				//	Increment row counter
+				$_iRow++;
 			}
 		}
 		
@@ -314,9 +308,9 @@ class CPSDataGrid extends CPSHelperBase
 	* Closes a data grid
 	* 
 	*/
-	public static function endDataGrid()
+	protected static function endDataGrid()
 	{
-		return '</TABLE>';
+		return PS::closeTag( 'table' );
 	}
 
 	/**
@@ -324,7 +318,7 @@ class CPSDataGrid extends CPSHelperBase
 	* 
 	* @param string $sLink
 	*/
-	public static function appendSortArrow( $sLink )
+	protected static function appendSortArrow( $sLink )
 	{
 		return $sLink;
 		
@@ -344,4 +338,45 @@ class CPSDataGrid extends CPSHelperBase
 
 		return $sLink . PS::tag( 'span', array( 'title' => $_sTitle, 'class' => "ui-icon ui-icon-arrowthickstop-1-{$_sDir} ps-data-grid-sort-arrow"  ) );
 	}	
+
+	//********************************************************************************
+	//* Deprecated
+	//********************************************************************************
+	
+    /**
+    * Outputs a data grid with pager on the bottom
+    * 
+    * @param string $sDataName
+    * @param array $arModel
+    * @param array $arColumns
+    * @param array $arActions
+    * @param CSort $oSort
+    * @param CPagination $oPages
+    * @param array $arPagerOptions
+    * @param mixed $sLinkView
+    * @deprecated Please use CPSDataGrid::createEx()
+    * @see CPSDataGrid::createEx
+    */
+	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array(), $sLinkView = 'update', $bEncode = true )
+	{
+		//	Build option array for createEx
+		$_arOpts = array();
+		$_arOpts['modelName'] = PS::o( $arPagerOptions, 'modelName', null, true );
+		$_arOpts['accordion'] = PS::o( $arPagerOptions, 'accordion', false, true );
+		$_arOpts['gridHeader'] = PS::o( $arPagerOptions, 'gridHeader', null, true );
+		$_arOpts['divComment'] = PS::o( $arPagerOptions, 'divComment', array(), true );
+		$_arOpts['pk'] = PS::o( $arPagerOptions, 'pk', null, true );
+
+		$_arOpts['pages'] = $oPages;
+		$_arOpts['sort'] = $oSort;
+		$_arOpts['actions'] = $arActions;
+		$_arOpts['columns'] = $arColumns;
+		$_arOpts['dataItemName'] = $sDataName;
+		$_arOpts['linkView'] = $sLinkView;
+		$_arOpts['encode'] = $bEncode;
+		$_arOpts['pagerOptions'] = $arPagerOptions;
+
+		return self::createEx( $arModel, $_arOpts );
+	}
+
 }

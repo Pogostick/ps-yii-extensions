@@ -11,12 +11,17 @@
 /**
  * CPSApiEvent provides specialized events for {@link CPSApiBehavior}
  *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @package 	psYiiExtensions
+ * @subpackage 	events
+ * @since 		1.0.4
+ * 
  * @filesource
- * @package psYiiExtensions
- * @subpackage Events
- * @since 1.0.4
+ * 
+ * @property string $url The API call url
+ * @property string $query The API call query
+ * @property string $results The API call results
  */
 class CPSApiEvent extends CEvent
 {

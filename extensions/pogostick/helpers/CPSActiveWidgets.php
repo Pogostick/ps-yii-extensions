@@ -1,21 +1,29 @@
 <?php
-/**
- * CPSActiveWidgets class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @package psYiiExtensions
- * @subpackage Helpers
- * @since 1.0.0
+ * A collection of helper methods that augment CHtml. 
+ * Extended by the PS class.
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.0
+ *  
+ * @filesource
+ * 
+ * @property string $codeModel The name of the code model for code lookups
+ * @property string $hintTemplate The template for displaying hints
  */
-class CPSActiveWidgets extends CHtml
+class CPSActiveWidgets extends CHtml implements IPogostick
 {
 	//********************************************************************************
 	//* Constants
@@ -27,29 +35,29 @@ class CPSActiveWidgets extends CHtml
 	/**
 	* These are a list of form elements that can be used along with the methods in this class.
 	*/
-	const TEXTAREA = 'activeTextArea';
-	const TEXT = 'activeTextField';
-	const HIDDEN = 'activeHiddenField';
-	const PASSWORD = 'activePasswordField';
-	const FILE = 'activeFileField';
-	const RADIO = 'activeRadioButton';
-	const CHECK = 'activeCheckBox';
-	const DROPDOWN = 'activeDropDownList';
-	const LISTBOX = 'activeListBox';
-	const CHECKLIST = 'activeCheckBoxList';
-	const RADIOLIST = 'activeRadioButtonList';
-	const WYSIWYG = 'wysiwyg';
-	const CKEDITOR = 'ckeditor';
-	const MARKITUP = 'markItUp';
-	const CODEDD = 'activeCodeDropDownList';
-	const JQUI = 'CPSjqUIWrapper';
-	const FG_MENU = 'CPSfgMenu';
+	const 	TEXTAREA = 'activeTextArea';
+	const 	TEXT = 'activeTextField';
+	const 	HIDDEN = 'activeHiddenField';
+	const 	PASSWORD = 'activePasswordField';
+	const 	FILE = 'activeFileField';
+	const 	RADIO = 'activeRadioButton';
+	const 	CHECK = 'activeCheckBox';
+	const 	DROPDOWN = 'activeDropDownList';
+	const 	LISTBOX = 'activeListBox';
+	const 	CHECKLIST = 'activeCheckBoxList';
+	const 	RADIOLIST = 'activeRadioButtonList';
+	const 	WYSIWYG = 'wysiwyg';
+	const 	CKEDITOR = 'ckeditor';
+	const 	MARKITUP = 'markItUp';
+	const 	CODEDD = 'activeCodeDropDownList';
+	const 	JQUI = 'CPSjqUIWrapper';
+	const 	FG_MENU = 'CPSfgMenu';
 
 	/**
 	* Faux methods for tranformation types
 	*/
-	const CODE_DISPLAY = 'inactiveCodeDisplay';		//	Not a real method, just a placeholder
-	const TEXT_DISPLAY = 'inactiveTextDisplay';		//	Not a real method, just a placeholder
+	const 	CODE_DISPLAY = 'inactiveCodeDisplay';		//	Not a real method, just a placeholder
+	const 	TEXT_DISPLAY = 'inactiveTextDisplay';		//	Not a real method, just a placeholder
 	
 	//	Types of drop downs...
 	const	DD_GENERIC = -1;
@@ -99,6 +107,10 @@ class CPSActiveWidgets extends CHtml
 	public function getHintTemplate() { return self::$m_sHintTemplate; }
 	public function setHintTemplate( $sValue ) { self::$m_sHintTemplate = $sValue; }
 	
+	/**
+	* Maps normal form fields to a type
+	* @var array
+	*/
 	protected static $m_arInputMap = array( 
 		self::TEXTAREA => 'textarea',
 		self::TEXT => 'text',
@@ -123,14 +135,14 @@ class CPSActiveWidgets extends CHtml
 		'select' => 'slt_',
 		'file' => 'file_',
 	);
-	public static function getIdPrefix( $sType ) { return ( self::$useIdPrefixes && is_array( self::$idPrefixes ) && self::nvl( self::$idPrefixes[ $sType ] ) ) ? self::$idPrefixes[ $sType ] : null; }
+	public static function getIdPrefix( $sType ) { return ( self::$useIdPrefixes && is_array( self::$idPrefixes ) && PS::nvl( self::$idPrefixes[ $sType ] ) ) ? self::$idPrefixes[ $sType ] : null; }
 
 	/**
 	* Name Prefixes
 	*/
 	public static $useNamePrefixes = false;
 	public static $namePrefixes = array();
-	public static function getNamePrefix( $sType ) { return ( self::$useNamePrefixes && is_array( self::$namePrefixes ) && self::nvl( self::$namePrefixes[ $sType ] )  ) ? self::$namePrefixes[ $sType ] : null; }
+	public static function getNamePrefix( $sType ) { return ( self::$useNamePrefixes && is_array( self::$namePrefixes ) && PS::nvl( self::$namePrefixes[ $sType ] )  ) ? self::$namePrefixes[ $sType ] : null; }
 	
 	public static $requiredHtml = null;
 	
@@ -495,7 +507,7 @@ HTML;
 		
 		//	Set up the cool input effects...
 		$_sScript =<<<CODE
-\$("{$sSelector}").addClass("{$_sOffClass}");\$("{$sSelector}").focus(function(){\$(this).addClass("{$_sOnClass}").removeClass("{$_sOffClass}");}).blur(function(){\$(this).removeClass("{$_sOnClass}").addClass("{$_sOffClass}");});
+jQuery("{$sSelector}").addClass("{$_sOffClass}");jQuery("{$sSelector}").focus(function(){jQuery(this).addClass("{$_sOnClass}").removeClass("{$_sOffClass}");}).blur(function(){jQuery(this).removeClass("{$_sOnClass}").addClass("{$_sOffClass}");});
 CODE;
 	
 		//	Register script
@@ -744,7 +756,7 @@ HTML;
 				if ( $_bSubmit || $_sLink == '_submit_' )
 				{
 					$_sLink = '#';
-					$_sOnClick = "return \$(" . ( $_sFormId ? "'#{$_sFormId}'" : "'div.yiiForm>form'" ) . ").submit();";
+					$_sOnClick = "return jQuery(" . ( $_sFormId ? "'#{$_sFormId}'" : "'div.yiiForm>form'" ) . ").submit();";
 				}
 			}
 		}
@@ -761,34 +773,10 @@ HTML;
 	}
 
 	/**
-	* If value is not set or empty, last passed in argument is returned
-	* 
-	* Allows for multiple nvl chains ( nvl(x,y,z,null) )
-	* 
-	* @param mixed 
-	* @returns mixed
-	*/
-	public static function nvl()
-	{
-		$_oDefault = null;
-		$_iArgs = func_num_args();
-		$_arArgs = func_get_args();
-		
-		for ( $_i = 0; $_i < $_iArgs; $_i++ )
-		{
-			if ( isset( $_arArgs[ $_i ] ) && ! empty( $_arArgs[ $_i ] ) )
-				return $_arArgs[ $_i ];
-				
-			$_oDefault = $_arArgs[ $_i ];
-		}
-
-		return $_oDefault;
-	}
-	
-	/**
 	* Formats the created and modified dates 
 	* 
 	* @param mixed $oModel
+	* @deprecated This method has been moved to CPSModel
 	*/
 	public static function showDates( $oModel, $sCreatedColumn = 'created', $sModifiedColumn = 'modified', $sDateFormat = 'm/d/Y h:i:s A' )
 	{
@@ -982,11 +970,11 @@ HTML;
 	public static function flashMessage( $sWhich = 'success', $bLeft = false )
 	{
 		if ( Yii::app()->user->hasFlash( $sWhich ) ) 
-		{
-			$_sDiv = 'ps-flash-display' . ( $bLeft ? '-left' : '' );
-			CPSHelp::registerScript( 'ps.flash.display', '$(".' . $_sDiv . '").animate({opacity: 1.0}, 3000).fadeOut();', CClientScript::POS_READY );
-			return self::tag( 'div', array( 'class' => $_sDiv ), Yii::app()->user->getFlash( $sWhich ) );
-		}
+			$_sMsg = Yii::app()->user->getFlash( $sWhich );
+
+		$_sDiv = 'ps-flash-display' . ( $bLeft ? '-left' : '' );
+		CPSHelp::registerScript( 'ps.flash.display', 'jQuery(".' . $_sDiv . '").animate({opacity: 1.0}, 3000).fadeOut();', CClientScript::POS_READY );
+		return self::tag( 'div', array( 'class' => $_sDiv ), $_sMsg );
 	}
 	
 	/**

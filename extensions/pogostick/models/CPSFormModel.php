@@ -1,24 +1,27 @@
 <?php
-/**
- * CPSFormModel class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPSFormModel provides something stupid
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	models
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.4
+ *  
  * @filesource
- * @package psYiiExtensions
- * @subpackage Models
- * @since 1.0.4
+ * 
+ * @property-read string $modelName The class name of the model
  */
-class CPSFormModel extends CFormModel
+class CPSFormModel extends CFormModel implements IPogostick
 {
 	/**
 	* Fixup attribute labels for my funky naming conventions...
