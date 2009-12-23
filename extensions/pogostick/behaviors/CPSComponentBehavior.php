@@ -1,29 +1,33 @@
 <?php
-/**
- * CPSComponentBehavior class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPSComponentBehavior provides base component behaviors to other classes
- *
- * @author Jerry Ablan <jablan@pogostick.com>
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	behaviors
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
- * @package psYiiExtensions
- * @subpackage Behaviors
+ * @since 		v1.0.1
+ * 
  * @filesource
- * @since 1.0.1
  */
-class CPSComponentBehavior extends CBehavior
+class CPSComponentBehavior extends CBehavior implements IPogostickBase
 {
 	//********************************************************************************
 	//* Constants
 	//********************************************************************************
 
+	/**
+	* Standard output formats
+	*/
 	const	JSON = 0;
 	const	HTTP = 1;
 	const	ASSOC_ARRAY = 2;
@@ -54,6 +58,8 @@ class CPSComponentBehavior extends CBehavior
 	* @access protected
 	*/
 	protected $m_sInternalName;
+	public function getInternalName() { return $this->m_sInternalName; }
+	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
 	/**
 	* The delimiter to use for prefixes. This must contain only characters that are not allowed
 	* in variable names (i.e. '::', '||', '.', etc.). Defaults to '::'. There is no length limit,
@@ -64,25 +70,14 @@ class CPSComponentBehavior extends CBehavior
 	* @access protected
 	*/
 	protected static $m_sPrefixDelimiter = '::';
-
-	//********************************************************************************
-	//* Property Accessors
-	//********************************************************************************
-
-	/**
-	* Getters for member variables
-	*
-	*/
-	public function getInternalName() { return $this->m_sInternalName; }
-	public function getNamePrefix() { return $this->m_sInternalName . $this->m_sPrefixDelimiter; }
 	public function getPrefixDelimiter() { return $this->m_sPrefixDelimiter; }
-	public function getValidPattern() { return $this->m_arValidPattern; }
-
+	public function getNamePrefix() { return $this->m_sInternalName . $this->m_sPrefixDelimiter; }
 	/**
-	* Setters for member variables
-	*
+	* Our component's valid pattern
+	* @var array
 	*/
-	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
+	protected $m_arValidPattern = array();
+	public function getValidPattern() { return $this->m_arValidPattern; }
 	public function setValidPattern( $arValue ) { $this->m_arValidPattern = $arValue; }
 
 	//********************************************************************************
@@ -111,8 +106,7 @@ class CPSComponentBehavior extends CBehavior
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
 
 		//	Preinitialize if available
-		if ( method_exists( $this, 'preinit' ) )
-			$this->preinit();
+		if ( method_exists( $this, 'preinit' ) ) $this->preinit();
 	}
 
 	//********************************************************************************
@@ -231,36 +225,11 @@ class CPSComponentBehavior extends CBehavior
 		$this->getOptionsObject()->mergeOptions( $arOptions );
 	}
 
-	//********************************************************************************
-	//* Public Methods
-	//********************************************************************************
-
 	/**
-	* Easier on the eyes
-	*
-	* @access private
-	*/
-	private function getBaseOptions()
-	{
-		return(
-			array(
-				'baseUrl_' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'checkOptions_' => array( CPSOptionManager::META_DEFAULTVALUE => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
-				'validOptions_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'checkCallbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => true, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
-				'validCallbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'callbacks_' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'extLibUrl_' => array( CPSOptionManager::META_DEFAULTVALUE => DIRECTORY_SEPARATOR, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-			)
-		);
-	}
-
-  /**
     * Checks the callback array to see if they're valid.
     *
     * @throws CException
     * @returns true If all is good.
-
     */
 	public function checkCallbacks()
 	{
@@ -513,19 +482,42 @@ class CPSComponentBehavior extends CBehavior
 		
 		//	Handler exists? Call it
 		if ( method_exists( $this->owner, $sName ) )
-			return call_user_method( $sName, $this->owner, $oEvent );
+			return call_user_func_array( array( $this->owner, $sName ), array( $oEvent ) );
 	
 		//	See if pre-handler exists...
-		if ( 0 === strncmp( 'on', $sName, 2 ) )
+		if ( 0 === strncasecmp( 'on', $sName, 2 ) ) 
 			$sName = substr( $sName, 2 );
-
-		$sName{0} = strtolower( $sName{0} );
+			
+		$sName = lcfirst( $sName );
 
 		if ( method_exists( $this->owner, $sName ) )
-			return call_user_method( $sName, $this->owner, $oEvent );
+			return call_user_func_array( array( $this->owner, $sName ), array( $oEvent ) );
 			
 		//	Not there? Throw error...
-		return parent::raiseEvent( $sName, $oEvent );
+		return parent::raiseEvent( $_sOrigName, $oEvent );
+	}
+
+	//********************************************************************************
+	//* Private Methods
+	//********************************************************************************
+
+	/**
+	* Easier on the eyes
+	* @access private
+	*/
+	private function getBaseOptions()
+	{
+		return(
+			array(
+				'baseUrl_' => 'string',
+				'checkOptions_' => 'bool:true',
+				'validOptions_' => 'array:array()',
+				'checkCallbacks_' => 'bool:true',
+				'validCallbacks_' => 'array:array()',
+				'callbacks_' => 'array:array()',
+				'extLibUrl_' => 'string:' . DIRECTORY_SEPARATOR,
+			)
+		);
 	}
 
 }

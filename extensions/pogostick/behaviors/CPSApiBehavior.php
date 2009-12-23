@@ -1,22 +1,23 @@
 <?php
-/**
- * CPSApiBehavior class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPSApiBehavior provides a behavior to classes for making API calls
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN $Id$
- * @package psYiiExtensions
- * @subpackage Behaviors
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	behaviors
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.5
+ * 
  * @filesource
- * @since 1.0.5
  */
 class CPSApiBehavior extends CPSComponentBehavior
 {
@@ -66,25 +67,25 @@ class CPSApiBehavior extends CPSComponentBehavior
 		return(
 			array(
 				//	API options
-				'altApiKey' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'appendFormat' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
-				'apiBaseUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'apiKey' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'apiQueryName' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'apiToUse' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'apiSubUrls' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'httpMethod' => array( CPSOptionManager::META_DEFAULTVALUE => self::HTTP_GET, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'requestData' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'requestMap' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'requireApiQueryName' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
-				'testApiKey' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'testAltApiKey' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'userAgent' => array( CPSOptionManager::META_DEFAULTVALUE => 'Pogostick Components for Yii; (+http://www.pogostick.com/yii)', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'altApiKey' => 'string:',
+				'appendFormat' => 'boolean:false',
+				'apiBaseUrl' => 'string:',
+				'apiKey' => 'string:',
+				'apiQueryName' => 'string:',
+				'apiToUse' => 'string:',
+				'apiSubUrls' => 'array:array()',
+				'httpMethod' => 'string:' . self::HTTP_GET,
+				'requestData' => 'array:array()',
+				'requestMap' => 'array:array()',
+				'requireApiQueryName' => 'boolean:false',
+				'testApiKey' => 'string:',
+				'testAltApiKey' => 'string:',
+				'userAgent' => 'string:Pogostick Components for Yii; (+http://www.pogostick.com/yii)',
 			)
 		);
 	}
 
-	 /**
+	/**
 	 * Make an HTTP request
 	 *
 	 * @param string $sUrl The URL to call

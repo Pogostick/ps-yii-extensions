@@ -1,23 +1,23 @@
 <?php
-/**
- * CPSWidgetBehavior class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPSWidgetBehavior provides convenient access to typical "widget" behaviors
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	behaviors
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.4
+ * 
  * @filesource
- * @package psYiiExtensions
- * @subpackage Behaviors
- * @filesource
- * @since 1.0.4
  */
 class CPSWidgetBehavior extends CPSComponentBehavior
 {
@@ -49,10 +49,10 @@ class CPSWidgetBehavior extends CPSComponentBehavior
 	{
 		return(
 			array(
-				'html_' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'script_' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'cssFile_' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'viewName_' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'html_' => 'string:',
+				'script_' => 'string:',
+				'cssFile_' => 'string:',
+				'viewName_' => 'string:',
 			)
 		);
 	}

@@ -1,22 +1,25 @@
 <?php
-/**
- * CPSDataFormatBehavior.php class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage behaviours
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
- * If attached to a model, fields are formatted per your configuration.
- * @property CPSSort $defaultSort The default sort for a model.
+ * If attached to a model, fields are formatted per your configuration. Also provides a default sort for a model
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	behaviors
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ * 
+ * @filesource
  */
-class CPSDataFormatBehavior extends CActiveRecordBehavior
+class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 {
 	//********************************************************************************
 	//* Member Variables

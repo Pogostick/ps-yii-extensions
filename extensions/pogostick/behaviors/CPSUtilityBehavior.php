@@ -1,19 +1,25 @@
 <?php
-/**
- * CPSUtilityBehavior class file.
- *
- * @filesource
- * @author Jerry Ablan <jablan@pogostick.com>
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage behaviors
- * @since v1.0.6
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
-class CPSUtilityBehavior extends CBehavior
+
+/**
+ * Provides some common utility methods for owner objects
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	behaviors
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ * 
+ * @filesource
+ */
+class CPSUtilityBehavior extends CBehavior implements IPogostick
 {
 	//********************************************************************************
 	//* Private Members
@@ -150,7 +156,7 @@ class CPSUtilityBehavior extends CBehavior
 	* <li>CClientScript::POS_END : the script is inserted at the end of the body section.</li>
 	* </ul>
 	*/
-	public static function _rsf( $sUrl, $ePosition = self::POS_HEAD )
+	public static function _rsf( $sUrl, $ePosition = CClientScript::POS_HEAD )
 	{
 		self::_cs()->registerScriptFile( $sUrl, $ePosition );
 	}

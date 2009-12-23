@@ -1,24 +1,28 @@
 <?php
-/**
- * CPSDeltaChangeBehavior.php class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage behaviours
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * Provides reference between saves for changed columns
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	behaviors
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ * 
+ * @filesource
  * 
  * @property array $lastAttributes The attributes when the model was fresh
  * @property boolean $caseInsensitive Changes are compared in a case-insensitive manner if true. Defaults to true.
  */
-class CPSDeltaChangeBehavior extends CActiveRecordBehavior
+class CPSDeltaChangeBehavior extends CActiveRecordBehavior implements IPogostick
 {
 	//********************************************************************************
 	//* Member Variables

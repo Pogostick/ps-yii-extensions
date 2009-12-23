@@ -1,23 +1,28 @@
 <?php
-/**
- * CPSSoftDeleteBehavior.php class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage behaviours
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * Provides soft-deleting of records
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	behaviors
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.5
+ * 
+ * @filesource
+ * 
  * @property string $softDeleteColumn The attribute which indicates a soft-delete
  * @property array $softDeleteValue Two item array containing the [false,true] values for soft-deletion. Defaults to array(0,1) ('false' and 'true' respectively).
  */
-class CPSSoftDeleteBehavior extends CActiveRecordBehavior
+class CPSSoftDeleteBehavior extends CActiveRecordBehavior implements IPogostick
 {
 	//********************************************************************************
 	//* Member Variables

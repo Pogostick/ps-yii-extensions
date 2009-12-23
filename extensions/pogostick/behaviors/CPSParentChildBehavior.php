@@ -1,21 +1,25 @@
 <?php
-/**
- * CPSParentChildBehavior.php class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
- * @package psYiiExtensions
- * @subpackage behaviours
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * Provides functionality helpful for parent/child relationships
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	behaviors
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ * 
+ * @filesource
  */
-class CPSParentChildBehavior extends CActiveRecordBehavior
+class CPSParentChildBehavior extends CActiveRecordBehavior implements IPogostick
 {
 	//********************************************************************************
 	//* Public Methods

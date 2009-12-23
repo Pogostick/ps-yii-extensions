@@ -1,22 +1,23 @@
 <?php
-/**
- * CPSOAuthBehavior class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
- 
+
 /**
  * CPSOAuthBehavior provides OAuth support to any Pogostick component
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @package psYiiExtensions
- * @subpackage Behaviors
- * @since 1.0.0
- * @uses pogostick.components.oauth.OAuth.php
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	behaviors
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.0
+ * 
+ * @filesource
  */
 class CPSOAuthBehavior extends CPSApiBehavior
 {
