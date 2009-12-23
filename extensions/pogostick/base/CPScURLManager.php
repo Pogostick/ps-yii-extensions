@@ -1,23 +1,27 @@
 <?php
-/**
- * CPScURLManager class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPScURLManager provides a manager for the cURL objects
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @package psYiiExtensions
- * @subpackage Base
- * @since 1.0.0
+ * 
+ * @todo This class is not fully implemented.
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	base
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN $Id$
+ * @since 		v1.0.0
+ * 
+ * @filesource
  */
-class CPScURLManager
+class CPScURLManager implements IPogostick
 {
 	//********************************************************************************
 	//* Member Variables

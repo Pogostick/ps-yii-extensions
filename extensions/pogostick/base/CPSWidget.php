@@ -1,34 +1,26 @@
 <?php
-/**
- * CPSWidget class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.gnu.org/licenses/gpl.html
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
- * The CPSWidget is the base class for all Pogostick widgets for Yii
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @package psYiiExtensions
- * @subpackage Base
+ * CPSWidget is the base class for all Pogostick widgets for Yii.
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	base
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ * 
  * @filesource
- * @since 1.0.0
  */
-class CPSWidget extends CInputWidget
+class CPSWidget extends CInputWidget implements IPogostickBehavior
 {
-	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-
-	const BEHAVIOR_META_METHODS = '_classMethods';
-	const BEHAVIOR_META_OBJECT = '_object';
-	const BEHAVIOR_META_VALID = '_validOptions';
-	const BEHAVIOR_META_VARS = '_classVars';
-
 	//********************************************************************************
 	//* Member variables
 	//********************************************************************************
@@ -47,6 +39,9 @@ class CPSWidget extends CInputWidget
 	* @see $m_sPrefixDelimiter
 	*/
 	protected $m_sInternalName;
+	public function getInternalName() { return $this->m_sInternalName; }
+	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
+	
 	/**
 	* The delimiter to use for prefixes. This must contain only characters that are not allowed
 	* in variable names (i.e. '::', '||', '.', etc.). Defaults to '::'. There is no length limit,
@@ -56,6 +51,10 @@ class CPSWidget extends CInputWidget
 	* @var string
 	*/
 	protected $m_sPrefixDelimiter = '::';
+	public function getPrefixDelimiter() { return $this->m_sPrefixDelimiter; }
+	protected function setPrefixDelimiter( $sValue ) { $this->m_sPrefixDelimiter = $sValue; }
+	public function getNamePrefix() { return $this->m_sInternalName . $this->m_sPrefixDelimiter; }
+	
 	/**
 	* As behaviors are added to the object, this is set to true to quickly determine if the
 	* component does in fact contain behaviors.
@@ -63,14 +62,32 @@ class CPSWidget extends CInputWidget
 	* @var bool
 	*/
 	protected $m_bHasBehaviors = false;
+	public function getHasBehaviors() { return $this->m_bHasBehaviors; }
+	public function setHasBehaviors( $bValue ) { $this->m_bHasBehaviors = $bValue; }
+	
 	/**
 	* A private array containing all the attached behaviors information of this component.
 	*
 	* @var array
 	*/
 	protected $m_arBehaviors = null;
+	
+	/**
+	* Retrieves the behaviors attached to this component
+	* @returns array
+	*/
+	public function getBehaviors() { return $this->m_arBehaviors; }
 
+	/**
+	* Our CSS files
+	* @var array
+	*/
 	protected $m_arCssFiles = array();
+	
+	/**
+	* Our JS files
+	* @var array
+	*/
 	protected $m_arScriptFiles = array();
 	
 	/**
@@ -86,30 +103,7 @@ class CPSWidget extends CInputWidget
 	//********************************************************************************
 
 	/**
-	* Getters for internal members
-	*/
-	public function getInternalName() { return $this->m_sInternalName; }
-	public function getNamePrefix() { return $this->m_sInternalName . $this->m_sPrefixDelimiter; }
-	public function getPrefixDelimiter() { return $this->m_sPrefixDelimiter; }
-	public function getHasBehaviors() { return $this->m_bHasBehaviors; }
-
-	/**
-	* Setters for internal members
-	*/
-	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
-	protected function setPrefixDelimiter( $sValue ) { $this->m_sPrefixDelimiter = $sValue; }
-	public function setHasBehaviors( $bValue ) { $this->m_bHasBehaviors = $bValue; }
-
-	/**
-	* Retrieves the behaviors attached to this component
-	*
-	* @returns array
-	*/
-	public function getBehaviors() { return $this->m_arBehaviors; }
-
-	/**
 	* Convenience functions to access the behavior assets
-	*
 	*/
 	public function &hasBehaviorMethod( $sMethodName ) { return CPSCommonBase::hasBehaviorMethod( $this, $sMethodName ); }
 	public function &hasBehaviorProperty( $sName ) { return CPSCommonBase::hasBehaviorProperty( $this, $sName ); }
@@ -140,8 +134,7 @@ class CPSWidget extends CInputWidget
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
 		
 		//	Preinitialize if available
-		if ( method_exists( $this, 'preinit' ) )
-			$this->preinit();
+		if ( method_exists( $this, 'preinit' ) ) $this->preinit();
 	}
 
 	//********************************************************************************
@@ -161,11 +154,10 @@ class CPSWidget extends CInputWidget
 		list( $this->name, $this->id ) = $this->resolveNameID();
 
 		//	Call our behaviors init() method if they exist
-		foreach ( $this->m_arBehaviors as $_oBehave )
+		foreach ( array_keys( $this->m_arBehaviors ) as $_sKey )
 		{
-			//	Only call init() on our own behaviors
-			if ( $_oBehave instanceof CPSComponentBehavior )
-				call_user_method( 'init', $_oBehave );
+			if ( method_exists( $this->m_arBehaviors[ $_sKey ][ self::BEHAVIOR_META_OBJECT ], 'init' ) )
+				$this->m_arBehaviors[ $_sKey ][ self::BEHAVIOR_META_OBJECT ]->init();
 		}
 	}
 	
@@ -199,6 +191,7 @@ class CPSWidget extends CInputWidget
 	public function registerClientScripts()
 	{
 		//	Get the clientScript
+		
 		$_oCS = Yii::app()->getClientScript();
 
 		//	Register a special CSS file if we have one...
@@ -256,27 +249,27 @@ class CPSWidget extends CInputWidget
 			$this->m_bHasBehaviors |= true;
 
 			//	Initialize arrays
-			if ( ! isset( $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] ) || null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] ) $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] = array();
-			if ( ! isset( $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] ) || null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] ) $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] = array();
+			if ( ! isset( $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ] ) || null == $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ] ) $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ] = array();
+			if ( ! isset( $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ] ) || null == $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ] ) $this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ] = array();
 
 			//	Set our object			
-			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_OBJECT ] = $_oObject;
+			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_OBJECT ] = $_oObject;
 
 			//	Place valid options in here for fast checking...
-			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VALID ] = array();
+			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VALID ] = array();
 
 			//	Cache behavior methods for lookup speed
-			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] =
+			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ] =
 				array_merge(
-					$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ],
+					$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_METHODS ],
 					array_change_key_case( array_flip( array_values( get_class_methods( $_oObject ) ) ), CASE_LOWER
 				)
 			);
 
 			//	Cache behavior members for lookup speed
-			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] =
+			$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ] =
 				array_merge(
-					$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ],
+					$this->m_arBehaviors[ $sName ][ self::BEHAVIOR_META_VARS ],
 					array_change_key_case( array_flip( array_keys( get_class_vars( get_class( $this ) ) ) ), CASE_LOWER
 				)
 			);
@@ -394,7 +387,7 @@ class CPSWidget extends CInputWidget
 		
 		//	Check behavior methods...
 		if ( $_oBehave = $this->hasBehaviorMethod( $sName ) )
-			try { return call_user_func_array( array( $_oBehave[ CPSCommonBase::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
+			try { return call_user_func_array( array( $_oBehave[ self::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 			
 		if ( $_oEvent && 1 == $_oEvent->getCode() )
 			throw $_oEvent;

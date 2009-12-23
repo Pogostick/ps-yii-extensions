@@ -1,11 +1,10 @@
 <?php
-/**
- * CPSOptionManager class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
@@ -95,13 +94,14 @@
  * Once you declare an option private (suffixing with the underscore as above, you no longer need to provide the underscore when 
  * accessing the option. The underscore is used ONLY when adding new options and is dropped once added.
  *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @filesource
- * @package psYiiExtensions
- * @subpackage Base
+ * @package 	psYiiExtensions
+ * @subpackage 	base
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.0
  */
-class CPSOptionManager
+class CPSOptionManager implements IPogostick
 {
 	//********************************************************************************
 	//* Constants
@@ -464,7 +464,7 @@ class CPSOptionManager
 		//	Split up pattern (type{:default{:extname{:required{:allowed}}}})
 		$_arPattern = explode( ':', $sPattern );
 		$_arRules[ self::META_TYPE ] = $_arPattern[ 0 ];
-		if ( isset( $_arPattern[ 1 ] ) ) $_arRules[ self::META_DEFAULTVALUE ] = $_arPattern[ 1 ];
+		if ( isset( $_arPattern[ 1 ] ) ) $_arRules[ self::META_DEFAULTVALUE ] = ( $_arPattern[ 0 ] != 'string' ? eval( 'return ' . $_arPattern[ 1 ] . ';' ) : $_arPattern[ 1 ] );
 		if ( isset( $_arPattern[ 2 ] ) ) $_sExtName = $_arPattern[ 2 ];
 		if ( isset( $_arPattern[ 3 ] ) ) $_arRules[ self::META_REQUIRED ] = $_arPattern[ 3 ];
 		if ( isset( $_arPattern[ 4 ] ) ) $_arRules[ self::META_ALLOWED ] = explode( '|', $_arPattern[ 4 ] );

@@ -1,26 +1,28 @@
 <?php
-/**
- * CPSComponent class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.gnu.org/licenses/gpl.html
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * CPSComponent is the base class for all Pogostick components for Yii.
- *
- * They contain special functionality to call behavior methods without the need for chaining.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @package psYiiExtensions
- * @subpackage Base
+ * It contains functionality to call behavior methods without the need for chaining.
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	base
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN $Id$
+ * @since 		v1.0.0
+ * 
  * @filesource
- * @since 1.0.0
+ * @property string $internalName The internal name of the component. Used as the name of the behavior when attaching.
+ * @property string $prefixDelimiter The delimiter to use for prefixes.
  */
-class CPSComponent extends CApplicationComponent
+class CPSComponent extends CApplicationComponent implements IPogostickBehavior
 {
 	//********************************************************************************
 	//* Member variables
@@ -37,9 +39,13 @@ class CPSComponent extends CApplicationComponent
 	*
 	* @var string
 	* @see setInternalName
+	* @see getInternalName
 	* @see $m_sPrefixDelimiter
 	*/
 	protected $m_sInternalName;
+	public function getInternalName() { return $this->m_sInternalName; }
+	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
+	
 	/**
 	* The delimiter to use for prefixes. This must contain only characters that are not allowed
 	* in variable names (i.e. '::', '||', '.', etc.). Defaults to '::'. There is no length limit,
@@ -49,6 +55,10 @@ class CPSComponent extends CApplicationComponent
 	* @var string
 	*/
 	protected $m_sPrefixDelimiter = '::';
+	public function getPrefixDelimiter() { return $this->m_sPrefixDelimiter; }
+	protected function setPrefixDelimiter( $sValue ) { $this->m_sPrefixDelimiter = $sValue; }
+	public function getNamePrefix() { return $this->m_sInternalName . $this->m_sPrefixDelimiter; }
+
 	/**
 	* As behaviors are added to the object, this is set to true to quickly determine if the
 	* component does in fact contain behaviors.
@@ -56,38 +66,23 @@ class CPSComponent extends CApplicationComponent
 	* @var bool
 	*/
 	protected $m_bHasBehaviors = false;
+	public function getHasBehaviors() { return $this->m_bHasBehaviors; }
+	public function setHasBehaviors( $bValue ) { $this->m_bHasBehaviors = $bValue; }
+
 	/**
 	* A private array containing all the attached behaviors information of this component.
-	*
 	* @var array
 	*/
 	protected $m_arBehaviors = null;
+	/**
+	* Retrieves the behaviors attached to this component
+	* @returns array
+	*/
+	public function getBehaviors() { return( $this->m_arBehaviors ); }
 
 	//********************************************************************************
 	//* Property Accessors
 	//********************************************************************************
-
-	/**
-	* Getters for internal members
-	*/
-	public function getInternalName() { return $this->m_sInternalName; }
-	public function getNamePrefix() { return $this->m_sInternalName . $this->m_sPrefixDelimiter; }
-	public function getPrefixDelimiter() { return $this->m_sPrefixDelimiter; }
-	public function getHasBehaviors() { return $this->m_bHasBehaviors; }
-
-	/**
-	* Setters for internal members
-	*/
-	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
-	protected function setPrefixDelimiter( $sValue ) { $this->m_sPrefixDelimiter = $sValue; }
-	public function setHasBehaviors( $bValue ) { $this->m_bHasBehaviors = $bValue; }
-
-	/**
-	* Retrieves the behaviors attached to this component
-	*
-	* @returns array
-	*/
-	public function getBehaviors() { return( $this->m_arBehaviors ); }
 
 	/**
 	* Convenience functions to access the behavior assets
@@ -118,33 +113,12 @@ class CPSComponent extends CApplicationComponent
 		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
 		
 		//	Preinitialize if available
-		if ( method_exists( $this, 'preinit' ) )
-			$this->preinit();
+		if ( method_exists( $this, 'preinit' ) ) $this->preinit();
 	}
 
 	//********************************************************************************
 	//* Yii Overrides
 	//********************************************************************************
-
-	/**
-	 * Attaches a list of behaviors to the component.
-	 * Each behavior is indexed by its name and should be an instance of
-	 * {@link IBehavior}, a string specifying the behavior class, or an
-	 * array of the following structure:
-	 * <code>
-	 * array(
-	 *     'class'=>'path.to.BehaviorClass',
-	 *     'property1'=>'value1',
-	 *     'property2'=>'value2',
-	 * )
-	 * </code>
-	 * @param array list of behaviors to be attached to the component
-	 */
-	public function attachBehaviors( $arBehaviors )
-	{
-		foreach( $arBehaviors as $_sName => $_oBehave )
-			$this->attachBehavior( $_sName, $_oBehave );
-	}
 
 	/**
 	 * Attaches a behavior to this component.
@@ -161,33 +135,37 @@ class CPSComponent extends CApplicationComponent
 		//	Attach the behavior at the parent and add options here...
 		if ( $_oObject = parent::attachBehavior( $sName, $oBehavior ) )
 		{
-			//	Set behavior object's internalName so it can recognize it's own options
-			$_oObject->getOptionsObject()->setInternalName( $sName );
-
 			$this->m_bHasBehaviors |= true;
 			
+			//	Set behavior object's internalName so it can recognize it's own options
+			$_oObject->getOptionsObject()->setInternalName( $sName );
+			$_arBehavior =& $this->m_arBehaviors[ $sName ];
+			
 			//	Initialize arrays
-			if ( ! isset( $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] ) || null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] ) $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] = array();
-			if ( ! isset( $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] ) || null == $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] ) $this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] = array();
+			if ( ! isset( $_arBehavior[ self::BEHAVIOR_META_METHODS ] ) || null === $_arBehavior[ self::BEHAVIOR_META_METHODS ] ) 
+				$_arBehavior[ self::BEHAVIOR_META_METHODS ] = array();
+			
+			if ( ! isset( $_arBehavior[ self::BEHAVIOR_META_VARS ] ) || null === $_arBehavior[ self::BEHAVIOR_META_VARS ] ) 
+				$_arBehavior[ self::BEHAVIOR_META_VARS ] = array();
 			
 			//	Set our object
-			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_OBJECT ] = $_oObject;
+			$_arBehavior[ self::BEHAVIOR_META_OBJECT ] = $_oObject;
 
 			//	Place valid options in here for fast checking...
-			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VALID ] = array();
+			$_arBehavior[ self::BEHAVIOR_META_VALID ] = array();
 
 			//	Cache behavior methods for lookup speed
-			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ] =
+			$_arBehavior[ self::BEHAVIOR_META_METHODS ] =
 				array_merge(
-					$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_METHODS ],
+					$_arBehavior[ self::BEHAVIOR_META_METHODS ],
 					array_change_key_case( array_flip( array_values( get_class_methods( $_oObject ) ) ), CASE_LOWER
 				)
 			);
 
 			//	Cache behavior members for lookup speed
-			$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ] =
+			$_arBehavior[ self::BEHAVIOR_META_VARS ] =
 				array_merge(
-					$this->m_arBehaviors[ $sName ][ CPSCommonBase::BEHAVIOR_META_VARS ],
+					$_arBehavior[ self::BEHAVIOR_META_VARS ],
 					array_change_key_case( array_flip( array_keys( get_class_vars( get_class( $this ) ) ) ), CASE_LOWER
 				)
 			);
@@ -206,11 +184,10 @@ class CPSComponent extends CApplicationComponent
 		parent::init();
 
 		//	Call our behaviors init() method if they exist
-		foreach ( $this->m_arBehaviors as $_oBehave )
+		foreach ( array_keys( $this->m_arBehaviors ) as $_sKey )
 		{
-			//	Only call init() on our own behaviors
-			if ( method_exists( $_oBehave[ CPSCommonBase::BEHAVIOR_META_OBJECT ], 'init' ) )
-				$_oBehave[ CPSCommonBase::BEHAVIOR_META_OBJECT ]->init();
+			if ( method_exists( $this->m_arBehaviors[ $_sKey ][ self::BEHAVIOR_META_OBJECT ], 'init' ) )
+				$this->m_arBehaviors[ $_sKey ][ self::BEHAVIOR_META_OBJECT ]->init();
 		}
 	}
 
@@ -293,10 +270,9 @@ class CPSComponent extends CApplicationComponent
 		
 		//	Check behavior methods...
 		if ( $_oBehave = $this->hasBehaviorMethod( $sName ) )
-			try { return call_user_func_array( array( $_oBehave[ CPSCommonBase::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
+			try { return call_user_func_array( array( $_oBehave[ self::BEHAVIOR_META_OBJECT ], $sName ), $arParams ); } catch ( CException $_ex ) { /* Ignore and pass through */ $_oEvent = $_ex; }
 
-		if ( $_oEvent && 1 == $_oEvent->getCode() )
-			throw $_oEvent;
+		if ( $_oEvent && 1 == $_oEvent->getCode() ) throw $_oEvent;
 
 		//	Try parent first... cache exception
 		return parent::__call( $sName, $arParams );

@@ -1,21 +1,31 @@
 <?php
-/**
- * CPSApiComponent class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
- * CPSApiComponent provides a convenient base class for APIs
- *
- * @author Jerry Ablan <jablan@pogostick.com>
+ * CPSApiComponent provides a convenient base class for APIs.
+ * Introduces three new events:
+ * 
+ * onBeforeApiCall
+ * onAfterApiCall
+ * onRequestComplete
+ * 
+ * Each are called respectively and pass the handler a CPSApiEvent
+ * object with details of the call.
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	base
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version SVN: $Id$
+ * @since 		v1.0.0
+ * 
  * @filesource
- * @package psYiiExtensions
- * @subpackage Base
- * @since 1.0.0
  */
 class CPSApiComponent extends CPSComponent
 {
@@ -205,7 +215,7 @@ class CPSApiComponent extends CPSComponent
 	*
 	* @param CPSApiEvent $oEvent
 	*/
-	public function beforeApiCall( $oEvent )
+	public function beforeApiCall( CPSApiEvent $oEvent )
 	{
 		$this->onBeforeApiCall( $oEvent );
 	}
@@ -215,7 +225,7 @@ class CPSApiComponent extends CPSComponent
 	*
 	* @param CPSApiEvent $oEvent
 	*/
-	public function onBeforeApiCall( $oEvent )
+	public function onBeforeApiCall( CPSApiEvent $oEvent )
 	{
 		$this->raiseEvent( 'onBeforeApiCall', $oEvent );
 	}
@@ -225,7 +235,7 @@ class CPSApiComponent extends CPSComponent
 	*
 	* @param CPSApiEvent $oEvent
 	*/
-	public function afterApiCall( $oEvent )
+	public function afterApiCall( CPSApiEvent $oEvent )
 	{
 		$this->onAfterApiCall( $oEvent );
 	}
@@ -235,7 +245,7 @@ class CPSApiComponent extends CPSComponent
 	*
 	* @param CPSApiEvent $oEvent
 	*/
-	public function onAfterApiCall( $oEvent )
+	public function onAfterApiCall( CPSApiEvent $oEvent )
 	{
 		$this->raiseEvent( 'onAfterApiCall', $oEvent );
 	}
@@ -245,7 +255,7 @@ class CPSApiComponent extends CPSComponent
 	*
 	* @param CPSApiEvent $oEvent
 	*/
-	public function requestComplete( $oEvent )
+	public function requestComplete( CPSApiEvent $oEvent )
 	{
 		$this->onRequestComplete( $oEvent );
 	}
@@ -255,7 +265,7 @@ class CPSApiComponent extends CPSComponent
 	*
 	* @param CPSApiEvent $oEvent
 	*/
-	public function onRequestComplete( $oEvent )
+	public function onRequestComplete( CPSApiEvent $oEvent )
 	{
 		$this->raiseEvent( 'onRequestComplete', $oEvent );
 	}

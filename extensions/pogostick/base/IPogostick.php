@@ -8,15 +8,18 @@
  */
 
 /**
+ * This interface does nothing other than indicate that an object is
+ * part of the psYiiExtension library. 
+ * 
  * @package 	psYiiExtensions
  * @subpackage 	base
  * 
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN $Id$
- * @since 		v1.0.4
+ * @since 		v1.0.6
  * 
  * @filesource
  */
-class CPSException extends CException implements IPogostick
+interface IPogostick
 {
 }

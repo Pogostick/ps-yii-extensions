@@ -1,22 +1,23 @@
 <?php
-/**
- * CPSOAuthComponent class file.
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @license http://www.gnu.org/licenses/gpl.html
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
 /**
  * The CPSOAuthComponent is the base class for all Pogostick widgets for Yii
- *
- * @author Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @package psYiiExtensions
- * @subpackage Base
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	base
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN $Id$
+ * @since 		v1.0.3
+ * 
  * @filesource
- * @since 1.0.3
  */
 class CPSOAuthComponent extends CPSApiComponent
 {

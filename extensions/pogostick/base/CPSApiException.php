@@ -12,8 +12,8 @@
  * @subpackage 	base
  * 
  * @author 		Jerry Ablan <jablan@pogostick.com>
- * @version SVN: $Id$
- * @since 		v1.0.6
+ * @version 	SVN: $Id$
+ * @since 		v1.0.3
  * 
  * @filesource
  */

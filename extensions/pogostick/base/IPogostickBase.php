@@ -8,8 +8,7 @@
  */
 
 /**
- * CPSRESTAction represents a REST action that is defined as a CPSRESTController method.
- * The method name is like 'restXYZ' where 'XYZ' stands for the action name.
+ * This interface defines methods required for base psYiiExtension objects.
  * 
  * @package 	psYiiExtensions
  * @subpackage 	base
@@ -20,28 +19,31 @@
  * 
  * @filesource
  */
-class CPSRESTAction extends CAction implements IPogostick
+interface IPogostickBase extends IPogostick
 {
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 	
 	/**
-	* Runs the REST action.
-	* @throws CHttpException
+	* Get the internal name of our component
+	* @returns string
 	*/
-	public function run()
-	{
-		$_oController = $this->getController();
-		
-		if ( ! ( $_oController instanceof CPSRESTController ) )
-		{
-			$_oController->missingAction( $this->getId() );
-			return;
-		}
-		
-		//	Call the controllers dispatch method...
-		$_oController->dispatchRequest( $this );
-	}
+	public function getInternalName();
+	/**
+	* Set the internal name of this component
+	* @param string
+	*/
+	public function setInternalName( $sValue );
+	/**
+	* Get the internal name with the delimiter appended
+	* @returns string
+	*/
+	public function getNamePrefix();
+	/**
+	* Get the delimiter used in our options indexes
+	* @returns string
+	*/
+	public function getPrefixDelimiter();
 
 }
