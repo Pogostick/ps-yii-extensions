@@ -32,7 +32,7 @@ class CPSModel extends CActiveRecord implements IPogostick
 	* @var CDbMetaData
 	*/
 	protected $m_oMetaData;
-	public function getMetaData() { return $this->m_arMetaData ? $this->m_arMetaData : $this->m_arMetaData = $this->getMetaData(); }
+	public function getMetaData() { return $this->m_oMetaData ? $this->m_oMetaData : $this->m_oMetaData = parent::getMetaData(); }
 		
 	/**
 	* Our schema, cached for speed
@@ -81,7 +81,8 @@ class CPSModel extends CActiveRecord implements IPogostick
 	*/
 	public function getAttributeLabel( $sAttribute )
 	{
-		return PS::o( $this->getAttributeLabels(), $sAttribute, $this->generateAttributeLabel( $sAttribute ) );
+		$_arAttributes = $this->getAttributeLabels();
+		return PS::o( $_arAttributes, $sAttribute, $this->generateAttributeLabel( $sAttribute ) );
 	}
 
 	/**

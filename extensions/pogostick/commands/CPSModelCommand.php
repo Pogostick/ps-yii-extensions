@@ -113,10 +113,13 @@ class CPSModelCommand extends CPSConsoleCommand
 		else  // with regular expressions
 		{
 			$_sPattern = $_arMatches[ 1 ];
-			$_sImport = @rtrim( substr( $_sClassName, 0, strrpos( $_sClassName, $_sPattern ) ), '.' ) . '.*';
+			
+			if ( false !== ( $_iPos = strrpos( $_sClassFile, $_sPattern ) ) )
+				$_sBasePath = Yii::getPathOfAlias( rtrim( substr( $_sClassName, 0, $_iPos ), '.' ) );
+			else
+				$_sBasePath = Yii::getPathOfAlias( 'application.models' );
 			
 			// only regexp is given
-			$_sBasePath = ( $_sImport ? Yii::Import( $_sImport ) : Yii::getPathOfAlias( 'application.models' ) );
 			$this->generateClassNames( $this->schema, $_sPattern );
 			$_arClasses = $this->tables;
 			$this->generateRelations();

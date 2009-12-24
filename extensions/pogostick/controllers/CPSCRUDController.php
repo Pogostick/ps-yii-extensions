@@ -54,9 +54,10 @@ abstract class CPSCRUDController extends CPSController
 		$this->addCommandToMap( 'undelete' );
 
 		//	Set our access rules..
-		$this->addUserAction( self::ACCESS_TO_ANY, 'index' );
-		$this->setUserActionList( self::ACCESS_TO_GUEST, array( 'login', 'register' ) );
-		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'login', 'logout', 'admin', 'create', 'delete', 'logout', 'show', 'update' ) );
+		$this->setUserActionList( self::ACCESS_TO_ANON, array( 'index', 'error' ) );
+		$this->setUserActionList( self::ACCESS_TO_GUEST, array( 'login' ) );
+		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'logout', 'admin', 'create', 'delete', 'logout', 'show', 'list', 'update', 'contact' ) );
+//		$this->setUserActionList( self::ACCESS_TO_ADMIN, array( 'admin' ) );
 	}
 
 	/**
@@ -100,7 +101,7 @@ abstract class CPSCRUDController extends CPSController
 				{
 					case self::ACCESS_TO_ANY:
 					case self::ACCESS_TO_ANON:
-						$_sVerb = 'allow'; 	
+						$_sVerb = 'allow';
 						$_sValid = '*'; 	
 						break;
 						
@@ -111,17 +112,17 @@ abstract class CPSCRUDController extends CPSController
 
 					case self::ACCESS_TO_AUTH: 	
 						$_sVerb = 'allow'; 	
-						$_sValid = '@'; 	
+						$_sValid = '@';
 						break;
 
 					case self::ACCESS_TO_ADMIN:	
-						$_sVerb = 'allow'; 	
-						$_sValid = 'admin';	
+						$_sVerb = 'allow';
+						$_sValid = 'admin';
 						break;
 
 					case self::ACCESS_TO_NONE: 	
-						$_sVerb = 'deny'; 	
-						$_sValid = '*';		
+						$_sVerb = 'deny';
+						$_sValid = '*';
 						break;
 				}
 				

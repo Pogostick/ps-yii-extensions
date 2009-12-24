@@ -129,10 +129,10 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	//* Property Accessors
 	//********************************************************************************
 	
-	public function getCurrentTheme() { return self::$m_sCurrentTheme; }
-	public function setCurrentTheme( $sTheme ) { self::$m_sCurrentTheme = $sTheme; }
-	public function getMultiTheme() { return self::$m_bMultiTheme; }
-	public function setMultiTheme( $bValue ) { self::$m_bMultiTheme = $bValue; }
+	public static function getCurrentTheme() { return self::$m_sCurrentTheme; }
+	public static function setCurrentTheme( $sTheme ) { self::$m_sCurrentTheme = $sTheme; }
+	public static function getMultiTheme() { return self::$m_bMultiTheme; }
+	public static function setMultiTheme( $bValue ) { self::$m_bMultiTheme = $bValue; }
 
 	//********************************************************************************
 	//* Constructor
@@ -238,7 +238,6 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	* 
 	* @param string $sName The type of jq widget to create
 	* @param array $arOptions The options for the widget
-	* @param string $sId The DOM id of the widget if other than $sName
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqUIWrapper
 	*/

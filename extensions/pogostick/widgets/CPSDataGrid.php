@@ -65,6 +65,7 @@ class CPSDataGrid extends CPSHelperBase
 		$_sPagerClass = PS::o( $arOptions, 'pagerClass', 'CPSLinkPager', true );
 		$_bAccordion = PS::o( $arOptions, 'accordion', false, true );
 		$_sGridHeader = PS::o( $arOptions, 'gridHeader', null, true );
+		$_oPages = PS::o( $arOptions, 'pages', null, true );
 		
 		//	Only work with CPSLinkPagers
 		if ( ! is_a( $_sPagerClass, 'CPSLinkPager' ) ) $_sPagerClass = 'CPSLinkPager';

@@ -18,6 +18,12 @@
  * @since 		v1.0.6
  * 
  * @filesource
+ * 
+ * @property string $createdColumn The name of the column that holds your create date
+ * @property string $createdByColumn The name of the column that holds your creating user
+ * @property string $lmodColumn The name of the column that holds your last modified date
+ * @property string $lmodByColumn The name of the column that holds your last modifying user
+ * @property string $dateTimeFunction The name of the function to use to set dates. Defaults to date('Y-m-d H:i:s').
  */
 class CPSTimeStampBehavior extends CActiveRecordBehavior
 {

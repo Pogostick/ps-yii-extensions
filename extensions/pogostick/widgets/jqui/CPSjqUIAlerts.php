@@ -93,11 +93,12 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 	* The options passed in are dynamically added to the options array and will be accessible 
 	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
 	* 
+	* @param string $sName The type of jq widget to create
 	* @param array $arOptions The options for the widget
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqGridWidget
 	*/
-	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName, array $arOptions = array(), $sClass = __CLASS__ )
 	{
 		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
 	}

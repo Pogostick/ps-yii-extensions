@@ -26,10 +26,10 @@ include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_he
 
 //	The rest
 echo <<<HTML
-	CPSHelp::_rcf( '/css/form.css' );
+CPSHelp::_rcf( '/css/form.css' );
 
-	//	I don't like this, I prefer bold-faced labels
-	PS::\$afterRequiredLabel = null;
+//	I don't like this, I prefer bold-faced labels
+PS::\$afterRequiredLabel = null;
 	
 //	Uncomment for automatic tooltips
 //	CPSjqToolsWrapper::create( 'tooltip', array( 'target' => '#ps-edit-form :input', 'tip' => '.ps-auto-tooltip', 'position' => 'center right', 'offset' => array( -2, 10 ), 'effect' => 'fade', 'opacity' => 0.7 ) );
@@ -45,11 +45,12 @@ echo <<<HTML
 					'ignoreTitle' => true,
 // @todo Place your extra validation options here...
 //					'rules' => array(
-//						'model_name[column_name] => array(
-//							'rule' => rule options,
+//						'model_name[column_name]' => array(
+//							'rule' => 'rule options',
+//						),
 //					),
 //					'messages' => array(
-//						'model_name[column_name] => array(
+//						'model_name[column_name]' => array(
 //							'rule_name' => 'message',
 //						),
 //					),

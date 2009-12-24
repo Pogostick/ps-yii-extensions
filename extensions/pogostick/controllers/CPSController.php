@@ -33,6 +33,7 @@ abstract class CPSController extends CController implements IPogostick
 	/**
 	* @var string Indexes into {@link CPSController:m_arUserActionMap}
 	*/
+	const ACCESS_TO_ALL = 0;
 	const ACCESS_TO_ANY = 0;
 	const ACCESS_TO_ANON = 0;
 	const ACCESS_TO_GUEST = 1;
@@ -240,8 +241,8 @@ abstract class CPSController extends CController implements IPogostick
 			$this->m_oModel = $this->load( $_iId );
 
 			//	No data? bug out
-			if ( null == $this->m_oModel ) $this->redirect( array( $this->defaultAction ) );
-			
+			if ( null === $this->m_oModel ) $this->redirect( array( $this->defaultAction ) );
+
 			//	Get the name of this model...
 			$this->setModelName( get_class( $this->m_oModel ) );
 		}

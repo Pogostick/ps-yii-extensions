@@ -60,16 +60,16 @@ class CPSActiveWidgets extends CHtml implements IPogostick
 	const 	TEXT_DISPLAY = 'inactiveTextDisplay';		//	Not a real method, just a placeholder
 	
 	//	Types of drop downs...
-	const	DD_GENERIC = -1;
-	const	DD_US_STATES = 0;
-	const	DD_MONTH_NUMBERS = 1;
-	const	DD_MONTH_NAMES = 2;
-	const	DD_YEARS = 3;
-	const	DD_CC_TYPES = 4;
-	const	DD_DAY_NUMBERS = 5;
-	const	DD_YES_NO = 6;
-	const	DD_TIME_ZONES = 7;
-	const	DD_YES_NO_ALL = 8;
+	const	DD_GENERIC = 9999;
+	const	DD_US_STATES = 1000;
+	const	DD_MONTH_NUMBERS = 1001;
+	const	DD_MONTH_NAMES = 1002;
+	const	DD_YEARS = 1003;
+	const	DD_CC_TYPES = 1004;
+	const	DD_DAY_NUMBERS = 1005;
+	const	DD_YES_NO = 1006;
+	const	DD_TIME_ZONES = 1007;
+	const	DD_YES_NO_ALL = 1008;
 	
 	//	Special drop down
 	const 	DD_CODE_TABLE = 'activeCodeDropDownList';
@@ -969,13 +969,40 @@ HTML;
 	*/
 	public static function flashMessage( $sWhich = 'success', $bLeft = false )
 	{
-		if ( Yii::app()->user->hasFlash( $sWhich ) ) 
-			$_sMsg = Yii::app()->user->getFlash( $sWhich );
-
+		$_sMsg = ( Yii::app()->user->hasFlash( $sWhich ) ) ? Yii::app()->user->getFlash( $sWhich ) : null;
 		$_sDiv = 'ps-flash-display' . ( $bLeft ? '-left' : '' );
 		CPSHelp::registerScript( 'ps.flash.display', 'jQuery(".' . $_sDiv . '").animate({opacity: 1.0}, 3000).fadeOut();', CClientScript::POS_READY );
 		return self::tag( 'div', array( 'class' => $_sDiv ), $_sMsg );
 	}
+	
+	/**
+	 * If value is not set or empty, last passed in argument is returned
+	 * 
+	 * Allows for multiple nvl chains ( nvl(x,y,z,null) )
+	 * 
+	 * @param mixed 
+	 * @returns mixed
+	 */
+	public static function nvl()
+	{
+		$_oDefault = null;
+		$_iArgs = func_num_args();
+		$_arArgs = func_get_args();
+		
+		for ( $_i = 0; $_i < $_iArgs; $_i++ )
+		{
+			if ( isset( $_arArgs[ $_i ] ) && ! empty( $_arArgs[ $_i ] ) )
+				return $_arArgs[ $_i ];
+				
+			$_oDefault = $_arArgs[ $_i ];
+		}
+
+		return $_oDefault;
+	}
+
+	//********************************************************************************
+	//* Protected Methods
+	//********************************************************************************
 	
 	/**
 	* Gets the options for pre-fab select boxes

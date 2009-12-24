@@ -132,7 +132,7 @@ class CPSLinkPager extends CLinkPager implements IPogostick
 		$this->cssFile = false;
 		
 		//	Our class for paging...
-		if ( null == PS::nvl( $this->htmlOptions['class'] ) ) $this->htmlOptions['class'] = $this->m_sPagerClass;
+		if ( null === PS::o( $this->htmlOptions, 'class' ) ) $this->htmlOptions['class'] = $this->m_sPagerClass;
 		
 		//	Set the pager location
 		$this->setPagerLocation( $this->m_iPagerLocation );

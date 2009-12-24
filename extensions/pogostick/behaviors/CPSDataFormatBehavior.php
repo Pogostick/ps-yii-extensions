@@ -82,7 +82,7 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 	* Apply any formats
 	* @param CModelEvent $oEvent
 	*/
-	public function beforeValidate( CModelEvent $oEvent ) 
+	public function beforeValidate( $oEvent ) 
 	{ 
 		return $this->handleEvent( __FUNCTION__, $oEvent ); 
 	}
@@ -91,7 +91,7 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 	* Apply any formats
 	* @param CEvent $oEvent
 	*/
-	public function afterValidate( CEvent $oEvent ) 
+	public function afterValidate( $oEvent ) 
 	{ 
 		return $this->handleEvent( __FUNCTION__, $oEvent ); 
 	}
@@ -100,8 +100,8 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 	* Apply any formats
 	* @param CEvent $oEvent
 	*/
-	public function beforeFind( CEvent $oEvent ) 
-	{ 
+	public function beforeFind( $oEvent ) 
+	{
 		//	Is a default sort defined?
 		if ( $this->m_sDefaultSort )
 		{
@@ -120,7 +120,7 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 	* Apply any formats
 	* @param CEvent $oEvent
 	*/
-	public function afterFind( CEvent $oEvent ) 
+	public function afterFind( $oEvent ) 
 	{ 
 		return $this->handleEvent( __FUNCTION__, $oEvent ); 
 	}
@@ -171,7 +171,7 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 	protected function handleEvent( $sWhich, CEvent $oEvent )
 	{
 		static $_arSchema;
-		static $_sSchemeFor;
+		static $_sSchemaFor;
 		
 		$_oModel = $oEvent->sender;
 		
