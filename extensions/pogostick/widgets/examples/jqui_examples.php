@@ -1,18 +1,25 @@
 <?php
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+
 /**
-* Examples for the CPSjqUIWrapper class
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @version SVN: $Id$
-* @package psYiiExtensions
-* @subpackage Examples
-* @since 1.0.2
-*/
-/***
-* Example file for CPSjqUIWrapper class
-* 
-* To use this, render as a view from any controller
-*/
+ * Example file for CPSjqUIWrapper class
+ * To use this, render as a view from any controller
+ * 
+ * @package 	psYiiExtensions.widgets
+ * @subpackage 	examples
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.2
+ *  
+ * @filesource
+ */
 
 //	Create an accordian...
 CPSjqUIWrapper::create( 'accordion', array( 'header' => 'h3', 'theme' => 'cupertino' ) );

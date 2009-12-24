@@ -1,19 +1,25 @@
 <?php
-/**
-* Examples for the CPSjqToolsWrapper class
-*
-* @author Jerry Ablan <jablan@pogostick.com>
-* @version SVN: $Id$
-* @package psYiiExtensions
-* @subpackage Examples
-* @since 1.0.4
-*/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
 
-/***
-* Example file for CPSjqToolsWrapper class
-* 
-* To use this, render as a view from any controller
-*/
+/**
+ * Examples for the CPSjqToolsWrapper class
+ * To use this, render as a view from any controller
+ * 
+ * @package 	psYiiExtensions.widgets
+ * @subpackage 	examples
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.4
+ *  
+ * @filesource
+ */
 
 //	Create some tabs...
 CPSjqToolsWrapper::create( 'tabs', array( 'target' => 'ul.tabs', 'paneClass' => 'panes' ) );
