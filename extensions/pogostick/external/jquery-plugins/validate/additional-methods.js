@@ -1,14 +1,24 @@
-jQuery.validator.addMethod("maxWords", function(value, element, params) { 
-    return this.optional(element) || value.match(/\b\w+\b/g).length < params; 
-}, jQuery.validator.format("Please enter {0} words or less.")); 
- 
-jQuery.validator.addMethod("minWords", function(value, element, params) { 
-    return this.optional(element) || value.match(/\b\w+\b/g).length >= params; 
-}, jQuery.validator.format("Please enter at least {0} words.")); 
- 
-jQuery.validator.addMethod("rangeWords", function(value, element, params) { 
-    return this.optional(element) || value.match(/\b\w+\b/g).length >= params[0] && value.match(/bw+b/g).length < params[1]; 
-}, jQuery.validator.format("Please enter between {0} and {1} words."));
+(function() {
+	
+	function stripHtml(value) {
+		// remove html tags and space chars
+		return value.replace(/<.[^<>]*?>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ')
+		// remove numbers and punctuation
+		.replace(/[0-9.(),;:!?%#$'"_+=\/-]*/g,'');
+	}
+	jQuery.validator.addMethod("maxWords", function(value, element, params) { 
+	    return this.optional(element) || stripHtml(value).match(/\b\w+\b/g).length < params; 
+	}, jQuery.validator.format("Please enter {0} words or less.")); 
+	 
+	jQuery.validator.addMethod("minWords", function(value, element, params) { 
+	    return this.optional(element) || stripHtml(value).match(/\b\w+\b/g).length >= params; 
+	}, jQuery.validator.format("Please enter at least {0} words.")); 
+	 
+	jQuery.validator.addMethod("rangeWords", function(value, element, params) { 
+	    return this.optional(element) || stripHtml(value).match(/\b\w+\b/g).length >= params[0] && value.match(/bw+b/g).length < params[1]; 
+	}, jQuery.validator.format("Please enter between {0} and {1} words."));
+
+})();
 
 jQuery.validator.addMethod("letterswithbasicpunc", function(value, element) {
 	return this.optional(element) || /^[a-z-.,()'\"\s]+$/i.test(value);
@@ -16,7 +26,7 @@ jQuery.validator.addMethod("letterswithbasicpunc", function(value, element) {
 
 jQuery.validator.addMethod("alphanumeric", function(value, element) {
 	return this.optional(element) || /^\w+$/i.test(value);
-}, "Letters, numbers or underscores only please");  
+}, "Letters, numbers, spaces or underscores only please");  
 
 jQuery.validator.addMethod("lettersonly", function(value, element) {
 	return this.optional(element) || /^[a-z]+$/i.test(value);
@@ -29,6 +39,10 @@ jQuery.validator.addMethod("nowhitespace", function(value, element) {
 jQuery.validator.addMethod("ziprange", function(value, element) {
 	return this.optional(element) || /^90[2-5]\d\{2}-\d{4}$/.test(value);
 }, "Your ZIP-code must be in the range 902xx-xxxx to 905-xx-xxxx");
+
+jQuery.validator.addMethod("integer", function(value, element) {
+	return this.optional(element) || /^-?\d+$/.test(value);
+}, "A positive or negative non-decimal number please");
 
 /**
 * Return true, if the value is a valid vehicle identification number (VIN).
@@ -106,7 +120,7 @@ jQuery.validator.addMethod(
 	"dateITA",
 	function(value, element) {
 		var check = false;
-		var re = /^\d{1,2}\/\d{1,2}\/\d{4}$/
+		var re = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
 		if( re.test(value)){
 			var adata = value.split('/');
 			var gg = parseInt(adata[0],10);
