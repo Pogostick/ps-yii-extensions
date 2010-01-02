@@ -1,0 +1,76 @@
+<?php
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2010 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+
+/**
+ * Date helper methods
+ * 
+ * @package 	psYiiExtensions
+ * @subpackage 	helpers
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id$
+ * @since 		v1.0.6
+ *  
+ * @filesource
+ */
+class CPSDateHelper implements IPSBase
+{
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
+
+	/**
+	* Returns the differnce between the two dates
+	* 
+	* @param string $dtStart
+	* @param string $dtEnd
+	* @returns DateInterval
+	*/
+	public static function dateDiff( $dtStart, $dtEnd, $bAbsolute = false )
+	{
+		$_dtStart = new DateTime( $dtStart );
+		$_dtEnd = new DateTime( $dtEnd );
+		return $_dtEnd->diff( $_dtStart, $bAbsolute );
+	}
+	
+	/**
+	* Returns value (or current date) formatted
+	* 
+	* @param mixed $sDate
+	* @return string
+	*/
+	public static function asDate( $sDate = null )
+	{
+		return self::format( $sDate, 'Y-m-d' );
+	}
+	
+	/**
+	* Returns value (or current date/time) formatted
+	* 
+	* @param mixed $sDate
+	* @param string $sFormat The date() format. Defaults to 'Y-m-d H:i:s'
+	* @return string
+	*/
+	public static function asDateTime( $sDate = null )
+	{
+		return self::format( $sDate, 'Y-m-d H:i:s' );
+	}
+	
+	/**
+	 * Formats a date
+	 * @param mixed $dtDate
+	 * @param string $sFormat
+	 * @return string
+	 */
+	public static function format( $dtDate = null, $sFormat = 'Y-m-d H:i:s' )
+	{
+		return date( $sFormat, $dtDate ? strtotime( $dtDate ) : time() );
+	}
+
+}

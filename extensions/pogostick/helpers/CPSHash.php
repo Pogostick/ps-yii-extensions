@@ -19,7 +19,7 @@
  *  
  * @filesource
  */
-class CPSHash extends CPSHelperBase
+class CPSHash implements IPSBase
 {
 	//********************************************************************************
 	//* Constants
@@ -85,7 +85,7 @@ class CPSHash extends CPSHelperBase
 	}
 	
 	/**
-	* Generic hashing method. Will hash any string
+	* Generic hashing method. Will hash any string or generate a random hash and hash that!
 	* 
 	* @param string $sValueToHash
 	* @param integer $eHashType
@@ -119,57 +119,4 @@ class CPSHash extends CPSHelperBase
 		return $_sHash;
 	}
 	
-	/**
-	* Converts a `camelCase`, human-friendly or `underscore_notation` string to `underscore_notation`
-	* 
-	* @param string $sString The string to convert
-	* @param string $sChar Optional separator character. Defaults to '_'
-	* @return string The converted string
-	*/
-	public static function underscorize( $sString, $sChar = '_' )
-	{
-		$sString = strtolower( $sString[ 0 ] ) . substr( $sString, 1 );
-		
-		//	If the string is already underscore notation then leave it
-		if ( false !== strpos( $sString, $sChar ) )
-		{
-			// Allow humanized string to be passed in
-		}
-		elseif ( false !== strpos( $sString, ' ' ) ) 
-		{
-			$sString = strtolower( preg_replace('#\s+#', $sChar, $sString ) );
-		}
-		else
-		{
-			do
-			{
-				$_sOld = $sString;
-				$sString = preg_replace( '/([a-zA-Z])([0-9])/', '\1' . $sChar . '\2', $sString );
-				$sString = preg_replace( '/([a-z0-9A-Z])([A-Z])/', '\1' . $sChar . '\2', $sString );
-			}
-			while ( $_sOld != $sString );
-			
-			$sString = strtolower( $sString );
-		}
-
-		return $sString;
-	}
-	
-	//********************************************************************************
-	//* Private Methods
-	//********************************************************************************
-	
-	/***
-	* Looks to see if a hash code is unique given a model name and a column
-	* 
-	* @param string $sModelName
-	* @param string $sAttribute
-	* @param string $sHash
-	* 
-	* @returns boolean
-	*/
-	protected static function isUnique( $sModelName, $sAttribute, $sHash )
-	{
-		return ( null == $sModelName::model()->find( $sAttribute . ' = :hash', array( 'hash' => $sHash ) ) );
-	}
 }

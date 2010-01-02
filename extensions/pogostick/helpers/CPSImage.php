@@ -19,11 +19,11 @@
  *  
  * @filesource
  * 
- * @sproperty integer $thumbnailWidth Width of created thumbnails. Defaults to 75
+ * @property integer $thumbnailWidth Width of created thumbnails. Defaults to 75
  * @property integer $thumbnailHeight Height of created thumbnails. Defaults to 75
  * @property string $thumbnailTemplate The template for creating thumbnail file names
 */
-class CPSImage extends CPSHelperBase
+class CPSImage implements IPSBase
 {
 	//********************************************************************************
 	//* Member Variables
