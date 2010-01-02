@@ -95,10 +95,12 @@ class CPSCodeTableModel extends CPSModel
 			$_sModelClass = get_called_class();
 
 		$_arCrit = null;
-		$sOrder = $_sModelClass::model()->getMetaData()->primaryKey;
+		$_oModel = call_user_func( array( $_sModelClass, 'model' ) );
+		
+		$sOrder = $_oModel->getMetaData()->primaryKey;
 
 		//	Get a single code...
-		if ( null !== $iId ) return $_sModelClass::model()->findByPk( $iId );
+		if ( null !== $iId ) return $_oModel->findByPk( $iId );
 		
 		//	Get a specific code by type/abbr
 		if ( null !== $sType && null !== $sAbbr )
@@ -109,7 +111,7 @@ class CPSCodeTableModel extends CPSModel
 				'order' => PS::nvl( $sOrder ),
 			);
 
-			return $_sModelClass::model()->find( $_arCrit );
+			return $_oModel->find( $_arCrit );
 		}
 
 		//	Codes By Type
@@ -131,7 +133,7 @@ class CPSCodeTableModel extends CPSModel
 			);
 		}
 		
-		return $_arCrit ? $_sModelClass::model()->findAll( $_arCrit ) : null;
+		return $_arCrit ? $_oModel->findAll( $_arCrit ) : null;
 	}
 	
 	/**

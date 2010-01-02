@@ -21,7 +21,7 @@
  * 
  * @property-read string $modelName The class name of the model
  */
-class CPSModel extends CActiveRecord implements IPogostick
+class CPSModel extends CActiveRecord implements IPSBase
 {
 	//********************************************************************************
 	//* Members
@@ -134,11 +134,6 @@ class CPSModel extends CActiveRecord implements IPogostick
 				'psDataFormat' => array(
 					'class' => 'pogostick.behaviors.CPSDataFormatBehavior',
 				),
-				
-				//	Utilities
-				'psUtility' => array(
-					'class' => 'pogostick.behaviors.CPSUtilityBehavior',
-				),
 			)
 		);
 	}
@@ -151,7 +146,7 @@ class CPSModel extends CActiveRecord implements IPogostick
 	{
 		//	Already in a transaction?
 		if ( $this->m_oTransaction )
-			throw new CDbException( Yii::t( 'psYiiExtensions', 'Unable to start new transaction. transaction already in progress.' ) );
+			throw new CDbException( Yii::t( 'pogostick.models', 'Unable to start new transaction. transaction already in progress.' ) );
 
 		$this->m_oTransaction = $this->dbConnection->beginTransaction();
 	}
@@ -217,8 +212,12 @@ class CPSModel extends CActiveRecord implements IPogostick
 			{
 				$_bIsAttribute = isset( $_arAttributes[ $_sKey ] );
 
-				if ( $_bIsAttribute || ( $this->hasProperty( $_sKey ) && $this->canSetProperty( $_sKey ) ) )
+				if ( $_bIsAttribute )
 					$this->setAttribute( $_sKey, $_oValue );
+				else if ( $this->hasProperty( $_sKey ) && $this->canSetProperty( $_sKey ) )
+				{
+					$this->{$_sKey} = $_oValue;
+				}
 			}
 		}
 	}
@@ -235,4 +234,23 @@ class CPSModel extends CActiveRecord implements IPogostick
 		return parent::__sleep();
 	}
 
+	/**
+	 * Executes the SQL statement and returns all rows.
+	 * @param mixed $oCriteria The criteria for the query
+	 * @param boolean $bFetchAssocArray Whether each row should be returned as an associated array with column names as the keys or the array keys are column indexes (0-based).
+	 * @param array $arParams input parameters (name=>value) for the SQL execution. This is an alternative to {@link bindParam} and {@link bindValue}. If you have multiple input parameters, passing them in this way can improve the performance. Note that you pass parameters in this way, you cannot bind parameters or values using {@link bindParam} or {@link bindValue}, and vice versa. binding methods and  the input parameters this way can improve the performance. This parameter has been available since version 1.0.10.
+	 * @return array All rows of the query result. Each array element is an array representing a row. An empty array is returned if the query results in nothing.
+	 * @throws CException execution failed
+	 */
+	public function queryAll( $oCriteria, $bFetchAssocArray = true, $arParams = array() )
+	{
+		//	This can all be chained together but I split it up for ease of reading/debugging
+		if ( $_oCB = $this->getDbConnection()->getCommandBuilder() )
+		{
+			if ( $_oFind = $_oCB->createFindCommand( $this->getTableSchema(), $oCriteria ) )
+				return $_oFind->queryAll( $bFetchAssocArray, $arParams );
+		}
+		
+		return null;
+	}
 }

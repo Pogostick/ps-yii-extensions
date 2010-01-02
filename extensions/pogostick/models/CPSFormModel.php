@@ -8,7 +8,7 @@
  */
 
 /**
- * CPSFormModel provides something stupid
+ * CPSFormModel provides something selfish. I'm old and prefix my member variable names with 'm_'. This class looks for that.
  * 
  * @package 	psYiiExtensions
  * @subpackage 	models
