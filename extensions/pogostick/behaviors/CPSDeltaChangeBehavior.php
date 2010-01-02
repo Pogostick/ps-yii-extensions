@@ -22,7 +22,7 @@
  * @property array $lastAttributes The attributes when the model was fresh
  * @property boolean $caseInsensitive Changes are compared in a case-insensitive manner if true. Defaults to true.
  */
-class CPSDeltaChangeBehavior extends CActiveRecordBehavior implements IPogostick
+class CPSDeltaChangeBehavior extends CPSBaseActiveRecordBehavior
 {
 	//********************************************************************************
 	//* Member Variables

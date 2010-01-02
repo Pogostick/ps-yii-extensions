@@ -10,6 +10,8 @@
 /**
  * CPSOAuthBehavior provides OAuth support to any Pogostick component
  * 
+ * Introduces new event: onUserAuthorized raised when a user has been authorized
+ * 
  * @package 	psYiiExtensions
  * @subpackage 	behaviors
  * 
@@ -18,6 +20,9 @@
  * @since 		v1.0.0
  * 
  * @filesource
+ * 
+ * @property-read OAuth $oAuthObject The curent OAuth object
+ * @property-read string $token The current token
  */
 class CPSOAuthBehavior extends CPSApiBehavior
 {
@@ -27,13 +32,12 @@ class CPSOAuthBehavior extends CPSApiBehavior
 
 	/***
 	* Our OAuth object
-	* 
 	* @var OAuth
 	*/
 	protected $m_oOAuth = null;
+	
 	/**
 	* The current token
-	* 
 	* @var array
 	*/
 	protected $m_arCurToken = null;
@@ -47,6 +51,7 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	* @returns array
 	*/
 	public function getToken() { return $this->m_arCurToken; }
+
 	/**
 	* Retrieves the OAuth object
 	* @returns oauth
@@ -69,12 +74,6 @@ class CPSOAuthBehavior extends CPSApiBehavior
 		
 		//	Call daddy...
 		parent::__construct();
-
-		//	Add ours...
-		$this->addOptions( self::getBaseOptions() );
-		
-		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
 	}
 	
 	//********************************************************************************
@@ -82,24 +81,19 @@ class CPSOAuthBehavior extends CPSApiBehavior
 	//********************************************************************************
                                      
 	/**
-	* Add our options
-	*
-	*/
-	private function getBaseOptions()
+	 * Pre-initialize
+	 */
+	public function preinit()
 	{
-		return(
-			array(
-				//	Required settings
-				'callbackUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'isAuthorized' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
-				//	Urls
-				'accessTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '/oauth/access_token', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'authorizeUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '/oauth/authorize', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'requestTokenUrl' => array( CPSOptionManager::META_DEFAULTVALUE => '/oauth/request_token', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-			)
-		);
+		parent::preinit();
+		
+		//	Add our options
+		$this->addOptions( self::getBaseOptions() );
+		
+		//	Events...
+		$this->attachEventHandler( 'onUserAuthorized', array( $this, 'userAuthorized' ) );
 	}
-
+		
 	/**
 	* Initialize this behavior
 	* 
@@ -124,7 +118,8 @@ class CPSOAuthBehavior extends CPSApiBehavior
 					$this->isAuthorized = true;
 				}
 				
-				$this->raiseEvent( 'onUserAuthorized', new CPSOAuthEvent( $this->m_arCurToken ) );
+				//	Raise our event
+				$this->onUserAuthorized( new CPSOAuthEvent( $this->m_arCurToken ) );
 			}
 		}
 	}
@@ -180,4 +175,47 @@ class CPSOAuthBehavior extends CPSApiBehavior
 		}
 	}
 
+	//********************************************************************************
+	//* Private Methods
+	//********************************************************************************
+	
+	/**
+	* Our options
+	*/
+	private function getBaseOptions()
+	{
+		return(
+			array(
+				//	Required settings
+				'callbackUrl' => 'string',
+				'isAuthorized' => 'boolean:false',
+				
+				//	Urls
+				'accessTokenUrl' => 'string:/oauth/access_token',
+				'authorizeUrl' => 'string:/oauth/authorize', 
+				'requestTokenUrl' => 'string:/oauth/request_token', 
+			)
+		);
+	}
+
+	//********************************************************************************
+	//* Events
+	//********************************************************************************
+	
+	/***
+	 * User has been authorized event
+	 * @param CPSOAuthEvent $oEvent
+	 */
+	public function onUserAuthorized( $oEvent )
+	{
+		$this->raiseEvent( 'onUserAuthorized', $oEvent );
+	}
+	
+	/**
+	 * And our event handler stub
+	 * @param CPSOAuthEvent $oEvent
+	 */
+	public function userAuthorized( $oEvent )
+	{
+	}
 }

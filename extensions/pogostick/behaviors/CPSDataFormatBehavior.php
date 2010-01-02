@@ -19,7 +19,7 @@
  * 
  * @filesource
  */
-class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
+class CPSDataFormatBehavior extends CPSBaseActiveRecordBehavior
 {
 	//********************************************************************************
 	//* Member Variables
@@ -51,8 +51,6 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 			'datetime' => 'Y-m-d H:i:s',
 		),
 	);
-	public function getFormat( $sWhich = 'afterFind', $sType = 'date' ) { return PS::nvl( $this->m_arFormat[ $sWhich ][ $sType ], 'm/d/Y' ); }
-	public function setFormat( $sWhich = 'afterValidate', $sType = 'date', $sFormat = 'm/d/Y' ) { $this->m_arFormat[ $sWhich ][ $sType ] = $sFormat; }
 	
 	/**
 	* Default sort
@@ -61,12 +59,44 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 	* @see setDefaultSort
 	*/
 	protected $m_sDefaultSort;
+
+	//********************************************************************************
+	//* Property Accessors
+	//********************************************************************************
+	
+	/**
+	 * Retrieves a format
+	 * @param string $sWhich
+	 * @param string $sType
+	 * @return string
+	 */
+	public function getFormat( $sWhich = 'afterFind', $sType = 'date' ) 
+	{ 
+		return PS::nvl( $this->m_arFormat[ $sWhich ][ $sType ], 'm/d/Y' ); 
+	}
+	
+	/**
+	 * Sets a format
+	 * 
+	 * @param string $sWhich
+	 * @param string $sType
+	 * @param string $sFormat
+	 */
+	public function setFormat( $sWhich = 'afterValidate', $sType = 'date', $sFormat = 'm/d/Y' ) 
+	{ 
+		if ( ! isset( $this->m_arFormat[ $sWhich ] ) )
+			$this->m_arFormat[ $sWhich ] = array();
+			
+		$this->m_arFormat[ $sWhich ][ $sType ] = $sFormat; 
+	}
+	
 	/**
 	* Returns the default sort
 	* @returns string
 	* @see setDefaultSort
 	*/
 	public function getDefaultSort() { return $this->m_sDefaultSort; }
+
 	/**
 	* Sets the default sort
 	* @param string $sValue
@@ -74,57 +104,6 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 	*/
 	public function setDefaultSort( $sValue ) { $this->m_sDefaultSort = $sValue; }
 
-	//********************************************************************************
-	//* Event Handlers
-	//********************************************************************************
-	
-	/**
-	* Apply any formats
-	* @param CModelEvent $oEvent
-	*/
-	public function beforeValidate( $oEvent ) 
-	{ 
-		return $this->handleEvent( __FUNCTION__, $oEvent ); 
-	}
-	
-	/**
-	* Apply any formats
-	* @param CEvent $oEvent
-	*/
-	public function afterValidate( $oEvent ) 
-	{ 
-		return $this->handleEvent( __FUNCTION__, $oEvent ); 
-	}
-	
-	/**
-	* Apply any formats
-	* @param CEvent $oEvent
-	*/
-	public function beforeFind( $oEvent ) 
-	{
-		//	Is a default sort defined?
-		if ( $this->m_sDefaultSort )
-		{
-			//	Is a sort defined?
-			$_oCrit = $oEvent->sender->getDbCriteria();
-			
-			//	No sort? Set the default
-			if ( null === $_oCrit->sort )
-				$oEvent->sender->getDbCriteria()->mergeWith( new CDbCriteria( array( 'order' => $this->m_sDefaultSort ) ) );
-		}
-		
-		return $this->handleEvent( __FUNCTION__, $oEvent ); 
-	}
-	
-	/**
-	* Apply any formats
-	* @param CEvent $oEvent
-	*/
-	public function afterFind( $oEvent ) 
-	{ 
-		return $this->handleEvent( __FUNCTION__, $oEvent ); 
-	}
-	
 	//********************************************************************************
 	//* Protected Methods
 	//********************************************************************************
@@ -140,18 +119,17 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 	*/
 	protected function applyFormat( $oColumn, $oValue, $sWhich = 'view' )
 	{
+		$_sReturn = null;
+		
 		//	Apply formats
 		switch ( $oColumn->dbType )
 		{
 			case 'date':
 			case 'datetime':
+			case 'timestamp':
 				//	Handle blanks
-				if ( null == $oValue || $oValue == '0000-00-00' || $oValue == '0000-00-00 00:00:00' ) 
-					$_sReturn = null;
-				else
+				if ( null != $oValue && $oValue != '0000-00-00' && $oValue != '0000-00-00 00:00:00' ) 
 					$_sReturn = date( $this->getFormat( $sWhich, $oColumn->dbType ), strtotime( $oValue ) );
-					
-//				echo 'Formatted: ' . $_sReturn . '<BR/>';
 				break;
 				
 			default:
@@ -207,4 +185,56 @@ class CPSDataFormatBehavior extends CActiveRecordBehavior implements IPogostick
 		//	Papa don't preach...
 		return parent::$sWhich( $oEvent );
 	}
+	
+	//********************************************************************************
+	//* Event Handlers
+	//********************************************************************************
+	
+	/**
+	* Apply any formats
+	* @param CModelEvent $oEvent
+	*/
+	public function beforeValidate( $oEvent ) 
+	{ 
+		return $this->handleEvent( __FUNCTION__, $oEvent ); 
+	}
+	
+	/**
+	* Apply any formats
+	* @param CEvent $oEvent
+	*/
+	public function afterValidate( $oEvent ) 
+	{ 
+		return $this->handleEvent( __FUNCTION__, $oEvent ); 
+	}
+	
+	/**
+	* Apply any formats
+	* @param CEvent $oEvent
+	*/
+	public function beforeFind( $oEvent ) 
+	{
+		//	Is a default sort defined?
+		if ( $this->m_sDefaultSort )
+		{
+			//	Is a sort defined?
+			$_oCrit = $oEvent->sender->getDbCriteria();
+			
+			//	No sort? Set the default
+			if ( ! $_oCrit->order )
+				$oEvent->sender->getDbCriteria()->mergeWith( new CDbCriteria( array( 'order' => $this->m_sDefaultSort ) ) );
+		}
+		
+		return $this->handleEvent( __FUNCTION__, $oEvent ); 
+	}
+	
+	/**
+	* Apply any formats
+	* @param CEvent $oEvent
+	*/
+	public function afterFind( $oEvent ) 
+	{ 
+		return $this->handleEvent( __FUNCTION__, $oEvent ); 
+	}
+	
 }

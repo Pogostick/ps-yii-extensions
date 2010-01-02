@@ -15,14 +15,15 @@
  * 
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id$
- * @since 		v1.0.5
+ * @since 		v1.0.6
  * 
  * @filesource
  * 
  * @property string $softDeleteColumn The attribute which indicates a soft-delete
  * @property array $softDeleteValue Two item array containing the [false,true] values for soft-deletion. Defaults to array(0,1) ('false' and 'true' respectively).
+ * 
  */
-class CPSSoftDeleteBehavior extends CActiveRecordBehavior implements IPogostick
+class CPSSoftDeleteBehavior extends CPSBaseActiveRecordBehavior
 {
 	//********************************************************************************
 	//* Member Variables
@@ -91,7 +92,7 @@ class CPSSoftDeleteBehavior extends CActiveRecordBehavior implements IPogostick
 				$oEvent->isValid = false;
 				$oEvent->handled = true;
 				$oEvent->sender->setAttribute( $this->m_sSoftDeleteColumn, $this->m_arSoftDeleteValue[ 1 ] );
-				if ( ! $oEvent->sender->save() )
+				if ( ! $oEvent->sender->update( array( $this->m_sSoftDeleteColumn ) ) )
 					throw new CDbException( 'Error saving soft delete row.' );
 			}
 		}
@@ -135,7 +136,7 @@ class CPSSoftDeleteBehavior extends CActiveRecordBehavior implements IPogostick
 			if ( $this->hasAttribute( $this->m_sSoftDeleteColumn ) )
 			{
 				$this->setAttribute( $this->m_sSoftDeleteColumn, $this->m_arSoftDeleteValue[ 0 ] );
-				return $this->save();
+				return $this->update( array( $this->m_sSoftDeleteColumn ) );
 			}
 		}
 		

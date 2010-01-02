@@ -25,7 +25,7 @@
  * @property string $lmodByColumn The name of the column that holds your last modifying user
  * @property string $dateTimeFunction The name of the function to use to set dates. Defaults to date('Y-m-d H:i:s').
  */
-class CPSTimeStampBehavior extends CActiveRecordBehavior
+class CPSTimeStampBehavior extends CPSBaseActiveRecordBehavior
 {
 	//********************************************************************************
 	//* Member Variables
@@ -131,13 +131,13 @@ class CPSTimeStampBehavior extends CActiveRecordBehavior
  	*/
     public function touch( $oOtherCols = null )
     {
-    	$_sTouchVal = ( null === $this->m_sDateTimeFunction ) ? date('Y-m-d H:i:s') : eval('return ' . $this->m_sDateTimeFunction . ';');
+    	$_sTouchVal = ( null === $this->m_sDateTimeFunction ) ? date('Y-m-d H:i:s') : eval( 'return ' . $this->m_sDateTimeFunction . ';' );
     	$_arUpdate = array();
     	
     	//	Any other columns to touch?
     	if ( null !== $oOtherCols )
     	{
-    		foreach ( CPSHelp::makeArray( $oOtherCols ) as $_sColumn )
+    		foreach ( PS::makeArray( $oOtherCols ) as $_sColumn )
     		{
     			if ( $this->owner->hasAttribute( $_sColumn ) )
     			{

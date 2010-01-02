@@ -22,21 +22,18 @@
 class CPSWidgetBehavior extends CPSComponentBehavior
 {
 	//********************************************************************************
-	//* Constructor
+	//* Public methods
 	//********************************************************************************
 
-	public function __construct()
+	public function preinit()
 	{
 		//	Call daddy
-		parent::__construct();
+		parent::preinit();
 
-		//	Add our settings to this
+		//	Add our options...
 		$this->addOptions( self::getBaseOptions() );
-
-		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
 	}
-
+	
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
@@ -49,10 +46,10 @@ class CPSWidgetBehavior extends CPSComponentBehavior
 	{
 		return(
 			array(
-				'html_' => 'string:',
-				'script_' => 'string:',
-				'cssFile_' => 'string:',
-				'viewName_' => 'string:',
+				'html_' => 'string',
+				'script_' => 'string',
+				'cssFile_' => 'string',
+				'viewName_' => 'string',
 			)
 		);
 	}

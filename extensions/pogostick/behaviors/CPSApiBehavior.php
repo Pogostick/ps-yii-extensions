@@ -29,34 +29,27 @@ class CPSApiBehavior extends CPSComponentBehavior
 	* 'GET' Http method
 	*/
 	const HTTP_GET = 'GET';
+	
 	/**
 	* 'PUT' Http method
 	*/
 	const HTTP_POST = 'POST';
 
 	//********************************************************************************
-	//* Constructor
+	//* Public Methods
 	//********************************************************************************
 
 	/***
-	* Constructor
-	*
+	* Initialize
 	*/
-	public function __construct()
+	public function preinit()
 	{
 		//	Call daddy...
-		parent::__construct();
+		parent::preinit();
 
 		//	Add ours...
 		$this->addOptions( self::getBaseOptions() );
-
-		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
 	}
-
-	//********************************************************************************
-	//* Public Methods
-	//********************************************************************************
 
 	/**
 	* Allows for single behaviors
@@ -80,7 +73,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 				'requireApiQueryName' => 'boolean:false',
 				'testApiKey' => 'string:',
 				'testAltApiKey' => 'string:',
-				'userAgent' => 'string:Pogostick Components for Yii; (+http://www.pogostick.com/yii)',
+				'userAgent' => 'string:Pogostick Yii Extensions; (+http://www.pogostick.com/yii)',
 			)
 		);
 	}
