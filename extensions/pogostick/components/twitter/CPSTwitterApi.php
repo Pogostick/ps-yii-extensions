@@ -48,22 +48,15 @@ class CPSTwitterApi extends CPSOAuthComponent
 	//********************************************************************************
 
 	/**
-	* Constructs a CPSTwitterApi object
-	* @returns CPSTwitterApi
+	* Preinitialize
 	*/
-	public function __construct()
+	public function preinit()
 	{
 		//	Phone home...
-		parent::__construct();
-
-		//	Create our internal name
-		$_sName = CPSCommonBase::createInternalName( $this );
+		parent::preinit();
 
 		//	Add ours...
 		$this->addOptions( self::getBaseOptions() );
-		
-		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $_sName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $_sName );
 	}
 
 	/**
@@ -78,6 +71,380 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'screenName' => 'string:',
 			)
 		);
+	}
+
+	//********************************************************************************
+	//* Yii Overrides
+	//********************************************************************************
+
+	public function init()
+	{
+		//	Call daddy
+		parent::init();
+
+		//	Set current twitter api url
+		if ( ! $this->apiBaseUrl )
+			$this->apiBaseUrl = 'http://twitter.com';
+		
+		//	Create the base array
+		$this->requestMap = array();
+
+		//********************************************************************************
+		//* Statuses API
+		//********************************************************************************
+		
+		$this->addTwitterRequestMapping( 'public_timeline',                                                      
+			null,
+			null,
+			self::STATUS_API
+		);
+
+		$this->addTwitterRequestMapping( 'friends_timeline',
+			array(
+				'since_id' => false,
+				'max_id' => false,
+				'count' => false,
+				'page' => false,
+			),
+			array( '_requireAuth' => true )
+		);
+
+		$this->addTwitterRequestMapping( 'user_timeline',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+				'since_id' => false,
+				'max_id' => false,
+				'count' => false,
+				'page' => false,
+			),
+			array( 
+				'_requireAuth' => true,
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+			)
+		);
+
+		$this->addTwitterRequestMapping( 'mentions',
+			array(
+				'since_id' => false,
+				'max_id' => false,
+				'count' => false,
+				'page' => false,
+			),
+			array( '_requireAuth' => true )
+		);
+
+		$this->addTwitterRequestMapping( 'show',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+			),
+			array( 
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+			)
+		);
+
+		$this->addTwitterRequestMapping( 'update',
+			array(
+				'status' => true,
+				'in_reply_to_status_id' => false
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+			)
+		);
+
+		$this->addTwitterRequestMapping( 'destroy',
+			array(
+				'id' => true
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+			)
+		);
+
+		$this->addTwitterRequestMapping( 'friends',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+				'page' => false,
+			)
+		);
+
+		$this->addTwitterRequestMapping( 'followers',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+				'page' => false,
+			),
+			array( '_requireAuth' => true )
+		);
+
+		//********************************************************************************
+		//* Users API
+		//********************************************************************************
+
+		$this->addTwitterRequestMapping( 'show',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+			),
+			array(
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+			),
+			self::USER_API
+		);
+
+		//********************************************************************************
+		//* Friendship API
+		//********************************************************************************
+
+		$this->addTwitterRequestMapping( 'create',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+				'follow' => false,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+				'_requireAuth' => true,
+			),
+			self::FRIENDSHIP_API
+		);
+
+		$this->addTwitterRequestMapping( 'destroy',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+				'_requireAuth' => true,
+			),
+			self::FRIENDSHIP_API
+		);
+
+		$this->addTwitterRequestMapping( 'exists',
+			array(
+				'user_a' => true,
+				'user_b' => true,
+			),
+			array( '_requireAuth' => true ),
+			self::FRIENDSHIP_API
+		);
+
+		//********************************************************************************
+		//* Friend API
+		//********************************************************************************
+
+		$this->addTwitterRequestMapping( 'ids',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+				'page' => false,
+			),
+			array(
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+			),
+			self::FRIEND_API
+		);
+
+		//********************************************************************************
+		//* Follower API
+		//********************************************************************************
+
+		$this->addTwitterRequestMapping( 'ids',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+				'page' => false,
+			),
+			array(
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+			),
+			self::FOLLOWER_API
+		);
+
+		//********************************************************************************
+		//* Account API
+		//********************************************************************************
+
+		$this->addTwitterRequestMapping( 'verify_credentials',
+			null,
+			array( '_requireAuth' => true ),
+			self::ACCOUNT_API
+		);
+
+		$this->addTwitterRequestMapping( 'rate_limit_status',
+			null,
+			array( '_requireAuth' => true )
+		 );
+
+		$this->addTwitterRequestMapping( 'end_session',
+			null,
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true
+			)
+		 );
+
+		$this->addTwitterRequestMapping( 'update_delivery_device',
+			array(
+				'device' => true,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true
+			)
+		);
+
+		$this->addTwitterRequestMapping( 'update_profile_colors',
+			array(
+				'profile_background_color' => false,
+				'profile_text_color' => false,
+				'profile_link_color' => false,
+				'profile_sidebar_fill_color' => false,
+				'profile_sidebar_border_color' => false,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireOneOf' => array( 'profile_background_color', 'profile_text_color', 'profile_link_color', 'profile_sidebar_fill_color', 'profile_sidebar_border_color' ),
+				'_requireAuth' => true,
+			)
+		);
+
+		$this->addTwitterRequestMapping( 'update_profile_image',
+			array(
+				'image' => true,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true,
+			)
+		);
+
+		$this->addTwitterRequestMapping( 'update_profile_background_image',
+			array(
+				'image' => true,
+				'tile' => false,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true,
+			)
+		);
+
+		$this->addTwitterRequestMapping( 'update_profile',
+			array(
+				'name' => false,
+				'email' => false,
+				'url' => false,
+				'location' => false,
+				'description' => false,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireOneOf' => array( 'name', 'email', 'url', 'location', 'description' ),
+				'_requireAuth' => true,
+			)
+		);
+
+		//********************************************************************************
+		//* Favorite API
+		//********************************************************************************
+
+		$this->addTwitterRequestMapping( '/',
+			array(
+				'id' => false,
+				'page' => false,
+			),
+			array(
+				'_requireAuth' => true,
+			),
+			self::FAVORITE_API
+		);
+
+		$this->addTwitterRequestMapping( 'create',
+			array(
+				'id' => true,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true,
+			)
+		);
+
+		$this->addTwitterRequestMapping( 'destroy',
+			array(
+				'id' => true,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireAuth' => true,
+			)
+		);
+
+		//********************************************************************************
+		//* Notification API
+		//********************************************************************************
+
+		$this->addTwitterRequestMapping( 'follow',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+				'_requireAuth' => true,
+			),
+			self::NOTIFICATION_API
+		);
+
+		$this->addTwitterRequestMapping( 'leave',
+			array(
+				'id' => false,
+				'user_id' => false,
+				'screen_name' => false,
+			),
+			array(
+				'_method' => CPSApiBehavior::HTTP_POST,
+				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
+				'_requireAuth' => true,
+			)
+		);
+		
+		//********************************************************************************
+		//* Search API
+		//********************************************************************************
+
+		$this->addTwitterRequestMapping( '/',
+			array(
+				'callback' => false,
+				'lang' => false,
+				'rpp' => false,
+				'page' => false,
+				'since_id' => false,
+				'geocode' => false,
+				'show_user' => false,
+				'q' => true,
+			),
+			null,
+			self::SEARCH_API
+		);
+		
 	}
 
 	//********************************************************************************
@@ -514,380 +881,6 @@ class CPSTwitterApi extends CPSOAuthComponent
 	{
 		$this->apiToUse = self::SEARCH_API;
 		return $this->makeRequest( '/', array( 'q' => $sTerm, 'callback' => $sCallback, 'lang' => $sLang, 'rpp' => $iRPP, 'page' => $iPage, 'since_id' => $sSinceId, 'geogode' => $sGeocode, 'show_user' => $bShowUser ) );
-	}
-
-	//********************************************************************************
-	//* Yii Overrides
-	//********************************************************************************
-
-	public function init()
-	{
-		//	Call daddy
-		parent::init();
-
-		//	Set current twitter api url
-		if ( $this->isEmpty( $this->apiBaseUrl ) )
-			$this->apiBaseUrl = 'http://twitter.com';
-		
-		//	Create the base array
-		$this->requestMap = array();
-
-		//********************************************************************************
-		//* Statuses API
-		//********************************************************************************
-		
-		$this->addTwitterRequestMapping( 'public_timeline',                                                      
-			null,
-			null,
-			self::STATUS_API
-		);
-
-		$this->addTwitterRequestMapping( 'friends_timeline',
-			array(
-				'since_id' => false,
-				'max_id' => false,
-				'count' => false,
-				'page' => false,
-			),
-			array( '_requireAuth' => true )
-		);
-
-		$this->addTwitterRequestMapping( 'user_timeline',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-				'since_id' => false,
-				'max_id' => false,
-				'count' => false,
-				'page' => false,
-			),
-			array( 
-				'_requireAuth' => true,
-				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
-			)
-		);
-
-		$this->addTwitterRequestMapping( 'mentions',
-			array(
-				'since_id' => false,
-				'max_id' => false,
-				'count' => false,
-				'page' => false,
-			),
-			array( '_requireAuth' => true )
-		);
-
-		$this->addTwitterRequestMapping( 'show',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-			),
-			array( 
-				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
-			)
-		);
-
-		$this->addTwitterRequestMapping( 'update',
-			array(
-				'status' => true,
-				'in_reply_to_status_id' => false
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-			)
-		);
-
-		$this->addTwitterRequestMapping( 'destroy',
-			array(
-				'id' => true
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-			)
-		);
-
-		$this->addTwitterRequestMapping( 'friends',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-				'page' => false,
-			)
-		);
-
-		$this->addTwitterRequestMapping( 'followers',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-				'page' => false,
-			),
-			array( '_requireAuth' => true )
-		);
-
-		//********************************************************************************
-		//* Users API
-		//********************************************************************************
-
-		$this->addTwitterRequestMapping( 'show',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-			),
-			array(
-				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
-			),
-			self::USER_API
-		);
-
-		//********************************************************************************
-		//* Friendship API
-		//********************************************************************************
-
-		$this->addTwitterRequestMapping( 'create',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-				'follow' => false,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
-				'_requireAuth' => true,
-			),
-			self::FRIENDSHIP_API
-		);
-
-		$this->addTwitterRequestMapping( 'destroy',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
-				'_requireAuth' => true,
-			),
-			self::FRIENDSHIP_API
-		);
-
-		$this->addTwitterRequestMapping( 'exists',
-			array(
-				'user_a' => true,
-				'user_b' => true,
-			),
-			array( '_requireAuth' => true ),
-			self::FRIENDSHIP_API
-		);
-
-		//********************************************************************************
-		//* Friend API
-		//********************************************************************************
-
-		$this->addTwitterRequestMapping( 'ids',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-				'page' => false,
-			),
-			array(
-				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
-			),
-			self::FRIEND_API
-		);
-
-		//********************************************************************************
-		//* Follower API
-		//********************************************************************************
-
-		$this->addTwitterRequestMapping( 'ids',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-				'page' => false,
-			),
-			array(
-				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
-			),
-			self::FOLLOWER_API
-		);
-
-		//********************************************************************************
-		//* Account API
-		//********************************************************************************
-
-		$this->addTwitterRequestMapping( 'verify_credentials',
-			null,
-			array( '_requireAuth' => true ),
-			self::ACCOUNT_API
-		);
-
-		$this->addTwitterRequestMapping( 'rate_limit_status',
-			null,
-			array( '_requireAuth' => true )
-		 );
-
-		$this->addTwitterRequestMapping( 'end_session',
-			null,
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireAuth' => true
-			)
-		 );
-
-		$this->addTwitterRequestMapping( 'update_delivery_device',
-			array(
-				'device' => true,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireAuth' => true
-			)
-		);
-
-		$this->addTwitterRequestMapping( 'update_profile_colors',
-			array(
-				'profile_background_color' => false,
-				'profile_text_color' => false,
-				'profile_link_color' => false,
-				'profile_sidebar_fill_color' => false,
-				'profile_sidebar_border_color' => false,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireOneOf' => array( 'profile_background_color', 'profile_text_color', 'profile_link_color', 'profile_sidebar_fill_color', 'profile_sidebar_border_color' ),
-				'_requireAuth' => true,
-			)
-		);
-
-		$this->addTwitterRequestMapping( 'update_profile_image',
-			array(
-				'image' => true,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireAuth' => true,
-			)
-		);
-
-		$this->addTwitterRequestMapping( 'update_profile_background_image',
-			array(
-				'image' => true,
-				'tile' => false,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireAuth' => true,
-			)
-		);
-
-		$this->addTwitterRequestMapping( 'update_profile',
-			array(
-				'name' => false,
-				'email' => false,
-				'url' => false,
-				'location' => false,
-				'description' => false,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireOneOf' => array( 'name', 'email', 'url', 'location', 'description' ),
-				'_requireAuth' => true,
-			)
-		);
-
-		//********************************************************************************
-		//* Favorite API
-		//********************************************************************************
-
-		$this->addTwitterRequestMapping( '/',
-			array(
-				'id' => false,
-				'page' => false,
-			),
-			array(
-				'_requireAuth' => true,
-			),
-			self::FAVORITE_API
-		);
-
-		$this->addTwitterRequestMapping( 'create',
-			array(
-				'id' => true,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireAuth' => true,
-			)
-		);
-
-		$this->addTwitterRequestMapping( 'destroy',
-			array(
-				'id' => true,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireAuth' => true,
-			)
-		);
-
-		//********************************************************************************
-		//* Notification API
-		//********************************************************************************
-
-		$this->addTwitterRequestMapping( 'follow',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
-				'_requireAuth' => true,
-			),
-			self::NOTIFICATION_API
-		);
-
-		$this->addTwitterRequestMapping( 'leave',
-			array(
-				'id' => false,
-				'user_id' => false,
-				'screen_name' => false,
-			),
-			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
-				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
-				'_requireAuth' => true,
-			)
-		);
-		
-		//********************************************************************************
-		//* Search API
-		//********************************************************************************
-
-		$this->addTwitterRequestMapping( '/',
-			array(
-				'callback' => false,
-				'lang' => false,
-				'rpp' => false,
-				'page' => false,
-				'since_id' => false,
-				'geocode' => false,
-				'show_user' => false,
-				'q' => true,
-			),
-			null,
-			self::SEARCH_API
-		);
-		
 	}
 
 	//********************************************************************************

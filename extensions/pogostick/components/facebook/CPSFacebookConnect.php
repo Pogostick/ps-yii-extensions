@@ -77,9 +77,9 @@ JSCRIPT;
 	*/
 	public function registerClientScripts()
 	{
-		$_oCS = parent::registerClientScripts();
+		parent::registerClientScripts();
 
-		$_oCS->registerScriptFile( 'http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php', CClientScript::POS_END );
-		$_oCS->registerScript( 'Yii.' . __CLASS__ . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
+		PS::_rsf( 'http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php', CClientScript::POS_END );
+		PS::_rs( 'Yii.' . __CLASS__ . '#' . $this->id, $this->generateJavascript() );
 	}
 }

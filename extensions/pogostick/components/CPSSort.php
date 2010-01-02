@@ -37,7 +37,7 @@
  * 
  * @filesource
  */
-class CPSSort extends CSort
+class CPSSort extends CSort implements IPSBase
 {
 	//********************************************************************************
 	//* Public Methods
