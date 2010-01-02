@@ -30,16 +30,13 @@ class CPSgApiWidget extends CPSApiWidget
 	* Constructor
 	*
 	*/
-	public function __construct()
+	public function preinit()
 	{
 		//	Daddy...
-		parent::__construct();
+		parent::preinit();
 
 		//	Our object settings
-		$this->addOption( 'apisToLoad', 'array:array():::maps|search|feeds|language|gdata|earth|visualization', true );
-
-		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
+		$this->addOption( 'apisToLoad', array(), 'array:array():::maps|search|feeds|language|gdata|earth|visualization' );
 	}
 
 	//********************************************************************************
@@ -65,19 +62,12 @@ class CPSgApiWidget extends CPSApiWidget
 		$this->script = '';
 
 		if ( is_array( $this->apisToLoad ) )
+		{
 			foreach ( $this->apisToLoad as $_sApi => $_sVersion )
 				$this->script .= "google.load(\"{$_sApi}\", \"{$_sVersion}\");\n";
+		}
 
 		return $this->script;
-	}
-
-	/**
-	* Generates the needed HTML
-	* @returns string
-	* 
-	*/
-	protected function generateHtml()
-	{
 	}
 
 	/**
@@ -90,12 +80,12 @@ class CPSgApiWidget extends CPSApiWidget
 		$_sApiKey = $this->apiKey;
 
 		//	Register scripts necessary
-		CPSHelp::_rsf( "http://www.google.com/jsapi?key={$_sApiKey}", CClientScript::POS_HEAD );
-		CPSHelp::_rsf( "http://maps.google.com/maps?file=api&v=2&key={$_sApiKey}&sensor=false", CClientScript::POS_HEAD );
-		CPSHelp::_rsf( 'http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/1.1/src/markermanager.js', CClientScript::POS_HEAD );
-		CPSHelp::_rsf( 'http://gmaps-utility-library.googlecode.com/svn/trunk/extinfowindow/release/src/extinfowindow.js', CClientScript::POS_HEAD );
+		PS::_rsf( "http://www.google.com/jsapi?key={$_sApiKey}", CClientScript::POS_HEAD );
+		PS::_rsf( "http://maps.google.com/maps?file=api&v=2&key={$_sApiKey}&sensor=false", CClientScript::POS_HEAD );
+		PS::_rsf( 'http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/1.1/src/markermanager.js', CClientScript::POS_HEAD );
+		PS::_rsf( 'http://gmaps-utility-library.googlecode.com/svn/trunk/extinfowindow/release/src/extinfowindow.js', CClientScript::POS_HEAD );
 
-		CPSHelp::_rs( "Yii.{__CLASS__}.#.{$this->id}", $this->generateJavascript(), CClientScript::POS_READY );
-		CPSHelp::_rs( "Yii.{__CLASS__}.#.{$this->id}.onLoad", "initialize();", CClientScript::POS_READY );
+		PS::_rs( "Yii.{__CLASS__}.#.{$this->id}", $this->generateJavascript() );
+		PS::_rs( "Yii.{__CLASS__}.#.{$this->id}.onLoad", 'initialize();' );
 	}
 }

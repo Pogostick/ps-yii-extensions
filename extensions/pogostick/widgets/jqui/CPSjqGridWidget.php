@@ -33,16 +33,16 @@ class CPSjqGridWidget extends CPSjqUIWrapper
 	public function registerClientScripts()
 	{
 		//	Daddy...
-		$_oCS = parent::registerClientScripts();
+		parent::registerClientScripts();
 		
 		//	Register scripts necessary
-		CPSHelp::_rsf( "{$this->extLibUrl}/jqGrid/js/i18n/grid.locale-en.js" );
-		CPSHelp::_rsf( "{$this->extLibUrl}/jqGrid/js/jquery.jqGrid.min.js" );
+		PS::_rsf( "{$this->extLibUrl}/jqGrid/js/i18n/grid.locale-en.js" );
+		PS::_rsf( "{$this->extLibUrl}/jqGrid/js/jquery.jqGrid.min.js" );
 
 		//	Register css files...
-		CPSHelp::_rcf( "{$this->extLibUrl}/jqGrid/css/ui.jqgrid.css", 'screen' );
+		PS::_rcf( "{$this->extLibUrl}/jqGrid/css/ui.jqgrid.css", 'screen' );
 		
-		return CPSHelp::_cs();
+		return PS::_cs();
 	}
 
 	//********************************************************************************
@@ -102,9 +102,9 @@ CODE;
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqGridWidget
 	*/
-	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName = null, array $arOptions = array() )
 	{
-		return parent::create( 'jqGrid', $arOptions, $sClass );
+		return parent::create( PS::nvl( $sName, self::PS_WIDGET_NAME ), array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
 	}
 	
 	/**
@@ -118,15 +118,14 @@ CODE;
 	public static function asXml( $oModel, $oCriteria = null, $arQSElems = null, $bReturnString = false )
 	{
 		//	Defaults...
-		$_iPage = 1;
-		$_iLimit = 25;
-		$_iSortCol = 1;
-		$_sSortOrder = 'asc';
-		$_sSearchField;
-		$_sSearchValue;
-		$_sSearchOperator;
+		$_iPage = PS::o( $_REQUEST, 0, 1 );
+		$_iLimit = PS::o( $_REQUEST, 1, 25 );
+		$_iSortCol = PS::o( $_REQUEST, 2, 1 );
+		$_sSortOrder = PS::o( $_REQUEST, 3, 'asc' );
+		$_sSearchField = PS::o( $_REQUEST, 4 );
+		$_sSearchValue = PS::o( $_REQUEST, 5 );
+		$_sSearchOperator = PS::o( $_REQUEST, 6 );
 		$_arArgs = array( 'page', 'rows', 'sidx', 'sord', 'searchField', 'searchString', 'searchOper' );
-		$_bHaveDBC = ( $oCriteria instanceof CDbCriteria );
 
 		//	Use user argument naames?
 		if ( $arQSElems )
@@ -135,52 +134,29 @@ CODE;
 			$_arArgs = $arQSElems;
 		}
 
-		//	Get any passed in arguments
-		if ( isset( $_REQUEST[ $_arArgs[ 0 ] ] ) ) $_iPage = $_REQUEST[ $_arArgs[ 0 ] ];
-		if ( isset( $_REQUEST[ $_arArgs[ 1 ] ] ) ) $_iLimit = $_REQUEST[ $_arArgs[ 1 ] ];
-		if ( isset( $_REQUEST[ $_arArgs[ 2 ] ] ) ) $_iSortCol = $_REQUEST[ $_arArgs[ 2 ] ];
-		if ( isset( $_REQUEST[ $_arArgs[ 3 ] ] ) ) $_sSortOrder = $_REQUEST[ $_arArgs[ 3 ] ];
-		if ( isset( $_REQUEST[ $_arArgs[ 4 ] ] ) ) $_sSearchField = $_REQUEST[ $_arArgs[ 4 ] ];
-		if ( isset( $_REQUEST[ $_arArgs[ 5 ] ] ) ) $_sSearchValue = $_REQUEST[ $_arArgs[ 5 ] ];
-		if ( isset( $_REQUEST[ $_arArgs[ 6 ] ] ) ) $_sSearchOperator = $_REQUEST[ $_arArgs[ 6 ] ];
-
-		Yii::trace( var_export($_REQUEST,true));
-		
 		//	Get a count of rows for this result set
-		$_iRowCount = $oModel->count( ( $_bHaveDBC ) ? $oCriteria : '' );
+		$_iRowCount = $oModel->count( $oCriteria );
 
 		//	Calculate paging info
-		if ( $_iRowCount > 0 )
-			$_iTotalPages = ceil( $_iRowCount / $_iLimit );
-		else
-			$_iTotalPages = 0;
+		$_iTotalPages = ( $_iRowCount > 0 ) ? ceil( $_iRowCount / $_iLimit ) : 0;
 
 		//	Sanity checks
-		if ( $_iPage > $_iTotalPages )
-			$_iPage = $_iTotalPages;
-
-		if ( $_iPage < 1 )
-			$_iPage = 1;
+		if ( $_iPage > $_iTotalPages ) $_iPage = $_iTotalPages;
+		if ( $_iPage < 1 ) $_iPage = 1;
 
 		//	Calculate starting offset
 		$_iStart = $_iLimit * $_iPage - $_iLimit;
 
 		//	Sanity check
-		if ( $_iStart < 0 )
-			$_iStart = 0;
+		if ( $_iStart < 0 ) $_iStart = 0;
 
 		//	Adjust the criteria for the actual query...
 		$_dbc = new CDbCriteria();
 
-		if ( $_bHaveDBC )
-		{
-			unset( $_dbc );
-			$_dbc = $oCriteria;
-		}
+		if ( $oCriteria instanceof CDbCriteria )
+			$_dbc->mergeWith( $oCriteria );
 		else if ( gettype( $oCriteria ) == 'string' )
-		{
 			$_dbc->select = $oCriteria;
-		}
 		
 		//	Handle search requests...
 		if ( $_sSearchField && $_sSearchValue && $_sSearchOperator )
@@ -224,7 +200,7 @@ CODE;
 		}
 
 		//	Now create the Xml...
-		$_sOut = CPSHelp::asXml(
+		$_sOut = CPSTransform::asXml(
 			$_oRows,
 			array(
 				'jqGrid' => true,

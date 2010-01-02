@@ -22,28 +22,23 @@
 class CPSOAuthComponent extends CPSApiComponent
 {
 	//********************************************************************************
-	//* Constructor
+	//* Public methods
 	//********************************************************************************
 
 	/**
-	* Constructor
-	*
+	* Preinitialize
 	*/
-	public function __construct( $oOwner = null )
+	public function preinit()
 	{
 		//	Call daddy
-		parent::__construct( $oOwner );
+		parent::preinit();
 
 		//	Attach our api behavior
 		$this->attachBehavior( $this->getInternalName(), 'pogostick.behaviors.CPSOAuthBehavior' );
-
-		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->getInternalName() );
+		
+		//	And our event
+		$this->attachEventHandler( 'onUserAuthorized', array( $this, 'userAuthorized' ) );
 	}
-
-	//********************************************************************************
-	//* Public methods
-	//********************************************************************************
 
 	/***
 	* Fetches a protected resource using the tokens stored
@@ -123,7 +118,7 @@ class CPSOAuthComponent extends CPSApiComponent
 
 		//	Handle events...
 		$_oEvent = new CPSApiEvent( $_sUrl, $_arReqArgs, null, $this );
-		$this->beforeApiCall( $_oEvent );
+		$this->onBeforeApiCall( $_oEvent );
 
 		//	Make the call...
 		try
@@ -145,22 +140,22 @@ class CPSOAuthComponent extends CPSApiComponent
 		catch ( Exception $_ex )
 		{
 			$_sResults = null;
-			CPSCommonBase::writeLog( Yii::t( $this->getInternalName(), 'Error making OAuth fetch request in {class}: {message}', array( "{class}" => get_class( $this ), 'message' => $_ex->getMessage() ) ), 'trace', $this->getInternalName() );
+			CPSLog::error( 'pogostick.base', Yii::t( $this->getInternalName(), 'Error making OAuth fetch request in {class}: {message}', array( "{class}" => get_class( $this ), 'message' => $_ex->getMessage() ) ) );
 		}
 
 		//	Handle events...
 		$_oEvent->urlResults = $_sResults;
-		$this->afterApiCall( $_oEvent );
+		$this->onAfterApiCall( $_oEvent );
 
 		//	Raise our completion event...
 		$_oEvent->setUrlResults( $_sResults );
-		$this->requestComplete( $_oEvent );
+		$this->onRequestComplete( $_oEvent );
 
 		//	If user doesn't want JSON output, then reformat
 		switch ( $this->format )
 		{
 			case 'xml':
-				$_sResults = CPSHelp::arrayToXml( json_decode( $_sResults, true ), 'Results' );
+				$_sResults = CPSTransform::arrayToXml( json_decode( $_sResults, true ), 'Results' );
 				break;
 				
 			case 'json':
@@ -181,40 +176,12 @@ class CPSOAuthComponent extends CPSApiComponent
 	//********************************************************************************
 
 	/**
-	 * Declares events and the corresponding event handler methods.
-	 * @return array events (array keys) and the corresponding event handler methods (array values).
-	 * @see CBehavior::events
-	 */
-	public function events()
-	{
-		return(
-			array_merge(
-				parent::events(),
-				array(
-					'onUserAuthorized' => 'userAuthorized',
-				)
-			)
-		);
-	}
-
-	/**
 	* userAuthorized event
-	* 
 	* @param CPSApiEvent $oEvent
 	*/
 	public function onUserAuthorized( $oEvent )
 	{
 		return $this->raiseEvent( 'onUserAuthorized', $oEvent );
 	}
-	
-	/**
-	* Called when a user has been authorized
-	* 
-	* @param mixed $sData
-	*/
-	public function userAuthorized( $sData )
-	{
-		$this->onUserAuthorized( new CPSApiEvent( null, null, $sData ) );
-	}
-	
+
 }

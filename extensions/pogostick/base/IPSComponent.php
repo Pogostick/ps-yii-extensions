@@ -2,13 +2,12 @@
 /*
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
-
 /**
- * This interface defines methods required for base psYiiExtension objects.
+ * This interface defines methods required for base pYe objects.
  * 
  * @package 	psYiiExtensions
  * @subpackage 	base
@@ -19,31 +18,32 @@
  * 
  * @filesource
  */
-interface IPogostickBase extends IPogostick
+interface IPSComponent extends IPSBase
 {
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 	
 	/**
+	 * Preinitialize the object
+	 */
+	function preinit();
+	
+	/**
+	 * Initialize the object
+	 */
+	function init();
+	
+	/**
 	* Get the internal name of our component
 	* @returns string
 	*/
-	public function getInternalName();
+	function getInternalName();
+	
 	/**
 	* Set the internal name of this component
 	* @param string
 	*/
-	public function setInternalName( $sValue );
-	/**
-	* Get the internal name with the delimiter appended
-	* @returns string
-	*/
-	public function getNamePrefix();
-	/**
-	* Get the delimiter used in our options indexes
-	* @returns string
-	*/
-	public function getPrefixDelimiter();
+	function setInternalName( $sValue );
 
 }

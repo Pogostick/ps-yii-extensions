@@ -119,7 +119,8 @@ class CPSOAuthBehavior extends CPSApiBehavior
 				}
 				
 				//	Raise our event
-				$this->onUserAuthorized( new CPSOAuthEvent( $this->m_arCurToken ) );
+				if ( $this->isAuthorized )
+					$this->onUserAuthorized( new CPSOAuthEvent( $this->m_arCurToken ) );
 			}
 		}
 	}
@@ -151,7 +152,7 @@ class CPSOAuthBehavior extends CPSApiBehavior
 		catch ( Exception $_ex )
 		{
 			$_sName = $this->getInternalName();
-			CPSCommonBase::writeLog( Yii::t( $_sName, 'Error storing OAuth token "{a}/{b}" : {c}', array( "{a}" => $oToken['oauth_token'], "{b}" => $oToken['oauth_token_secret'], "{c}" => $_ex->getMessage() ), 'trace', $_sName ) );		
+			CPSLog::error( 'pogostick.behaviors', Yii::t( $_sName, 'Error storing OAuth token "{a}/{b}" : {c}', array( "{a}" => $oToken['oauth_token'], "{b}" => $oToken['oauth_token_secret'], "{c}" => $_ex->getMessage() ) ) );
 		}
 	}
 
@@ -211,11 +212,4 @@ class CPSOAuthBehavior extends CPSApiBehavior
 		$this->raiseEvent( 'onUserAuthorized', $oEvent );
 	}
 	
-	/**
-	 * And our event handler stub
-	 * @param CPSOAuthEvent $oEvent
-	 */
-	public function userAuthorized( $oEvent )
-	{
-	}
 }

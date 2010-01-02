@@ -26,7 +26,7 @@ include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_he
 
 //	The rest
 echo <<<HTML
-CPSHelp::_rcf( '/css/form.css' );
+PS::_rcf( '/css/form.css' );
 
 //	I don't like this, I prefer bold-faced labels
 PS::\$afterRequiredLabel = null;

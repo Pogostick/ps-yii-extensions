@@ -29,6 +29,7 @@ class CPSWysiwygWidget extends CPSjqUIWrapper
 	* The name of this widget
 	*/
 	const PS_WIDGET_NAME = 'wysiwyg';
+
 	/**
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	*/
@@ -42,48 +43,33 @@ class CPSWysiwygWidget extends CPSjqUIWrapper
 	* Initialize the widget
 	* 
 	*/
-	public function init()
+	public function preinit()
 	{
 		//	Call daddy
-		parent::init();
+		parent::preinit();
 		
 		//	Set the default widgetName
 		$this->widgetName = self::PS_WIDGET_NAME;
 	}		
-	
-	/***
-	* Runs this widget
-	*
-	*/
-	public function run()
-	{
-		//	Phone home
-		parent::run();
-		
-		//	Register the scripts/css
-		$this->registerClientScripts();
-	}
 
 	/**
 	* Registers the needed CSS and JavaScript.
-	*
-	* @param string $sId
 	*/
 	public function registerClientScripts()
 	{
-		//	Daddy...
-		$_oCS = Yii::app()->getClientScript();
+		//	Dad
+		parent::registerClientScripts();
 		
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
-
-		//	Register scripts necessary
-		self::loadScripts( $this, $this->theme );
-		$_oCS->registerScriptFile( "{$this->baseUrl}/jquery.wysiwyg.js" );
-		$_oCS->registerCssFile( "{$this->baseUrl}/jquery.wysiwyg.css" );
 	
+		PS::rsf( "{$this->baseUrl}/jquery.wysiwyg.js" );
+		PS::rcf( "{$this->baseUrl}/jquery.wysiwyg.css" );
+		
 		//	Get the javascript for this widget
-		$_oCS->registerScript( 'ps' . self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
+		$this->registerWidgetScript();
+		
+		return PS::_cs();
 	}
 
 	/**
@@ -96,9 +82,9 @@ class CPSWysiwygWidget extends CPSjqUIWrapper
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqGridWidget
 	*/
-	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName = null, array $arOptions = array() )
 	{
-		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
+		return parent::create( PS::nvl( $sName, self::PS_WIDGET_NAME ), array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
 	}
 	
 }

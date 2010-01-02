@@ -39,9 +39,6 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 		//	Preinitialize
 		$this->preinit();
 		
-		//	Raise our new event
-		$this->onBeforeInit( new CEvent( $this ) );
-
 		//	Log it and check for issues...
 		Yii::trace( Yii::t( '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'pogostick.behaviors' );
 	}
@@ -56,7 +53,6 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 	function preinit()
 	{
 		PS::createInternalName( $this );
-		$this->attachEventHandler( 'onBeforeInit', array( $this, 'beforeInit' ) );
 	}
 	
 	/**
@@ -70,17 +66,5 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 	* @param string
 	*/
 	function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
-	
-	//********************************************************************************
-	//* Event Handlers
-	//********************************************************************************
-	
-	/***
-	 * beforeInit event. Called right before init() is called.
-	 * @param CEvent $oEvent
-	 */
-	function beforeInit( $oEvent )
-	{
-	}
 
 }

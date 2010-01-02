@@ -2,14 +2,14 @@
 /*
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
 
 /**
- * This interface does nothing other than indicate that an object is
- * part of the psYiiExtension library. 
+ * This interface does nothing other than indicate that an exception is
+ * part of the psYiiExtensions package.
  * 
  * @package 	psYiiExtensions
  * @subpackage 	base
@@ -20,6 +20,6 @@
  * 
  * @filesource
  */
-interface IPogostick
+interface IPSException extends IPSBase
 {
 }

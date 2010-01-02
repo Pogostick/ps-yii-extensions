@@ -34,25 +34,26 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 	* The name of this widget
 	*/
 	const PS_WIDGET_NAME = 'markItUp';
+
 	/**
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	*/
 	const PS_EXTERNAL_PATH = '/jquery-plugins/markitup';
 
 	//********************************************************************************
-	//* Constructor
+	//* Public Methods
 	//********************************************************************************
 
 	/**
-	* Constructs a CPSjqUIWraqpper
-	*
-	* @param mixed $oOwner
-	* @return CPSjqUIWraqpper
+	* initialize
 	*/
-	function __construct( $oOwner = null )
+	public function preinit()
 	{
 		//	Phone home
-		parent::__construct( $oOwner );
+		parent::preinit();
+		
+		//	Set some defaults in case user lazy (like me)
+		$this->widgetName = self::PS_WIDGET_NAME;
 		
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
@@ -65,39 +66,6 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 		);
 	}
 	
-	//********************************************************************************
-	//* Public Methods
-	//********************************************************************************
-
-	/**
-	* Initialize the widget
-	* 
-	*/
-	public function init()
-	{
-		//	Call daddy
-		parent::init();
-		
-		//	Set some defaults in case user lazy (like me)
-		$this->widgetName = self::PS_WIDGET_NAME;
-		if ( $this->isEmpty( $this->skinToUse ) ) $this->skinToUse = 'markitup';
-		if ( $this->isEmpty( $this->setToUse ) ) $this->setToUse = 'html';
-		if ( $this->isEmpty( $this->settingsToUse ) ) $this->settingsToUse = 'mySettings';
-	}
-	
-	/***
-	* Runs this widget
-	*
-	*/
-	public function run()
-	{
-		//	Phone home...
-		parent::run();
-		
-		//	Register the scripts/css
-		$this->registerClientScripts();
-	}
-
 	/**
 	* Registers the needed CSS and JavaScript.
 	*
@@ -105,22 +73,20 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 	*/
 	public function registerClientScripts()
 	{
-		//	Daddy...
-		$_oCS = Yii::app()->getClientScript();
-		
 		//	Reset the baseUrl
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 
 		//	Register scripts necessary
 		self::loadScripts( $this, $this->theme );
-		$_oCS->registerScriptFile( "{$this->baseUrl}/jquery.markitup.pack.js" );
-		$_oCS->registerScriptFile( "{$this->baseUrl}/sets/{$this->setToUse}/set.js" );
-		$_oCS->registerCssFile( "{$this->baseUrl}/skins/{$this->skinToUse}/style.css" );
-		$_oCS->registerCssFile( "{$this->baseUrl}/sets/{$this->setToUse}/style.css" );
+
+		PS::_rsf( "{$this->baseUrl}/jquery.markitup.pack.js" );
+		PS::_rsf( "{$this->baseUrl}/sets/{$this->setToUse}/set.js" );
+		PS::_rcf( "{$this->baseUrl}/skins/{$this->skinToUse}/style.css" );
+		PS::_rcf( "{$this->baseUrl}/sets/{$this->setToUse}/style.css" );
 	
 		//	Get the javascript for this widget
-		$_sScript = $this->generateJavascript( ( ! $this->isEmpty( $this->multiUseClass ) ) ? $this->multiUseClass : null, $this->settingsToUse );
-		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . $this->widgetName . '#' . $this->id . '.' . time() ), $_sScript, CClientScript::POS_READY );
+		$_sScript = $this->generateJavascript( $this->multiUseClass ? $this->multiUseClass : null, $this->settingsToUse );
+		$this->registerWidgetScript( $_sScript );
 	}
 
 	/**
@@ -133,8 +99,8 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 	* @param string $sClass The class of the calling object if different
 	* @return CPSMarkItUpWidget
 	*/
-	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName = null, array $arOptions = array() )
 	{
-		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
+		return parent::create( PS::nvl( $sName, self::PS_WIDGET_NAME ), array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
 	}
 }

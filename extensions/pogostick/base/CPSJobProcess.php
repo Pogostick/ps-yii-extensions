@@ -8,7 +8,17 @@
  */
 
 /**
- * CPSJobProcess encapulates a work unit
+ * CPSJobProcess encapulates a work unit.
+ * 
+ * Work unit lifecycle is as follows:
+ * 
+ * 1. __construct()
+ * 2. run()
+ * 3. process()
+ * 
+ * Job can be run during construction by setting $bRun to true. Otherwise the run() method must be called by the consumer.
+ * 
+ * When overriding this class, you should only need to create the process() method with your work details.
  * 
  * @package 	psYiiExtensions
  * @subpackage 	base
@@ -19,6 +29,12 @@
  * 
  * @filesource
  * @abstract
+ * 
+ * @property integer $resultCode The result code of the processing
+ * @property string $status The status of the processing
+ * @property mixed $jobData The job data
+ * @property-read string $processingTime The amount of time processing took formated in seconds (i.e. 1.23s)
+ * 
  */
 abstract class CPSJobProcess extends CPSComponent
 {
@@ -28,35 +44,35 @@ abstract class CPSJobProcess extends CPSComponent
 	
 	/**
 	* Start time
-	* 
 	* @var float
 	*/
 	protected $m_fStart = null;
+
 	/**
 	* End time
-	* 
 	* @var float
 	*/
+
 	protected $m_fEnd = null;
+
 	/**
 	* The result code of the ran job
-	* 
 	* @var integer
 	*/
 	protected $m_iResultCode = null;
 	public function getResultCode() { return $this->m_iResultCode; }
 	public function setResultCode( $iValue ) { $this->m_iResultCode = $iValue; }
+	
 	/**
 	* The result status of job
-	* 
 	* @var string
 	*/
 	protected $m_sStatus = null;
 	public function getStatus() { return $this->m_sStatus; }
 	public function setStatus( $sValue ) { $this->m_sStatus = $sValue; }
+	
 	/**
 	* The data for this job
-	* 
 	* @var mixed
 	*/
 	protected $m_oJobData = null;
@@ -70,7 +86,7 @@ abstract class CPSJobProcess extends CPSComponent
 	/**
 	* Constructor
 	* 
-	* @param mixed $oJob Either a row from the job queue or data to process
+	* @param mixed $oJob Either a row from a job queue or data to process
 	* @param boolean $bRun If true, initializes and runs the job
 	* @return CPSJobProcess
 	*/
@@ -96,18 +112,9 @@ abstract class CPSJobProcess extends CPSComponent
 	*/
 	public function run()
 	{
-		$this->m_fStart = CPSHelp::currentTimeMillis();
-
+		$this->startTimer();
 		$_bResult = $this->process();
-
-		$this->m_fEnd = CPSHelp::currentTimeMillis();
-		
-		if ( $this->m_oJobData ) 
-		{
-			$this->m_oJobData->proc_ind = $this->m_iResultCode;
-			$this->m_oJobData->last_status_text = $this->m_sStatus;
-			$this->m_oJobData->save();
-		}
+		$this->stopTimer();
 
 		return $_bResult;
 	}
@@ -118,7 +125,7 @@ abstract class CPSJobProcess extends CPSComponent
 	*/
 	public function getProcessingTime( $bRaw = false )
 	{
-		$_fSpan = PS::nvl( $this->m_fEnd, CPSHelp::currentTimeMillis() ) - $this->m_fStart;
+		$_fSpan = PS::nvl( $this->m_fEnd, PS::currentTimeMillis() ) - $this->m_fStart;
 		return $bRaw ? $_fSpan : number_format( $_fSpan, 2 ) . 's';
 	}
 	
@@ -128,7 +135,7 @@ abstract class CPSJobProcess extends CPSComponent
 	*/
 	public function stopTimer()
 	{
-		$this->m_fEnd = CPSHelp::currentTimeMillis();
+		$this->m_fEnd = PS::currentTimeMillis();
 	}
 	
 	/**
@@ -137,7 +144,7 @@ abstract class CPSJobProcess extends CPSComponent
 	*/
 	public function startTimer()
 	{
-		$this->m_fStart = CPSHelp::currentTimeMillis();
+		$this->m_fStart = PS::currentTimeMillis();
 		$this->m_fEnd = null;
 	}
 

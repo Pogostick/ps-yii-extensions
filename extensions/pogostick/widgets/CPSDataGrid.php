@@ -19,8 +19,25 @@
  *  
  * @filesource
  */
-class CPSDataGrid extends CPSHelperBase
+class CPSDataGrid implements IPSBase
 {
+	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+	
+	/***
+	* Predefined action types
+	*/
+	const	ACTION_NONE = 0;
+	const	ACTION_VIEW = 1;
+	const	ACTION_EDIT = 2;
+	const	ACTION_DELETE = 3;
+	const	ACTION_ADMIN = 4;
+	const	ACTION_LOCK = 5;
+	const	ACTION_UNLOCK = 6;
+	//	Add your own in between 4 and 999...
+	const	ACTION_GENERIC = 999;
+	
 	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
@@ -41,6 +58,19 @@ class CPSDataGrid extends CPSHelperBase
 	public function getGridOptions() { return $this->m_arGridOptions; }
 	public function setGridOptions( $arValue ) { $this->m_arGridOptions = $arValue; }
 
+	/**
+	* Map of predefined actions to names
+	*/
+	protected static $m_arActionMap = array(
+		self::ACTION_NONE => null,
+		self::ACTION_VIEW => 'view',
+		self::ACTION_EDIT => 'edit',
+		self::ACTION_DELETE => 'delete',
+		self::ACTION_ADMIN => 'admin',
+		self::ACTION_LOCK => 'lock',
+		self::ACTION_UNLOCK => 'unlock',
+	);
+	
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -61,7 +91,7 @@ class CPSDataGrid extends CPSHelperBase
 		
 		//	Store our model, get our options
 		self::$m_arGridOptions['data'] = $arModel;
-		$_arPagerOptions = self::getOption( $arOptions, 'pagerOptions', array(), true );
+		$_arPagerOptions = PS::o( $arOptions, 'pagerOptions', array(), true );
 		$_sPagerClass = PS::o( $arOptions, 'pagerClass', 'CPSLinkPager', true );
 		$_bAccordion = PS::o( $arOptions, 'accordion', false, true );
 		$_sGridHeader = PS::o( $arOptions, 'gridHeader', null, true );
@@ -70,7 +100,7 @@ class CPSDataGrid extends CPSHelperBase
 		//	Only work with CPSLinkPagers
 		if ( ! is_a( $_sPagerClass, 'CPSLinkPager' ) ) $_sPagerClass = 'CPSLinkPager';
 
-		$_iPagerLocation = self::getOption( $_arPagerOptions, 'location', $_sPagerClass::TOP_RIGHT, true );
+		$_iPagerLocation = PS::o( $_arPagerOptions, 'location', $_sPagerClass::TOP_RIGHT, true );
 
 		//	Create widget...
 		if ( $_oPages ) 
@@ -79,7 +109,7 @@ class CPSDataGrid extends CPSHelperBase
 		
 			if ( $_oWidget ) 
 			{
-				$_oWidget->pagerLocation = self::nvl( $_iPagerLocation, $_oWidget->pagerLocation );
+				$_oWidget->pagerLocation = PS::nvl( $_iPagerLocation, $_oWidget->pagerLocation );
 				$_sPager = $_oWidget->run( true );
 
 				//	Where do you want it?
@@ -114,7 +144,7 @@ class CPSDataGrid extends CPSHelperBase
 		$_arActions = PS::o( self::$m_arGridOptions, 'actions', array() );
 		$bAddActions = ! empty( $_arActions );
 		$_sGridId = PS::o( self::$m_arGridOptions, 'id', null, true );
-		$_sGridClass = PS::o( self::$m_arGridOptions, 'gridClass', 'dataGrid', true );
+		$_sGridClass = PS::o( self::$m_arGridOptions, 'gridClass', 'ps-data-grid ui-widget-content', true );
 		
 		$_sHeaders = null;
 		$_oModel = is_array( $arModel ) && count( $arModel ) ? current( $arModel ) : null;
@@ -144,7 +174,7 @@ class CPSDataGrid extends CPSHelperBase
 		
 		if ( $_sGridId ) $_arTableOpts['id'] = $_sGridId;
 		
-		return PS::tag( 'table', $_arTableOpts, PS::tag( 'tr', array(), $_sHeaders ), false );
+		return PS::tag( 'table', $_arTableOpts, PS::tag( 'tr', array( 'class' => 'ui-widget-header' ), $_sHeaders ), false );
 	}
 	
 	/***
@@ -159,9 +189,7 @@ class CPSDataGrid extends CPSHelperBase
 		//	Pull are variables from the options
 		$arModel = PS::o( self::$m_arGridOptions, 'data', array() );
 		$sLinkView = PS::o( self::$m_arGridOptions, 'linkView', null );
-		$sDataName = PS::o( self::$m_arGridOptions, 'dataItemName', 'item' );
 		$arColumns = PS::o( self::$m_arGridOptions, 'columns', array() );
-		$arActions = PS::o( self::$m_arGridOptions, 'actions', null );
 		$sPK = PS::o( self::$m_arGridOptions, 'pk', null );
 		$bEncode = PS::o( self::$m_arGridOptions, 'encode', true );
 		$arDivComment = PS::o( self::$m_arGridOptions, 'divComment', array() );
@@ -174,7 +202,6 @@ class CPSDataGrid extends CPSHelperBase
 		//	Build the grid rows
 		$_sOut = null;
 		$_iRow = 0;
-		if ( null === $arActions ) $arActions = array( 'edit', 'delete' );
 		
 		if ( ! $arModel || ( is_array( $arModel ) && ! count( $arModel ) ) ) 
 			$_sOut .= CHtml::tag( 'tr', array(), PS::tag( 'td', array( 'class' => 'ps-data-grid-no-data-found', 'colspan' => self::$m_iColumnCount ), 'No Records Found' ) );
@@ -187,85 +214,15 @@ class CPSDataGrid extends CPSHelperBase
 				$_sTD = CPSTransform::column( $_oModel, $arColumns, $sLinkView, 'td', array( 'encode' => $bEncode ) );
 					
 				//	Build actions...
-				if ( $_sPK && ! empty( $arActions ) )
-				{
-					foreach ( $arActions as $_oParts )
-					{
-						$_sAction = $_oParts;
-						
-						//	Our default view (update)
-						$_sViewName = PS::nvl( $sLinkView, 'update' );
-
-						//	If action is an array, first element is action, second is view (which can also be an array)
-						if ( is_array( $_oParts ) )
-						{
-							$_sAction = $_oParts[0];
-							$_sViewName = $_oParts[1];
-						}
-						
-						//	Skip lock actions on non-lockable columns
-						if ( $_sAction == 'lock' && ! $_sLockColumn )
-							continue;
-							
-						//	Fix up link view array...
-						$_arLink = array( $_sViewName );
-						if ( is_array( $_sViewName ) ) $_arLink = $_sViewName;
-						
-						//	Stuff in the PK(s)
-						$_arLink[ $_sPK ] = $_oModel->{$_sPK};
-						foreach ( $_arLink as $_sKey => $_sValue )
-						{
-							foreach ( array_keys( $_oModel->getAttributes() ) as $_sAttribute )
-							$_arLink[ $_sKey ] = str_ireplace( "%%{$_sAttribute}%%", $_oModel->{$_sAttribute}, $_arLink[ $_sKey ] );
-						}
-
-						//	Add the action
-						switch ( $_sAction )
-						{
-							case 'lock':	//	Special case if model contains lock column
-								$_sLockName = ( ! $_oModel->{$_sLockColumn} ) ? 'Lock' : 'Unlock';
-								$_sIconName = ( $_oModel->{$_sLockColumn} ) ? 'locked' : 'unlocked';
-
-								//	Lock import file
-								$_sActions .= CPSActiveWidgets::jquiButton( $_sLockName, $_arLink,
-									array(
-										'confirm' => "Do you really want to " . strtolower( $_sLockName ) . " this {$sDataName}?",
-										'iconOnly' => true, 
-										'icon' => $_sIconName,
-										'iconSize' => 'small'
-									)
-								);
-								break;
-							
-							case 'view':
-							case 'edit':
-								$_sActions .= CPSActiveWidgets::jquiButton( 'Edit', $_arLink, array( 'iconOnly' => true, 'icon' => $_sAction == 'edit' ? 'pencil' : 'gear', 'iconSize' => 'small' ) );
-								break;
-								
-							case 'delete':
-								$_sActions .= CPSActiveWidgets::jquiButton( 'Delete', array( 'delete', $_sPK => $_oModel->{$_sPK} ),
-									array(
-										'confirm' => "Do you really want to delete this {$sDataName}?",
-										'iconOnly' => true, 
-										'icon' => 'trash', 
-										'iconSize' => 'small'
-									)
-								);
-								break;
-								
-							default:	//	Catchall for prefab stuff...
-								$_sActions .= str_ireplace( '%%PK_VALUE%%', $_oModel->{$_sPK}, $_sAction );
-								break;
-						}
-					}
-					
-					$_sTD .= CHtml::tag( 'td', array( 'class' => 'grid-actions' ), '<div class="_grid_actions">' . $_sActions . '<hr /></div>' );
-				}
+				$_sTD .= CHtml::tag( 'td', array( 'class' => 'ps-grid-actions' ), '<div class="ps-grid-actions-inner">' . self::buildActions( $_oModel ) . '<hr /></div>' );
 				
+				//	Build the output row
 				$_arRowOpts = array();
 				
 				if ( count( $arDivComment ) && $_oModel->hasErrors() )
 					$_arRowOpts = array( 'class' => $arDivComment[1], 'title' => implode( ', ', current( $_oModel->getErrors() ) ) );
+					
+				$_arRowOpts['class'] = PS::o( $_arRowOpts, 'class', ' ui-widget-content' );
 					
 				//	Row id template? Fill it in
 				if ( $_sRowIdTemplate ) 
@@ -283,14 +240,14 @@ class CPSDataGrid extends CPSHelperBase
 				{
 					foreach ( $_oModel->subRows as $_oRow )
 					{
-						$_arInnerOptions = self::smart_array_merge( PS::o( $_oRow, '_innerHtmlOptions', array(), true ), array( 'encode' => false ) );
-						$_arOuterOptions = self::smart_array_merge( array( 'class' => 'ps-sub-row' ), PS::o( $_oRow, '_outerHtmlOptions', array(), true ) );
+						$_arInnerOptions = PS::smart_array_merge( PS::o( $_oRow, '_innerHtmlOptions', array(), true ), array( 'encode' => false ) );
+						$_arOuterOptions = PS::smart_array_merge( array( 'class' => 'ps-sub-row' ), PS::o( $_oRow, '_outerHtmlOptions', array(), true ) );
 						
 						$_sRow = CPSTransform::column( $_oRow, array_keys( $_oRow ), null, 'td', $_arInnerOptions );
 
 						if ( ! empty( $arActions ) )
 						{
-							$_sRow .= CHtml::tag( 'td', self::smart_array_merge( $_arInnerOptions, array( 'class' => 'grid-actions' ) ), '<div class="_grid_actions">&nbsp;<hr /></div>' );
+							$_sRow .= CHtml::tag( 'td', PS::smart_array_merge( $_arInnerOptions, array( 'class' => 'grid-actions' ) ), '<div class="_grid_actions">&nbsp;<hr /></div>' );
 						}
 							
 						$_sOut .= CHtml::tag( 'tr', $_arOuterOptions, $_sRow );
@@ -341,6 +298,148 @@ class CPSDataGrid extends CPSHelperBase
 	}	
 
 	//********************************************************************************
+	//* Private Methods
+	//********************************************************************************
+	
+	/**
+	* Builds an action cell
+	* 
+	* @param CPSModel $oModel
+	*/
+	protected static function buildActions( CPSModel $oModel )
+	{
+		$_oId = $_sActions = $_eAction = null;
+		$_sDataName = PS::o( self::$m_arGridOptions, 'dataItemName', 'item' );
+
+		//	Fix up link view array...
+		$_sLinkView = PS::o( self::$m_arGridOptions, 'linkView', null );
+		$_sViewName = PS::nvl( $_sLinkView, 'update' );
+			
+		$_sPK = PS::nvl( PS::o( self::$m_arGridOptions, 'pk' ), $oModel->getTableSchema()->primaryKey );
+		$_arActions = PS::o( self::$m_arGridOptions, 'actions', array( 'edit', 'delete' ) );
+		
+		//	sub options
+		$_arOptions = PS::o( $_arActions, 'options', array(), true );
+		$_sLockColumn = PS::o( $_arOptions, 'lockColumn', null, true );
+
+		//	Build the actions
+		foreach ( $_arActions as $_sKey => $_oParts )
+		{
+			$_eAction = self::ACTION_NONE;
+			$_sAction = ( is_numeric( $_sKey ) && $_sKey <= self::ACTION_GENERIC ) ? $_sKey : $_oParts;
+			$_arActionOptions = null;
+			$_arLink = is_array( $_sViewName ) ? $_sViewName : array( $_sViewName );
+
+			//	If action is an array, first element is action, second is viewName (which can also be an array)
+			if ( is_array( $_oParts ) )
+			{
+				if ( isset( $_oParts[1] ) )
+				{
+					$_sViewName = $_oParts[1];
+					$_arLink = is_array( $_sViewName ) ? $_sViewName : array( $_sViewName );
+					$_sAction = array_shift( $_oParts );
+					unset( $_oParts[1] );
+				}
+				else
+				{
+					//	The rest art action options...
+					$_arActionOptions = $_oParts;
+					$_arLink = PS::nvl( PS::o( $_arActionOptions, 'url' ), $_arLink );
+				}
+			}
+
+			//	Invalid action? Skip
+			if ( is_numeric( $_sAction ) )
+				$_eAction = intval( $_sAction );
+			else if ( false === ( $_eAction = array_search( $_sAction, self::$m_arActionMap, true ) ) )
+				continue;
+			
+			//	Skip lock actions on non-lockable columns
+			if ( ! $_sLockColumn and ( $_eAction == self::ACTION_LOCK || $_eAction == self::ACTION_UNLOCK ) )
+				continue;
+				
+			//	Stuff in the PK(s)
+			$_arLink[ $_sPK ] = $_oId = $oModel->{$_sPK};
+			foreach ( $_arLink as $_sKey => $_sValue )
+			{
+				if ( 0 != preg_match( '/\%\%(.*)+\%\%/i', $_arLink[$_sKey], $_arMatch ) )
+				{
+					if ( $_arMatch )
+					{
+						foreach ( array_keys( $oModel->getAttributes() ) as $_sAttribute )
+						{
+							$_arLink[ $_sKey ] = str_ireplace( "%%{$_sAttribute}%%", $oModel->{$_sAttribute}, $_arLink[ $_sKey ] );
+						}
+					}
+				}
+			}
+
+			//	Add the action
+			switch ( $_eAction )
+			{
+				/**
+				* Creates a generic "action" button
+				*/
+				case self::ACTION_GENERIC:
+					$_sLabel = PS::o( $_arActionOptions, 'label' );
+					$_sIconName = PS::o( $_arActionOptions, 'icon' );
+					$_sConfirm = PS::o( $_arActionOptions, 'confirm' );
+
+					//	Build an action
+					$_sActions .= PS::jquiButton( $_sLabel, $_arLink,
+						array(
+							'confirm' => $_sConfirm,
+							'iconOnly' => true, 
+							'icon' => $_sIconName,
+							'iconSize' => 'small'
+						)
+					);
+					break;
+					
+				case self::ACTION_LOCK:			//	Special case if model contains lock column
+					$_sLockName = ( ! $oModel->{$_sLockColumn} ) ? 'Lock' : 'Unlock';
+					$_sIconName = ( $oModel->{$_sLockColumn} ) ? 'locked' : 'unlocked';
+
+					//	Lock import file
+					$_sActions .= PS::jquiButton( $_sLockName, $_arLink,
+						array(
+							'confirm' => "Do you really want to " . strtolower( $_sLockName ) . " this {$_sDataName}?",
+							'iconOnly' => true, 
+							'icon' => $_sIconName,
+							'iconSize' => 'small'
+						)
+					);
+					break;
+				
+				case self::ACTION_VIEW:
+					$_sActions .= PS::jquiButton( 'View', $_arLink, array( 'iconOnly' => true, 'icon' => 'gear', 'iconSize' => 'small' ) );
+					break;
+					
+				case self::ACTION_EDIT:
+					$_sActions .= PS::jquiButton( 'Edit', $_arLink, array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
+					break;
+					
+				case self::ACTION_DELETE:
+					$_sActions .= PS::jquiButton( 'Delete', array( 'delete', $_sPK => $_oId ),
+						array(
+							'confirm' => "Do you really want to delete this {$_sDataName}?",
+							'iconOnly' => true, 
+							'icon' => 'trash', 
+							'iconSize' => 'small'
+						)
+					);
+					break;
+					
+				default:	//	Catchall for prefab stuff...
+					$_sActions .= str_ireplace( '%%PK_VALUE%%', $_oId, $_sAction );
+					break;
+			}
+		}
+		
+		return $_sActions;
+	}
+			
+	//********************************************************************************
 	//* Deprecated
 	//********************************************************************************
 	
@@ -355,8 +454,8 @@ class CPSDataGrid extends CPSHelperBase
     * @param CPagination $oPages
     * @param array $arPagerOptions
     * @param mixed $sLinkView
-    * @deprecated Please use CPSDataGrid::createEx()
     * @see CPSDataGrid::createEx
+    * @deprecated Please use CPSDataGrid::createEx()
     */
 	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array(), $sLinkView = 'update', $bEncode = true )
 	{

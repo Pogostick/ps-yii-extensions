@@ -111,7 +111,6 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-button-bar {
 	clear: both;
 	display: block;
-	min-width:580px;
 	position: relative;
 	padding:0px auto;
 }
@@ -127,6 +126,8 @@ button.ps-button { width:auto; overflow:visible; }
 	display: block;
 	position: relative;
 	padding:0px auto;
+	width:96.5%;
+	padding-bottom: 5px;
 }
 
 .ps-submit-button-bar-right {
@@ -201,6 +202,10 @@ button.ps-button { width:auto; overflow:visible; }
 	font-weight:bold;
 }
 
+.ps-form-header {
+	margin-bottom:10px;
+}
+
 h1.ps-form-header-left {
 	float: left;
 	margin-right: 15px;
@@ -264,7 +269,7 @@ h1.ps-form-header-left {
 * Form footers
 */
 .ps-form-footer {
-	margin:20px 0px 0px 0px;
+	margin:20px 20px 0px 0px;
 	text-align:right;
 }
 
@@ -292,19 +297,30 @@ h1.ps-form-header-left {
 	color:white;
 }
 
-.ps-data-grid-sort-arrow {
-	display:inline-block;
-	margin:0 auto;
-	vertical-align:bottom;
-	padding:0px;
-	padding-left:5px;
+/* Grid Actions */
+td.ps-grid-actions {
+	text-align: center;
+	min-width:100px;
 }
 
-.ps-data-grid-no-data-found {
-	text-align:	center;
-	font-weight: bold;
-	font-size: 15px;
-	margin: 10px auto;
+td.ps-grid-actions div.ps-grid-actions-inner {
+	margin:2px auto;
+	height:22px;
+	min-width:100px;
+}
+
+td.ps-grid-actions div.ps-grid-actions-inner a.ps-button {
+	float:none;
+	display: inline-block;
+	margin:0px 3px;
+}
+	
+td.ps-grid-actions div.ps-grid-actions-inner hr {
+	display: block; 
+	clear: left; 
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
 }
 
 /**
@@ -573,10 +589,13 @@ div.ps-edit-container div.yiiForm label.error {
 /**
 * This styles the label that is inserted *UNDERNEATH* the form field
 */
+label.ps-validate-error {
+	display:inline-block;
+}
+
 div.ps-edit-container div.yiiForm label.ps-validate-error { 
 	color: red;
 	margin-left:175px;
-	display:inline-block;
 	text-align: left;
 	width: 100% !important;
 	vertical-align: top;
@@ -631,3 +650,22 @@ div.ps-edit-container div.yiiForm div.wide {
 	margin:5px 0px;
 	font-weight: bold;	
 }
+
+/**
+* Data Grids
+*/
+.ps-data-grid-sort-arrow {
+	display:inline-block;
+	margin:0 auto;
+	vertical-align:bottom;
+	padding:0px;
+	padding-left:5px;
+}
+
+.ps-data-grid-no-data-found {
+	text-align:	center;
+	font-weight: bold;
+	font-size: 15px;
+	margin: 10px auto;
+}
+

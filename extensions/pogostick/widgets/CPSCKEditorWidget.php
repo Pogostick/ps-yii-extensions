@@ -29,6 +29,7 @@ class CPSCKEditorWidget extends CPSjQueryWidget
 	* The name of this widget
 	*/
 	const PS_WIDGET_NAME = 'ckeditor';
+
 	/**
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	*/
@@ -42,28 +43,15 @@ class CPSCKEditorWidget extends CPSjQueryWidget
 	* Initialize the widget
 	* 
 	*/
-	public function init()
+	public function preinit()
 	{
 		//	Call daddy
-		parent::init();
+		parent::preinit();
 		
 		//	Set the default widgetName
 		$this->widgetName = self::PS_WIDGET_NAME;
 	}		
 	
-	/***
-	* Runs this widget
-	*
-	*/
-	public function run()
-	{
-		//	Phone home
-		parent::run();
-		
-		//	Register the scripts/css
-		$this->registerClientScripts();
-	}
-
 	/**
 	* Registers the needed CSS and JavaScript.
 	*
@@ -72,16 +60,16 @@ class CPSCKEditorWidget extends CPSjQueryWidget
 	public function registerClientScripts()
 	{
 		//	Daddy...
-		$_oCS = Yii::app()->getClientScript();
+		parent::registerClientScripts();
 		
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( "{$this->baseUrl}/ckeditor.js" );
+		PS::_rsf( "{$this->baseUrl}/ckeditor.js" );
 	
 		//	Get the javascript for this widget
-		$_oCS->registerScript( 'ps' . self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id, $this->generateJavascript(), CClientScript::POS_READY );
+		$this->registerWidgetScript();
 	}
 	
 	//********************************************************************************
@@ -107,9 +95,11 @@ class CPSCKEditorWidget extends CPSjQueryWidget
 			if ( ! empty( $_arOptions ) ) $_sOptions .= ", {$_arOptions}";
 			$_arOptions = $_sOptions;
 		}
+		
+		if ( $_arOptions ) $_arOptions = ',' . $_arOptions;
 
 		$this->script =<<<CODE
-CKEDITOR.replace('{$_sId}',{$_arOptions});
+CKEDITOR.replace('{$_sId}'{$_arOptions});
 CODE;
 
 		return $this->script;
@@ -126,8 +116,9 @@ CODE;
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjQueryWidget
 	*/
-	public static function create( array $arOptions = array(), $sClass = __CLASS__ )                  
+	public static function create( $sName = null, array $arOptions = array() )
 	{
-		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
+		return parent::create( self::PS_WIDGET_NAME, array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
 	}
+	
 }

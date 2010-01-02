@@ -19,7 +19,7 @@
  * 
  * @filesource
  */
-class CPSModuleAccessControlFilter extends CAccessControlFilter implements IPogostick
+class CPSModuleAccessControlFilter extends CAccessControlFilter implements IPSBase
 {
 	//********************************************************************************
 	//* Public Methods

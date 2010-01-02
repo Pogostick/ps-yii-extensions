@@ -29,6 +29,7 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 	* The name of this widget
 	*/
 	const PS_WIDGET_NAME = 'jquery-alerts';
+	
 	/**
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	*/
@@ -37,14 +38,11 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 	//********************************************************************************
 	//* Methods
 	//********************************************************************************
-
-	/**
-	* Initialize
-	*/
-	public function init()
-	{
-		parent::init();
 	
+	public function preinit()
+	{
+		parent::preinit();
+		
 		//	Set my name...	
 		$this->widgetName = self::PS_WIDGET_NAME;
 	}
@@ -56,17 +54,8 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 	{
 		//	Daddy...
 		parent::registerClientScripts();
-		
-		//	Reset the baseUrl for our own scripts
-		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
-
-		//	Register scripts necessary
-		CPSHelp::_rsf( "{$this->baseUrl}/jquery.alerts.js" );
-
-		//	Register css files...
-		CPSHelp::_rcf( "{$this->baseUrl}/jquery.alerts.css" );
-		
-		return CPSHelp::_cs();
+		self::loadScripts( $this );
+		return PS::_cs();
 	}
 
 	/**
@@ -98,9 +87,9 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqGridWidget
 	*/
-	public static function create( $sName, array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName = null, array $arOptions = array() )
 	{
-		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
+		return parent::create( PS::nvl( $sName, self::PS_WIDGET_NAME ), array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
 	}
 	
 	/**
@@ -115,24 +104,32 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 	*/
 	public static function loadScripts( $oWidget = null, $sTheme = null )
 	{
-		//	Daddy...
-		parent::loadScripts( $oWidget, $sTheme );
+		static $_bLoaded = false;
 		
-		//	Instantiate if needed...
-		$_oWidget = ( null == $oWidget ) ? new CPSjqUIWrapper() : $oWidget;
+		if ( ! $_bLoaded )
+		{
+			//	Daddy...
+			parent::loadScripts( $oWidget, $sTheme );
+		
+			//	Instantiate if needed...
+			$_oWidget = ( null == $oWidget ) ? new CPSjqUIWrapper() : $oWidget;
 
-		//	Save then Set baseUrl...
-		$_sOldPath = $_oWidget->baseUrl;
-		$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
-		
-		//	Register scripts necessary
-		CPSHelp::_rsf( "{$_oWidget->baseUrl}/jquery.alerts.js" );
+			//	Save then Set baseUrl...
+			$_sOldPath = $_oWidget->baseUrl;
+			$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
+			
+			//	Register scripts necessary
+			PS::_rsf( "{$_oWidget->baseUrl}/jquery.alerts.js" );
 
-		//	Register css files...
-		CPSHelp::_rcf( "{$_oWidget->baseUrl}/jquery.alerts.css" );
-		
-		//	Restore path
-		$_oWidget->baseUrl = $_sOldPath;
+			//	Register css files...
+			PS::_rcf( "{$_oWidget->baseUrl}/jquery.alerts.css" );
+			
+			//	Restore/set path
+			$_oWidget->baseUrl = PS::nvl( $_sOldPath, $_oWidget->baseUrl );
+
+			//	Mark done
+			$_bLoaded = true;
+		}
 	}
 
 }

@@ -19,7 +19,7 @@
  * 
  * @filesource
  */
-class CPSWebModule extends CWebModule implements IPogostick
+class CPSWebModule extends CWebModule implements IPSBase
 {
 	//********************************************************************************
 	//* Private Members & Accessors
@@ -70,8 +70,8 @@ class CPSWebModule extends CWebModule implements IPogostick
 		if ( ! is_dir( $this->m_sAssetPath ) ) @mkdir( $this->m_sAssetPath );
 		$this->m_sAssetUrl = $_oAM->publish( $this->m_sAssetPath, true, -1 );
 		
-		//	Add jquery
-		Yii::app()->clientScript->registerCoreScript( 'jquery' );
+		//	Who doesn't need this???
+		PS::_cs()->registerCoreScript( 'jquery' );
 	}                                                                                                          	
 	
 }

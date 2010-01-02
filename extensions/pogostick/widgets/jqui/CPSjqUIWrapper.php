@@ -56,6 +56,7 @@
  * @property $imagePath Image path will be automatically set. You can override the default here.
  * @property $currentTheme The currently used theme
  * @property $multiTheme If multiple themes are allowed
+ * @property-read string $stateName The prefix for state storage
  */
 class CPSjqUIWrapper extends CPSjQueryWidget
 {
@@ -67,6 +68,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	*/
 	const PS_WIDGET_NAME = 'jqui';
+	
 	/**
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	*/
@@ -83,7 +85,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	* @access protected
 	*/
 	protected static $m_sCurrentTheme;
-	
+
 	/**
 	* If true, no theme-blocking will be done.
 	* 
@@ -97,7 +99,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	* 
 	* @var array
 	*/
-	protected $m_arValidThemes = array( 
+	protected static $m_arValidThemes = array( 
 		'base', 
 		'black-tie', 
 		'blitzer', 
@@ -124,13 +126,21 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		'ui-lightness',
 		'vader'
 	); 
+	public static function getValidThemes() { return self::$m_arValidThemes; }
+
+	/**
+	* A name for storing in the state.
+	* @var string
+	*/
+	protected static $m_sStateName = '_ps_jqui_theme';
+	public static function getStateName() { return self::$m_sStateName; }
 	
 	//********************************************************************************
 	//* Property Accessors
 	//********************************************************************************
 	
-	public static function getCurrentTheme() { return self::$m_sCurrentTheme; }
-	public static function setCurrentTheme( $sTheme ) { self::$m_sCurrentTheme = $sTheme; }
+	public static function getCurrentTheme() { return self::$m_sCurrentTheme ? self::$m_sCurrentTheme : self::$m_sCurrentTheme = Yii::app()->user->getState( self::$m_sStateName ); }
+	public static function setCurrentTheme( $sTheme, $bSessionToo = true ) { if ( $bSessionToo ) Yii::app()->user->setState( self::$m_sStateName, $sTheme ); self::$m_sCurrentTheme = $sTheme; }
 	public static function getMultiTheme() { return self::$m_bMultiTheme; }
 	public static function setMultiTheme( $bValue ) { self::$m_bMultiTheme = $bValue; }
 
@@ -139,20 +149,17 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	//********************************************************************************
 
 	/**
-	* Constructs a CPSjqUIWraqpper
-	*
-	* @param mixed $oOwner
-	* @return CPSjqUIWraqpper
+	* Initialize
 	*/
-	function __construct( $oOwner = null )
+	function preinit()
 	{
 		//	Phone home...
-		parent::__construct( $oOwner );
+		parent::preinit();
 		
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
 			array(
-				'theme_' => 'string:::true:' . implode( '|', $this->m_arValidThemes ),
+				'theme_' => 'string:cupertino::true:' . implode( '|', self::$m_arValidThemes ),
 				'imagePath_' => 'string',
 			)
 		);
@@ -170,9 +177,9 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		//	Validate defaults...
 		$_sTheme = $this->theme;
 		
-		if ( empty( $_sTheme ) ) $this->theme = ( ! empty( self::$m_sCurrentTheme ) ) ? self::$m_sCurrentTheme : $_sTheme = 'base';
-		if ( $this->isEmpty( $this->baseUrl ) ) $this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
-		if ( $this->isEmpty( $this->imagePath ) ) $this->imagePath = "{$this->baseUrl}/css/{$this->theme}/images";
+		if ( empty( $_sTheme ) ) $this->theme = ( ! empty( self::$m_sCurrentTheme ) ) ? self::$m_sCurrentTheme : $_sTheme = 'cupertino';
+		if ( empty( $this->baseUrl ) ) $this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
+		if ( empty( $this->imagePath ) ) $this->imagePath = "{$this->baseUrl}/css/{$this->theme}/images";
 	}
 
 	/***
@@ -185,7 +192,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		$this->registerClientScripts();
 
 		//	Generate the HTML if available
-		if ( method_exists( $this, 'generateHtml' ) ) echo $this->generateHtml();
+		echo $this->generateHtml();
 	}
 
 	/**
@@ -195,35 +202,32 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	*/
 	public function registerClientScripts()
 	{
-		//	Push stuff to load...
-		if ( $this->script ) $this->pushScriptFile( $this->extLibUrl . $this->script );
-
 		//	Daddy...
-		$_oCS = parent::registerClientScripts();
+		parent::registerClientScripts();
 		
 		//	Register scripts necessary
-		self::loadScripts( $this );
+		self::loadScripts( $this, $this->theme );
 
 		//	Fix up datepicker internationalization
 		if ( $this->widgetName == 'datepicker' )
 		{
 			//	Is there a regional attribute? Pull it out and remove...
-			$_sRegion = ( ! $this->isEmpty( $this->regional ) ) ? $this->regional : '';
+			$_sRegion = ( ! empty( $this->regional ) ) ? $this->regional : '';
 			$this->unsetOption( 'regional' );
 
 			//	Not en? Let's load i18n file...
-			if ( ! empty( $_sRegion ) ) $_oCS->registerScriptFile( "http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/i18n/jquery-ui-i18n.min.js" );
+			if ( ! empty( $_sRegion ) ) PS::_rsf( "http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/i18n/jquery-ui-i18n.min.js" );
 			
 			//	Set defaults for datepicker if this is one...
 			$_sRegion = "$.datepicker.setDefaults($.extend({showMonthAfterYear: false},$.datepicker.regional['{$_sRegion}']));";
-			$_oCS->registerScript( 'ps.reset.datepicker.' . md5( self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id . '#' . $this->target . '.' . time() ), $_sRegion, CClientScript::POS_READY );
+			PS::_rs( 'ps.reset.datepicker.' . md5( self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id . '#' . $this->target . '.' . time() ), $_sRegion );
 		}
 		
 		//	Get the javascript for this widget
-		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . '.' . $this->widgetName . '#' . $this->id . '#' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );
+		$this->registerWidgetScript();
 
 		//	Don't forget subclasses
-		return $_oCS;
+		return PS::_cs();
 	}
 
 	//********************************************************************************
@@ -241,9 +245,9 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqUIWrapper
 	*/
-	public static function create( $sName, array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName = null, array $arOptions = array() )
 	{
-		return parent::create( $sName, $arOptions, $sClass );
+		return parent::create( $sName, array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
 	}
 	
 	/**
@@ -258,38 +262,43 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	*/
 	public static function loadScripts( $oWidget = null, $sTheme = null )
 	{
-		//	Daddy...
-		$_oCS = Yii::app()->getClientScript();
+		static $_bLoaded = false;
 		
-		//	Instantiate if needed...
-		$_oWidget = ( null == $oWidget ) ? new CPSjqUIWrapper() : $oWidget;
-
-		//	Save then Set baseUrl...
-		$_sOldPath = $_oWidget->baseUrl;
-		$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
-		
-		//	Check theme overrides...
-		$_sTheme = CPSHelp::nvl( $sTheme, $_oWidget->theme, self::$m_sCurrentTheme, Yii::app()->params['theme'] );
-		if ( ! self::$m_bMultiTheme && empty( self::$m_sCurrentTheme ) ) self::$m_sCurrentTheme = $_sTheme;
-
-		$_oWidget->theme = $_sTheme;
-		
-		//	Register scripts necessary
-		$_oCS->registerScriptFile( "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js" );
-		$_oCS->registerScriptFile( $_oWidget->baseUrl . '/js/jquery.pogostick.hover.js', CClientScript::POS_END );
-
-		//	Register css files if we have a theme...
-		if ( $_oWidget->theme )
+		if ( ! $_bLoaded )
 		{
-//	Uncomment to use CDN			
-//			$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css" );
+			//	Instantiate if needed...
+			$_oWidget = ( null == $oWidget ) ? new CPSjqUIWrapper() : $oWidget;
 
-			$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/{$_oWidget->theme}/ui.all.css" );
-			$_oCS->registerCssFile( "{$_oWidget->baseUrl}/css/ui.pogostick.css" );
+			//	Save then Set baseUrl...
+			$_sOldPath = $_oWidget->baseUrl;
+			$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
+			
+			//	Check theme overrides...
+			$_sTheme = PS::nvl( $sTheme, $_oWidget->theme, self::getCurrentTheme(), Yii::app()->params['theme'] );
+			if ( ! self::$m_bMultiTheme && ! self::getCurrentTheme() ) self::setCurrentTheme( $_sTheme );
+
+			$_oWidget->theme = $_sTheme;
+			
+			//	Register scripts necessary
+			PS::_rsf( "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js" );
+			PS::_rsf( $_oWidget->baseUrl . '/js/jquery.pogostick.hover.js', CClientScript::POS_END );
+
+			//	Register css files if we have a theme...
+			if ( $_oWidget->theme )
+			{
+	//	Uncomment to use CDN
+	//			$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css" );
+
+				PS::_rcf( "{$_oWidget->baseUrl}/css/{$_oWidget->theme}/ui.all.css" );
+				PS::_rcf( "{$_oWidget->baseUrl}/css/ui.pogostick.css" );
+			}
+			
+			//	Restore path
+			$_oWidget->baseUrl = $_sOldPath;
+			
+			//	And mark completed...
+			$_bLoaded = true;
 		}
-		
-		//	Restore path
-		$_oWidget->baseUrl = $_sOldPath;
 	}
 
 }

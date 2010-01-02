@@ -41,14 +41,11 @@ class CPSjQueryWidget extends CPSWidget
 	//********************************************************************************
 
 	/**
-	* Constructs a CPSjqUIWraqpper
-	*
-	* @param mixed $oOwner
-	* @return CPSjqUIWraqpper
+	* Initialize
 	*/
-	function __construct( $oOwner = null )
+	function preinit()
 	{
-		parent::__construct( $oOwner );
+		parent::preinit();
 		
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
@@ -101,7 +98,7 @@ class CPSjQueryWidget extends CPSWidget
 		parent::init();
 		
 		//	Validate baseUrl
-		if ( $this->isEmpty( $this->baseUrl ) ) $this->baseUrl = $this->extLibUrl;
+		if ( empty( $this->baseUrl ) ) $this->baseUrl = $this->extLibUrl;
 	}
 
 	/***
@@ -114,47 +111,45 @@ class CPSjQueryWidget extends CPSWidget
 		$this->registerClientScripts();
 
 		//	Generate the HTML if available
-		if ( method_exists( $this, 'generateHtml' ) ) echo $this->generateHtml();
+		echo $this->generateHtml();
 	}
 
 	/**
 	* Registers the needed CSS and JavaScript.
+	* This method DOES NOT call generateJavascript()
 	*
 	* @param string $sId
 	* @returns CClientScript The current app's ClientScript object
 	*/
-	public function registerClientScripts()
+	public function registerClientScripts( $bLocateScript = false )
 	{
-		static $_iScriptCount = 0;
-		
-		//	Daddy...
-		$_oCS = parent::registerClientScripts();
-
-		//	Additional scripts
-		if ( ! empty( $this->m_arScripts ) )
+		//	Additional scripts, let dad load them.
+		if ( ! empty( $this->m_arScripts ) && is_array( $this->m_arScripts ) )
 		{
 			foreach ( $this->m_arScripts as $_sScript )
-				$_oCS->registerScript( 'psjqw.script' . $_iScriptCount++ . '.' . md5( $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $_sScript, CClientScript::POS_READY );
+				$this->pushScriptFile( $_sScript );
 		}
-		else
-		{
-			if ( ! $this->script )
-			{
-				//	Try and auto-find script file...
-				$_sFilePath = $this->getExternalLibraryPath() . '/jquery-plugins/' . $this->name . '/jquery.' . $this->name;
-				$_sFileUrl = $this->getExternalLibraryUrl() . '/jquery-plugins/' . $this->name . '/jquery.' . $this->name;
+		
+		//	Daddy...
+		parent::registerClientScripts();
 
-				//	See if we have such a plug-in
-				if ( file_exists(  $_sFilePath . '.min.js' ) )
-					$_oCS->registerScriptFile( $_sFileUrl . '.min.js', CClientScript::POS_HEAD );
-				//	Try non-minimized version...
-				else if ( file_exists( $_sFilePath . '.js' ) )
-					$_oCS->registerScriptFile( $_sFileUrl . '.js', CClientScript::POS_HEAD );
-			}
+		//	Do we have a registered script?
+		if ( $bLocateScript )
+		{
+			//	Try and auto-find script file...
+			$_sFilePath = $this->getExternalLibraryPath() . '/jquery-plugins/' . $this->name . '/jquery.' . $this->name;
+			$_sFileUrl = $this->getExternalLibraryUrl() . '/jquery-plugins/' . $this->name . '/jquery.' . $this->name;
+
+			//	See if we have such a plug-in
+			if ( file_exists(  $_sFilePath . '.min.js' ) )
+				PS::_rsf( $_sFileUrl . '.min.js', CClientScript::POS_HEAD );
+			//	Try non-minimized version...
+			else if ( file_exists( $_sFilePath . '.js' ) )
+				PS::_rsf( $_sFileUrl . '.js', CClientScript::POS_HEAD );
 		}
 
 		//	Don't forget subclasses
-		return $_oCS;
+		return PS::_cs();
 	}
 
 	//********************************************************************************
@@ -215,7 +210,7 @@ CODE;
 			//	Do we have a target element?
 			if ( $this->hasOption( 'target' ) && $this->target == '_NONE_' )
 				$_sId = null;
-			else if ( ! $this->isEmpty( $this->target ) ) 
+			else if ( ! empty( $this->target ) ) 
 				$_sId = $this->target;
 			else
 				$_sId = "#{$this->id}";
@@ -240,10 +235,11 @@ CODE;
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjQueryWidget
 	*/
-	public static function create( $sName, array $arOptions = array(), $sClass = __CLASS__ )                  
+	public static function create( $sName = null, array $arOptions = array() )
 	{
 		//	Instantiate...
-		$_oWidget = new $sClass();
+		$_sClass = PS::o( $arOptions, 'class' );
+		$_oWidget = new $_sClass();
 
 		//	Set default options...
 		$_oWidget->widgetName = $sName;
@@ -271,18 +267,17 @@ CODE;
 		//	Set variable options...
 		if ( is_array( $arOptions ) )
 		{
-			$_oCS = Yii::app()->getClientScript();
-			
 			//	Check for scripts...
-			foreach ( PS::o( $arOptions, '_scripts', array(), true ) as $_sScript ) $_oCS->registerScriptFile( $this->baseUrl . $_sScript );
-			if ( $_sScript = PS::o( $arOptions, 'script', null, true ) ) $_oCS->registerScriptFile( $this->baseUrl . $_sScript );
+			foreach ( PS::o( $arOptions, '_scripts', array(), true ) as $_sScript ) 
+				$this->pushScriptFile( $this->baseUrl . $_sScript );
 
 			//	Check for css...
-			foreach ( PS::o( $arOptions, '_cssFiles', array(), true ) as $_sCss ) $_oCS->registerCssFile( $this->baseUrl . $_sCss );
-			if ( $_sScript = PS::o( $arOptions, 'cssFile', null, true ) ) $_oCS->registerCssFile( $this->baseUrl . $_sScript );
+			foreach ( PS::o( $arOptions, '_cssFiles', array(), true ) as $_sCss ) 
+				$this->pushCssFile( $this->baseUrl . $_sCss );
 
 			//	Now process the rest of the options...			
-			foreach ( $arOptions as $_sKey => $_oValue ) $this->addOption( $_sKey, null, false, $_oValue );
+			foreach ( $arOptions as $_sKey => $_oValue ) 
+				$this->addOption( $_sKey, $_oValue );
 		}
 		
 		//	Does user want us to run it?

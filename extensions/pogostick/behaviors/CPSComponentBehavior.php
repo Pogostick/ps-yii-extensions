@@ -56,14 +56,11 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	*/
 	public function __construct( $arConfig = array() )
 	{
+		//	Log it and check for issues...
+		Yii::trace( Yii::t( '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'pogostick.behaviors' );
+		
 		//	Preinitialize
 		$this->preinit();
-		
-		//	Raise our new event
-		$this->onBeforeInit( new CEvent( $this ) );
-
-		//	Log it and check for issues...
-		Yii::trace( Yii::t( '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'pogostick.base' );
 	}
 	
 	/**
@@ -83,13 +80,10 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 		
 		//	Set the external library path
 		$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick.external' ), true );
-		
-		//	Attach our event handler
-		$this->attachEventHandler( 'onBeforeInit', array( $this, 'beforeInit' ) );
 	}
 	
 	/**
-	* Initialize our component. Raises the beforeInit() event.
+	* Initialize our component.
 	*/
 	public function init()
 	{
@@ -353,27 +347,6 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 				'extLibUrl_' => 'string:' . DIRECTORY_SEPARATOR,
 			)
 		);
-	}
-
-	//********************************************************************************
-	//* Event Handlers
-	//********************************************************************************
-	
-	/**
-	 * This event is raised before the init() is called
-	 * @param CEvent the event parameter
-	 */
-	public function onBeforeInit( CEvent $oEvent )
-	{
-		$this->raiseEvent( 'onBeforeInit', $oEvent );
-	}
-	
-	/**
-	 * before init
-	 * @param CEvent $oEvent
-	 */
-	public function beforeInit( $oEvent )
-	{
 	}
 	
 }

@@ -28,7 +28,7 @@ class CPSgMapsWidget extends CPSgApiWidget
 	/**
 	* Initialize our widget
 	*/
-	public function init()
+	public function preinit()
 	{
 		$this->addOptions(
 			array(
@@ -39,6 +39,7 @@ class CPSgMapsWidget extends CPSgApiWidget
 				'draggingCursor' => 'string',
 				'googleBarOptions' => 'array',
 				'backgroundColor' => 'string',
+				
 				//	Method Options
 				'mapCenter' => 'array',
 				'mapType' => 'string',

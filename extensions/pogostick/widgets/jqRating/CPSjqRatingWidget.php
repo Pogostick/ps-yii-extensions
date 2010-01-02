@@ -22,17 +22,16 @@
 class CPSjqRatingWidget extends CPSWidget
 {
 	//********************************************************************************
-	//* Constructor
+	//* Public Methods
 	//********************************************************************************
-
+	
 	/**
-	* Constructs a CPSjqRatingWidget
-	* @param CBaseController $oOwner
+	* Initialize
 	*/
-	public function __construct( CBaseController $oOwner = null )
+	public function preinit()
 	{
 		//	Phone home. Call first to get base behaviors loaded...
-		parent::__construct( $oOwner );
+		parent::preinit();
 
 		//	Add these options in the constructor so the Yii base can pre-fill them from the config files.
 		$this->addOptions(
@@ -64,10 +63,6 @@ class CPSjqRatingWidget extends CPSWidget
 		//	Set our view name...
 		$this->viewName = __CLASS__ . 'View';
 	}
-
-	//********************************************************************************
-	//* Yii Overrides
-	//********************************************************************************
 
 	/***
 	* Runs this widget
@@ -102,17 +97,15 @@ class CPSjqRatingWidget extends CPSWidget
 		parent::registerClientScripts();
 
 		//	Register scripts necessary
-		CPSHelp::_rsf( "{$this->baseUrl}/jquery.MetaData.js" );
-		CPSHelp::_rsf( "{$this->baseUrl}/jquery.rating.js" );
+		PS::_rsf( "{$this->baseUrl}/jquery.MetaData.js" );
+		PS::_rsf( "{$this->baseUrl}/jquery.rating.js" );
 
 		//	Get the javascript for this widget
-		$_sScript = $this->generateJavascript();
-
 		if ( ! $this->supressScripts && ! $this->returnString )
-				CPSHelp::_rs( 'PS.' . __CLASS__ . '#' . $this->id, $_sScript, CClientScript::POS_READY );
+			$this->registerWidgetScript();
 
 		//	Register css files...
-		CPSHelp::_rcf( "{$this->baseUrl}/jquery.rating.css", 'screen' );
+		PS::_rcf( "{$this->baseUrl}/jquery.rating.css", 'screen' );
 	}
 
 	//********************************************************************************
@@ -121,17 +114,16 @@ class CPSjqRatingWidget extends CPSWidget
 
 	/**
 	* Generates the javascript code for the widget
-	*
 	* @return string
 	*/
 	protected function generateJavascript()
 	{
 		//	No callback set? then make the ajax callback
-		if ( ! isset( $this->callbacks[ 'callback' ] ) && ! $this->isEmpty( $this->ajaxCallback ) )
+		if ( ! isset( $this->callbacks[ 'callback' ] ) && ! empty( $this->ajaxCallback ) )
 		{
 			$_arTemp = array(
 				'type' => 'GET',
-				'url' => Yii::app()->createUrl( $this->ajaxCallback ),
+				'url' => PS::_cu( $this->ajaxCallback ),
 				'dataType' => 'html'
 			);
 
@@ -226,38 +218,38 @@ class CPSjqRatingWidget extends CPSWidget
 		static $_iIdCount = 0;
 
 		//	Fix up the base url...
-		$_sBaseUrl = CPSHelp::getOption( $arOptions, 'baseUrl', '' );
+		$_sBaseUrl = PS::o( $arOptions, 'baseUrl', '' );
 
 		if ( empty( $_sBaseUrl ) )
 			$_sBaseUrl = Yii::getPathOfAlias( 'pogostick' ) . '/jqRating';
 
 		//	Put it back in the array
-		CPSHelp::setOption( $arOptions, 'baseUrl', $_sBaseUrl );
+		PS::so( $arOptions, 'baseUrl', $_sBaseUrl );
 
-		$sId = CPSHelp::getOption( $arOptions, 'id' );
-		$sName = CPSHelp::getOption( $arOptions, 'name' );
+		$sId = PS::o( $arOptions, 'id' );
+		$sName = PS::o( $arOptions, 'name' );
 
 		//	Build the options...
 		$_arOptions = array(
-			'supressScripts' => CPSHelp::getOption( $arOptions, 'supressScripts', false ),
-			'returnString' => CPSHelp::getOption( $arOptions, 'returnString', false ),
-			'readOnly' => CPSHelp::getOption( $arOptions, 'readOnly', false ),
-			'required' => CPSHelp::getOption( $arOptions, 'required', false ),
-			'baseUrl' => CPSHelp::getOption( $arOptions, 'baseUrl', $_sBaseUrl ),
+			'supressScripts' => PS::o( $arOptions, 'supressScripts', false ),
+			'returnString' => PS::o( $arOptions, 'returnString', false ),
+			'readOnly' => PS::o( $arOptions, 'readOnly', false ),
+			'required' => PS::o( $arOptions, 'required', false ),
+			'baseUrl' => PS::o( $arOptions, 'baseUrl', $_sBaseUrl ),
 			'name' => ( $sName == null ? 'rating' . $_iIdCount : $sName . $_iIdCount ),
-			'starClass' => CPSHelp::getOption( $arOptions, 'starClass', 'star' ),
-			'split' => CPSHelp::getOption( $arOptions, 'split', 1 ),
-			'starCount' => CPSHelp::getOption( $arOptions, 'starCount', 5 ),
-			'selectValue' => ( double )CPSHelp::getOption( $arOptions, 'selectValue', 0 ),
-			'ajaxCallback' => CPSHelp::getOption( $arOptions, 'ajaxCallback' ),
-			'starTitles' => CPSHelp::getOption( $arOptions, 'starTitles' ),
-			'starValues' => CPSHelp::getOption( $arOptions, 'starValues' ),
-			'hoverTips' => CPSHelp::getOption( $arOptions, 'hoverTips' ),
+			'starClass' => PS::o( $arOptions, 'starClass', 'star' ),
+			'split' => PS::o( $arOptions, 'split', 1 ),
+			'starCount' => PS::o( $arOptions, 'starCount', 5 ),
+			'selectValue' => ( double )PS::o( $arOptions, 'selectValue', 0 ),
+			'ajaxCallback' => PS::o( $arOptions, 'ajaxCallback' ),
+			'starTitles' => PS::o( $arOptions, 'starTitles' ),
+			'starValues' => PS::o( $arOptions, 'starValues' ),
+			'hoverTips' => PS::o( $arOptions, 'hoverTips' ),
 			'callbacks' =>
 				array(
-					'callback' => CPSHelp::getOption( $arOptions, 'callback', null ),
-					'focus' => CPSHelp::getOption( $arOptions, 'focus', null ),
-					'blur' => CPSHelp::getOption( $arOptions, 'blur', null ),
+					'callback' => PS::o( $arOptions, 'callback', null ),
+					'focus' => PS::o( $arOptions, 'focus', null ),
+					'blur' => PS::o( $arOptions, 'blur', null ),
 			),
 		);
 
@@ -267,7 +259,7 @@ class CPSjqRatingWidget extends CPSWidget
 		);
 
 		//	Return my created widget
-		return( $_oWidget );
+		return $_oWidget;
  	}
 
 }

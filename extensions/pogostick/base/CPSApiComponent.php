@@ -34,19 +34,21 @@ class CPSApiComponent extends CPSComponent
 	//********************************************************************************
 
 	/**
-	* Constructor
+	* Preinitialize
 	*
 	*/
-	public function __construct()
+	public function preinit()
 	{
 		//	Call daddy...
-		parent::__construct( $this );
+		parent::preinit();
 
 		//	Attach our default behavior
 		$this->attachBehavior( $this->m_sInternalName, 'pogostick.behaviors.CPSApiBehavior' );
-
-		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->m_sInternalName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->m_sInternalName );
+		
+		//	Attach our events...
+		$this->attachEventHandler( 'onBeforeApiCall', array( $this, 'beforeApiCall' ) );
+		$this->attachEventHandler( 'onAfterApiCall', array( $this, 'afterApiCall' ) );
+		$this->attachEventHandler( 'onRequestComplete', array( $this, 'requestComplete' ) );
 	}
 
 	//********************************************************************************
@@ -158,20 +160,20 @@ class CPSApiComponent extends CPSComponent
 
 		//	Handle events...
 		$_oEvent = new CPSApiEvent( $_sUrl, $_sQuery, null, $this );
-		$this->beforeApiCall( $_oEvent );
+		$this->onBeforeApiCall( $_oEvent );
 
 		//	Ok, we've build our request, now let's get the results...
-		$_sResults = $this->makeHttpRequest( $_sUrl, $_sQuery, $sMethod, $this->userAgent );
+		$_sResults = PS::makeHttpRequest( $_sUrl, $_sQuery, $sMethod, $this->userAgent );
 
 		//	Handle events...
 		$_oEvent->urlResults = $_sResults;
-		$this->afterApiCall( $_oEvent );
+		$this->onAfterApiCall( $_oEvent );
 
 		//	If user doesn't want JSON output, then reformat
 		switch ( $this->format )
 		{
 			case 'xml':
-				$_sResults = CPSHelp::arrayToXml( json_decode( $_sResults, true ), 'Results' );
+				$_sResults = CPSTransform::arrayToXml( json_decode( $_sResults, true ), 'Results' );
 				break;
 
 			case 'array':
@@ -181,7 +183,7 @@ class CPSApiComponent extends CPSComponent
 
 		//	Raise our completion event...
 		$_oEvent->setUrlResults( $_sResults );
-		$this->requestComplete( $_oEvent );
+		$this->onRequestComplete( $_oEvent );
 
 		//	Return results...
 		return $_sResults;
@@ -192,52 +194,13 @@ class CPSApiComponent extends CPSComponent
 	//********************************************************************************
 
 	/**
-	 * Declares events and the corresponding event handler methods.
-	 * @return array events (array keys) and the corresponding event handler methods (array values).
-	 * @see CBehavior::events
-	 */
-	public function events()
-	{
-		return(
-			array_merge(
-				parent::events(),
-				array(
-					'onBeforeApiCall' => 'beforeApiCall',
-					'onAfterApiCall' => 'afterApiCall',
-					'onRequestComplete' => 'requestComplete',
-				)
-			)
-		);
-	}
-
-	/**
-	* Call to raise the onBeforeApiCall event
-	*
-	* @param CPSApiEvent $oEvent
-	*/
-	public function beforeApiCall( CPSApiEvent $oEvent )
-	{
-		$this->onBeforeApiCall( $oEvent );
-	}
-
-	/**
 	* Raises the onBeforeApiCall event
 	*
 	* @param CPSApiEvent $oEvent
 	*/
 	public function onBeforeApiCall( CPSApiEvent $oEvent )
 	{
-		$this->raiseEvent( 'onBeforeApiCall', $oEvent );
-	}
-
-	/**
-	* Call to raise the onAfterApiCall event
-	*
-	* @param CPSApiEvent $oEvent
-	*/
-	public function afterApiCall( CPSApiEvent $oEvent )
-	{
-		$this->onAfterApiCall( $oEvent );
+		$this->raiseEvent( 'onBeforeApiCall', $oEvent);
 	}
 
 	/**
@@ -248,16 +211,6 @@ class CPSApiComponent extends CPSComponent
 	public function onAfterApiCall( CPSApiEvent $oEvent )
 	{
 		$this->raiseEvent( 'onAfterApiCall', $oEvent );
-	}
-
-	/**
-	* Call to raise the onRequestComplete event
-	*
-	* @param CPSApiEvent $oEvent
-	*/
-	public function requestComplete( CPSApiEvent $oEvent )
-	{
-		$this->onRequestComplete( $oEvent );
 	}
 
 	/**

@@ -8,7 +8,7 @@
  */
 
 /**
- * The CPSApiWidget is the base class for all Pogostick widgets for Yii
+ * The CPSApiWidget is the base class for all Pogostick API widgets for Yii
  * 
  * @package 	psYiiExtensions
  * @subpackage 	base
@@ -27,19 +27,20 @@ abstract class CPSApiWidget extends CPSWidget
 	//********************************************************************************
 
 	/**
-	* Constructor
-	*
+	* Preinitialize
 	*/
-	public function __construct( $oOwner = null )
+	public function preinit()
 	{
 		//	Call daddy
-		parent::__construct( $oOwner );
+		parent::preinit();
 
 		//	Attach our api behavior
 		$this->attachBehavior( $this->m_sInternalName, 'pogostick.behaviors.CPSApiBehavior' );
-
-		//	Log it and check for issues...
-		CPSCommonBase::writeLog( Yii::t( $this->m_sInternalName, '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'trace', $this->m_sInternalName );
+		
+		//	Attach our events
+		$this->attachEventHandler( 'onBeforeApiCall', array( $this, 'beforeApiCall' ) );
+		$this->attachEventHandler( 'onAfterApiCall', array( $this, 'afterApiCall' ) );
+		$this->attachEventHandler( 'onRequestComplete', array( $this, 'requestComplete' ) );
 	}
 
 	//********************************************************************************
@@ -106,63 +107,11 @@ abstract class CPSApiWidget extends CPSWidget
 	}
 
 	//********************************************************************************
-	//* Private methods
+	//* Event Handlers
 	//********************************************************************************
-
-	/**
-	* Generates the javascript code for the widget
-	*
-	* @return string
-	*/
-	protected function generateJavascript()
-	{
-	}
-
-	/**
-	* Generates the javascript code for the widget
-	*
-	* @return string
-	*/
-	protected function generateHtml()
-	{
-	}
-
-	//********************************************************************************
-	//* Events and Handlers
-	//********************************************************************************
-
-	/**
-	 * Declares events and the corresponding event handler methods.
-	 * @return array events (array keys) and the corresponding event handler methods (array values).
-	 * @see CBehavior::events
-	 */
-	public function events()
-	{
-		return(
-			array_merge(
-				parent::events(),
-				array(
-					'onBeforeApiCall' => 'beforeApiCall',
-					'onAfterApiCall' => 'afterApiCall',
-					'onRequestComplete' => 'requestComplete',
-				)
-			)
-		);
-	}
-
-	/**
-	* Call to raise the onBeforeApiCall event
-	*
-	* @param CPSApiEvent $oEvent
-	*/
-	public function beforeApiCall( $oEvent )
-	{
-		$this->onBeforeApiCall( $oEvent );
-	}
 
 	/**
 	* Raises the onBeforeApiCall event
-	*
 	* @param CPSApiEvent $oEvent
 	*/
 	public function onBeforeApiCall( $oEvent )
@@ -171,18 +120,14 @@ abstract class CPSApiWidget extends CPSWidget
 	}
 
 	/**
-	* Call to raise the onAfterApiCall event
-	*
 	* @param CPSApiEvent $oEvent
 	*/
-	public function afterApiCall( $oEvent )
+	public function beforeApiCall( $oEvent )
 	{
-		$this->onAfterApiCall( $oEvent );
 	}
 
 	/**
 	* Raises the onAfterApiCall event. $oEvent contains "raw" return data
-	*
 	* @param CPSApiEvent $oEvent
 	*/
 	public function onAfterApiCall( $oEvent )
@@ -191,23 +136,26 @@ abstract class CPSApiWidget extends CPSWidget
 	}
 
 	/**
-	* Call to raise the onRequestComplete event
-	*
 	* @param CPSApiEvent $oEvent
 	*/
-	public function requestComplete( $oEvent )
+	public function afterApiCall( $oEvent )
 	{
-		$this->onRequestComplete( $oEvent );
 	}
 
 	/**
 	* Raises the onRequestComplete event. $oEvent contains "processed" return data (if applicable)
-	*
 	* @param CPSApiEvent $oEvent
 	*/
 	public function onRequestComplete( $oEvent )
 	{
 		$this->raiseEvent( 'onRequestComplete', $oEvent );
+	}
+
+	/**
+	* @param CPSApiEvent $oEvent
+	*/
+	public function requestComplete( $oEvent )
+	{
 	}
 
 }

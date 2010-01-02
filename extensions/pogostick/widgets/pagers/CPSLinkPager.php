@@ -21,20 +21,8 @@
  * 
  * @todo This is a work in progress
  */
-class CPSLinkPager extends CLinkPager implements IPogostick
+class CPSLinkPager extends CLinkPager implements IPSBase
 {
-	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-	
-	/**
-	* Pager locations
-	*/
-	const TOP_LEFT = 0;
-	const TOP_RIGHT = 1;
-	const BOTTOM_LEFT = 2;
-	const BOTTOM_RIGHT = 3;
-	
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -60,7 +48,7 @@ class CPSLinkPager extends CLinkPager implements IPogostick
 	* 
 	* @var integer
 	*/
-	protected $m_iPagerLocation = self::TOP_LEFT;
+	protected $m_iPagerLocation = PS::PL_TOP_LEFT;
 	public function getPagerLocation() { return $this->m_iPagerLocation; }
 	
 	/**
@@ -149,16 +137,16 @@ class CPSLinkPager extends CLinkPager implements IPogostick
 		
 		switch ( $eValue )
 		{
-			case self::TOP_RIGHT:
+			case PS::PL_TOP_RIGHT:
 				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-right ps-pager-top';
 				break;
-			case self::BOTTOM_RIGHT:
+			case PS::PL_BOTTOM_RIGHT:
 				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-right ps-pager-bottom';
 				break;
-			case self::TOP_LEFT:
+			case PS::PL_TOP_LEFT:
 				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-left ps-pager-top';
 				break;
-			case self::BOTTOM_LEFT:
+			case PS::PL_BOTTOM_LEFT:
 				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-left ps-pager-bottom';
 				break;
 		}

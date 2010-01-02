@@ -20,7 +20,7 @@
  * 
  * @filesource
  */
-class CPSRESTAction extends CAction implements IPogostick
+class CPSRESTAction extends CAction implements IPSBase
 {
 	//********************************************************************************
 	//* Public Methods

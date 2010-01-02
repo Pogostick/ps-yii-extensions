@@ -29,6 +29,7 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 	* The name of this widget
 	*/
 	const PS_WIDGET_NAME = 'jqTools';
+
 	/**
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	* Currently, a CDN is in use and no local files are required...
@@ -46,13 +47,16 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 	protected $m_arSupportFiles = array();
 	
 	//********************************************************************************
-	//* Constructor
+	//* Public Methods
 	//********************************************************************************
-
-	public function __construct( $sOwner = null )
+	
+	/**
+	 * Preinitialize
+	 */
+	public function preinit()
 	{
 		//	Phone home...
-		parent::__construct( $oOwner );
+		parent::preinit();
 		
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
@@ -63,10 +67,9 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 		
 	}
 	
-	//********************************************************************************
-	//* Methods
-	//********************************************************************************
-
+	/**
+	 * Initialize
+	 */
 	public function init()
 	{
 		parent::init();
@@ -90,7 +93,7 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 		//	Make sure we have the right stuff		
 		if ( 'tabs' == $this->widgetName )
 		{
-			if ( $this->isEmpty( $this->paneClass ) )
+			if ( ! $this->paneClass )
 				throw new CException( Yii::t( 'yii', 'When creating "tabs" you must set the "paneClass" option to the class of the div containing the tab panes.' ) );
 		}
 	}
@@ -101,33 +104,33 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 	public function registerClientScripts()
 	{
 		//	Daddy...
-		$_oCS = parent::registerClientScripts();
+		parent::registerClientScripts();
 		
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 		
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( $this->baseUrl . '/jquery.tools.min.js' );
+		PS::_rsf( $this->baseUrl . '/jquery.tools.min.js' );
 		
 //	Uncomment to use CDN		
-//		$_oCS->registerScriptFile( "http://cdn.jquerytools.org/1.1.2/tiny/jquery.tools.min.js" );
+//		PS::_rsf( "http://cdn.jquerytools.org/1.1.2/tiny/jquery.tools.min.js" );
 
 		//	Add for flashembed if we need it...
-		if ( 'flashembed' == $this->widgetName ) $_oCS->registerScriptFile( "http://static.flowplayer.org/js/tools/tools.flashembed-1.0.4.min.js" );
+		if ( 'flashembed' == $this->widgetName ) PS::_rsf( "http://static.flowplayer.org/js/tools/tools.flashembed-1.0.4.min.js" );
 		
 		//	Register any CSS files for this tool...
 		if ( isset( $this->m_arSupportFiles, $this->m_arSupportFiles[ $this->widgetName ], $this->m_arSupportFiles[ $this->widgetName ]['css'] ) )
 		{
 //	I forgot why I commented this out... sorry. It may be needed.			
 //			foreach ( $this->m_arSupportFiles[ $this->widgetName ][ 'css' ] as $_sFile )
-//				$_oCS->registerCssFile( "{$this->baseUrl}/css/{$_sFile}", 'screen' );
+//				PS::_rcf( "{$this->baseUrl}/css/{$_sFile}", 'screen' );
 		}
 
 		//	Get the javascript for this widget
-		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );
+		$this->registerWidgetScript();
 
 		//	Don't forget subclasses
-		return $_oCS;
+		return PS::_cs();
 	}
 
 	//********************************************************************************
@@ -179,9 +182,9 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqToolsWrapper
 	*/
-	public static function create( $sName, array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName = null, array $arOptions = array() )
 	{
-		return parent::create( $sName, $arOptions, $sClass );
+		return parent::create( PS::nvl( $sName, self::PS_WIDGET_NAME ), array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
 	}
 
 }

@@ -35,7 +35,8 @@ class CPSjqValidate extends CPSjQueryWidget
 	* Currently, a CDN is in use and no local files are required...
 	*/
 	const PS_EXTERNAL_PATH = '/jquery-plugins/validate';
-	const CDN_PATH = 'http://ajax.microsoft.com/ajax/jquery.validate/1.5.5/jquery.validate.min.js';
+	const CDN_ROOT = 'http://ajax.microsoft.com/ajax/jquery.validate/1.6';
+	const CDN_PATH = 'http://ajax.microsoft.com/ajax/jquery.validate/1.6/jquery.validate.min.js';
 
 	//********************************************************************************
 	//* Public Methods
@@ -47,27 +48,26 @@ class CPSjqValidate extends CPSjQueryWidget
 	public function registerClientScripts()
 	{
 		//	Daddy...
-		$_oCS = parent::registerClientScripts();
+		parent::registerClientScripts();
 		
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 		
 		//	Meta data for goodness...
-		$_oCS->registerScriptFile( $this->extLibUrl . '/jquery-plugins/jquery.metadata.js', CClientScript::POS_HEAD );
+		PS::_rsf( $this->extLibUrl . '/jquery-plugins/jquery.metadata.js', CClientScript::POS_HEAD );
 		
 		//	Register scripts necessary
-		if ( defined( __CLASS__ . '::CDN_PATH' ) )
-			$_oCS->registerScriptFile( self::CDN_PATH, CClientScript::POS_HEAD );
-		else
-			$_oCS->registerScriptFile( $this->baseUrl . '/jquery.validate.min.js', CClientScript::POS_HEAD );
+//		PS::_rsf( self::CDN_ROOT . '/jquery.validate.min.js', CClientScript::POS_HEAD );
+		PS::_rsf( $this->baseUrl . '/jquery.validate.min.js', CClientScript::POS_HEAD );
 			
-		$_oCS->registerScriptFile( $this->baseUrl . '/additional-methods.js', CClientScript::POS_HEAD );
+//		PS::_rsf( self::CDN_ROOT . '/additional-methods.js', CClientScript::POS_HEAD );
+		PS::_rsf( $this->baseUrl . '/additional-methods.js', CClientScript::POS_HEAD );
 
 		//	Get the javascript for this widget
-		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );
+		$this->registerWidgetScript();
 
 		//	Don't forget subclasses
-		return $_oCS;
+		return PS::_cs();
 	}
 
 	/**
@@ -76,13 +76,14 @@ class CPSjqValidate extends CPSjQueryWidget
 	* The options passed in are dynamically added to the options array and will be accessible 
 	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
 	* 
+	* @param string $sName The widget name
 	* @param array $arOptions The options for the widget
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqMaskedInputWrapper
 	*/
-	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName = null, array $arOptions = array() )
 	{
-		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
+		return parent::create( PS::nvl( $sName, self::PS_WIDGET_NAME ), array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
 	}
 
 	//********************************************************************************
@@ -108,12 +109,14 @@ class CPSjqValidate extends CPSjQueryWidget
 			$_arOptions = $_sOptions;
 		}
 
-		$_sValidate = 'jQuery.validator.addMethod( "phoneUS", function(phone_number, element) { phone_number = phone_number.replace(/\s+/g, ""); return this.optional(element) || phone_number.length > 9 && phone_number.match(/^(1[\s\.-]?)?(\([2-9]\d{2}\)|[2-9]\d{2})[\s\.-]?[2-9]\d{2}[\s\.-]?\d{4}$/);}, "Please specify a valid phone number");';
-		$_sValidate .= 'jQuery.validator.addMethod( "postalcode", function(postalcode, element) { return this.optional(element) || postalcode.match(/(^\d{5}(-\d{4})?$)|(^[ABCEGHJKLMNPRSTVXYabceghjklmnpstvxy]{1}\d{1}[A-Za-z]{1} ?\d{1}[A-Za-z]{1}\d{1})$/);}, "Please specify a valid postal/zip code");';
+		$_sValidate = '$.validator.addMethod( "phoneUS", function(phone_number, element) { phone_number = phone_number.replace(/\s+/g, ""); return this.optional(element) || phone_number.length > 9 && phone_number.match(/^(1[\s\.-]?)?(\([2-9]\d{2}\)|[2-9]\d{2})[\s\.-]?[2-9]\d{2}[\s\.-]?\d{4}$/);}, "Please specify a valid phone number");';
+		$_sValidate .= '$.validator.addMethod( "postalcode", function(postalcode, element) { return this.optional(element) || postalcode.match(/(^\d{5}(-\d{4})?$)|(^[ABCEGHJKLMNPRSTVXYabceghjklmnpstvxy]{1}\d{1}[A-Za-z]{1} ?\d{1}[A-Za-z]{1}\d{1})$/);}, "Please specify a valid postal/zip code");';
+		
+		//	Put these via registerScript as not to double them up.
+		PS::_rs( '#psValidate.validator.addMethod#', $_sValidate );
 		
 		$this->script =<<<CODE
-{$_sValidate}
-jQuery('{$_sId}').{$this->widgetName}({$_arOptions});
+$('{$_sId}').validate({$_arOptions});
 CODE;
 
 		return $this->script;

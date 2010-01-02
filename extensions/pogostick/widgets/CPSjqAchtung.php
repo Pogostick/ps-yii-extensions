@@ -29,6 +29,7 @@ class CPSjqAchtung extends CPSjQueryWidget
 	* The name of this widget
 	*/
 	const PS_WIDGET_NAME = 'achtung';
+
 	/**
 	* The path where the assets for this widget are stored (underneath the psYiiExtensions/external base
 	* Currently, a CDN is in use and no local files are required...
@@ -45,22 +46,22 @@ class CPSjqAchtung extends CPSjQueryWidget
 	public function registerClientScripts()
 	{
 		//	Daddy...
-		$_oCS = parent::registerClientScripts();
+		parent::registerClientScripts();
 		
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 		
 		//	Register css
-		$_oCS->registerCssFile( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.css", CClientScript::POS_HEAD );
+		PS::_rcf( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.css", CClientScript::POS_HEAD );
 		
 		//	Register scripts necessary
-		$_oCS->registerScriptFile( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.js", CClientScript::POS_HEAD );
+		PS::_rsf( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.js", CClientScript::POS_HEAD );
 
 		//	Get the javascript for this widget
-		$_oCS->registerScript( 'ps_' . md5( self::PS_WIDGET_NAME . $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $this->generateJavascript(), CClientScript::POS_READY );
+		$this->registerWidgetScript();
 
 		//	Don't forget subclasses
-		return $_oCS;
+		return PS::_cs();
 	}
 
 	/**
@@ -73,30 +74,9 @@ class CPSjqAchtung extends CPSjQueryWidget
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqMaskedInputWrapper
 	*/
-	public static function create( array $arOptions = array(), $sClass = __CLASS__ )
+	public static function create( $sName = null, array $arOptions = array() )
 	{
-		return parent::create( self::PS_WIDGET_NAME, $arOptions, $sClass );
+		return parent::create( PS::nvl( $sName, self::PS_WIDGET_NAME ), array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
 	}
 
-	//********************************************************************************
-	//* Private Methods
-	//********************************************************************************
-	
-	/**
-	* Generates the javascript code for the widget
-	*
-	* @return string
-	*/
-	protected function generateJavascript( $sTargetSelector = null, $arOptions = null, $sInsertBeforeOptions = null )
-	{
-		$_sOptions = CPSHelp::getOption( $this->getPublicOptions(), self::PS_WIDGET_NAME, '' );
-		$_sId = $this->getTargetSelector( $sTargetSelector );
-		
-		$this->script =<<<CODE
-jQuery('{$_sId}').{$this->widgetName}({$_sOptions});
-CODE;
-
-		return $this->script;
-	}
-	
 }

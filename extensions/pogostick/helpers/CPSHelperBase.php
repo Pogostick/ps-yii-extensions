@@ -32,6 +32,14 @@ class CPSHelperBase extends CHtml implements IPSBase
 	const	OF_HTTP 		= 1;
 	const	OF_ASSOC_ARRAY 	= 2;
 	
+	/**
+	* Pager locations
+	*/
+	const 	PL_TOP_LEFT		= 0;
+	const 	PL_TOP_RIGHT	= 1;
+	const 	PL_BOTTOM_LEFT	= 2;
+	const 	PL_BOTTOM_RIGHT	= 3;
+	
 	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
@@ -673,6 +681,18 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function registerMetaTag( $sContent, $sName = null, $sHttpEquiv = null, $arOptions = array() )
 	{
 		return self::_rmt( $sContent, $sName, $sHttpEquiv, $arOptions );
+	}
+
+	/**
+	 * Creates a relative URL based on the given controller and action information.
+	 * @param string the URL route. This should be in the format of 'ControllerID/ActionID'.
+	 * @param array additional GET parameters (name=>value). Both the name and value will be URL-encoded.
+	 * @param string the token separating name-value pairs in the URL.
+	 * @return string the constructed URL
+	 */
+	public static function _cu( $sRoute, $arParams = array(), $sAmpersand = '&' )
+	{
+		return Yii::app()->createUrl( $sRoute, $arParams, $sAmpersand );
 	}
 
 	//********************************************************************************
