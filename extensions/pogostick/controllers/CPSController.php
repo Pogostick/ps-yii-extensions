@@ -19,7 +19,7 @@
  * 
  * @filesource
  */
-abstract class CPSController extends CController implements IPogostick
+abstract class CPSController extends CController implements IPSBase
 {
 	//********************************************************************************
 	//* Constants
@@ -48,15 +48,6 @@ abstract class CPSController extends CController implements IPogostick
 	//* Member Variables
 	//********************************************************************************
 	
-	/**
-	* An optional page heading
-	* 
-	* @var string
-	*/
-	protected $m_sPageHeading = null;
-	public function getPageHeading() { return $this->m_sPageHeading; }
-	public function setPageHeading( $sValue ) { $this->m_sPageHeading = $sValue; }
-
 	/***
 	* Allows you to change your action prefix
 	* 
@@ -140,7 +131,6 @@ abstract class CPSController extends CController implements IPogostick
 
 	/**
 	* Action queue for keeping track of where we are...
-	* 
 	* @var array
 	*/
 	protected $m_arActionQueue = array();
@@ -152,7 +142,7 @@ abstract class CPSController extends CController implements IPogostick
 	protected $m_arUserActionList = array();
 	protected function resetUserActionList() { $this->m_arUserActionList = array(); $this->addUserAction( self::ACCESS_TO_ANY, 'error' ); }
 	protected function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = null; $this->addUserActions( $eWhich, $arValue ); }
-	public function getUserActionList( $eWhich ) { return CPSHelp::getOption( $this->m_arUserActionList, $eWhich ); }
+	public function getUserActionList( $eWhich ) { return PS::o( $this->m_arUserActionList, $eWhich ); }
 	public function addUserActionRole( $eWhich, $sRole, $sAction ) { $this->m_arUserActionList[ $eWhich ]['roles'][] = $arValue; }
 
 	public function removeUserAction( $eWhich, $sAction ) 
@@ -281,21 +271,6 @@ abstract class CPSController extends CController implements IPogostick
 	public function getRequest()
 	{
 		return Yii::app()->getRequest();
-	}
-	
-	/**
-	* Add our utility behaviors
-	*/
-	public function behaviors()
-	{
-		return array_merge(
-			parent::behaviors(),
-			array(
-				'psUtility' => array(
-					'class' => 'pogostick.behaviors.CPSUtilityBehavior',
-				),
-			)
-		);
 	}
 	
 	//********************************************************************************
@@ -474,27 +449,5 @@ abstract class CPSController extends CController implements IPogostick
 		
 		return null;
 	}
-
-	/**
-	* Logs a message to the application log
-	* 
-	* @param string $sMessage The log message
-	* @param string $sCategory The category for this log entry. Defaults to __METHOD__
-	* @param string $sLevel The level of this log. Defaults to 'trace'
-	*/
-	protected function log( $sMessage, $sCategory = __METHOD__, $sLevel = 'trace' )
-	{
-		return Yii::log( $sMessage, $sLevel, $sCategory );
-	}
-	
-	/**
-	* Log helpers
-	* 
-	* @param string $sMessage The log message
-	* @param string $sCategory The category for this log entry. Defaults to __METHOD__
-	*/
-	protected function logInfo( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'info' ); }
-	protected function logError( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'error' ); }
-	protected function logWarning( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'warning' ); }
-	protected function logTrace( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'trace' ); }
+ 
 }

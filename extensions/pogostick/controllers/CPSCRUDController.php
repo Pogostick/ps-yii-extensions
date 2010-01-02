@@ -31,7 +31,7 @@ abstract class CPSCRUDController extends CPSController
 	* @var string
 	*/
 	protected $m_sLoginFormClass = null;
-	public function getLoginFormClass() { return CPSHelp::nvl( $this->m_sLoginFormClass, 'LoginForm' ); }
+	public function getLoginFormClass() { return PS::nvl( $this->m_sLoginFormClass, 'LoginForm' ); }
 	public function setLoginFormClass( $sValue ) { $this->m_sLoginFormClass = $sValue; }
 	
 	//********************************************************************************
@@ -54,10 +54,9 @@ abstract class CPSCRUDController extends CPSController
 		$this->addCommandToMap( 'undelete' );
 
 		//	Set our access rules..
-		$this->setUserActionList( self::ACCESS_TO_ANON, array( 'index', 'error' ) );
-		$this->setUserActionList( self::ACCESS_TO_GUEST, array( 'login' ) );
-		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'logout', 'admin', 'create', 'delete', 'logout', 'show', 'list', 'update', 'contact' ) );
-//		$this->setUserActionList( self::ACCESS_TO_ADMIN, array( 'admin' ) );
+		$this->setUserActionList( self::ACCESS_TO_ALL, array( 'index', 'error' ) );
+		$this->setUserActionList( self::ACCESS_TO_GUEST, array( 'login', 'show', 'list', 'contact' ) );
+		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'logout', 'admin', 'create', 'delete', 'update' ) );
 	}
 
 	/**
@@ -93,12 +92,13 @@ abstract class CPSCRUDController extends CPSController
 			$_arRules = array();
 			
 			for ( $_i = 0; $_i <= self::ACCESS_TO_NONE; $_i++ )
-			{
+			{                                                                                                                   
 				$_sVerb = $_sValid = null;
 				
 				//	Get the user type
 				switch ( $_i )
 				{
+					case self::ACCESS_TO_ALL:
 					case self::ACCESS_TO_ANY:
 					case self::ACCESS_TO_ANON:
 						$_sVerb = 'allow';
@@ -129,11 +129,15 @@ abstract class CPSCRUDController extends CPSController
 				//	Add to rules array
 				if ( $_sVerb && $_sValid )
 				{
-					$_arRules[] = array( 
+					$_arTemp = array( 
 						$_sVerb, 
-						'actions' => PS::o( $this->m_arUserActionList, $_i, array() ),
+						'actions' => PS::o( $this->m_arUserActionList, $_i ),
 						'users' => array( $_sValid )
 					);
+					
+					if ( $_arTemp['actions'] == null ) unset( $_arTemp['actions'] );
+					
+					$_arRules[] = $_arTemp;
 				}
 			}
 			
@@ -297,7 +301,7 @@ abstract class CPSCRUDController extends CPSController
 	*/
 	public function actionIndex()
 	{
-		$this->render('index');
+		$this->render( 'index' );
 	}
 	
 	/**
@@ -306,7 +310,7 @@ abstract class CPSCRUDController extends CPSController
 	*/
 	public function actionLogin()
 	{
-		$_sClass = CPSHelp::nvl( $this->m_sLoginFormClass, 'LoginForm' );
+		$_sClass = PS::nvl( $this->m_sLoginFormClass, 'LoginForm' );
 		$_oLogin = new $_sClass();
 		
 		if ( isset( $_POST[ $_sClass ] ) )

@@ -6,9 +6,6 @@
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
-
-Yii::import( 'pogostick.filters.CPSModuleAccessControlFilter' );
- 
 /**
  * CPSModuleController provides filtered access to module resources
  * 
@@ -35,7 +32,7 @@ abstract class CPSModuleController extends CPSController
 	*/
     public function filterAccessControl( $filterChain )
     {
-        $filter = new CPSModuleAccessControlFilter;
+        $filter = new CPSModuleAccessControlFilter();
         $filter->setRules( $this->accessRules() );
         $filter->filter( $filterChain );
     }
