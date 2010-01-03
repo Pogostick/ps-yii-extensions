@@ -25,6 +25,27 @@ class BaseModel extends CPSModel
 	//* Public Methods
 	//********************************************************************************
 
+	/**
+	* Set default sort
+	*/
+	public function beforeFind()
+	{
+		$this->setDefaultSort( 'create_date desc' );
+		return parent::beforeFind();
+	}
+	
+	/**
+	* Set our formats
+	*/
+	public function afterFind()
+	{
+		$this->psDataFormat->setFormat( 'afterFind', 'date', 'F j, Y' );
+		$this->psDataFormat->setFormat( 'afterFind', 'datetime', 'F j, Y @ H:i:s' );
+		$this->psDataFormat->setFormat( 'afterFind', 'timestamp', 'F j, Y @ H:i:s' );
+		
+		return parent::afterFind();
+	}
+	
 	/***
 	* Sets our default behaviors. 
 	* We want our base model to have timestamping

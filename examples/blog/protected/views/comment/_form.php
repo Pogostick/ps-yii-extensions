@@ -19,50 +19,60 @@
  * @filesource
  * 
  */
-	CPSHelp::_rcf( '/css/form.css' );
+	CPSHelp::_rcf( Yii::app()->baseUrl . '/css/form.css' );
 
 	//	I don't like this, I prefer bold-faced labels
 	PS::$afterRequiredLabel = null;
+	PS::$errorCss = 'ui-state-error';
 	
-//	Uncomment for automatic tooltips
-//	CPSjqToolsWrapper::create( 'tooltip', array( 'target' => '#ps-edit-form :input', 'tip' => '.ps-auto-tooltip', 'position' => 'center right', 'offset' => array( -2, 10 ), 'effect' => 'fade', 'opacity' => 0.7 ) );
-?>
-<div class="ps-edit-container">
-	<div class="yiiForm">
-<?php
-		echo PS::beginForm( '', 'POST', 
-			array( 
-				'validate' => true, 
-				'validateOptions' => array(
-					'errorClass' => 'ps-validate-error',
-					'ignoreTitle' => true,
-// @todo Place your extra validation options here...
-//					'rules' => array(
-//						'model_name[column_name] => array(
-//							'rule' => rule options,
-//					),
-//					'messages' => array(
-//						'model_name[column_name] => array(
-//							'rule_name' => 'message',
-//						),
-//					),
-				), 
-				'id' => 'ps-edit-form', 
-				'name' => 'ps-edit-form'
-			)
-		);
-	
-			echo PS::errorSummary( $model );
-			echo PS::field( PS::TEXT, $model, 'post_id' );
-			echo PS::field( PS::TEXTAREA, $model, 'content_text', array( 'rows' => 6, 'cols' => 50 ) );
-			echo PS::field( PS::TEXTAREA, $model, 'content_display_text', array( 'rows' => 6, 'cols' => 50 ) );
-			echo PS::field( PS::TEXT, $model, 'status_nbr' );
-			echo PS::field( PS::TEXT, $model, 'author_name_text', array( 'size' => 60, 'maxlength' => 255 ) );
-			echo PS::field( PS::TEXT, $model, 'email_addr_text', array( 'size' => 60, 'maxlength' => 255 ) );
-			echo PS::field( PS::TEXT, $model, 'url_text', array( 'size' => 60, 'maxlength' => 255 ) );
+	if ( Yii::app()->user->hasFlash( 'commentSubmitted' ) )
+	{
+		echo PS::tag( 'h3', array(), 'Thanks!' );
+		echo '<div class="yiiForm">' . Yii::app()->user->getFlash( 'commentSubmitted' ) . '</div>';
+		return;
+	}
 
-			echo $model->showDates();
-		echo PS::endForm();
-?>
-	</div>
-</div>
+	//	Show header
+	echo PS::tag( 'h3', array(), 'Leave a Comment' );
+
+	//	Build our form options array...
+	$_arFormOpts = array( 
+		//	Gimme jQuery UI styling
+		'uiStyle' => PS::UI_JQUERY,
+		
+		//	Our model
+		'formModel' => $comment,
+		
+		//	We want error summary...
+		'errorSummary' => true,
+		
+		//	Our form fields...
+		'fields' => array(
+			array( PS::TEXT, 'author_name_text', array( 'size' => 60, 'maxlength' => 255 ) ),
+			array( PS::TEXT, 'email_addr_text', array( 'class' => 'email', 'size' => 60, 'maxlength' => 255, 'hint' => 'Your email address will not be published.' ) ),
+			array( PS::TEXT, 'url_text', array( 'class' => 'url', 'size' => 60, 'maxlength' => 255 ) ),
+			array( PS::CKEDITOR, 'content_text' ),
+			array( PS::CAPTCHA, 'verifyCode', array( 'condition' => '( Yii::app()->user->isGuest && extension_loaded( \'gd\' ) )' ) ),
+			array( 'submit', $update ? 'Update' : 'Save', array( 'id' => 'btnSubmit', 'name' => 'submitComment', 'jqui' => true, 'icon' => 'disk' ) ),
+		),
+		
+		//	And validate the form too
+		'validate' => true, 
+		
+		//	Set some validation options
+		'validateOptions' => array(
+			'messages' => array(
+				'Comment[author_name_text]' => array(
+					'required' => 'Anonymous commenting is not allowed. We need your name.',
+				),
+				'Comment[email_addr_text]' => array(
+					'required' => 'You must enter your email address',
+				),
+				'Comment[content_text]' => array(
+					'required' => 'You must enter a comment.',
+				),
+			),
+		), 
+	);
+
+	CPSForm::create( $_arFormOpts );	

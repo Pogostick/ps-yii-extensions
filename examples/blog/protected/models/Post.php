@@ -50,6 +50,28 @@ class Post extends BaseModel
     const STATUS_PUBLISHED = 1;
     const STATUS_ARCHIVED = 2;
  
+	//********************************************************************************
+	//* Member Variables
+	//********************************************************************************
+	
+	/**
+	* The array of status labels
+	* @returns array
+	*/
+	protected $m_arStatusOptions = array(
+        self::STATUS_DRAFT => 'Draft',
+        self::STATUS_PUBLISHED => 'Published',
+        self::STATUS_ARCHIVED => 'Archived',
+	);
+ 	public function getStatusOptions() { return $this->m_arStatusOptions; }
+ 	/**
+ 	* Get the status text
+ 	*/
+ 	public function getStatusText()
+    {
+        return PS::o( $this->m_arStatusOptions, $this->status_nbr, 'Unknown (' . $this->status_nbr . ')' );
+    }
+
  	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -90,13 +112,14 @@ class Post extends BaseModel
 	public function relations()
 	{
 		return array(
-			'comments' => array( self::HAS_MANY, 'Comment', 'post_id', 'order' => 'comment_t.create_date' ),
+			'comments' => array( self::HAS_MANY, 'Comment', 'post_id', 'order' => '??.create_date desc' ),
 			'author' => array( self::BELONGS_TO, 'User', 'author_id' ),
 			'tags' => array( self::MANY_MANY, 'Tag', 'PostTag( post_id, tag_id )' ),
-	        'tagFilter' => array( self::MANY_MANY, 'Tag', 'PostTag( post_id, tag_id )',
+	        'tagFilter' => array( self::MANY_MANY, 'Tag', 'post_tag_asgn_t( post_id, tag_id )',
+	        	'alias' => 'tagFilter',
 	        	'together' => true,
 	        	'joinType' => 'INNER JOIN',
-	        	'condition' => 'tagFilter.name_text = :tag_text'
+	        	'condition' => 'tagFilter.tag_name_text = :tag_name_text'
 	        ),
 		);
 	}
@@ -109,56 +132,17 @@ class Post extends BaseModel
 		return array(
 			'id' => 'Id',
 			'author_id' => 'Author',
-			'title_text' => 'Title Text',
-			'content_text' => 'Content Text',
-			'content_display_text' => 'Content Display Text',
-			'tags_text' => 'Tags Text',
-			'status_nbr' => 'Status Nbr',
-			'comment_count_nbr' => 'Comment Count Nbr',
-			'create_date' => 'Create Date',
-			'lmod_date' => 'Lmod Date',
+			'title_text' => 'Title',
+			'content_text' => 'Contents',
+			'content_display_text' => 'Content',
+			'tags_text' => 'Tags',
+			'status_nbr' => 'Status',
+			'statusText' => 'Status',
+			'comment_count_nbr' => '# of Comments',
+			'create_date' => 'Created On',
+			'lmod_date' => 'Modified On',
 		);
 	}
-
-	/**
-	 * @return array customized tooltips (attribute=>tip)
-	 */
-	public function attributeTooltips()
-	{
-		return array(
-			'id' => 'Id',
-			'author_id' => 'Author',
-			'title_text' => 'Title Text',
-			'content_text' => 'Content Text',
-			'content_display_text' => 'Content Display Text',
-			'tags_text' => 'Tags Text',
-			'status_nbr' => 'Status Nbr',
-			'comment_count_nbr' => 'Comment Count Nbr',
-			'create_date' => 'Create Date',
-			'lmod_date' => 'Lmod Date',
-		);
-	}
-
-	/**
-	* The array of status labels
-	* @returns array
-	*/
- 	public function getStatusOptions()
-    {
-        return array(
-            self::STATUS_DRAFT => 'Draft',
-            self::STATUS_PUBLISHED => 'Published',
-            self::STATUS_ARCHIVED => 'Archived',
-        );
-    }
- 
- 	/**
- 	* Get the status text
- 	*/
- 	public function getStatusText()
-    {
-        return PS::o( $this->getStatusOptions(), $this->status_nbr, 'Unknown (' . $this->status_nbr . ')' );
-    }
 
  	/**
  	* Returns an array of tags
@@ -173,6 +157,25 @@ class Post extends BaseModel
 	}
 	
 	//********************************************************************************
+	//* Scopes
+	//********************************************************************************
+	
+	/**
+	* Scope to return published posts.
+	* @returns Post
+	*/
+	public function published()
+	{
+		$_oCrit = new CDbCriteria();
+		$_oCrit->condition = 'status_nbr = :status_nbr';
+		$_oCrit->params = array( ':status_nbr' => self::STATUS_PUBLISHED );
+
+		$this->getDbCriteria()->mergeWith( $_oCrit );
+		
+		return $this;
+	}
+	
+	//********************************************************************************
 	//* Event Handlers
 	//********************************************************************************
 	
@@ -182,33 +185,9 @@ class Post extends BaseModel
 	*/
 	protected function beforeValidate( $sScenario )
 	{
-		$_oParser = new CMarkdownParser;
-		$this->content_display_text = $_oParser->safeTransform( $this->content_text );
-		
 		if ( $this->isNewRecord ) $this->author_id = Yii::app()->user->id;
-		
+		$this->content_display_text = PS::markdownTransform( $this->content_text );
 		return parent::beforeValidate( $sScenario );
 	}
-
-	/**
-	* After a save...
-	* 
-	*/
-	public function afterSave()
-	{
-		PostTag::model()->deleteAll( 'post_id = :post_id', array( ':post_id' => $this->id ) );
-
-		foreach ( $this->getTagArray() as $_sName )
-		{
-			if ( null === ( $_oTag = Tag::model()->findByAttributes( array( 'tag_name_text' => $_sName ) ) ) )
-			{
-				$_oTag = new Tag( array( 'tag_name_text' => $_sName ) );
-				$_oTag->save();
-			}
-			
-			PostTag::model()->insert( array( 'post_id' => $this->id, 'tag_id' => $_oTag->id ) );
-		}
-		
-		return parent::afterSave();
-	}
+	
 }

@@ -1,0 +1,90 @@
+.portlet-wrapper
+{
+	margin: 0 auto;
+	padding:0px;
+	margin-bottom:10px;
+}
+
+.portlet-header
+{
+	padding:5px 10px 6px;
+	margin: 0;
+	text-align:center;
+}
+
+.portlet-content
+{
+	padding:10px 5px;
+	border-top-width:0px !important;
+}
+
+.portlet-content span.tag {
+	display: inline-block;
+}
+
+.portlet-content label {
+	display: inline-block;
+	margin-bottom:2px;
+}
+
+.portlet-content label.error {
+	color: red;
+}
+
+.portlet-content input, 
+.portlet-content select {
+	margin-bottom:5px;
+}
+
+.portlet-content input[type="text"],
+.portlet-content input[type="password"],
+.portlet-content input[type="textarea"] {
+	width:180px;
+	border: 1px solid #ccc;
+	padding:2px;
+}
+
+.portlet-content input[type="checkbox"] {
+	margin: 0 auto;
+	vertical-align: middle;
+	margin-bottom:2px;
+	margin-left:5px;
+}
+
+.portlet-content select {
+	border-style:solid;
+	border-width:1px;
+	padding:2px;
+	margin-bottom:0px;
+}	
+
+.portlet-content ul, .portlet-content ol
+{
+	list-style-image:none;
+	list-style-position:outside;
+	list-style-type:none;
+	margin: 0 0 0 5px;
+	padding: 0;
+}
+
+.portlet-content li
+{
+	padding: 2px 0 4px 0px;
+	font-size: 8pt;
+}
+
+.portlet-content .row
+{
+	margin: 0 0 5px 0;
+}
+
+.portlet-content .row .hint
+{
+	margin: 0;
+	padding: 0;
+	color: #999;
+}
+
+.portlet-content .ui-datepicker {
+	font-size:1em !important;
+}

@@ -7,7 +7,7 @@
  */
 
 /**
- * PostTagAsgn file
+ * PostTag file
  * 
  * @package 	blog
  * @subpackage 	

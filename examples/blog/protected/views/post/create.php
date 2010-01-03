@@ -19,28 +19,9 @@
  * @filesource
  * 
  */
-	echo CPSForm::formHeader( 'New Post', 
-		array( 
-			'save' => array(
-				'label' => 'Save',
-				'url' => '_submit_',
-				'icon' => 'disk',
-			),
-			
-			'cancel' => array(
-				'label' => 'Cancel',
-				'url' => array( 'admin' ),
-				'icon' => 'cancel',
-			),
-			
-			'return' => array(
-				'label' => 'Post Manager',
-				'url' => array( 'admin' ),
-				'icon' => 'arrowreturnthick-1-w',
-			),
-		)
-	);
 
+echo PS::tag( 'h1', array(), 'New Blog Post' );
+ 
 echo $this->renderPartial( '_form', array(
 	'model' => $model,
 	'update' => false,

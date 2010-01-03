@@ -1,9 +1,7 @@
 <?php
-
 /**
  * LoginForm class.
  * LoginForm is the data structure for keeping
- * user login form data. It is used by the 'login' action of 'SiteController'.
  */
 class LoginForm extends CFormModel
 {
@@ -32,7 +30,9 @@ class LoginForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'rememberMe'=>'Remember me next time',
+			'username' => 'User Name',
+			'password' => 'Password',
+			'rememberMe'=>'Remember Me',
 		);
 	}
 

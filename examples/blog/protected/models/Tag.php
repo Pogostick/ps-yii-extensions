@@ -64,7 +64,7 @@ class Tag extends BaseModel
 	{
 		return array(
 			array( 'tag_name_text', 'length', 'max' => 255 ),
-			array( 'tag_name_text, lmod_date', 'required' ),
+			array( 'tag_name_text', 'required' ),
 		);
 	}
 
@@ -74,7 +74,7 @@ class Tag extends BaseModel
 	public function relations()
 	{
 		return array(
-			'posts' => array( self::MANY_MANY, 'Post', 'PostTag( post_id, tag_id )' ),
+			'posts' => array( self::MANY_MANY, 'Post', 'post_tag_asgn_t( post_id, tag_id )' ),
 		);
 	}
 
@@ -85,7 +85,7 @@ class Tag extends BaseModel
 	{
 		return array(
 			'id' => 'Id',
-			'tag_name_text' => 'Tag Name Text',
+			'tag_name_text' => 'Tag',
 			'create_date' => 'Create Date',
 			'lmod_date' => 'Lmod Date',
 		);
@@ -102,5 +102,44 @@ class Tag extends BaseModel
 			'create_date' => 'Create Date',
 			'lmod_date' => 'Lmod Date',
 		);
+	}
+	
+	/**
+	 * Returns tag names and their corresponding weights.
+	 * Only the tags with the top weights will be returned.
+	 * @param integer the maximum number of tags that should be returned
+	 * @return array weights indexed by tag names
+	 */
+	public function findTagWeights( $iLimit = 20 )
+	{
+		$_iTotalWeight = 0;
+		$_arOut = array();
+		
+		$_oCrit = new CDbCriteria(
+			array(
+				'select' => 'tag_name_text, count(post_id) as weight',
+				'join' => 'INNER JOIN post_tag_asgn_t on tag_t.id = post_tag_asgn_t.tag_id',
+				'group' => 'tag_name_text',
+				'having' => 'count(post_id) > 0',
+				'order' => 'weight desc',
+				'limit' => $iLimit,
+			)
+		);
+
+		if ( $_arTags = $this->queryAll( $_oCrit ) )
+		{
+			foreach ( $_arTags as $_oTag ) 
+				$_iTotalWeight += $_oTag['weight'];
+				
+			if ( $_iTotalWeight )
+			{				
+				foreach ( $_arTags as $_oTag ) 
+					$_arOut[ $_oTag['tag_name_text'] ] = 8 + ( int )( 16 * $_oTag['weight'] / ( $_iTotalWeight + 10 ) );
+					
+				ksort( $_arOut );
+			}
+		}
+
+		return $_arOut;
 	}
 }

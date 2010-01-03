@@ -1,124 +1,130 @@
-/* begin overall style */
+/**
+* Generic classes & styles
+*/
 body
 {
+	font-family: Arial, Helvetica, sans-serif;
 	margin: 0;
 	padding: 0;
-	background: white;
-	color: #444;
-	font: normal 10pt Arial,Helvetica,sans-serif;
-	background:white url(bg.gif) repeat-x left top;
+	text-align: center;
+	font-size: 11px;
 }
 
-#page
+a, 
+a:visited
 {
-	width: 750px;
-	margin: 0 auto;
-	padding: 0;
-}
-
-#header
-{
-	margin: 0;
-	padding: 0;
-	height: 95px;
-}
-
-#logo
-{
-	padding: 20px 0 20px 10px;
-	font-size: 200%;
-}
-
-#mainmenu
-{
-	position: absolute;
-	top: 59px;
-}
-
-#mainmenu ul
-{
-	padding: 0;
-	margin: 0;
-	padding: 0.4em 0 0.3em 0;
-}
-
-#mainmenu ul li
-{
-	display: inline;
-}
-
-#mainmenu ul li a
-{
-	padding: 0.4em 0.4em;
-	color: white;
 	text-decoration: none;
-	font-weight: bold;
 }
 
-#mainmenu ul li a:hover, #mainmenu ul li a.active
+a:hover
 {
-	background: #E6F2FF;
-	color: #6399cd;
+	text-decoration: underline;
 }
 
-#content
+pre
 {
-    position: relative;
-    width: 95%;
-    margin: 0 auto;
-    padding: 0px;
+	border-left-width:5px;
+	font-family:"Courier New",Courier,mono;
+	margin:0.3em;
+	padding:0.5em;
 }
 
-#footer
+/* Overload font size of theme. */
+.ui-widget {
+	font-size: 10pt !important;
+}	
+
+/***
+* Page Classes
+*/
+.page-wrapper
 {
-	padding: 15px;
-	margin: 20px 0 0 0;
+	min-width: 800px;
+	width: 800px;
+	margin:0 auto;
+	padding:0px;
+	text-align: left;
+}
+
+.page-header
+{
+	padding: 0 10px 0 20px;
+	border-left-width:0px !important;
+	border-right-width:0px !important;
+	border-top-width:0px !important;
+}
+
+.page-header h1
+{
+	margin: 0px auto;
+	padding: 10px 5px 15px 5px;
+}
+
+.page-header a
+{
+	text-decoration: none;
+}
+
+.page-content-wrapper
+{
+	border: none !important;
+	min-width: 800px;
+	width: 800px;
+	margin:0px;
+	padding:0px;
+	height: 100%;
+	display: inline-block;
+}
+
+.page-content-wrapper h1 {
+	margin-top: 5px;
+	padding-top:2px;
+	margin-bottom:5px;
+}
+
+.page-content
+{
+	display: inline-block;
+	width: 540px;
+	margin:0px;
+	padding:0px 20px 20px 20px;
+}
+
+.page-sidebar
+{
+	float: right;
+	width: 200px;
+	padding: 15px 10px;
+	display: inline;
+	border: none !important;
+}
+
+/**
+* Footer
+*/
+.page-footer
+{
+	clear: both;
+	margin:0;
+	padding: 0 10px 0 10px;
 	font-size: 0.8em;
-	text-align: center;
-	border-top: 1px solid #EEE;
-}
-/* end of overall style */
-
-/* begin data grid style */
-table.dataGrid
-{
-	background: white;
-	border-collapse: collapse;
-	width: 100%;
+	border-left-width:0px !important;
+	border-right-width:0px !important;
+	border-bottom-width:0px !important;
 }
 
-table.dataGrid th, table.dataGrid td
+.page-footer p
 {
-	font-size: 0.9em;
-	border: 1px #4F81BD solid;
-	padding: 0.3em;
+	margin: 0;
+	padding: 10px 0;
 }
 
-table.dataGrid th
+.errorMessage
 {
-	background: #d3dfee;
-	text-align: center;
+	color: red;
 }
 
-table.dataGrid th.label
+span.tag
 {
-	width: 150px;
-}
-
-table.dataGrid tr.odd
-{
-	background: #E6F2FF;
-}
-/* end of data grid style */
-
-.actionBar
-{
-	margin: 10px;
-}
-
-div.item
-{
-	margin: 10px 0 0 0;
-	border: 1px solid silver;
-	padding: 5px;
+	padding: 0 4px 0 0;
 }

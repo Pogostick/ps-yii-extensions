@@ -7,6 +7,7 @@ Yii::setPathOfAlias( 'pogostick', '/usr/local/psYiiExtensions/extensions/pogosti
 return array(
 	'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
 	'name' => 'Yii/Pogostick Yii Extensions Blog',
+	'defaultController' => 'post',
 
 	// preloading 'log' component
 	'preload' => array('log'),
@@ -15,10 +16,8 @@ return array(
 	'import' => array(
 		'application.models.*',
 		'application.components.*',
-		'application.controllers.*',
 		'pogostick.base.*',
 		'pogostick.behaviors.*',
-		'pogostick.commands.*',
 		'pogostick.components.*',
 		'pogostick.controllers.*',
 		'pogostick.models.*',
@@ -33,6 +32,13 @@ return array(
 		'urlManager' => array(
 			'urlFormat' => 'path',
 			'showScriptName' => false,
+			'rules' => array(
+				'tag/<tag>' => 'post/list',
+				'date/<date>' => 'post/list',
+				'posts' => 'post/list',
+				'post/<id:\d+>' => 'post/show',
+				'post/update/<id:\d+>' => 'post/update',
+			),
        	),
        	
 		//	Authentication manager...
@@ -42,8 +48,10 @@ return array(
 		),
 
 		'user' => array(
-			// enable cookie-based authentication
+			//	Enable cookie-based authentication
 			'allowAutoLogin' => false,
+			//	Force 403 HTTP error if authentication needed
+			'loginUrl' => null,
 		),
 
 		//      Database (Site)
@@ -68,16 +76,7 @@ return array(
 		),
 	),
 
-	// application-level parameters that can be accessed
-	// using Yii::app()->params['paramName']
-	'params'=>array(
-		'theme' => 'ui-lightness',
-		'adminEmail' => 'webmaster@example.com',
-		'@copyright' => 'Copyright &copy; 2009 My Company, LLC.',
-		'@author' => 'Web Master <webmaster@example.com>',
-		'@link' => 'http://www.example.com',
-		'@package' => 'blog',
-		'serverId' => $_SERVER['SERVER_ADDR'],							//	This server's ID for job queue
-		'uploadPath' => '/protected/data/uploads',						//	The directory to which files are uploaded
-	),
+	//	Our application parameters
+	'params' => require( dirname( __FILE__ ) . '/params.php' ),
+
 );

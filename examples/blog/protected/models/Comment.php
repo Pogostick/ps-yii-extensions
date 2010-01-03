@@ -18,6 +18,7 @@
  *  
  * @filesource
  * 
+ * @property-read array $statusOptions
  */
 class Comment extends BaseModel
 {
@@ -42,6 +43,42 @@ class Comment extends BaseModel
 	* @var string $lmod_date
 	*/
 	 
+	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+	
+	/**
+	* Comment Statuses
+	*/
+	const STATUS_PENDING = 0;
+	const STATUS_APPROVED = 1;
+	
+	//********************************************************************************
+	//* Member Variables
+	//********************************************************************************
+	
+	/**
+	* The text representation of our statuses
+	* @var array
+	*/
+	protected $m_arStatusOptions = array(
+		self::STATUS_PENDING => 'Pending',
+		self::STATUS_APPROVED => 'Approved',
+	);
+	public function getStatusOptions() { return $this->m_arStatusOptions; }
+	/**
+	 * @return string the status display for the current comment
+	 */
+	public function getStatusText() { return PS::o( $this->m_arStatusOptions, $this->status_nbr, 'Unknown (' . $this->status_nbr . ')' ); }
+
+	/**
+	* Our verification code
+	* @var string
+	*/
+	protected $m_sVerifyCode;
+	public function getVerifyCode() { return $this->m_sVerifyCode; }
+	public function setVerifyCode( $sValue ) { $this->m_sVerifyCode = $sValue; }
+	
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -74,6 +111,7 @@ class Comment extends BaseModel
 			array( 'url_text', 'length', 'max' => 255 ),
 			array( 'content_text, status_nbr, author_name_text, email_addr_text', 'required' ),
 			array( 'status_nbr', 'numerical', 'integerOnly' => true ),
+			array( 'verifyCode', 'captcha', 'on' => 'insert', 'allowEmpty' => ! Yii::app()->user->isGuest || ! extension_loaded( 'gd' ) ),
 		);
 	}
 
@@ -83,7 +121,7 @@ class Comment extends BaseModel
 	public function relations()
 	{
 		return array(
-			'post' => array( self::BELONGS_TO, 'Post', 'post_id' ),
+			'post' => array( self::BELONGS_TO, 'Post', 'post_id', 'joinType' => 'INNER JOIN' ),
 		);
 	}
 
@@ -95,33 +133,99 @@ class Comment extends BaseModel
 		return array(
 			'id' => 'Id',
 			'post_id' => 'Post',
-			'content_text' => 'Content Text',
-			'content_display_text' => 'Content Display Text',
-			'status_nbr' => 'Status Nbr',
-			'author_name_text' => 'Author Name Text',
-			'email_addr_text' => 'Email Addr Text',
-			'url_text' => 'Url Text',
-			'create_date' => 'Create Date',
-			'lmod_date' => 'Lmod Date',
+			'content_text' => 'Comment',
+			'content_display_text' => 'Comment',
+			'status_nbr' => 'Status',
+			'statusText' => 'Status',
+			'author_name_text' => 'Commentor',
+			'email_addr_text' => 'Email Address',
+			'url_text' => 'Website',
+			'create_date' => 'Created On',
+			'lmod_date' => 'Modified On',
+			'verifyCode' => 'Verification Code',
 		);
 	}
 
 	/**
-	 * @return array customized tooltips (attribute=>tip)
+	 * @return string the hyperlink display for the current comment's author
 	 */
-	public function attributeTooltips()
+	public function getAuthorLink()
 	{
-		return array(
-			'id' => 'Id',
-			'post_id' => 'Post',
-			'content_text' => 'Content Text',
-			'content_display_text' => 'Content Display Text',
-			'status_nbr' => 'Status Nbr',
-			'author_name_text' => 'Author Name Text',
-			'email_addr_text' => 'Email Addr Text',
-			'url_text' => 'Url Text',
-			'create_date' => 'Create Date',
-			'lmod_date' => 'Lmod Date',
-		);
+		if ( ! empty( $this->url_text ) ) return PS::link( PS::encode( $this->author_name_text ), $this->url_text );
+		return PS::encode( $this->author_name_text );
 	}
+
+	/**
+	 * @return integer the number of comments that are pending approval
+	 */
+	public function getPendingCommentCount()
+	{
+		return Comment::model()->count( 'status_nbr = ' . self::STATUS_PENDING );
+	}
+
+	/**
+	 * @param integer the maximum number of comments that should be returned
+	 * @return array the most recently added comments
+	 */
+	public function findRecentComments( $iLimit = 10 )
+	{
+		$_oCrit = array(
+			'condition' => 'comment_t.status_nbr = ' . self::STATUS_APPROVED,
+			'order' => 'comment_t.create_date DESC',
+			'limit' => $iLimit,
+		);
+		
+		return $this->with( 'post' )->findAll( $_oCrit );
+	}
+
+	/**
+	 * Approves a comment.
+	 */
+	public function approve()
+	{
+		if ( $this->status_nbr == self::STATUS_PENDING )
+		{
+			$this->status_nbr = self::STATUS_APPROVED;
+			$this->save();
+
+			Post::model()->updateCounters( array( 'comment_count_nbr' => 1 ), 'id = ' . $this->post_id );
+		}
+	}
+
+	//********************************************************************************
+	//* Event Handlers
+	//********************************************************************************
+	
+	/***
+	* Before validation
+	* @param string $sScenario
+	*/
+	protected function beforeValidate( $sScenario = null )
+	{
+		$this->content_display_text = PS::markdownTransform( $this->content_text );
+		return parent::beforeValidate( $sScenario );
+	}
+
+	/**
+	* After a save
+	*/
+	protected function afterSave()
+	{
+		if ( $this->isNewRecord && $this->status_nbr == Comment::STATUS_APPROVED )
+			Post::model()->updateCounters( array( 'comment_count_nbr' => 1 ), 'id = ' . $this->post_id );
+			
+		return parent::afterSave();
+	}
+	
+    /**
+    * After a delete
+    */
+	protected function afterDelete()
+	{
+		if ( $this->status_nbr == Comment::STATUS_APPROVED )
+			Post::model()->updateCounters( array( 'comment_count_nbr' => -1 ), 'id = ' . $this->post_id );
+			
+		return parent::afterDelete();
+	}
+
 }

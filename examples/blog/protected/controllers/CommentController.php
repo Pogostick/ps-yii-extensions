@@ -32,16 +32,28 @@ class CommentController extends CPSCRUDController
 		
 		//	Set model name...
 		$this->setModelName( 'Comment' );
+		
+		$this->addUserAction( self::ACCESS_TO_AUTH, 'approve' );
 	}
-
+ 
+	//********************************************************************************
+	//* Actions
+	//********************************************************************************
+	
 	/**
-	 * Default admin action. Change conditions for your system
-	 *
+	 * Approves a particular comment.
+	 * If approval is successful, the browser will be redirected to the post page.
 	 */
-	public function actionAdmin( $arExtraParams = array(), $oCriteria = null )
+	public function actionApprove()
 	{
-		//	Add your own functionality...
-		return parent::actionAdmin( $arExtraParams, $oCriteria );
+		if ( $this->isPostRequest )
+		{
+			$_oComment = $this->loadModel();
+			$_oComment->approve();
+			$this->redirect( array( 'post/show', 'id' => $_oComment->post_id, '#' => 'c' . $_oComment->id ) );
+		}
+		else
+			throw new CHttpException( 400, 'Invalid request. Please do not repeat this request again.' );
 	}
 
 }

@@ -1,122 +1,242 @@
+.form
+{
+	padding:10px;
+	margin: 0;
+}
+
+.form .row
+{
+	margin: 5px 0;
+}
+
+.portlet div.simple label,
+.form .simple label,
+.form .row label
+{
+/*	display: inline-block; */
+/*	font-weight: bold; */
+}
+
+.form .hint
+{
+	margin: 0;
+	padding: 0;
+	color: #999;
+}
+
 /**
- * CSS styles for form and input fields.
- *
- * These styles are used with form and input fields generated via yiic script.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2009 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+* Our generic edit container, but no color
+*/
 
-div.yiiForm
-{
-	border: 2px solid #B7DDF2;
-	background: #EBF4FB;
-	margin: 0;
-	padding: 5px;
-	width: 550px;
+div.ui-edit-container {
+	width:100%;
+	margin:0px;
 }
 
-div.yiiForm label.required
+div.ui-edit-container div.yiiForm {
+	width:100%;
+	margin:5px 10px;
+}
+
+div.ui-edit-container div.yiiForm label {
+	font-weight: bold;	
+	padding-bottom:3px;
+	display: block;
+}
+
+div.ui-edit-container div.yiiForm fieldset
+{
+	border-width: 1px;
+	margin:0 auto;
+	padding:5px;
+	margin-bottom:5px;
+	padding-bottom:10px;
+}
+
+div.ui-edit-container div.yiiForm fieldset legend
+{
+	font-weight: bold;
+	font-size:13px;
+	padding:0px 6px;
+}
+
+div.ui-edit-container div.yiiForm fieldset hr
+{
+	border-width:1px;
+	height: 1px;
+	width:80%;
+}
+
+div.ui-edit-container select {
+	border-width:1px;
+	padding:2px;
+	min-width: 235px;
+}
+
+div.ui-edit-container div.yiiForm input[type="text"],
+div.ui-edit-container div.yiiForm textarea,
+div.ui-edit-container div.yiiForm input[type="password"] {
+	border-width:1px;
+	padding:3px;
+}
+
+div.ui-edit-container div.yiiForm textarea {
+}
+
+
+div.ui-edit-container input[type="text"].number {
+	text-align:right;
+}
+
+div.ui-edit-container div.simple {
+	margin:10px 5px;
+	width: 510px;
+}
+
+div.ui-edit-container div.simple div
 {
 }
 
-div.yiiForm span.required
+div.ui-edit-container div.yiiForm div.simple div.cke_toolbox,
+div.ui-edit-container div.yiiForm div.complex div.cke_toolbox
 {
-	color: red;
+	margin-left: 0px;
 }
 
-div.errorSummary
-{
-	border: 2px solid #C00;
-	padding: 7px 7px 12px 7px;
-	margin: 0 0 20px 0;
-	background: #FEE;
-	font-size: 0.9em;
+div.ui-edit-container div.yiiForm div.selectList {
+	clear:both;
+	margin:0 auto;
+	vertical-align:middle;
 }
 
-div.errorSummary p
-{
-	margin: 0;
-	padding: 5px;
+div.ui-edit-container div.yiiForm div.selectList label {
+	font-weight: bold;	
 }
 
-div.errorSummary ul
-{
-	margin: 0;
-	padding: 0 0 0 20px;
+div.ui-edit-container div.yiiForm div.selectList input[type="checkbox"] {
+	margin-left:25px;
+	vertical-align:middle;
 }
 
-div.errorSummary ul li
-{
-	list-style: square;
+div.ui-edit-container div.yiiForm div.selectList label.cbList {
+	margin-left:0px;
+	margin-top:0px;
+	vertical-align:middle;
 }
 
-div.yiiForm p.hint
-{
-	color: gray;
-	font-size: 90%;
-	margin: 0 0 0 110px;
+/**
+* DATEPICKER styling
+*/
+
+div.ui-edit-container div.yiiForm img.ui-datepicker-trigger {
+	padding:0px 0px 2px 5px;
+	margin:0px auto;
+	vertical-align: middle;
 }
 
-div.yiiForm fieldset
-{
-	border: #DDD 1px solid;
-	margin: 10px 0;
-	padding: 10px;
+/**
+* ERROR STYLES
+*/
+
+/**
+* These style the labels *BEFORE* the form field
+*/
+div.ui-edit-container div.yiiForm div.simple label.error { 
 }
 
-div.yiiForm legend
-{
+div.ui-edit-container div.yiiForm label.error { 
+}
+
+/**
+* These style the label that is inserted *UNDERNEATH* the form field
+*/
+label.ui-state-error {
+	margin-top:2px;
+	min-width:200px;
+	padding:2px;
+}
+
+div.ui-edit-container div.yiiForm label.ps-validate-error { 
+	padding:2px;
+	margin-top:1px;
+	display:inline-block;
+}
+
+div.ui-edit-container div.yiiForm div.simple select.error,
+div.ui-edit-container div.yiiForm div.simple textarea.error,
+div.ui-edit-container div.yiiForm div.simple input.error { 
+	border-width:1px;
+}
+
+div.ui-edit-container div.yiiForm span.cbDivider {
+	float:left;
+}
+
+div.ui-edit-container div.yiiForm :disabled {
+	background: transparent;
+	border:0;
+	padding-left:0px;
 	font-weight: bold;
 }
 
-div.yiiForm label
-{
+/**
+* WIDTH STYLES
+*/
+
+div.ui-edit-container div.yiiForm input[type="text"].hasDatepicker {
+	width: 175px !important;
 }
 
-div.yiiForm div.action
-{
-	clear: left;
-	margin-left: 110px;
-	padding: 0.25em 0;
+div.ui-edit-container div.yiiForm input[type="text"].date {
+	width: 70px;
 }
 
-div.yiiForm div.simple,
-div.yiiForm div.complex
-{
-	clear: left;
-	padding: 0.25em 0;
+div.ui-edit-container div.yiiForm input[type="text"].datetime {
+	width: 110px;
 }
 
-div.yiiForm div.simple label,
-div.yiiForm div.complex span
-{
-	display: block;
-	float: left;
-	margin-right: 10px;
-	position: relative;
-	text-align: right;
-	width: 100px;
+div.ui-edit-container div.yiiForm div.wide span { 
+	font-weight: normal; 
+	font-size: 11px; 
+	float:none !important;
+	margin:0;
+	padding:0;
 }
 
-div.yiiForm label.error,
-div.yiiForm span.error
-{
-	color: #C00;
+div.ui-edit-container div.yiiForm div.wide {
+	margin:5px 0px;
+	font-weight: bold;	
 }
 
-div.yiiForm input.error,
-div.yiiForm textarea.error,
-div.yiiForm select.error
-{
-	background: #FEE;
-	border-color: #C00;
+div.ui-edit-container p.hint {
+	font-size: 8pt;
+	margin:2px 0px;
 }
 
-div.yiiForm div.simple div,
-div.yiiForm div.complex div
-{
-	margin-left: 110px;
+.ps-captcha-container {
+	margin:5px;
 }
+
+.ps-captcha-container a {
+	margin-left: 5px;
+	font-size: 8pt;
+	font-weight: normal;
+}
+
+.ps-validate-error {
+	margin-left:0px !important;
+}
+
+.ps-error-summary {
+	width: 495px;
+	margin-top:10px;
+	padding:5px 10px;
+}
+
+/**
+* Grid Action Boxes
+*/
+.grid-actions {
+	text-align:center;
+}
+

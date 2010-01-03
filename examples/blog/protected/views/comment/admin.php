@@ -19,21 +19,13 @@
  * @filesource
  * 
  */
-	echo CPSForm::formHeader( 'Comment Manager', 
-		array( 'new' => 
-			array(
-				'label' => 'New Comment',
-				'url' => array( 'create' ),
-				'icon' => 'circle-plus',
-			)
-		)
-	);
+	echo CPSForm::formHeader( 'Comment Manager' );
 
 	$_arOpts = array(
-		'actions' => array( 'edit', 'delete' ),
+		'actions' => array( 'delete' ),
 		'sort' => $sort,
 		'pages' => $pages,
-		'columns' => array( 'post_id', 'content_text', 'content_display_text', 'status_nbr', 'author_name_text', 'email_addr_text', 'url_text', 'create_date', 'lmod_date' ),
+		'columns' => array( '@post_id', 'content_display_text', 'statusText', 'author_name_text', 'create_date' ),
 		'pagerOptions' => array( 'header' => '' ),
 		'dataItemName' => 'Comment',
 	);

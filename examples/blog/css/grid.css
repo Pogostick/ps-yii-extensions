@@ -1,0 +1,81 @@
+/*
+ * This file is part of psYiiExtensions blog example
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+ 
+/**
+ * @package 	blog
+ * @subpackage 	css
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN $Id$
+ * @since 		v1.0.6
+ * 
+ * @filesource
+ */
+ 
+/**
+* Styles for grids
+* 
+* Grid blocks are as follows:
+* 
+* 	<table class="dataGrid">
+* 		<tr>
+* 			<th>Header Items</th>
+* 			...
+*		</tr>
+* 		<tr>
+* 			<td>Data Row</td>
+* 		</tr>
+* 		...
+* 	</table>
+* 
+*/
+
+table.ps-data-grid {
+	border-width: 1px;
+	border-top-width:1px;
+	border-style: solid;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+table.ps-data-grid th {
+	text-align: center;
+	margin-right: 0px;
+}
+
+table.ps-data-grid th, 
+table.ps-data-grid td {
+	font-size: 0.9em;
+	padding: 0.3em;
+}
+
+table.ps-data-grid th a {
+	text-decoration: none;
+}
+
+table.ps-data-grid th a:hover {
+	text-decoration: underline;
+}
+
+/**
+* Miscellaneous styles
+*/
+.ps-data-grid-sort-arrow {
+	display:inline-block;
+	margin:0 auto;
+	vertical-align:bottom;
+	padding:0px;
+	padding-left:5px;
+}
+
+.ps-data-grid-no-data-found {
+	text-align:	center;
+	font-weight: bold;
+	font-size: 15px;
+	margin: 10px auto;
+}

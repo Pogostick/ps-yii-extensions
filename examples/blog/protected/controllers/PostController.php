@@ -30,51 +30,192 @@ class PostController extends CPSCRUDController
 		//	Phone home...
 		parent::init();
 		
+		$this->defaultAction = 'list';
+		$this->addUserActions( self::ACCESS_TO_ALL, array( 'captcha', 'useTheme', 'postsByDate' ) );
+		$this->setUserActionList( self::ACCESS_TO_AUTH, array() );
+		
 		//	Set model name...
 		$this->setModelName( 'Post' );
 	}
 
-	/**
-	 * Default admin action. Change conditions for your system
-	 *
-	 */
-	public function actionAdmin( $arExtraParams = array(), $oCriteria = null )
-	{
-		//	Add your own functionality...
-		return parent::actionAdmin( $arExtraParams, $oCriteria );
-	}
+	//********************************************************************************
+	//* Private Methods
+	//********************************************************************************
 	
+	/**
+	* Create a new comment
+	* 
+	* @param Post $oPost
+	* @return Comment
+	*/
+	protected function newComment( Post $oPost )
+	{
+		$_oComment = new Comment();
+		
+		if ( isset( $_POST, $_POST['Comment'] ) )
+		{
+			//	Use setAttributes!
+			$_oComment->setAttributes( $_POST['Comment'] );
+			$_oComment->post_id = $oPost->id;
+			$_oComment->status_nbr = Comment::STATUS_PENDING;
+
+			if ( $_oComment->save() )
+			{
+				Yii::app()->user->setFlash( 'commentSubmitted', 'Thank you. Your comment has been saved.' );
+				$this->refresh();
+			}
+		}
+
+		return $_oComment;
+	}
+
+	/**
+	* Check if user is logged in.
+	* @returns Post
+	*/
+	public function loadModel( $iId = null )
+	{
+		if ( null === ( $_oModel = parent::loadModel( $iId ) ) )
+		{
+			if ( Yii::app()->user->isGuest && $_oModel->status_nbr != Post::STATUS_PUBLISHED )
+				throw new CHttpException( 404, 'The requested post does not exist.' );
+		}
+		
+		return $_oModel;
+	}
+
+	/**
+	 * Generates the hyperlinks for post tags.
+	 * This is mainly used by the view that displays a post.
+	 * @param Post the post instance
+	 * @return string the hyperlinks for the post tags
+	 */
+	public function getTagLinks( $oPost )
+	{
+		$_arLinks = array();
+		
+		foreach ( $oPost->getTagArray() as $_sTag )
+			$_arLinks[] = PS::link( PS::encode( $_sTag ), array( 'list', 'tag' => $_sTag ) );
+			
+		return implode( ', ', $_arLinks );
+	}
+
 	//********************************************************************************
 	//* Actions
 	//********************************************************************************
 	
 	/**
+	 * Declares class-based actions.
+	 */
+	public function actions()
+	{
+		return array(
+			// captcha action renders the CAPTCHA image
+			// this is used by the contact page
+			'captcha' => array(
+				'class' => 'CCaptchaAction',
+				'transparent' => true,
+				'minLength' => 10,
+				'maxLength' => 15,
+				'width' => 200,
+			),
+		);
+	}
+
+	/**
+	* Allows theme switching.
+	*/
+	public function actionUseTheme()
+	{
+		$_arThemes = CPSjqUIWrapper::getValidThemes();
+		$_sTheme = PS::o( $_arThemes, PS::o( $_POST, 'theme' ), CPSjqUIWrapper::getCurrentTheme() );
+		$_sReturn = PS::o( $_POST, 'uri', 'index' );
+		
+		if ( $_sTheme && $_sReturn && in_array( $_sTheme, $_arThemes ) )
+			Yii::app()->user->setState( CPSjqUIWrapper::getStateName(), $_sTheme );
+			
+		//	Return to our action...
+		$this->redirect( $_sReturn );
+	}
+
+	/**
+	* Shows a post
+	* 
+	*/
+	public function actionShow( $arExtraParams = array() )
+	{
+		$_oPost = $this->loadModel();
+		$_oComment = $this->newComment( $_oPost );
+	    $this->render( 'show', array_merge( $arExtraParams, array( 'post' => $_oPost, 'comments' => $_oPost->comments, 'newComment' => $_oComment ) ) );
+	}
+	
+	/**
 	* Creates a post
 	*/
-	public function actionCreate()
+	public function actionCreate( $arExtraParams = array() )
 	{
 		$_oPost = new Post();
 		
 		if ( isset( $_POST, $_POST['Post'] ) )
 		{
-			$_oPost->attributes = $_POST['Post'];
+			$_oPost->setAttributes( $_POST['Post'] );
 			
 			if ( isset( $_POST['previewPost'] ) )
 				$_oPost->validate();
 			else 
 			{
-				if ( isset( $_POST['submitPost'] ) && $_oPost->save() )
-					$this->redirect( array( 'show', 'id' => $_oPost->id ) );
+				try
+				{
+					$_oPost->beginTransaction();
+					
+					if ( $this->saveTransactionModel( $_oPost, $_POST, 'show', true ) )
+					{
+						//	Delete all tag associations
+						PostTag::model()->deleteAll( 'post_id = :post_id', array( ':post_id' => $this->id ) );
+
+						//	Get the tags from this post and create associations
+						$_arTags = $_oPost->getTagArray();
+						
+						foreach ( $_arTags as $_sName )
+						{
+							//	If tag doesn't exist, create it.
+							if ( null === ( $_oTag = Tag::model()->findByAttributes( array( 'tag_name_text' => $_sName ) ) ) )
+							{
+								$_oTag = new Tag( array( 'tag_name_text' => $_sName ) );
+								$_oTag->save();
+							}
+							
+							//	Create associated entity...
+							$_oPostTag = new PostTag();
+							$_oPostTag->post_id = $_oPost->id;
+							$_oPostTag->tag_id = $_oTag->id;
+							$_oPostTag->save();
+						}
+						
+						//	And commit...
+						$_oPost->commitTransaction();
+						
+						//	Redirect to show...
+						$this->redirect( array( 'show', 'id' => $_oPost->id ) );
+					}
+					
+				}
+				catch ( Exception $_ex )
+				{
+					//	Something bad happened...
+					$_oPost->rollbackTransaction();
+					throw $_ex;
+				}
 			}
 		}
 		
-		$this->render( 'create', array( 'model' => $_oPost ) );
+		$this->render( 'create', array_merge( $arExtraParams, array( 'model' => $_oPost ) ) );
 	}
 
 	/**
 	* Updates a post
 	*/
-	public function actionUpdate()
+	public function actionUpdate( $arExtraParams = array() )
 	{
 		$_iId = PS::o( $_GET, 'id' );
 		
@@ -94,22 +235,60 @@ class PostController extends CPSCRUDController
 			}
 		}
 		
-		$this->render( 'update', array( 'model' => $_oPost ) );
+		$this->render( 'update', array_merge( $arExtraParams, array( 'model' => $_oPost ) ) );
 	}
 
 	/**
-	* Check if user is logged in.
-	* @returns Post
+	* List view
 	*/
-	public function loadModel()
-	{
-		if ( null === ( $_oModel = parent::loadModel() ) )
+	public function actionList( $arExtraParams = array() )
+	{ 
+		$_oCrit = new CDbCriteria;
+		$_arWith = array( 'author' );
+		
+		if ( $_sPostDate = PS::o( $_GET, 'date' ) )
+			$_oCrit->mergeWith( new CDbCriteria( array( 'alias' => 'post_t', 'condition' => 'date(post_t.create_date) = date(:post_date)', 'params' => array( ':post_date' => $_sPostDate ) ) ) );
+		
+		if ( $_sTag = PS::o( $_GET, 'tag' ) )
 		{
-			if ( Yii::app()->user->isGuest && $_oModel->status_nbr != Post::STATUS_PUBLISHED )
-				throw new CHttpException( 404, 'The requested post does not exist.' );
+			$_oCrit->distinct = true;
+			$_arWith['tagFilter']['distinct'] = true;
+			$_arWith['tagFilter']['params'][':tag_name_text'] = $_sTag;
+			$_iCount = Post::model()->published()->with( $_arWith )->count();
+		}
+		else
+			$_iCount = Post::model()->published()->count( $_oCrit );
+
+		$_oPages = new CPagination( $_iCount );
+		$_oPages->pageSize = Yii::app()->params['postsPerPage'];
+		$_oPages->applyLimit( $_oCrit );
+
+		$_arModel = Post::model()->published()->with( $_arWith )->findAll( $_oCrit );
+		
+		$this->render( 'list', array( 'posts' => $_arModel, 'pages' => $_oPages, 'postDate' => $_sPostDate ) );
+	}
+
+	/**
+	 * Publishes a post
+	 */
+	public function actionPublish()
+	{
+		if ( $_oPost = $this->loadModel() )
+		{
+			$_oPost->status_nbr = Post::STATUS_PUBLISHED;
+			$_oPost->save();
 		}
 		
-		return $_oModel;
+		$this->actionAdmin();
+	}
+	
+	/**
+	 * Get a list of posts on a day
+	 * 
+	 */
+	public function actionPostsByDate()
+	{
+		$this->redirect( array( '/date/' . date( 'Y-m-d', strtotime( PS::o( $_POST, 'dateValue' ) ) ) ) );
 	}
 
 }

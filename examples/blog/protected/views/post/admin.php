@@ -17,8 +17,13 @@
  * @since 		v1.0.6
  *  
  * @filesource
- * 
+ *                                                                   
  */
+ 	
+ 	//	Load our grid css
+ 	CPSHelp::_rcf( Yii::app()->baseUrl . '/css/grid.css' );
+ 
+ 	//	Build the header
 	echo CPSForm::formHeader( 'Post Manager', 
 		array( 'new' => 
 			array(
@@ -29,11 +34,21 @@
 		)
 	);
 
+	//	Build the grid
 	$_arOpts = array(
-		'actions' => array( 'edit', 'delete' ),
+		'actions' => array( 
+			CPSDataGrid::ACTION_GENERIC => array(
+				'label' => 'Publish',
+				'url' => array( 'publish', 'id' => '%%id%%' ),
+				'confirm' => 'Publish this post?',
+				'icon' => 'check',
+			),
+			CPSDataGrid::ACTION_EDIT => 'update',
+			CPSDataGrid::ACTION_DELETE,
+		),
 		'sort' => $sort,
 		'pages' => $pages,
-		'columns' => array( 'author_id', 'title_text', 'content_text', 'content_display_text', 'tags_text', 'status_nbr', 'comment_count_nbr', 'create_date', 'lmod_date' ),
+		'columns' => array( 'title_text', 'statusText', 'comment_count_nbr', 'create_date' ),
 		'pagerOptions' => array( 'header' => '' ),
 		'dataItemName' => 'Post',
 	);
