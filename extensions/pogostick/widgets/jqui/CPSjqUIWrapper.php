@@ -8,7 +8,7 @@
  */
 
 /**
- * The CPSjqUIWraqpper is a wrapper for any jQuery UI widget
+ * The CPSjqUIWrapper is a wrapper for any jQuery UI widget
  * 
  * This class must be instantiated by using the static method (@link create). 
  * If you do not use that method, the options will not initiate properly.
@@ -52,7 +52,7 @@
  *  
  * @filesource
  * 
- * @property $theme The theme to use. Defaults to 'base'
+ * @property $theme The theme to use. Defaults to 'cupertino'
  * @property $imagePath Image path will be automatically set. You can override the default here.
  * @property $currentTheme The currently used theme
  * @property $multiTheme If multiple themes are allowed

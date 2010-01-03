@@ -23,17 +23,31 @@ require_once( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'PS.php' );
 class CPSOptionHelper implements IPSBase
 {
 	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+	
+	/**
+	 * A key for use when mapping callbacks
+	 */
+	const	CB_KEY	= '__pscb_';
+	
+	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
 
 	/**
-	* Check to see if the value follows a callback function pattern
+	* Check to see if the value follows a callback function pattern. 
+	* Basically we want to check for values that should *NOT* be quoted.
+	* 
 	* @param string $sValue
+	* @returns boolean
 	*/
 	public static function isScriptCallback( $sValue )
 	{
 		return is_string( $sValue ) && 
 			( 
+				$sValue === 'true' ||
+				$sValue === 'false' ||
 				0 == strncasecmp( $sValue, 'function(', 9 ) || 
 				0 == strncasecmp( $sValue, 'new Date(', 9 ) || 
 				0 == strncasecmp( $sValue, 'jQuery(', 7 ) || 
@@ -228,7 +242,7 @@ class CPSOptionHelper implements IPSBase
 		$_arOut = array();
 		$_sEncodedOptions = null;
 
-		//	Add callbacks to the array...
+		//	Tag callbacks for special processing afterwards
 		foreach ( $_arCallbacks as $_sKey => $_oValue )
 		{
 			if ( ! empty( $_oValue ) )
@@ -248,20 +262,24 @@ class CPSOptionHelper implements IPSBase
 				$_sExtName = $_oOption->getExternalName();
 
 				//	Check for callbacks in the inner array (.i.e. "buttons" from jqUI dialog)
-				if ( 'array' == $_oOption->getOptionType() )
+				if ( is_array( $_oValue ) )
 				{
 					foreach ( $_oValue as $_sSubKey => $_oSubValue )
 					{
-						if ( ! is_array( $_oSubValue ) && self::isScriptCallback( $_oSubValue ) )
+						if ( self::isScriptCallback( $_oSubValue ) )
 						{
-							$_arCallbacks[ $_sSubKey ] = $_sSubValue;
-							$_arOut[ "__pscb_{$_sSubKey}" ] = $_sSubKey;
-							unset( $_oValue[ $_sSubKey ] );
+							$_arCallbacks[ $_sSubKey ] = $_oSubValue;
+							$_arOut[ $_sKey ][ "__pscb_{$_sSubKey}" ] = $_sSubKey;
+						}
+						else
+						{
+							if ( ! isset( $_arOut[ $_sExtName ] ) || ! is_array( $_arOut[ $_sExtName ] ) ) $_arOut[ $_sExtName ] = array();
+							$_arOut[ $_sExtName ][ $_sSubKey ] = $_oSubValue;
 						}
 					}
 				}
-					
-				$_arOut[ $_sExtName ] = $_oValue;
+				else
+					$_arOut[ $_sExtName ] = $_oValue;
 			}
 		}
 		
@@ -270,7 +288,7 @@ class CPSOptionHelper implements IPSBase
 			switch ( $iFormat )
 			{
 				case PS::OF_JSON:
-					$_sEncodedOptions = json_encode( $_arOut );
+					$_sEncodedOptions = CJSON::encode( $_arOut );
 					break;
 					
 				case PS::OF_HTTP:
@@ -289,28 +307,8 @@ class CPSOptionHelper implements IPSBase
 					break;
 			}
 
-			//	Fix up the callbacks...
-			foreach ( $_arCallbacks as $_sKey => $_oValue )
-			{
-				$_sQuote = null;
-
-				//	Indicator to quote key...
-				if ( '!!!' == substr( $_sKey, 0, 3 ) )
-				{
-					$_sQuote = '\'';
-					$_sKey = substr( $_sKey, 3 );
-				}
-
-				if ( ! empty( $_oValue ) )
-				{
-					if ( self::isScriptCallback( $_oValue ) )
-						$_sEncodedOptions = str_replace( "\"__pscb_{$_sKey}\":\"{$_sKey}\"", "{$_sQuote}{$_sKey}{$_sQuote}:{$_oValue}", $_sEncodedOptions );
-					else
-						$_sEncodedOptions = str_replace( "\"__pscb_{$_sKey}\":\"{$_sKey}\"", "{$_sKey}:'{$_oValue}'", $_sEncodedOptions );
-				}
-			}
-
-			return $_sEncodedOptions;
+			//	Fix up the callbacks and return...
+			return self::fixCallbacks( $_sEncodedOptions, $_arCallbacks );
 		}
 
 		//	Nada
@@ -382,6 +380,39 @@ class CPSOptionHelper implements IPSBase
 
 		//	Clean...
 		return true;
+	}
+	
+	/**
+	 * Fix up the callbacks
+	 * @param mixed $oValue
+	 * @param mixed $arCallbacks
+	 */
+	protected static function fixCallbacks( $sOutput, $arCallbacks )
+	{
+		$_sOut = $sOutput;
+		
+		foreach ( $arCallbacks as $_sKey => $_oValue )
+		{
+			$_sQuote = '"';
+
+			//	Indicator to quote key...
+			if ( '!!!' == substr( $_sKey, 0, 3 ) )
+			{
+				$_sQuote = '\'';
+				$_sKey = substr( $_sKey, 3 );
+			}
+
+			$_sSearch = '"' . self::CB_KEY . $_sKey . '":"' . $_sKey . '"';
+			
+			if ( self::isScriptCallback( $_oValue ) )
+				$_sReplace = $_sQuote . $_sKey . $_sQuote . ' : ' . $_oValue;
+			else
+				$_sReplace = $_sKey . ' : \'' . $_oValue . '\'';
+
+			$_sOut = str_replace( $_sSearch, $_sReplace, $_sOut );
+		}
+		
+		return $_sOut;
 	}
 
 }

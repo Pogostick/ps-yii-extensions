@@ -268,7 +268,7 @@ CODE;
 		{
 			//	Check for scripts...
 			foreach ( PS::o( $arOptions, '_scripts', array(), true ) as $_sScript ) 
-				$this->pushScriptFile( $this->baseUrl . $_sScript );
+				$this->registerWidgetScript( $_sScript );
 
 			//	Check for css...
 			foreach ( PS::o( $arOptions, '_cssFiles', array(), true ) as $_sCss ) 

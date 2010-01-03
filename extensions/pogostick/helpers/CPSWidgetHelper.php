@@ -1299,7 +1299,7 @@ HTML;
 		{
 			$_oArg = func_get_arg( $_i );
 			
-			if ( isset( $_oArg ) && ! empty( $_oArg ) )
+			if ( null !== $_oArg || ( isset( $_oArg ) && ! empty( $_oArg ) ) )
 				return $_oArg;
 				
 			$_oDefault = $_oArg;

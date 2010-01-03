@@ -31,7 +31,7 @@ class PostController extends CPSCRUDController
 		parent::init();
 		
 		$this->defaultAction = 'list';
-		$this->addUserActions( self::ACCESS_TO_ALL, array( 'captcha', 'useTheme', 'postsByDate' ) );
+		$this->addUserActions( self::ACCESS_TO_ALL, array( 'captcha', 'useTheme', 'postsByDate', 'jquiExamples' ) );
 		$this->setUserActionList( self::ACCESS_TO_AUTH, array() );
 		
 		//	Set model name...
@@ -289,6 +289,11 @@ class PostController extends CPSCRUDController
 	public function actionPostsByDate()
 	{
 		$this->redirect( array( '/date/' . date( 'Y-m-d', strtotime( PS::o( $_POST, 'dateValue' ) ) ) ) );
+	}
+	
+	public function actionJquiExamples()
+	{
+		$this->render( 'pogostick.widgets.examples.jqui_examples' );
 	}
 
 }

@@ -95,7 +95,7 @@ class CPSHash implements IPSBase
 	*/
 	public static function hash( $sValueToHash = null, $eHashType = self::SHA1, $iLength = 32, $bRawOutput = false )
 	{
-		$_sValue = PS::nvl( $sValueToHash, self::generate( $iLength ) );
+		$_sValue = ( null === $sValueToHash ) ? self::generate( $iLength ) : $sValueToHash;
 		
 		switch ( $eHashType )
 		{

@@ -169,7 +169,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	public function registerWidgetScript( $sScript = null, $iWhere = CClientScript::POS_READY )
 	{
 		if ( null === $sScript ) $sScript = $this->generateJavascript();
-		if ( $sScript ) PS::_rs( 'ps_' . md5( __CLASS__ . $this->widgetName . '#' . $this->id . '.' . $this->target . '.' . time() ), $sScript, $iWhere );
+		if ( $sScript ) PS::_rs( $this->getUniqueId( $this->id ), $sScript, $iWhere );
 	}
 
 	/**
@@ -209,7 +209,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	*/
 	public function getUniqueId( $sId = null )
 	{
-		return 'ps.' . PS::nvl( $sId, __CLASS__ ) . '.' . self::getNextIdCount();
+		return 'ps.' . CPSHash::hash( PS::nvl( $sId, __CLASS__ ) . time() . CPSWidgetHelper::getNextIdCount() );
 	}
 
 	//********************************************************************************
