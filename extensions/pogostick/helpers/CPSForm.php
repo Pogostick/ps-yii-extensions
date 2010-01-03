@@ -22,7 +22,7 @@
  * @property string $codeModel The name of the code model for code lookups
  * @property string $hintTemplate The template for displaying hints
  */
-class CPSForm extends IPSBase
+class CPSForm implements IPSBase
 {
 	//********************************************************************************
 	//* Constants

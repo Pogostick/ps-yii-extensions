@@ -68,17 +68,18 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 	
 	/**
 	* Registers the needed CSS and JavaScript.
-	*
-	* @param string $sId
+	* @param boolean If true, system will try to find jquery plugins based on the pattern jquery.<plugin-name[.min].js
+	* @returns CClientScript The current app's ClientScript object
 	*/
-	public function registerClientScripts()
+	public function registerClientScripts( $bLocateScript = false )
 	{
+		//	Daddy...
+		parent::registerClientScripts( $bLocateScript );
+		
 		//	Reset the baseUrl
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 
 		//	Register scripts necessary
-		self::loadScripts( $this, $this->theme );
-
 		PS::_rsf( "{$this->baseUrl}/jquery.markitup.pack.js" );
 		PS::_rsf( "{$this->baseUrl}/sets/{$this->setToUse}/set.js" );
 		PS::_rcf( "{$this->baseUrl}/skins/{$this->skinToUse}/style.css" );

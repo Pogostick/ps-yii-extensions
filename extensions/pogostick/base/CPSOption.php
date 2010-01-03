@@ -102,7 +102,7 @@ class CPSOption implements IPSBase
 		'object',
 		'mixed',
 	);
-	public function isValidType( $sType ) { return in_array( $sType, $this->arValidTypes ); }
+	public function isValidType( $sType = null ) { return in_array( PS::nvl( $sType, $this->getRule( self::RPT_TYPE ) ), $this->arValidTypes ); }
 
 	//********************************************************************************
 	//* Member Variables
@@ -165,7 +165,7 @@ class CPSOption implements IPSBase
 	 * @param mixed
 	 */
 	 
-	public function getValue() { return $this->m_oValue; }
+	public function getValue( $bDefaultIfNull = false ) { return $bDefaultIfNull ? PS::nvl( $this->m_oValue, $this->getDefaultValue() ) : $this->m_oValue; }
 	
 	/**
 	 * Set the option value

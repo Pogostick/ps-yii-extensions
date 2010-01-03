@@ -117,8 +117,7 @@ class CPSjQueryWidget extends CPSWidget
 	/**
 	* Registers the needed CSS and JavaScript.
 	* This method DOES NOT call generateJavascript()
-	*
-	* @param string $sId
+	* @param boolean If true, system will try to find jquery plugins based on the pattern jquery.<plugin-name[.min].js
 	* @returns CClientScript The current app's ClientScript object
 	*/
 	public function registerClientScripts( $bLocateScript = false )
@@ -238,7 +237,7 @@ CODE;
 	public static function create( $sName = null, array $arOptions = array() )
 	{
 		//	Instantiate...
-		$_sClass = PS::o( $arOptions, 'class' );
+		$_sClass = PS::o( $arOptions, 'class', null, true );
 		$_oWidget = new $_sClass();
 
 		//	Set default options...

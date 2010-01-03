@@ -98,13 +98,15 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 		}
 	}
 		
-	/**                                                                                                                     
+	/**
 	* Registers the needed CSS and JavaScript.
+	* @param boolean If true, system will try to find jquery plugins based on the pattern jquery.<plugin-name[.min].js
+	* @returns CClientScript The current app's ClientScript object
 	*/
-	public function registerClientScripts()
+	public function registerClientScripts( $bLocateScript = false )
 	{
 		//	Daddy...
-		parent::registerClientScripts();
+		parent::registerClientScripts( $bLocateScript );
 		
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;

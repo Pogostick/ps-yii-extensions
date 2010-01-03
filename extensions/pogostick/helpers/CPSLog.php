@@ -34,7 +34,7 @@ class CPSLog implements IPSBase
 	 * @param string $sSource Which message source application component to use.
 	 * @param string $sLanguage The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
 	 */
-	protected static function log( $sCategory, $sMessage, $sLevel = 'info', $arParams = null, $sSource = null, $sLanguage = null )
+	protected static function log( $sCategory, $sMessage, $sLevel = 'info', $arParams = array(), $sSource = null, $sLanguage = null )
 	{
 		Yii::log( Yii::t( $sCategory, $sMessage, $arParams, $sSource, $sLanguage ), $sLevel, $sCategory );
 	}
@@ -47,7 +47,7 @@ class CPSLog implements IPSBase
 	 * @param mixed $sSource Which message source application component to use.
 	 * @param mixed $sLanguage The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
 	 */
-	public static function info( $sCategory, $sMessage, $arParams = null, $sSource = null, $sLanguage = null )
+	public static function info( $sCategory, $sMessage, $arParams = array(), $sSource = null, $sLanguage = null )
 	{
 		self::log( $sCategory, $sMessage, 'info', $arParams, $sSource, $sLanguage );
 	}
@@ -60,7 +60,7 @@ class CPSLog implements IPSBase
 	 * @param mixed $sSource Which message source application component to use.
 	 * @param mixed $sLanguage The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
 	 */
-	public static function error( $sCategory, $sMessage, $arParams = null, $sSource = null, $sLanguage = null )
+	public static function error( $sCategory, $sMessage, $arParams = array(), $sSource = null, $sLanguage = null )
 	{
 		self::log( $sCategory, $sMessage, 'error', $arParams, $sSource, $sLanguage );
 	}
@@ -73,7 +73,7 @@ class CPSLog implements IPSBase
 	 * @param mixed $sSource Which message source application component to use.
 	 * @param mixed $sLanguage The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
 	 */
-	public static function warning( $sCategory, $sMessage, $arParams = null, $sSource = null, $sLanguage = null )
+	public static function warning( $sCategory, $sMessage, $arParams = array(), $sSource = null, $sLanguage = null )
 	{
 		self::log( $sCategory, $sMessage, 'warning', $arParams, $sSource, $sLanguage );
 	}
@@ -86,7 +86,7 @@ class CPSLog implements IPSBase
 	 * @param mixed $sSource Which message source application component to use.
 	 * @param mixed $sLanguage The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
 	 */
-	public static function trace( $sCategory, $sMessage, $arParams = null, $sSource = null, $sLanguage = null )
+	public static function trace( $sCategory, $sMessage, $arParams = array(), $sSource = null, $sLanguage = null )
 	{
 		self::log( $sCategory, $sMessage, 'trace', $arParams, $sSource, $sLanguage );
 	}

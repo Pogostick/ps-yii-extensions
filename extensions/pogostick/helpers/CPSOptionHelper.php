@@ -32,7 +32,13 @@ class CPSOptionHelper implements IPSBase
 	*/
 	public static function isScriptCallback( $sValue )
 	{
-		return is_string( $sValue ) && ( 0 == strncasecmp( $sValue, 'function(', 9 ) || 0 == strncasecmp( $sValue, 'jQuery(', 7 ) || 0 == strncasecmp( $sValue, '$(', 2 ) );
+		return is_string( $sValue ) && 
+			( 
+				0 == strncasecmp( $sValue, 'function(', 9 ) || 
+				0 == strncasecmp( $sValue, 'new Date(', 9 ) || 
+				0 == strncasecmp( $sValue, 'jQuery(', 7 ) || 
+				0 == strncasecmp( $sValue, '$(', 2 ) 
+			);
 	}
 	
 	/**
@@ -113,7 +119,7 @@ class CPSOptionHelper implements IPSBase
 	 * Validates all options in a collection
 	 * @param ICPSOptionContainer $oContainer
 	 */
-	public static function validateOptions( IPSOptionContainer $oContainer )
+	public static function validateOptions( IPSOptionContainer &$oContainer )
 	{
 		//	Get the option collection and validate
 		foreach ( $oContainer as $_oOption )
@@ -126,21 +132,26 @@ class CPSOptionHelper implements IPSBase
 	 * @param mixed $oValue Optional value to use for validation purposes
 	 * @throws CPSOptionException
 	 */
-	public static function validateOption( CPSOption $oOption, $oValue = null )
+	public static function validateOption( CPSOption &$oOption, $oValue = null )
 	{
 		//	We all start innocent
 		$_bPassed = true;
 		
-		//	Get the value to test
-		$_oValue = PS::nvl( $oValue, $oOption->getValue() );
+		//	Get the value to test 
+		$_oValue = PS::nvl( $oValue, $oOption->getValue( true ) );
 		
 		//	Check required values...
 		if ( ! $_bPassed = ( $oOption->getIsRequired() && null === $_oValue ) )
 			throw new CPSOptionException( "Option \"{$oOption->getName()}\" is required." );
 		
-		//	Check type...
-		if ( $_bPassed && null !== ( $_sType = $oOption->getOptionType() ) )
+		//	Fix up types...
+		$_arType = $oOption->getOptionType();
+		if ( ! is_array( $_arType ) ) $_arType = array( $_arType );
+
+		//	Allowed type?
+		foreach ( $_arType as $_sKey => $_sType )
 		{
+			//	Check type...
 			switch ( $_sType )
 			{
 				case 'bool':
@@ -168,7 +179,7 @@ class CPSOptionHelper implements IPSBase
 					break;
 					
 				case 'object':
-					$_bPassed = is_object( $_oValue );
+					$_bPassed = is_object( $_oValue ) || $_oValue === null;
 					break;
 					
 				case 'string':
@@ -180,12 +191,17 @@ class CPSOptionHelper implements IPSBase
 					if ( null !== $_sType && 'NULL' !== $_sType ) $_bPassed = ( $_oValue instanceof $_sType );
 					break;
 			}
+
+			if ( ! $oOption->isValidType( $_sType ) )
+				throw new CPSOptionException( Yii::t( __CLASS__, 'Invalid type "{y}" specified for "{x}"', array( '{y}' => $_sType, '{x}' => $_sKey ) ), 1  );
 			
 			if ( ! $_bPassed )
 			{
 				$_sValType = gettype( $_oValue );
 				throw new CPSOptionException( "Option \"{$oOption->getName()}\" expects values to be of type \"{$_sType}\". \"{$_sValType}\" given." );
 			}
+			
+			$oOption->setRule( CPSOption::RPT_TYPE, $_sType );
 		}
 	}
 
@@ -203,25 +219,34 @@ class CPSOptionHelper implements IPSBase
 		if ( ! $bNoCheck ) self::validateOptions( $oContainer );
 
 		//	Get our public callbacks...
-		$_arCallbacks = $oContainer->getOption( 'callbacks', array() );
-
+		$_arCallbacks = $oContainer->getValue( 'callbacks', array() );
+		
+		//	Remove it
+		$oContainer->unsetOption( 'callbacks' );
+		
 		//	Our output array
 		$_arOut = array();
 		$_sEncodedOptions = null;
 
+		//	Add callbacks to the array...
+		foreach ( $_arCallbacks as $_sKey => $_oValue )
+		{
+			if ( ! empty( $_oValue ) )
+				$_arOut[ "__pscb_{$_sKey}" ] = $_sKey;
+		}
+
 		//	Now build our final array...
-		foreach( $oContainer as $_sKey => $_oOption )
+		foreach( $oContainer->getRawOptions( true ) as $_sKey => $_oOption )
 		{
 			//	Private option? Skip if public-only
-			if ( $_sKey == 'callbacks' || ( $bPublicOnly && $_oOption->getIsPrivate() ) )
+			if ( $_sKey != 'callbacks' && $bPublicOnly && $_oOption->getIsPrivate() )
 				continue;
 				
 			//	Skip nulls...
-			if ( $_oOption->__isset( $_sKey ) )
+			if ( null !== ( $_oValue = $_oOption->getValue() ) )
 			{
-				$_oValue = $_oOption->getValue();
 				$_sExtName = $_oOption->getExternalName();
-					
+
 				//	Check for callbacks in the inner array (.i.e. "buttons" from jqUI dialog)
 				if ( 'array' == $_oOption->getOptionType() )
 				{
@@ -230,6 +255,7 @@ class CPSOptionHelper implements IPSBase
 						if ( ! is_array( $_oSubValue ) && self::isScriptCallback( $_oSubValue ) )
 						{
 							$_arCallbacks[ $_sSubKey ] = $_sSubValue;
+							$_arOut[ "__pscb_{$_sSubKey}" ] = $_sSubKey;
 							unset( $_oValue[ $_sSubKey ] );
 						}
 					}
@@ -278,9 +304,9 @@ class CPSOptionHelper implements IPSBase
 				if ( ! empty( $_oValue ) )
 				{
 					if ( self::isScriptCallback( $_oValue ) )
-						$_sEncodedOptions = str_replace( "\"cb_{$_sKey}\":\"{$_sKey}\"", "{$_sQuote}{$_sKey}{$_sQuote}:{$_oValue}", $_sEncodedOptions );
+						$_sEncodedOptions = str_replace( "\"__pscb_{$_sKey}\":\"{$_sKey}\"", "{$_sQuote}{$_sKey}{$_sQuote}:{$_oValue}", $_sEncodedOptions );
 					else
-						$_sEncodedOptions = str_replace( "\"cb_{$_sKey}\":\"{$_sKey}\"", "{$_sKey}:'{$_oValue}'", $_sEncodedOptions );
+						$_sEncodedOptions = str_replace( "\"__pscb_{$_sKey}\":\"{$_sKey}\"", "{$_sKey}:'{$_oValue}'", $_sEncodedOptions );
 				}
 			}
 
@@ -290,4 +316,72 @@ class CPSOptionHelper implements IPSBase
 		//	Nada
 		return null;
 	}
+
+	/**
+	* Checks a single option against its pattern.
+	*
+	* @param string $sKey
+	* @param mixed $oValue
+	* @throws CException           
+	* @returns bool
+	*/                         
+	public static function checkOption( CPSOption $oOption )
+	{
+		//	Required and missing? Bail
+		if ( null === ( $_oValue = $oOption->getValue() ) && $oOption->isRequired )
+			throw new CPSOptionException( Yii::t( __CLASS__, '"{x}" is a required option', array( '{x}' => $oOption->name ) ), 1 );
+
+		//	Check if this is a valid value for this option
+		if ( null !== ( $_arValid = $oOption->getAllowed() ) )
+		{
+			if ( null !== $oValue && ! in_array( $_oValue, $_arValid ) )
+				throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: "{y}"', array( '{x}' => $sKey, '{y}' => implode( ', ', $_arValid ) ) ), 1  );
+		}
+
+		//	Looks clean....
+		return true;
+	}
+
+	/**
+	* Checks the options array or a passed in array for validity checking...
+	*
+	* @param array $arOptions
+	* @throws CException
+	* @returns bool
+	*/
+	public static function checkOptions( IPSOptionContainer $oContainer )
+	{
+		//	One at a time...
+		foreach ( $oContainer->getRawOptions() as $_oOption )
+			self::checkOption( $_oOption );
+
+		//	We made it here? We cool baby!
+		return true;
+	}
+
+  /**
+    * Checks the callback array to see if they're valid.
+    *
+    * @throws CException
+    * @returns true If all is good.
+
+    */
+	public static function checkCallbacks( IPSComponent $oComponent )
+	{
+		$_arCallbacks = $oComponent->callbacks;
+		$_arValidCallbacks = $oComponent->validCallbacks;
+
+		if ( ! empty( $_arCallbacks ) && ! empty( $_arValidCallbacks ) )
+		{
+			foreach ( $_arCallbacks as $_sKey => $_oValue )
+			{
+				if ( ! in_array( $_sKey, $_arValidCallbacks ) )
+					throw new CException( Yii::t( __CLASS__, '"{x}" must be one of: {y}', array( '{x}' => $_sKey, '{y}' => implode( ', ', $_arValidCallbacks ) ) ) );
+			}
+		}
+
+		//	Clean...
+		return true;
+	}
+
 }

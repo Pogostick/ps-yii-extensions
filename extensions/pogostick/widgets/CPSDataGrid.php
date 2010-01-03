@@ -100,7 +100,7 @@ class CPSDataGrid implements IPSBase
 		//	Only work with CPSLinkPagers
 		if ( ! is_a( $_sPagerClass, 'CPSLinkPager' ) ) $_sPagerClass = 'CPSLinkPager';
 
-		$_iPagerLocation = PS::o( $_arPagerOptions, 'location', $_sPagerClass::TOP_RIGHT, true );
+		$_iPagerLocation = PS::o( $_arPagerOptions, 'location', PS::PL_TOP_RIGHT, true );
 
 		//	Create widget...
 		if ( $_oPages ) 
@@ -113,7 +113,7 @@ class CPSDataGrid implements IPSBase
 				$_sPager = $_oWidget->run( true );
 
 				//	Where do you want it?
-				if ( $_oWidget->pagerLocation == $_sPagerClass::TOP_LEFT || $_oWidget->pagerLocation == $_sPagerClass::TOP_RIGHT ) $_sOut .= $_sPager;
+				if ( $_oWidget->pagerLocation == PS::PL_TOP_LEFT || $_oWidget->pagerLocation == PS::PL_TOP_RIGHT ) $_sOut .= $_sPager;
 			}
 		}
 
@@ -126,7 +126,7 @@ class CPSDataGrid implements IPSBase
 		$_sOut .= self::endDataGrid();
 
 		//	Display on the bottom...
-		if ( $_oWidget && ( $_oWidget->pagerLocation == $_sPagerClass::BOTTOM_LEFT || $_oWidget->pagerLocation == $_sPagerClass::BOTTOM_RIGHT ) ) 
+		if ( $_oWidget && ( $_oWidget->pagerLocation == PS::PL_BOTTOM_LEFT || $_oWidget->pagerLocation == PS::PL_BOTTOM_RIGHT ) ) 
 			$_sOut .= $_sPager;
 		
 		return $_sOut;

@@ -187,6 +187,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	 * @return array
 	 */
 	public function getOptions( $bPublicOnly = false, $arOnlyThese = array() ) { return $this->m_oOptions->getOptions( $bPublicOnly, $arOnlyThese ); }
+	public function getRawOptions( $bPublicOnly = false, $arOnlyThese = array() ) { return $this->m_oOptions->toArray( $bPublicOnly, $arOnlyThese ); }
 
 	/**
 	* Sets an option
@@ -225,7 +226,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	*/
 	public function contains( $sKey ) { return $this->m_oOptions->contains( $sKey ); }
 	public function hasOption( $sKey ) { return $this->contains( $sKey ); }
-
+	
 	//********************************************************************************
 	//* Magic Methods
 	//********************************************************************************

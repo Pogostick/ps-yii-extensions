@@ -1029,8 +1029,8 @@ function confirmAction( oForm, sMessage, sHref )
 }
 HTML;
 					//	Register scripts
-					Yii::app()->clientScript->registerScript( self::getWidgetId( self::ID_PREFIX . '.cas.' ), $_sScript, CClientScript::POS_END );
-					CPSjqUIAlerts::create( null, array( 'theme_' => CPSjqUIAlerts::getCurrentTheme() ) );
+					PS::_cs()->registerScript( self::getWidgetId( self::ID_PREFIX . '.cas.' ), $_sScript, CClientScript::POS_END );
+					CPSjqUIAlerts::loadScripts();
 					$_bRegistered = true;
 				}
 			}
@@ -1073,8 +1073,22 @@ HTML;
 		
 		if ( $oModel->hasAttribute( $sCreatedColumn ) && $oModel->hasAttribute( $sModifiedColumn ) )
 		{
+			$_dtCreate = $oModel->$sCreatedColumn;
+			$_dtLMod = $oModel->$sModifiedColumn;
+			
+			//	Fix up dates
+			if ( is_numeric( $_dtCreate ) )
+				$_dtCreate = date( $sDateFormat, $_dtCreate );
+			else if ( false != ( $_sTime = strtotime( $_dtCreate ) ) )
+				$_dtCreate = $_sTime;
+			
+			if ( is_numeric( $_dtLMod ) )
+				$_dtLMod = date( $sDateFormat, $_dtLMod );
+			else if ( false != ( $_sTime = strtotime( $_dtLMod ) ) )
+				$_dtLMod = $_sTime;
+			
 			$_sOut = '<div class="ps-form-footer">';
-			$_sOut .= '<span><strong>Created:</strong>&nbsp;' . date( $sDateFormat, ! is_numeric( $oModel->$sCreatedColumn ) ? strtotime( $oModel->$sCreatedColumn ) : $oModel->$sCreatedColumn ) . '</span>' . self::pipe( '/' ) . '<span><strong>Modified:</strong>&nbsp;' . date( $sDateFormat, ! is_numeric( $oModel->$sModifiedColumn ) ? strtotime( $oModel->$sModifiedColumn ) : $oModel->$sModifiedColumn ) . '</span>';
+			$_sOut .= '<span><strong>Created:</strong>&nbsp;' . $_dtCreate . '</span>' . self::pipe( '/' ) . '<span><strong>Modified:</strong>&nbsp;' . $_dtLMod . '</span>';
 			$_sOut .= '</div>';
 		}
 		
@@ -1280,15 +1294,15 @@ HTML;
 	public static function nvl()
 	{
 		$_oDefault = null;
-		$_iArgs = func_num_args();
-		$_arArgs = func_get_args();
 		
-		for ( $_i = 0; $_i < $_iArgs; $_i++ )
+		for ( $_i = 0, $_iArgs = func_num_args(); $_i < $_iArgs; $_i++ )
 		{
-			if ( isset( $_arArgs[ $_i ] ) && ! empty( $_arArgs[ $_i ] ) )
-				return $_arArgs[ $_i ];
+			$_oArg = func_get_arg( $_i );
+			
+			if ( isset( $_oArg ) && ! empty( $_oArg ) )
+				return $_oArg;
 				
-			$_oDefault = $_arArgs[ $_i ];
+			$_oDefault = $_oArg;
 		}
 
 		return $_oDefault;

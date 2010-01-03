@@ -49,11 +49,14 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 
 	/**
 	* Registers the needed CSS and JavaScript.
+	* @param boolean If true, system will try to find jquery plugins based on the pattern jquery.<plugin-name[.min].js
+	* @returns CClientScript The current app's ClientScript object
 	*/
-	public function registerClientScripts()
+	public function registerClientScripts( $bLocateScript = false )
 	{
 		//	Daddy...
-		parent::registerClientScripts();
+		parent::registerClientScripts( $bLocateScript );
+		
 		self::loadScripts( $this );
 		return PS::_cs();
 	}

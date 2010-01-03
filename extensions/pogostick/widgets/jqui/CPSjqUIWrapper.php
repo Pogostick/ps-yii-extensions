@@ -159,7 +159,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		//	Add the default options for jqUI stuff
 		$this->addOptions( 
 			array(
-				'theme_' => 'string:cupertino::true:' . implode( '|', self::$m_arValidThemes ),
+				'theme_' => 'string:::true:' . implode( '|', self::$m_arValidThemes ),
 				'imagePath_' => 'string',
 			)
 		);
@@ -197,13 +197,13 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 
 	/**
 	* Registers the needed CSS and JavaScript.
-	*
-	* @param string $sId
+	* @param boolean If true, system will try to find jquery plugins based on the pattern jquery.<plugin-name[.min].js
+	* @returns CClientScript The current app's ClientScript object
 	*/
-	public function registerClientScripts()
+	public function registerClientScripts( $bLocateScript = false )
 	{
 		//	Daddy...
-		parent::registerClientScripts();
+		parent::registerClientScripts( $bLocateScript );
 		
 		//	Register scripts necessary
 		self::loadScripts( $this, $this->theme );

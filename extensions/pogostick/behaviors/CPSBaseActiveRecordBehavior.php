@@ -36,11 +36,11 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 	 */
 	public function __construct()
 	{
+		//	Log it and check for issues...
+		CPSLog::trace( 'pogostick.behaviors', __CLASS__ . ' constructed' );
+		
 		//	Preinitialize
 		$this->preinit();
-		
-		//	Log it and check for issues...
-		Yii::trace( Yii::t( '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'pogostick.behaviors' );
 	}
 
 	//********************************************************************************
@@ -50,21 +50,28 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 	/**
 	 * Preinitialize the object
 	 */
-	function preinit()
+	public function preinit()
 	{
 		PS::createInternalName( $this );
+	}
+	
+	/**
+	 * Initialize
+	 */
+	public function init()
+	{
 	}
 	
 	/**
 	* Get the internal name of our component
 	* @returns string
 	*/
-	function getInternalName() { return $this->m_sInternalName; }
+	public function getInternalName() { return $this->m_sInternalName; }
 	
 	/**
 	* Set the internal name of this component
 	* @param string
 	*/
-	function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
+	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
 
 }
