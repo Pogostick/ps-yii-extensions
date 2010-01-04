@@ -51,8 +51,10 @@ class CPSjQueryWidget extends CPSWidget
 		$this->addOptions( 
 			array(
 				'autoRun_' => 'bool:true::true',
+				'autoRegister_' => 'bool:false',
 				'widgetName_' => 'string:::true',
 				'target_' => 'string:::true',
+				'locateScript_' => 'bool:false',
 			)
 		);
 	}
@@ -108,7 +110,7 @@ class CPSjQueryWidget extends CPSWidget
 	public function run()
 	{
 		//	Register the scripts/css
-		$this->registerClientScripts();
+		$this->registerClientScripts( $this->locateScript );
 
 		//	Generate the HTML if available
 		echo $this->generateHtml();
@@ -135,17 +137,60 @@ class CPSjQueryWidget extends CPSWidget
 		//	Do we have a registered script?
 		if ( $bLocateScript )
 		{
+			$_sWName = $this->widgetName;
+			
 			//	Try and auto-find script file...
-			$_sFilePath = $this->getExternalLibraryPath() . '/jquery-plugins/' . $this->name . '/jquery.' . $this->name;
-			$_sFileUrl = $this->getExternalLibraryUrl() . '/jquery-plugins/' . $this->name . '/jquery.' . $this->name;
+			$_sBasePath = self::getExternalLibraryPath() . '/jquery-plugins/' . $_sWName;
+			$_sFilePath = $_sBasePath . '/jquery.' . $_sWName;
+			
+			$_sBaseUrl = self::getExternalLibraryUrl() . '/jquery-plugins/' . $_sWName;
+			$_sFileUrl = $_sBaseUrl . '/jquery.' . $_sWName;
 
 			//	See if we have such a plug-in
-			if ( file_exists(  $_sFilePath . '.min.js' ) )
-				PS::_rsf( $_sFileUrl . '.min.js', CClientScript::POS_HEAD );
-			//	Try non-minimized version...
-			else if ( file_exists( $_sFilePath . '.js' ) )
-				PS::_rsf( $_sFileUrl . '.js', CClientScript::POS_HEAD );
+			$_arFiles = array(
+				$_sFilePath . '.min.js',
+				$_sFilePath . '-min.js',
+				$_sFilePath . '.js',
+				$_sBasePath . '/ui.' . $_sWName . '.min.js',
+				$_sBasePath . '/ui.' . $_sWName . '-min.js',
+				$_sBasePath . '/ui.' . $_sWName . '.js',
+				$_sBasePath . '/js/jquery.' . $_sWName . '.min.js',
+				$_sBasePath . '/js/jquery.' . $_sWName . '-min.js',
+				$_sBasePath . '/js/jquery.' . $_sWName . '.js',
+				$_sBasePath . '/js/ui.' . $_sWName . '.min.js',
+				$_sBasePath . '/js/ui.' . $_sWName . '-min.js',
+				$_sBasePath . '/js/ui.' . $_sWName . '.js',
+			);
+			
+			foreach ( $_arFiles as $_sFile )
+			{
+				if ( file_exists( $_sFile ) ) PS::_rsf( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sFile ) );
+			}
+				
+			$_arFiles = array(
+				$_sFilePath . '.min.css',
+				$_sFilePath . '-min.css',
+				$_sFilePath . '.css',
+				$_sBasePath . '/ui.' . $_sWName . '.min.css',
+				$_sBasePath . '/ui.' . $_sWName . '-min.css',
+				$_sBasePath . '/ui.' . $_sWName . '.css',
+				$_sBasePath . '/css/jquery.' . $_sWName . '.min.css',
+				$_sBasePath . '/css/jquery.' . $_sWName . '-min.css',
+				$_sBasePath . '/css/jquery.' . $_sWName . '.css',
+				$_sBasePath . '/css/ui.' . $_sWName . '.min.css',
+				$_sBasePath . '/css/ui.' . $_sWName . '-min.css',
+				$_sBasePath . '/css/ui.' . $_sWName . '.css',
+			);
+			
+			foreach ( $_arFiles as $_sFile )
+			{
+				if ( file_exists( $_sFile ) ) PS::_rcf( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sFile ) );
+			}
 		}
+		
+		//	Auto register our script
+		if ( $this->autoRegister )
+			$this->registerWidgetScript();
 
 		//	Don't forget subclasses
 		return PS::_cs();
@@ -237,7 +282,7 @@ CODE;
 	public static function create( $sName = null, array $arOptions = array() )
 	{
 		//	Instantiate...
-		$_sClass = PS::o( $arOptions, 'class', null, true );
+		$_sClass = PS::o( $arOptions, 'class', __CLASS__, true );
 		$_oWidget = new $_sClass();
 
 		//	Set default options...

@@ -196,14 +196,20 @@ button.ps-button { width:auto; overflow:visible; }
 	color: yellow;
 	z-index:5;
 	display: inline;
-	margin-left:5px;
 	padding-left:5px;
 	padding-top:4px;
 	font-weight:bold;
+	margin: 0px auto; 
+	margin-top:0.5em; 
+	vertical-align: middle; opacity: 1;
 }
 
 .ps-form-header {
 	margin-bottom:10px;
+}
+
+.ps-form-header p {
+	padding-left:0px !important;
 }
 
 h1.ps-form-header-left {
@@ -535,6 +541,13 @@ div.ps-edit-container div.yiiForm div.complex span
 	font-weight: bold;	
 }
 
+div.ps-edit-container div.yiiForm div.simple label.ps-text-display
+{
+	padding-left: 2px;
+	text-align:left !important;
+	width: auto;
+}
+
 div.ps-edit-container div.yiiForm div.selectList {
 	clear:both;
 	margin:0 auto;
@@ -585,6 +598,12 @@ div.ps-edit-container div.yiiForm label.error {
 	color: red; 
 	padding-left:0; 
 	vertical-align: top;
+}
+
+div.ps-edit-container div.yiiForm div.uploadifyQueue,
+div.ps-edit-container div.yiiForm div.uploadifyQueue div { 
+	margin-left:0px !important;
+	padding-left: 180px;
 }
 
 /**
@@ -669,4 +688,3 @@ div.ps-edit-container div.yiiForm div.wide {
 	font-size: 15px;
 	margin: 10px auto;
 }
-

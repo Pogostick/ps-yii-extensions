@@ -48,6 +48,14 @@ abstract class CPSController extends CController implements IPSBase
 	//* Member Variables
 	//********************************************************************************
 	
+	/**
+	 * An optional, additional page heading
+	 * @var string
+	 */
+	protected $m_sPageHeading;
+	public function getPageHeading() { return $this->m_sPageHeading; }
+	public function setPageHeading( $sValue ) { $this->m_sPageHeading = $sValue; }
+	
 	/***
 	* Allows you to change your action prefix
 	* 

@@ -78,7 +78,7 @@ class CPSSoftDeleteBehavior extends CPSBaseActiveRecordBehavior
 	* @params CEvent $oEvent
 	* @returns boolean
 	*/
-	public function beforeDelete( CEvent $oEvent )
+	public function beforeDelete( $oEvent )
 	{
 		//	Pass it on...
 		parent::beforeDelete( $oEvent );
@@ -102,7 +102,7 @@ class CPSSoftDeleteBehavior extends CPSBaseActiveRecordBehavior
 	* Insert our soft-delete criteria
 	* @param CEvent $oEvent
 	*/
-	public function beforeFind( CEvent $oEvent )
+	public function beforeFind( $oEvent )
 	{
 		if ( $this->m_sSoftDeleteColumn && $this->owner->hasAttribute( $this->m_sSoftDeleteColumn ) ) 
 		{

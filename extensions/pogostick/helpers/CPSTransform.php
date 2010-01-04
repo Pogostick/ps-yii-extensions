@@ -78,7 +78,7 @@ class CPSTransform implements IPSBase
 		{
 			if ( $sType == $_sChar )
 			{
-				list( $oValue, $_bLink ) = self::$_sMethod( $_sColumn, $oValue );
+				list( $oValue, $_bLink ) = self::$_sMethod( $sType, $oValue );
 				break;
 			}
 		}

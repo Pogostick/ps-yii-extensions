@@ -84,8 +84,17 @@ class CPSForm implements IPSBase
 			
 			if ( $_bPassed )
 			{
-				switch ( $_sType )
+				switch ( strtolower( $_sType ) )
 				{
+					case 'html':
+						$_sOut .= implode( $_arValue );
+						break;
+					
+					case 'beginfieldset':
+					case 'endfieldset':
+						$_sOut .= call_user_func_array( array( 'PS', $_sType ), $_arValue );
+						break;
+					
 					case 'hidden':
 						$_sOut .= call_user_func_array( array( 'PS', 'hiddenField' ), $_arValue );
 						break;
@@ -128,24 +137,6 @@ class CPSForm implements IPSBase
 	}
 
 	/**
-	* Makes a nice form header
-	* 
-	* @param mixed $sTitle
-	* @param mixed $arOptions
-	*/
-	public static function formHeaderEx( $sTitle, $arOptions = array() )
-	{
-		$_arMenuItems = PS::o( $arOptions, 'menuItems', array() );
-		$_sDivClass = PS::o( $arOptions, 'divClass', 'ps-form-header' );
-		$_bShowFlashDiv = PS::o( $arOptions, 'showFlashDiv', true );
-		$_sHtmlInject = PS::o( $arOptions, 'htmlInject', null );
-		$_sSubHeader = PS::o( $arOptions, 'subHeader', null );
-		
-		//	Do the header
-		return self::formHeader( $sTitle, $_arMenuItems, $_sDivClass, $_bShowFlashDiv, $_sHtmlInject ) . $_sSubHeader;
-	}
-	
-	/**
 	* Creates a standard form header
 	* 
 	* Pass in menu item array as follows:
@@ -173,14 +164,33 @@ class CPSForm implements IPSBase
 	* @param boolean $bShowFlashDiv If true, will output a standard ps-flash-display div
 	* @returns string
 	* 
-	* @deprecated Use formHeaderEx
 	*/
-	public static function formHeader( $sTitle, $arMenuItems = array(), $sDivClass = 'ps-form-header', $bShowFlashDiv = true, $sHtmlInject = null )
+	public static function formHeaderEx( $sTitle, $arOptions = array() )
 	{
+		$arMenuItems = PS::o( $arOptions, 'menuItems', array() );
+		
+		$sDivClass = PS::o( $arOptions, 'divClass', 'ps-form-header' );
+		$bShowFlashDiv = PS::o( $arOptions, 'showFlashDiv', true );
+		$sHtmlInject = PS::o( $arOptions, 'htmlInject', null );
+		$_sSubHeader = PS::o( $arOptions, 'subHeader', null );
+
 		$_bIcon = false;
 		$_sClass = $_sLink = $_sOut = null;
 		$_sFlash = $bShowFlashDiv ? PS::flashMessage( 'success', true ) : null;
 		$_sExtra = null;//'style="margin-bottom:' . ( $_sFlash ? '32px' : '10px' ) . '";"';
+
+		if ( in_array( 'menuButtons', $arOptions ) ) 
+		{
+			$arMenuItems = array_merge( 
+				$arMenuItems, 
+				self::createMenuButtons( 
+					PS::o( $arOptions, 'itemName', 'item', true ), 
+					PS::o( $arOptions, 'menuButtons', array(), true ), 
+					PS::o( $arOptions, 'adminName', null, true ), 
+					PS::o( $arOptions, 'adminAction', null, true ) 
+				)
+			);
+		}
 		
 		//	Create menu
 		foreach ( $arMenuItems as $_sId => $_arItem ) 
@@ -201,9 +211,25 @@ class CPSForm implements IPSBase
 		<div class="{$sDivClass}" {$_sExtra}>
 			<h1 class="ps-form-header-left">{$sTitle}</h1>{$_sFlash}
 			<p style="clear:both;">{$_sOut}</p>
-			<div style="clear:both"></div>{$sHtmlInject}
+			<div style="clear:both"></div>
+			{$sHtmlInject}
 		</div>
+		{$_sSubHeader}
 HTML;
+
+	}
+	
+	/**
+	* Makes a nice form header
+	* @deprecated Use formHeaderEx
+	*/
+	public static function formHeader( $sTitle, $arMenuItems = array(), $sDivClass = 'ps-form-header', $bShowFlashDiv = true, $sHtmlInject = null )
+	{
+		//	Be nice and let people call this instead
+		if ( in_array( 'menuItems', $arMenuItems ) ) return self::formHeaderEx( $sTitle, $arMenuItems );
+		
+		//	Otherwise, screw you
+		trigger_error( 'CPSForm::formHeader is deprecated. Please use formHeaderEx instead', defined( E_USER_DEPRECATED ) ? E_USER_DEPRECATED : E_USER_WARNING );
 	}
 	
 	/**
@@ -240,6 +266,104 @@ HTML;
 		return <<<HTML
 		<div class="{$_sDivClass}">{$_sOut}</div>
 HTML;
+	}
+	
+	/**
+	 * Send in an array of standard actions and they will be converted to spiffy action buttons.
+	 * @param array $arWhich
+	 * @returns array
+	 */
+	public static function createMenuButtons( $sItemName, $arWhich = array(), $sAdminName = null, $sAdminAction = null )
+	{
+		$_arOut = array();
+		
+		if ( null === $sAdminName ) $sAdminName = ucfirst( $sItemName ) . ' Manager';
+		if ( null === $sAdminAction ) $sAdminAction = array( 'admin' );
+		
+		foreach ( $arWhich as $_sButton )
+		{
+			$_iButton = CPSDataGrid::getMenuButtonType( $_sButton );
+			
+			switch ( $_iButton )
+			{
+				case CPSDataGrid::ACTION_VIEW:
+					$_arOut[ 'view' ] = array(
+						'label' => 'View',
+						'url' => array( 'show' ),
+						'icon' => 'check',
+					);
+					break;
+
+				case CPSDataGrid::ACTION_CREATE:
+					$_arOut[ 'new' ] = array(
+						'label' => 'New ' . $sItemName,
+						'url' => array( 'update' ),
+						'icon' => 'pencil',
+					);
+					break;
+
+				case CPSDataGrid::ACTION_EDIT:
+					$_arOut[ 'update' ] = array(
+						'label' => intval( $_sButton ) == CPSDataGrid::ACTION_EDIT ? 'Edit' : 'Update',
+						'url' => array( 'update' ),
+						'icon' => 'pencil',
+					);
+					break;
+				
+				case CPSDataGrid::ACTION_SAVE:
+					$_arOut[ 'save' ] = array(
+						'label' => 'Save',
+						'url' => '_submit_',
+						'icon' => 'disk',
+					);
+					break;
+
+				case CPSDataGrid::ACTION_DELETE:
+					$_arOut[ 'delete' ] = array(
+						'label' => 'Delete',
+						'url' => array( 'delete' ),
+						'confirm' => 'Do you really want to delete this ' . $sItemName . '?',
+						'icon' => 'trash',
+					);
+					break;
+
+				case CPSDataGrid::ACTION_RETURN:
+				case CPSDataGrid::ACTION_CANCEL:
+					$_arOut[ 'cancel' ] = array(
+						'label' => 'Cancel',
+						'url' => $sAdminAction,
+						'icon' => 'disk',
+					);
+					break;
+
+				case CPSDataGrid::ACTION_ADMIN:
+					$_arOut[ 'return' ] = array(
+						'label' => $sAdminName,
+						'url' => $sAdminAction,
+						'icon' => 'arrowreturnthick-1-w',
+					);
+					break;
+					
+				case CPSDataGrid::ACTION_LOCK:
+					$_arOut[ 'lock' ] = array(
+						'label' => 'Lock',
+						'url' => array( 'lock' ),
+						'icon' => 'unlocked',
+					);
+					break;
+
+				case CPSDataGrid::ACTION_UNLOCK:
+					$_arOut[ 'unlock' ] = array(
+						'label' => 'Unlock',
+						'url' => array( 'unlock' ),
+						'icon' => 'locked',
+					);
+					break;
+			}
+		}
+		
+		//	Return our buttons
+		return $_arOut;
 	}
 
 }

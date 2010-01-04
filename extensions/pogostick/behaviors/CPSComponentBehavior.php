@@ -57,7 +57,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	public function __construct( $arConfig = array() )
 	{
 		//	Log it and check for issues...
-		Yii::trace( Yii::t( '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'pogostick.behaviors' );
+		Yii::trace( 'pogostick.behaviors', '{class} constructed', array( "{class}" => get_class( $this ) ) );
 		
 		//	Preinitialize
 		$this->preinit();

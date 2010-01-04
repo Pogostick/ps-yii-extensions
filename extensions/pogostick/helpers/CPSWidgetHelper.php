@@ -175,6 +175,12 @@ class CPSWidgetHelper extends CPSHelperBase
 	protected static $m_sLastFieldName = null;
 	public static function getLastFieldName() { return self::$m_sLastFieldName; }
 	
+	/**
+	 * Did we load our CSS yet?
+	 * @var boolean
+	 */
+	protected static $m_bCssLoaded = false;
+	
 	//********************************************************************************
 	//* Properties
 	//********************************************************************************
@@ -279,7 +285,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	//********************************************************************************
 	//* Public methods
 	//********************************************************************************
-
+	
 	/**
 	* Generate a random ID # for a widget
 	* @param string $sPrefix
@@ -298,6 +304,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	* labelOptions		Options for the label tag
 	* data				Data to pass to the field (i.e. select options array)
 	* widgetOptions		Options for the widget
+	* content			Optional content for field. If not specified, it's generated
 	* 
 	* @param int $eFieldType
 	* @param CModel $oModel
@@ -309,77 +316,95 @@ class CPSWidgetHelper extends CPSHelperBase
 	*/
 	public static function field( $eFieldType, CModel $oModel, $sColName, $arOptions = array() )
 	{
+		//	Are we loaded up?
+		if ( ! self::$m_bCssLoaded )
+		{
+			PS::_rcf( Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick.external.jqui.css' ) . DIRECTORY_SEPARATOR . 'ui.pogostick.css', true ) );
+			self::$m_bCssLoaded = true;
+		}
+		
+		$_arDivOpts = PS::o( $arOptions, '_divOpts', array(), true );
+		$_sHint = PS::o( $arOptions, 'hint', null, true );
+			
 		//	A little switcheroo...
 		if ( $eFieldType == PS::CODE_DISPLAY )
 		{
 			$eFieldType = PS::TEXT_DISPLAY;
 			$arOptions['transform'] = '*';
-			echo PS::field( PS::HIDDEN, $oModel, $sColName );
+			$arOptions['name'] = $arOptions['id'] = 'disp_' . $oModel->id . $sColName;
+			$_sOut = PS::activeHiddenField( $oModel, $sColName );
+			$arOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display' ), CPSTransform::valueOf( '*', $oModel->$sColName ) );
+			$_sOut .= PS::field( $eFieldType, $oModel, $sColName, $arOptions );
 		}
-
-		//	Get our operating parameters
-		$_sLabel = self::o( $arOptions, 'label', null, true );
-		$_arLabelOptions = self::o( $arOptions, 'labelOptions', array(), true );
-		$_sSuffixToUse = PS::o( $_arLabelOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
-		$_arWidgetOptions = self::o( $arOptions, 'widgetOptions', array(), true );
-		$_arData = self::o( $arOptions, 'data', null, true );
-		$_sHtml = PS::o( $arOptions, '_appendHtml', '', true );
-		$_sDivClass = PS::o( $arOptions, '_divClass', null, true );
-		$_sTransform = PS::o( $arOptions, 'transform', null, true );
-		$_sTitle = PS::o( $arOptions, 'title', null );
-		$_sHint = PS::o( $arOptions, 'hint', null, true );
-		$_arValueMap = PS::o( $arOptions, 'valueMap', array(), true );
-		
-		//	Value map...
-		if ( in_array( $oModel->{$sColName}, array_keys( $_arValueMap ) ) && isset( $_arValueMap[$oModel->{$sColName}] ) ) 
-			$arOptions['value'] = $_arValueMap[$oModel->{$sColName}];
-
-		//	Do auto-tooltipping...
-		if ( ! $_sTitle && $oModel && method_exists( $oModel, 'attributeTooltips' ) )
-		{
-			if ( $_arTemp = $oModel->attributeTooltips() )
-			{
-				if ( isset( $_arTemp[$sColName] ) ) 
-					$arOptions['title'] = self::encode( $_arTemp[ $sColName ] );
-			}
-		}
-
-		//	Denote checkbox/radiobutton labels
-		if ( ! $_sDivClass & ( $eFieldType == self::CHECK || $eFieldType == self::RADIO || $eFieldType == self::CHECKLIST || $eFieldType == self::RADIOLIST ) ) 
-			$_sDivClass = 'chk_label';
-		
-		//	Need an id for div tag
-		if ( ! isset( $arOptions[ 'id' ] ) ) $arOptions[ 'id' ] = self::getIdByName( self::resolveName( $oModel, $sColName ) );
-		
-		//	Preset class for hover effects if enabled...
-		if ( isset( self::$m_sOffClass ) && ! isset( $arOptions[ 'class' ] ) ) 
-			$arOptions[ 'class' ] = self::$m_sOffClass;
-
-		if ( null == $oModel )		
-			$_sOut = self::label( $_sLabel, $arOptions[ 'id' ], $_arLabelOptions );
 		else
 		{
-			//	Set label name
-			$_arLabelOptions['label'] = PS::nvl( $_sLabel, PS::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . $_sSuffixToUse;
-			$_sOut = self::activeLabelEx( $oModel, $sColName, $_arLabelOptions );
-		}
+			//	Get our operating parameters
+			$_sLabel = PS::o( $arOptions, 'label', null, true );
+			$_arLabelOptions = PS::o( $arOptions, 'labelOptions', array(), true );
+			$_sSuffixToUse = PS::o( $_arLabelOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
+			$_arWidgetOptions = PS::o( $arOptions, 'widgetOptions', array(), true );
+			$_arData = PS::o( $arOptions, 'data', null, true );
+			$_sHtml = PS::o( $arOptions, '_appendHtml', '', true );
+			$_sDivClass = PS::o( $arOptions, '_divClass', null, true );
+			$_sTransform = PS::o( $arOptions, 'transform', null, true );
+			$_sTitle = PS::o( $arOptions, 'title', null );
+			$_arValueMap = PS::o( $arOptions, 'valueMap', array(), true );
+			$_sContent = PS::o( $arOptions, 'content', null, true );
+			
+			//	Value map...
+			if ( in_array( $oModel->{$sColName}, array_keys( $_arValueMap ) ) && isset( $_arValueMap[$oModel->{$sColName}] ) ) 
+				$arOptions['value'] = $_arValueMap[$oModel->{$sColName}];
 
-		//	Do a value transform if requested
-		if ( $_sTransform && $oModel ) $oModel->{$sColName} = YPTransform::value( $_sTransform, $oModel->$sColName );
-		
-		//	Build our field
-		$_sOut .= self::activeField( $eFieldType, $oModel, $sColName, $arOptions, $_arWidgetOptions, $_arData );
-		$_sOut .= $_sHtml;
+			//	Do auto-tooltipping...
+			if ( ! $_sTitle && $oModel && method_exists( $oModel, 'attributeTooltips' ) )
+			{
+				if ( $_arTemp = $oModel->attributeTooltips() )
+				{
+					if ( isset( $_arTemp[$sColName] ) ) 
+						$arOptions['title'] = self::encode( $_arTemp[ $sColName ] );
+				}
+			}
+
+			//	Denote checkbox/radiobutton labels
+			if ( ! $_sDivClass & ( $eFieldType == self::CHECK || $eFieldType == self::RADIO || $eFieldType == self::CHECKLIST || $eFieldType == self::RADIOLIST ) ) 
+				$_sDivClass = 'chk_label';
+			
+			//	Need an id for div tag
+			if ( ! isset( $arOptions[ 'id' ] ) ) $arOptions[ 'id' ] = self::getIdByName( self::resolveName( $oModel, $sColName ) );
+			
+			//	Preset class for hover effects if enabled...
+			if ( isset( self::$m_sOffClass ) && ! isset( $arOptions[ 'class' ] ) ) 
+				$arOptions[ 'class' ] = self::$m_sOffClass;
+
+			if ( null == $oModel )		
+				$_sOut = self::label( $_sLabel, $arOptions[ 'id' ], $_arLabelOptions );
+			else
+			{
+				//	Set label name
+				$_arLabelOptions['label'] = PS::nvl( $_sLabel, PS::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . $_sSuffixToUse;
+				$_sOut = self::activeLabelEx( $oModel, $sColName, $_arLabelOptions );
+			}
+
+			//	Do a value transform if requested
+			if ( $_sTransform && $oModel ) $oModel->{$sColName} = CPSTransform::valueOf( $_sTransform, $oModel->$sColName );
+			
+			//	Build our field
+			$_sOut .= ( null !== $_sContent ) ? $_sContent : self::activeField( $eFieldType, $oModel, $sColName, $arOptions, $_arWidgetOptions, $_arData );
+			$_sOut .= $_sHtml;
+			
+			//	Construct the div...
+			$_arDivOpts = array_merge(
+				$_arDivOpts, 
+				array( 
+					'id' => self::$m_sFormFieldContainerPrefix . '_' . $arOptions['id'],
+					'class' => trim( self::$m_sFormFieldContainerClass . ' ' . $_sDivClass ),
+				)
+			);
+		}
 		
 		//	Any hints?
 		if ( $_sHint ) $_sHint = str_ireplace( '%%HINT%%', $_sHint, self::$m_sHintTemplate );
 
-		//	Construct the div...
-		$_arDivOpts = array( 
-			'id' => self::$m_sFormFieldContainerPrefix . '_' . $arOptions['id'],
-			'class' => trim( self::$m_sFormFieldContainerClass . ' ' . $_sDivClass ),
-		);
-		
 		return PS::tag( self::$m_sFormFieldContainer, $_arDivOpts, $_sOut . $_sHint );
 	}
 
@@ -842,7 +867,7 @@ CSS;
 		if ( PS::o( $arFormOptions, 'validate', false ) == true )
 		{
 			$_arValid = PS::o( $arFormOptions, 'validateOptions', array() );
-			if ( null == PS::o( $_arValid, 'errorClass' ) ) $_arValid['errorClass'] = $_sErrorClass;
+			$_arValid['errorClass'] = PS::o( $_arValid, 'errorClass', self::$errorCss );
 			$_arValid['ignoreTitle'] = PS::o( $_arValid, 'ignoreTitle', true );
 			$arFormOptions['validateOptions'] = $_arValid;
 		}
@@ -1038,7 +1063,7 @@ HTML;
 			{
 				if ( $_bSubmit || $_sLink == '_submit_' )
 				{
-					$_sLink = '#';
+					$_sLink = '';
 					$_sOnClick = "return jQuery(" . ( $_sFormId ? "'#{$_sFormId}'" : "'div.yiiForm>form'" ) . ").submit();";
 				}
 			}
@@ -1073,19 +1098,12 @@ HTML;
 		
 		if ( $oModel->hasAttribute( $sCreatedColumn ) && $oModel->hasAttribute( $sModifiedColumn ) )
 		{
-			$_dtCreate = $oModel->$sCreatedColumn;
-			$_dtLMod = $oModel->$sModifiedColumn;
+			$_dtCreate = strtotime( $oModel->$sCreatedColumn );
+			$_dtLMod = strtotime( $oModel->$sModifiedColumn );
 			
 			//	Fix up dates
-			if ( is_numeric( $_dtCreate ) )
-				$_dtCreate = date( $sDateFormat, $_dtCreate );
-			else if ( false != ( $_sTime = strtotime( $_dtCreate ) ) )
-				$_dtCreate = $_sTime;
-			
-			if ( is_numeric( $_dtLMod ) )
-				$_dtLMod = date( $sDateFormat, $_dtLMod );
-			else if ( false != ( $_sTime = strtotime( $_dtLMod ) ) )
-				$_dtLMod = $_sTime;
+			$_dtCreate = date( $sDateFormat, $_dtCreate );
+			$_dtLMod = date( $sDateFormat, $_dtLMod );
 			
 			$_sOut = '<div class="ps-form-footer">';
 			$_sOut .= '<span><strong>Created:</strong>&nbsp;' . $_dtCreate . '</span>' . self::pipe( '/' ) . '<span><strong>Modified:</strong>&nbsp;' . $_dtLMod . '</span>';
@@ -1299,7 +1317,7 @@ HTML;
 		{
 			$_oArg = func_get_arg( $_i );
 			
-			if ( null !== $_oArg || ( isset( $_oArg ) && ! empty( $_oArg ) ) )
+			if ( null !== $_oArg && ( isset( $_oArg ) && ! empty( $_oArg ) ) )
 				return $_oArg;
 				
 			$_oDefault = $_oArg;

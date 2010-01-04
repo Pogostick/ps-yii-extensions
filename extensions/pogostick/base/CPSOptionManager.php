@@ -103,6 +103,6 @@
  * 
  * @deprecated This has been replaced by the CPSOptionCollection
  */
-class CPSOptionManager implements IPogostick
+class CPSOptionManager implements IPSBase
 {
 }

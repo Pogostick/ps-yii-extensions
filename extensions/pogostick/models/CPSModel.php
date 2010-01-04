@@ -28,13 +28,6 @@ class CPSModel extends CActiveRecord implements IPSBase
 	//********************************************************************************
 
 	/**
-	* Our metadata, cached for speed
-	* @var CDbMetaData
-	*/
-	protected $m_oMetaData;
-	public function getMetaData() { return $this->m_oMetaData ? $this->m_oMetaData : $this->m_oMetaData = parent::getMetaData(); }
-		
-	/**
 	* Our schema, cached for speed
 	* @var array
 	*/

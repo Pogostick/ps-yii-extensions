@@ -58,7 +58,7 @@ class CPSDeltaChangeBehavior extends CPSBaseActiveRecordBehavior
 	* After a row is pulled from the database...
 	* @param CEvent $oEvent
 	*/
-	public function afterFind( CEvent $oEvent )
+	public function afterFind( $oEvent )
 	{
 		//	Get fresh values
 		$this->m_arLastAttributes = $oEvent->sender->getAttributes();
@@ -72,7 +72,7 @@ class CPSDeltaChangeBehavior extends CPSBaseActiveRecordBehavior
 	* After a row is saved to the database...
 	* @param CEvent $oEvent
 	*/
-	public function afterSave( CEvent $oEvent )
+	public function afterSave( $oEvent )
 	{
 		//	Get fresh values
 		$this->m_arLastAttributes = $oEvent->sender->getAttributes();

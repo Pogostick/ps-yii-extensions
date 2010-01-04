@@ -6,7 +6,7 @@
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
-
+ 
 /**
  * Allows you to define time stamp fields in models and automatically update them.
  * 

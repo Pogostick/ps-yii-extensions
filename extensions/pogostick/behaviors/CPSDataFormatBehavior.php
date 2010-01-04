@@ -176,7 +176,7 @@ class CPSDataFormatBehavior extends CPSBaseActiveRecordBehavior
 				if ( ! empty( $_sName ) && $_oModel->hasAttribute( $_sName ) && isset( $_arSchema[ $_sName ], $this->m_arFormat[ $sWhich ][ $_oCol->dbType ] ) )
 				{
 					$_sValue = $this->applyFormat( $_oCol, $_oModel->getAttribute( $_sName ), $sWhich );
-					if ( $_sValue ) Yii::trace( 'Apply format to ' . $_sName . ' [' . $_oModel->{$_sName} . ' -> ' . $_sValue . ']', __METHOD__ . '::' . $sWhich );
+					if ( $_sValue ) CPSLog::trace( __METHOD__, 'Apply format to ' . $_sName . ' [' . $_oModel->{$_sName} . ' -> ' . $_sValue . ']' );
 					$_oModel->setAttribute( $_sName, $_sValue );
 				}
 			}

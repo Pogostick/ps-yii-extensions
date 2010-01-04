@@ -545,9 +545,9 @@ abstract class CPSConsoleCommand extends CPSComponent
 					
 				default:
 					//	Look through options..
-					foreach ( $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY, true ) as $_sOptKey => $_sOptValue )
+					foreach ( $this->makeOptions( null, PS::OF_ASSOC_ARRAY, true ) as $_sOptKey => $_sOptValue )
 					{
-						if ( $_sKey == $_sOptKey || $_sKey == CPSHash::underscorize( $_sOptKey, '-' ) )
+						if ( $_sKey == $_sOptKey || $_sKey == CPSTransform::underscorize( $_sOptKey, '-' ) )
 						{
 							$this->{$_sOptKey} = $_sValue;
 							break;
@@ -569,7 +569,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 		$_sOptions = null;
 		
 		//	Look through options..
-		foreach ( $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY ) as $_sOptKey => $_sOptValue )
+		foreach ( $this->makeOptions( null, PS::OF_ASSOC_ARRAY ) as $_sOptKey => $_sOptValue )
 		{
 			$_sOptions .= str_pad( $this->bold( '  --' . $_sOptKey ), 39, ' ', STR_PAD_RIGHT );
 			if ( $_sOptValue ) $_sOptions .= 'Default value is "' . ( is_array( $_sOptValue ) ? implode( ', ', $_sOptValue ) : $_sOptValue ) . '"';
@@ -625,7 +625,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 	*/
 	protected function displayParameters( $sName, $arExtra = array() )
 	{
-		$_arOptions = array_merge( $arExtra, $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY, true ) );
+		$_arOptions = array_merge( $arExtra, $this->makeOptions( null, PS::OF_ASSOC_ARRAY, true ) );
 		$_iColWidth = $this->colWidth;
 		
 		//	Update column width based on option keys...
@@ -642,7 +642,24 @@ abstract class CPSConsoleCommand extends CPSComponent
 		echo "============================================================" . PHP_EOL . PHP_EOL;
 
 		foreach ( $_arOptions as $_sKey => $_sValue )
-			echo $this->boldEchoString( is_array( $_sValue ) ? implode( ', ', $_sValue ) : $_sValue, $_sKey, true );
+		{
+			if ( ! is_array( $_sValue ) )
+				echo $this->boldEchoString( $_sValue, $_sKey, true );
+			else
+			{
+				if ( count( $_sValue ) && is_array( current( $_sValue ) ) )
+				{
+					$_arOut = array();
+					
+					foreach ( $_sValue as $_sSubKey => $_sSubValue )
+						$_arOut[] = $_sSubKey;
+
+					$_sValue = $_arOut;
+				}
+				
+				echo $this->boldEchoString( implode( ', ', $_sValue ), $_sKey, true );				
+			}
+		}
 			                  
 		echo PHP_EOL;
 	}
@@ -656,13 +673,13 @@ abstract class CPSConsoleCommand extends CPSComponent
 	{
 		return(
 			array(
-				'force_' => array( CPSOptionManager::META_DEFAULTVALUE => false, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'boolean' ) ),
-				'databaseName_' => array( CPSOptionManager::META_DEFAULTVALUE => 'db', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'basePath_' => array( CPSOptionManager::META_DEFAULTVALUE => Yii::getPathOfAlias( 'application.models' ), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'templatePath_' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'templateName_' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'baseClass_' => array( CPSOptionManager::META_DEFAULTVALUE => 'CPSModel', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'colWidth' => array( CPSOptionManager::META_DEFAULTVALUE => self::MIN_COL_WIDTH, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'integer' ) ),
+				'force_' => 'bool:false',
+				'databaseName_' => 'string:db',
+				'basePath_' => 'string:' . Yii::getPathOfAlias( 'application.models' ),
+				'templatePath_' => 'string',
+				'templateName_' => 'string',
+				'baseClass_' => 'string:CPSModel',
+				'colWidth' => 'int:' . self::MIN_COL_WIDTH,
 			)
 		);
 	}

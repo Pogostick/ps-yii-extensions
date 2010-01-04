@@ -189,7 +189,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	public function run()
 	{
 		//	Register the scripts/css
-		$this->registerClientScripts();
+		$this->registerClientScripts( $this->locateScript );
 
 		//	Generate the HTML if available
 		echo $this->generateHtml();
@@ -274,7 +274,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 			$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
 			
 			//	Check theme overrides...
-			$_sTheme = PS::nvl( $sTheme, $_oWidget->theme, self::getCurrentTheme(), Yii::app()->params['theme'] );
+			$_sTheme = PS::nvl( $sTheme, $_oWidget->theme, Yii::app()->params['theme'], self::getCurrentTheme() );
 			if ( ! self::$m_bMultiTheme && ! self::getCurrentTheme() ) self::setCurrentTheme( $_sTheme );
 
 			$_oWidget->theme = $_sTheme;

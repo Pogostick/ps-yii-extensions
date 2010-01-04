@@ -97,7 +97,7 @@ class CPSCodeTableModel extends CPSModel
 		$_arCrit = null;
 		$_oModel = call_user_func( array( $_sModelClass, 'model' ) );
 		
-		$sOrder = $_oModel->getMetaData()->primaryKey;
+		$sOrder = $_oModel->getMetaData()->tableSchema->primaryKey;
 
 		//	Get a single code...
 		if ( null !== $iId ) return $_oModel->findByPk( $iId );

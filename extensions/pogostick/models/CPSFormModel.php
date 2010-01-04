@@ -21,7 +21,7 @@
  * 
  * @property-read string $modelName The class name of the model
  */
-class CPSFormModel extends CFormModel implements IPogostick
+class CPSFormModel extends CFormModel implements IPSBase
 {
 	/**
 	* Fixup attribute labels for my funky naming conventions...

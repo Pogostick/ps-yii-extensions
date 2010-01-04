@@ -68,7 +68,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 		parent::__construct( $oOwner );
 		
 		//	Log it and check for issues...
-		Yii::trace( Yii::t( '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'pogostick.base' );
+		CPSLog::trace( 'pogostick.base', '{class} constructed', array( "{class}" => get_class( $this ) ) );
 		
 		//	Preinitialize
 		$this->preinit();

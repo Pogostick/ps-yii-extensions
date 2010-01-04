@@ -28,14 +28,19 @@ class CPSDataGrid implements IPSBase
 	/***
 	* Predefined action types
 	*/
-	const	ACTION_NONE = 0;
-	const	ACTION_VIEW = 1;
-	const	ACTION_EDIT = 2;
-	const	ACTION_DELETE = 3;
-	const	ACTION_ADMIN = 4;
-	const	ACTION_LOCK = 5;
-	const	ACTION_UNLOCK = 6;
-	//	Add your own in between 4 and 999...
+	const	ACTION_NONE 	= 0;
+	const	ACTION_CREATE 	= 1;
+	const	ACTION_VIEW 	= 2;
+	const	ACTION_EDIT 	= 3;
+	const	ACTION_SAVE 	= 4;
+	const	ACTION_DELETE 	= 5;
+	const	ACTION_ADMIN 	= 6;
+	const	ACTION_LOCK 	= 7;
+	const	ACTION_UNLOCK 	= 8;
+	
+	//	Add your own in between 4 and 997...
+	const	ACTION_RETURN 	= 997;
+	const	ACTION_CANCEL 	= 998;
 	const	ACTION_GENERIC = 999;
 	
 	//********************************************************************************
@@ -59,17 +64,43 @@ class CPSDataGrid implements IPSBase
 	public function setGridOptions( $arValue ) { $this->m_arGridOptions = $arValue; }
 
 	/**
-	* Map of predefined actions to names
+	* Map of predefined menuButton names to types
+	*/
+	protected static $m_arMenuButtonMap = array(
+		'none' 		=> null,
+		'new'		=> self::ACTION_CREATE,
+		'create'	=> self::ACTION_CREATE,
+		'view'		=> self::ACTION_VIEW,
+		'edit'		=> self::ACTION_EDIT,
+		'update'	=> self::ACTION_EDIT,
+		'save'		=> self::ACTION_SAVE,
+		'delete'	=> self::ACTION_DELETE,
+		'lock' 		=> self::ACTION_LOCK,
+		'unlock'	=> self::ACTION_UNLOCK,
+		'admin'		=> self::ACTION_ADMIN,
+		'cancel'	=> self::ACTION_CANCEL,
+		'return'	=> self::ACTION_CANCEL,
+	);
+
+	/**
+	* Map of predefined row-level actions to names
 	*/
 	protected static $m_arActionMap = array(
-		self::ACTION_NONE => null,
-		self::ACTION_VIEW => 'view',
+		self::ACTION_CREATE => 'create',
+		self::ACTION_VIEW => 'show',
 		self::ACTION_EDIT => 'edit',
+		self::ACTION_SAVE => 'save',
 		self::ACTION_DELETE => 'delete',
-		self::ACTION_ADMIN => 'admin',
 		self::ACTION_LOCK => 'lock',
 		self::ACTION_UNLOCK => 'unlock',
 	);
+
+	/**
+	 * Converts a string action to its corresponding enum
+	 * @param string $sAction
+	 * @return integer
+	 */
+	public static function getMenuButtonType( $sButton ) { return is_numeric( $sButton ) ? intval( $sButton ) : PS::o( self::$m_arMenuButtonMap, $sButton ); }
 	
 	//********************************************************************************
 	//* Public Methods
@@ -89,6 +120,9 @@ class CPSDataGrid implements IPSBase
 		self::$m_iColumnCount = 0;
 		self::$m_arGridOptions = $arOptions;
 		
+		//	Register our css...
+		PS::_rcf( Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick.templates.css' ) . DIRECTORY_SEPARATOR . 'ps-data-grid.css' ) );
+		
 		//	Store our model, get our options
 		self::$m_arGridOptions['data'] = $arModel;
 		$_arPagerOptions = PS::o( $arOptions, 'pagerOptions', array(), true );
@@ -96,6 +130,13 @@ class CPSDataGrid implements IPSBase
 		$_bAccordion = PS::o( $arOptions, 'accordion', false, true );
 		$_sGridHeader = PS::o( $arOptions, 'gridHeader', null, true );
 		$_oPages = PS::o( $arOptions, 'pages', null, true );
+		$_arFormHeader = PS::o( $arOptions, 'formHeader', null, true );
+		
+		if ( null !== $_arFormHeader )
+		{
+			$_arFormHeader['itemName'] = PS::o( $_arFormHeader, 'itemName', 'item' );
+			echo CPSForm::formHeaderEx( PS::o( $_arFormHeader, 'title', 'Form Header', true ), $_arFormHeader );
+		}
 		
 		//	Only work with CPSLinkPagers
 		if ( ! is_a( $_sPagerClass, 'CPSLinkPager' ) ) $_sPagerClass = 'CPSLinkPager';
@@ -157,13 +198,13 @@ class CPSDataGrid implements IPSBase
 			$_sColumn = CPSTransform::cleanColumn( ( is_array( $_oColumn ) ? $_sKey = array_shift( $_oColumn ) : $_oColumn ) );
 			if ( $_oModel ) $_sModelLabel = $_oModel->getAttributeLabel( $_sColumn );
 			$_sLabel = PS::o( $_oColumn, 'label', ( $oSort ) ? self::appendSortArrow( $oSort->link( $_sColumn ) ) : ( $_sModelLabel ? $_sModelLabel : $_sColumn ), true );
-			$_sHeaders .= CHtml::tag( 'th', array(), $_sLabel );
+			$_sHeaders .= PS::tag( 'th', array(), $_sLabel );
 			self::$m_iColumnCount++;
 		}	
 
 		if ( $bAddActions ) 
 		{
-			$_sHeaders .= CHtml::tag( 'th', array(), 'Actions' );
+			$_sHeaders .= PS::tag( 'th', array(), 'Actions' );
 			self::$m_iColumnCount++;
 		}
 			
@@ -204,7 +245,7 @@ class CPSDataGrid implements IPSBase
 		$_iRow = 0;
 		
 		if ( ! $arModel || ( is_array( $arModel ) && ! count( $arModel ) ) ) 
-			$_sOut .= CHtml::tag( 'tr', array(), PS::tag( 'td', array( 'class' => 'ps-data-grid-no-data-found', 'colspan' => self::$m_iColumnCount ), 'No Records Found' ) );
+			$_sOut .= PS::tag( 'tr', array(), PS::tag( 'td', array( 'class' => 'ps-data-grid-no-data-found', 'colspan' => self::$m_iColumnCount ), 'No Records Found' ) );
 		else
 		{
 			foreach ( $arModel as $_iIndex => $_oModel )
@@ -214,7 +255,7 @@ class CPSDataGrid implements IPSBase
 				$_sTD = CPSTransform::column( $_oModel, $arColumns, $sLinkView, 'td', array( 'encode' => $bEncode ) );
 					
 				//	Build actions...
-				$_sTD .= CHtml::tag( 'td', array( 'class' => 'ps-grid-actions' ), '<div class="ps-grid-actions-inner">' . self::buildActions( $_oModel ) . '<hr /></div>' );
+				$_sTD .= PS::tag( 'td', array( 'class' => 'ps-grid-actions' ), '<div class="ps-grid-actions-inner">' . self::buildActions( $_oModel ) . '<hr /></div>' );
 				
 				//	Build the output row
 				$_arRowOpts = array();
@@ -223,7 +264,7 @@ class CPSDataGrid implements IPSBase
 					$_arRowOpts = array( 'class' => $arDivComment[1], 'title' => implode( ', ', current( $_oModel->getErrors() ) ) );
 					
 				$_arRowOpts['class'] = PS::o( $_arRowOpts, 'class', ' ui-widget-content' );
-					
+				
 				//	Row id template? Fill it in
 				if ( $_sRowIdTemplate ) 
 				{
@@ -233,7 +274,10 @@ class CPSDataGrid implements IPSBase
 						$_arRowOpts['id'] = str_ireplace( '{pk}', $_oModel->{$_sPK}, $_sRowIdTemplate );
 				}
 				
-				$_sOut .= CHtml::tag( 'tr', $_arRowOpts, $_sTD );
+				//	Mark odd rows
+				if ( $_iRow % 2 ) $_arRowOpts['class'] .= ' ui-state-highlight ps-data-grid-row-odd';
+				
+				$_sOut .= PS::tag( 'tr', $_arRowOpts, $_sTD );
 				
 				//	Add subrows...
 				if ( ! empty( $_oModel->subRows ) )
@@ -247,10 +291,10 @@ class CPSDataGrid implements IPSBase
 
 						if ( ! empty( $arActions ) )
 						{
-							$_sRow .= CHtml::tag( 'td', PS::smart_array_merge( $_arInnerOptions, array( 'class' => 'grid-actions' ) ), '<div class="_grid_actions">&nbsp;<hr /></div>' );
+							$_sRow .= PS::tag( 'td', PS::smart_array_merge( $_arInnerOptions, array( 'class' => 'grid-actions' ) ), '<div class="_grid_actions">&nbsp;<hr /></div>' );
 						}
 							
-						$_sOut .= CHtml::tag( 'tr', $_arOuterOptions, $_sRow );
+						$_sOut .= PS::tag( 'tr', $_arOuterOptions, $_sRow );
 					}
 				}
 				
@@ -326,7 +370,7 @@ class CPSDataGrid implements IPSBase
 		foreach ( $_arActions as $_sKey => $_oParts )
 		{
 			$_eAction = self::ACTION_NONE;
-			$_sAction = ( is_numeric( $_sKey ) && $_sKey <= self::ACTION_GENERIC ) ? $_sKey : $_oParts;
+			$_sAction = ( is_numeric( $_oParts ) && $_oParts <= self::ACTION_GENERIC ) ? self::$m_arActionMap[ $_oParts ] : $_oParts;
 			$_arActionOptions = null;
 			$_arLink = is_array( $_sViewName ) ? $_sViewName : array( $_sViewName );
 
@@ -460,23 +504,23 @@ class CPSDataGrid implements IPSBase
 	public static function create( $sDataName, $arModel, $arColumns = array(), $arActions = array(), $oSort = null, $oPages = null, $arPagerOptions = array(), $sLinkView = 'update', $bEncode = true )
 	{
 		//	Build option array for createEx
-		$_arOpts = array();
-		$_arOpts['modelName'] = PS::o( $arPagerOptions, 'modelName', null, true );
-		$_arOpts['accordion'] = PS::o( $arPagerOptions, 'accordion', false, true );
-		$_arOpts['gridHeader'] = PS::o( $arPagerOptions, 'gridHeader', null, true );
-		$_arOpts['divComment'] = PS::o( $arPagerOptions, 'divComment', array(), true );
-		$_arOpts['pk'] = PS::o( $arPagerOptions, 'pk', null, true );
-
-		$_arOpts['pages'] = $oPages;
-		$_arOpts['sort'] = $oSort;
-		$_arOpts['actions'] = $arActions;
-		$_arOpts['columns'] = $arColumns;
-		$_arOpts['dataItemName'] = $sDataName;
-		$_arOpts['linkView'] = $sLinkView;
-		$_arOpts['encode'] = $bEncode;
-		$_arOpts['pagerOptions'] = $arPagerOptions;
-
-		return self::createEx( $arModel, $_arOpts );
+		return self::createEx( $arModel, 
+			array(
+				'modelName' 	=> PS::o( $arPagerOptions, 'modelName', null, true ),
+				'accordion' 	=> PS::o( $arPagerOptions, 'accordion', false, true ),
+				'gridHeader' 	=> PS::o( $arPagerOptions, 'gridHeader', null, true ),
+				'divComment' 	=> PS::o( $arPagerOptions, 'divComment', array(), true ),
+				'pk' 			=> PS::o( $arPagerOptions, 'pk', null, true ),
+				'pages' 		=> $oPages,
+				'sort' 			=> $oSort,
+				'actions' 		=> $arActions,
+				'columns' 		=> $arColumns,
+				'dataItemName' 	=> $sDataName,
+				'linkView' 		=> $sLinkView,
+				'encode' 		=> $bEncode,
+				'pagerOptions'	=> $arPagerOptions,
+			)
+		);
 	}
 
 }

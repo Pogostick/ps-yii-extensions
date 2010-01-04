@@ -74,7 +74,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 		$_sClass = get_class( $oComponent );
 
 		//	Set names (with a little Pogostick magic!)
-		$_sIntName = ( false !== strpos( $_sClass, 'PS', 0 ) ) ? str_replace( 'PS', 'ps', $_sClass ) : $_sClass;
+		$_sIntName = ( false !== strpos( $_sClass, 'CPS', 0 ) ) ? str_replace( 'CPS', 'ps', $_sClass ) : $_sClass;
 
 		//	Set the names inside the object
 		$oComponent->setInternalName( $_sIntName );

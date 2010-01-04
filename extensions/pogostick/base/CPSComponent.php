@@ -63,7 +63,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 		//	No parent constructor
 		
 		//	Log it and check for issues...
-		Yii::trace( Yii::t( '{class} constructed', array( "{class}" => get_class( $this ) ) ), 'pogostick.base' );
+		CPSLog::trace( 'pogostick.base', '{class} constructed', array( "{class}" => get_class( $this ) ) );
 		
 		//	Preinitialize
 		$this->preinit();
@@ -162,6 +162,10 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	 */
 	public function __get( $sName )
 	{
+		//	Ours?
+		if ( $this->hasProperty( $sName ) )
+			return $this->{$sName};
+			
 		//	Then behaviors
 		foreach ( $this->m_arBehaviorCache as $_sBehavior )
 		{
@@ -182,6 +186,10 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	 */
 	public function __set( $sName, $oValue )
 	{
+		//	Ours?
+		if ( $this->hasProperty( $sName ) )
+			return $this->{$sName} = $oValue;
+			
 		//	Then behaviors
 		foreach ( $this->m_arBehaviorCache as $_sBehavior )
 		{

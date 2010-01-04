@@ -6,7 +6,7 @@
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
-
+ 
 /**
  * Base functionality that I want in ALL my helper classes
  * 
