@@ -102,7 +102,9 @@ abstract class CPSPortlet extends CPSWidget
 	*/
 	protected function renderContent()
 	{
-		if ( $this->autoRender ) $this->render( lcfirst( get_class( $this ) ) );
+		$_sClass = get_class( $this );
+		$_sClass[0] = strtolower( $_sClass[0] );
+		if ( $this->autoRender ) $this->render( $_sClass );
 	}
 	
 	/**
