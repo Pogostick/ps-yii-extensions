@@ -59,7 +59,10 @@ class CPSForm implements IPSBase
 		$_bShowDates = PS::o( $arOptions, 'showDates', true, true );
 		$_bValidate = PS::o( $arOptions, 'validate', false );
 		$_bErrorSummary = PS::o( $arOptions, 'errorSummary', true, true );
-
+		$_sFormId = PS::o( $arOptions, 'id', 'ps-edit-form' );
+		$_eUIStyle = PS::o( $arOptions, 'uiStyle', PS::UI_DEFAULT );
+		if ( ! isset( $arOptions['name'] ) ) $arOptions['name'] = $_sFormId;
+		
 		//	Our model?
 		$_oModel = PS::o( $arOptions, 'formModel', null, true );
 		
@@ -100,15 +103,36 @@ class CPSForm implements IPSBase
 						break;
 						
 					case 'submit':
+						//	Fix up the argument array
+						$_arSubmit = ( is_array( $_arValue ) && count( $_arValue ) == 1 ) ? $_arValue[0] : $_arValue;
+						$_sLabel = PS::o( $_arSubmit, 'label', $_sType, true );
+						if ( PS::UI_JQUERY == $_eUIStyle ) $_arSubmit['jqui'] = true;
+						$_arValue = array( $_sLabel, $_arSubmit, 'formId' => $_sFormId );
 						$_sOut .= call_user_func_array( array( 'PS', 'submitButtonBar' ), $_arValue );
 						break;
 						
-					default:
-						//	Push model into the front of the array...
-						array_unshift( $_arValue, $_sType, $_oModel );
+					case 'label':
+//						$_sOut .= call_user_func_array( array( 'PS', 'label' ), $_arValue );
+						break;
 						
+					default:
+						$_sMethod = $_sType;
+						
+						switch ( $_sType )
+						{
+							case 'label':	//	No special array manipulation needed.
+								$_sMethod = $_sType;
+								break;
+								
+							default:		//	Format for PS::field() call
+								//	Push model into the front of the array...
+								array_unshift( $_arValue, $_sType, $_oModel );
+								$_sMethod = 'field';
+								break;
+						}
+
 						//	Make the field
-						$_sOut .= call_user_func_array( array( 'PS', 'field' ), $_arValue );
+						$_sOut .= call_user_func_array( array( 'PS', $_sMethod ), $_arValue );
 						
 						//	CKEditor needs special handing for validate...
 						if ( $_bValidate && $_sType == PS::CKEDITOR )
@@ -173,6 +197,7 @@ class CPSForm implements IPSBase
 		$bShowFlashDiv = PS::o( $arOptions, 'showFlashDiv', true );
 		$sHtmlInject = PS::o( $arOptions, 'htmlInject', null );
 		$_sSubHeader = PS::o( $arOptions, 'subHeader', null );
+		$_sFormId = PS::o( $arOptions, 'formId', 'ps-edit-form', true );
 
 		$_bIcon = false;
 		$_sClass = $_sLink = $_sOut = null;
@@ -204,6 +229,7 @@ class CPSForm implements IPSBase
 			
 			$_sLabel = PS::o( $_arItem, 'label', $sTitle, true );
 			$_sLink = PS::normalizeUrl( PS::o( $_arItem, 'url', array('#'), true ) );
+			$_arItem['formId'] = $_sFormId;
 			$_sOut .= PS::jquiButton( $_sLabel, $_sLink, $_arItem );
 		}
 		
@@ -286,7 +312,7 @@ HTML;
 			
 			switch ( $_iButton )
 			{
-				case CPSDataGrid::ACTION_VIEW:
+				case PS::ACTION_VIEW:
 					$_arOut[ 'view' ] = array(
 						'label' => 'View',
 						'url' => array( 'show' ),
@@ -294,23 +320,23 @@ HTML;
 					);
 					break;
 
-				case CPSDataGrid::ACTION_CREATE:
+				case PS::ACTION_CREATE:
 					$_arOut[ 'new' ] = array(
 						'label' => 'New ' . $sItemName,
-						'url' => array( 'update' ),
+						'url' => array( 'create' ),
 						'icon' => 'pencil',
 					);
 					break;
 
-				case CPSDataGrid::ACTION_EDIT:
+				case PS::ACTION_EDIT:
 					$_arOut[ 'update' ] = array(
-						'label' => intval( $_sButton ) == CPSDataGrid::ACTION_EDIT ? 'Edit' : 'Update',
+						'label' => intval( $_sButton ) == PS::ACTION_EDIT ? 'Edit' : 'Update',
 						'url' => array( 'update' ),
 						'icon' => 'pencil',
 					);
 					break;
 				
-				case CPSDataGrid::ACTION_SAVE:
+				case PS::ACTION_SAVE:
 					$_arOut[ 'save' ] = array(
 						'label' => 'Save',
 						'url' => '_submit_',
@@ -318,7 +344,7 @@ HTML;
 					);
 					break;
 
-				case CPSDataGrid::ACTION_DELETE:
+				case PS::ACTION_DELETE:
 					$_arOut[ 'delete' ] = array(
 						'label' => 'Delete',
 						'url' => array( 'delete' ),
@@ -327,8 +353,8 @@ HTML;
 					);
 					break;
 
-				case CPSDataGrid::ACTION_RETURN:
-				case CPSDataGrid::ACTION_CANCEL:
+				case PS::ACTION_RETURN:
+				case PS::ACTION_CANCEL:
 					$_arOut[ 'cancel' ] = array(
 						'label' => 'Cancel',
 						'url' => $sAdminAction,
@@ -336,7 +362,7 @@ HTML;
 					);
 					break;
 
-				case CPSDataGrid::ACTION_ADMIN:
+				case PS::ACTION_ADMIN:
 					$_arOut[ 'return' ] = array(
 						'label' => $sAdminName,
 						'url' => $sAdminAction,
@@ -344,7 +370,7 @@ HTML;
 					);
 					break;
 					
-				case CPSDataGrid::ACTION_LOCK:
+				case PS::ACTION_LOCK:
 					$_arOut[ 'lock' ] = array(
 						'label' => 'Lock',
 						'url' => array( 'lock' ),
@@ -352,7 +378,7 @@ HTML;
 					);
 					break;
 
-				case CPSDataGrid::ACTION_UNLOCK:
+				case PS::ACTION_UNLOCK:
 					$_arOut[ 'unlock' ] = array(
 						'label' => 'Unlock',
 						'url' => array( 'unlock' ),

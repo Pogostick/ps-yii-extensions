@@ -55,6 +55,9 @@ class CPSjQueryWidget extends CPSWidget
 				'widgetName_' => 'string:::true',
 				'target_' => 'string:::true',
 				'locateScript_' => 'bool:false',
+				'naked_' => 'bool:false',				//	Setting naked = true turns on autoRegister and locateScript
+				'extraCssFiles' => 'array:array()',		//	For nakedness
+				'extraScriptFiles' => 'array:array()',	//	For nakedness
 			)
 		);
 	}
@@ -131,9 +134,6 @@ class CPSjQueryWidget extends CPSWidget
 				$this->pushScriptFile( $_sScript );
 		}
 		
-		//	Daddy...
-		parent::registerClientScripts();
-
 		//	Do we have a registered script?
 		if ( $bLocateScript )
 		{
@@ -162,9 +162,15 @@ class CPSjQueryWidget extends CPSWidget
 				$_sBasePath . '/js/ui.' . $_sWName . '.js',
 			);
 			
+			//	Any others?
+			foreach ( PS::nvl( $this->extraScriptFiles, array() ) as $_sScript )
+				$_arFiles[] = $_sBasePath . '/' . $_sScript;
+				
+			//	Ok, check 'em out...
 			foreach ( $_arFiles as $_sFile )
 			{
-				if ( file_exists( $_sFile ) ) PS::_rsf( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sFile ) );
+				if ( file_exists( $_sFile ) ) 
+					$this->pushScriptFile( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sFile ) );
 			}
 				
 			$_arFiles = array(
@@ -182,12 +188,23 @@ class CPSjQueryWidget extends CPSWidget
 				$_sBasePath . '/css/ui.' . $_sWName . '.css',
 			);
 			
+			//	Any other css?
+			foreach ( PS::nvl( $this->extraCssFiles, array() ) as $_sCss )
+				$_arFiles[] = $_sBasePath . '/' . $_sCss;
+				
 			foreach ( $_arFiles as $_sFile )
 			{
-				if ( file_exists( $_sFile ) ) PS::_rcf( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sFile ) );
+				if ( file_exists( $_sFile ) ) 
+					$this->pushCssFile( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sFile ) );
 			}
+			
+			//	Clear 'em out.
+			$this->extraScriptFiles = $this->extraCssFiles = null;
 		}
 		
+		//	Daddy...
+		parent::registerClientScripts();
+
 		//	Auto register our script
 		if ( $this->autoRegister )
 			$this->registerWidgetScript();
@@ -290,6 +307,12 @@ CODE;
 		$_oWidget->target = PS::o( $arOptions, 'target', null, true );
 		$_oWidget->id = $_oWidget->name = PS::o( $arOptions, 'id', $sName );
 		$_oWidget->name = PS::o( $arOptions, 'name', $_oWidget->id );
+		
+		if ( PS::o( $arOptions, 'naked', false ) )
+		{
+			$_oWidget->locateScript = true;
+			$_oWidget->autoRegister = true;
+		}
 
 		return $_oWidget->finalizeCreate( $arOptions );
 	}

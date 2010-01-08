@@ -119,9 +119,6 @@ class CPSLinkPager extends CLinkPager implements IPSBase
 		//	No CSS file, styling provided by jQuery UI and us
 		$this->cssFile = false;
 		
-		//	Our class for paging...
-		if ( null === PS::o( $this->htmlOptions, 'class' ) ) $this->htmlOptions['class'] = $this->m_sPagerClass;
-		
 		//	Set the pager location
 		$this->setPagerLocation( $this->m_iPagerLocation );
 	}
@@ -133,23 +130,35 @@ class CPSLinkPager extends CLinkPager implements IPSBase
 	*/
 	public function setPagerLocation( $eValue )
 	{
+		//	Our class for paging...
+		$_arClass = explode( ' ', trim( PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass, true ) ) );
+
+		//	Clear out duplicate types...
+		if ( $eValue != $this->m_iPagerLocation )
+			$_arClass = PS::removeClass( $_arClass, '/^ps-pager-/' );
+			
 		$this->m_iPagerLocation = $eValue;
 		
 		switch ( $eValue )
 		{
 			case PS::PL_TOP_RIGHT:
-				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-right ps-pager-top';
+				$_arClass = PS::addClass( $_arClass, array( 'ps-pager-right', 'ps-pager-top' )  );
 				break;
+				
 			case PS::PL_BOTTOM_RIGHT:
-				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-right ps-pager-bottom';
+				$_arClass = PS::addClass( $_arClass, array( 'ps-pager-right', 'ps-pager-bottom' )  );
 				break;
+				
 			case PS::PL_TOP_LEFT:
-				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-left ps-pager-top';
+				$_arClass = PS::addClass( $_arClass, array( 'ps-pager-left', 'ps-pager-top' )  );
 				break;
+				
 			case PS::PL_BOTTOM_LEFT:
-				$this->htmlOptions['class'] = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass ) . ' ps-pager-left ps-pager-bottom';
+				$_arClass = PS::addClass( $_arClass, array( 'ps-pager-left', 'ps-pager-bottom' )  );
 				break;
 		}
+		
+		$this->htmlOptions['class'] = implode( ' ', $_arClass );
 	}
 	
 	/**

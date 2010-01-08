@@ -40,6 +40,24 @@ class CPSHelperBase extends CHtml implements IPSBase
 	const 	PL_BOTTOM_LEFT	= 2;
 	const 	PL_BOTTOM_RIGHT	= 3;
 	
+	/***
+	* Predefined action types for CPSForm
+	*/
+	const	ACTION_NONE 	= 0;
+	const	ACTION_CREATE 	= 1;
+	const	ACTION_VIEW 	= 2;
+	const	ACTION_EDIT 	= 3;
+	const	ACTION_SAVE 	= 4;
+	const	ACTION_DELETE 	= 5;
+	const	ACTION_ADMIN 	= 6;
+	const	ACTION_LOCK 	= 7;
+	const	ACTION_UNLOCK 	= 8;
+	
+	//	Add your own in between 4 and 997...
+	const	ACTION_RETURN 	= 997;
+	const	ACTION_CANCEL 	= 998;
+	const	ACTION_GENERIC = 999;
+	
 	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
@@ -495,6 +513,16 @@ class CPSHelperBase extends CHtml implements IPSBase
 		return $_arOut;
 	}
 	
+	/**
+	 * Takes the arguments and makes a file path out of them.
+	 * @param mixed File path parts
+	 * @returns string
+	 */
+	public static function makePath()
+	{
+		return implode( DIRECTORY_SEPARATOR, func_get_args() );
+	}
+	
 	//********************************************************************************
 	//* Yii Convenience Mappings
 	//********************************************************************************
@@ -693,6 +721,37 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _cu( $sRoute, $arParams = array(), $sAmpersand = '&' )
 	{
 		return Yii::app()->createUrl( $sRoute, $arParams, $sAmpersand );
+	}
+	
+	/**
+	 * Convenience access to CAssetManager::publish()
+	 * 
+	 * Publishes a file or a directory.
+	 * This method will copy the specified asset to a web accessible directory
+	 * and return the URL for accessing the published asset.
+	 * <ul>
+	 * <li>If the asset is a file, its file modification time will be checked
+	 * to avoid unnecessary file copying;</li>
+	 * <li>If the asset is a directory, all files and subdirectories under it will
+	 * be published recursively. Note, in this case the method only checks the
+	 * existence of the target directory to avoid repetitive copying.</li>
+	 * </ul>
+	 * @param string the asset (file or directory) to be published
+	 * @param boolean whether the published directory should be named as the hashed basename.
+	 * If false, the name will be the hashed dirname of the path being published.
+	 * Defaults to false. Set true if the path being published is shared among
+	 * different extensions.
+	 * @param integer level of recursive copying when the asset is a directory.
+	 * Level -1 means publishing all subdirectories and files;
+	 * Level 0 means publishing only the files DIRECTLY under the directory;
+	 * level N means copying those directories that are within N levels.
+	 * @return string an absolute URL to the published asset
+	 * @throws CException if the asset to be published does not exist.
+	 * @see CAssetManager::publish
+	 */
+	public static function _publish( $sPath , $bHashByName = false, $iLevel = -1 )
+	{
+		return Yii::app()->getAssetManager()->publish( $sPath, $bHashByName, $iLevel );
 	}
 
 	//********************************************************************************

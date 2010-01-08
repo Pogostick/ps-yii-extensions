@@ -78,7 +78,7 @@ class CPSHash implements IPSBase
 		if ( ! isset( self::$m_arSeed ) || ! is_array( self::$m_arSeed[ $eType ] ) ) return md5( time() . time() );
 
 		$_sHash = null;
-		$_iSize = count( self::$m_arSeed[ $eType ] );
+		$_iSize = count( self::$m_arSeed[ $eType ] ) - 1;
 		for ( $_i = 0; $_i < $iLength; $_i++ ) $_sHash .= self::$m_arSeed[ $eType ][ mt_rand( 0, $_iSize ) ];
 
 		return $_sHash;

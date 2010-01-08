@@ -42,24 +42,27 @@ class CPSWidgetHelper extends CPSHelperBase
 	/**
 	* These are a list of form elements that can be used along with the methods in this class.
 	*/
-	const 	TEXTAREA 	= 'activeTextArea';
-	const 	TEXT 		= 'activeTextField';
-	const 	HIDDEN 		= 'activeHiddenField';
-	const 	PASSWORD 	= 'activePasswordField';
-	const 	FILE 		= 'activeFileField';
-	const 	RADIO 		= 'activeRadioButton';
-	const 	CHECK 		= 'activeCheckBox';
-	const 	DROPDOWN 	= 'activeDropDownList';
-	const 	LISTBOX 	= 'activeListBox';
-	const 	CHECKLIST 	= 'activeCheckBoxList';
-	const 	RADIOLIST 	= 'activeRadioButtonList';
-	const 	WYSIWYG 	= 'wysiwyg';
-	const 	CKEDITOR 	= 'CPSCKEditorWidget';
-	const 	MARKITUP 	= 'markItUp';
-	const 	CODEDD 		= 'activeCodeDropDownList';
-	const 	JQUI 		= 'CPSjqUIWrapper';
-	const 	FG_MENU 	= 'CPSfgMenu';
-	const	CAPTCHA 	= 'CCaptcha';
+	const 	TEXTAREA 		= 'activeTextArea';
+	const 	TEXT 			= 'activeTextField';
+	const 	HIDDEN 			= 'activeHiddenField';
+	const 	PASSWORD 		= 'activePasswordField';
+	const 	FILE 			= 'activeFileField';
+	const 	RADIO 			= 'activeRadioButton';
+	const 	CHECK 			= 'activeCheckBox';
+	const 	DROPDOWN 		= 'activeDropDownList';
+	const 	LISTBOX 		= 'activeListBox';
+	const 	CHECKLIST 		= 'activeCheckBoxList';
+	const 	RADIOLIST 		= 'activeRadioButtonList';
+	const 	WYSIWYG 		= 'wysiwyg';
+	const 	CKEDITOR 		= 'CPSCKEditorWidget';
+	const 	MARKITUP 		= 'markItUp';
+	const 	CODEDD 			= 'activeCodeDropDownList';
+	const 	JQUI 			= 'CPSjqUIWrapper';
+	const 	FG_MENU 		= 'CPSfgMenu';
+	const	CAPTCHA 		= 'CCaptcha';
+	const	LABEL 			= 'label';
+	const	LABEL_ACTIVE	= 'activeLabel';
+	const	MULTISELECT		= 'jqMultiselect';
 
 	/**
 	* Faux methods for tranformation types
@@ -316,13 +319,6 @@ class CPSWidgetHelper extends CPSHelperBase
 	*/
 	public static function field( $eFieldType, CModel $oModel, $sColName, $arOptions = array() )
 	{
-		//	Are we loaded up?
-		if ( ! self::$m_bCssLoaded )
-		{
-			PS::_rcf( Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick.external.jqui.css' ) . DIRECTORY_SEPARATOR . 'ui.pogostick.css', true ) );
-			self::$m_bCssLoaded = true;
-		}
-		
 		$_arDivOpts = PS::o( $arOptions, '_divOpts', array(), true );
 		$_sHint = PS::o( $arOptions, 'hint', null, true );
 			
@@ -335,6 +331,20 @@ class CPSWidgetHelper extends CPSHelperBase
 			$_sOut = PS::activeHiddenField( $oModel, $sColName );
 			$arOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display' ), CPSTransform::valueOf( '*', $oModel->$sColName ) );
 			$_sOut .= PS::field( $eFieldType, $oModel, $sColName, $arOptions );
+		}
+		else if ( $eFieldType == PS::MULTISELECT )
+		{
+			//	Another special dealio
+			$arWidgetOptions = PS::o( $arOptions, 'widgetOptions', array(), true );
+			$arWidgetOptions['name'] = PS::o( $arOptions, 'name', $sColName, true );
+			$arWidgetOptions['id'] = PS::o( $arOptions, 'id', $arWidgetOptions['name'], true );
+			$arWidgetOptions['naked'] = true;
+			$_oSelected = PS::o( $arOptions, 'selected', null, true );
+			$arWidgetOptions['extraScriptFiles'] = array( 'js/plugins/blockUI/jquery.blockUI.js', 'js/plugins/localisation/jquery.localisation-min.js', 'js/plugins/tmpl/jquery.tmpl.1.1.1.js' );
+			CPSjQueryWidget::create( 'multiselect', $arWidgetOptions );
+			$arOptions['class'] = PS::addClass( PS::o( $arOptions, 'class', null ), 'multiselect' );
+			$arOptions['multiple'] = 'multiple';
+			return self::dropDownList( $sColName, $_oSelected, PS::o( $arOptions, 'data', null, true ), $arOptions );
 		}
 		else
 		{
@@ -842,11 +852,24 @@ CSS;
 	 */
 	public static function beginFormEx( $arFormOptions = array() )
 	{
+		//	Make sure we have a form id...
+		if ( ! isset( $arFormOptions['id'] ) ) $arFormOptions['id'] = 'ps-edit-form';
+		
+		//	Get the rest of our options
 		$_eUIStyle = PS::o( $arFormOptions, 'uiStyle', self::UI_DEFAULT, true );
-		$arFormOptions['id'] = PS::o( $arFormOptions, 'id', 'ps-edit-form' );
 		$_sAction = PS::o( $arFormOptions, 'action', '', true );
 		$_sMethod = PS::o( $arFormOptions, 'method', 'POST', true );
+		$_bSetPageTitle = PS::o( $arFormOptions, 'setPageTitle', true, true );
 
+		//	Register form CSS if desired...
+		foreach ( PS::o( $arFormOptions, 'cssFiles', array( '/css/form.css' ), true ) as $_sFile ) 
+			PS::_rcf( $_sFile );
+		
+		//	And scripts
+		foreach ( PS::o( $arFormOptions, 'scriptFiles', array(), true ) as $_sFile ) 
+			PS::_rsf( $_sFile );
+			
+		//	What type of form?
 		switch ( $_eUIStyle )
 		{
 			case self::UI_JQUERY:
@@ -872,8 +895,23 @@ CSS;
 			$arFormOptions['validateOptions'] = $_arValid;
 		}
 		
+		//	So it begins...
+		$_sOut = null;
+		
+		//	Form header info...
+		if ( $_sFormHeader = PS::o( $arFormOptions, 'formHeader', null, true ) )
+		{
+			//	Page title...
+			if ( $_bSetPageTitle ) Yii::app()->getController()->pageTitle = Yii::app()->name . ' : ' . $_sFormHeader;
+
+			//	Form title...
+			$_sFormHeaderTag = PS::o( $arFormOptions, 'formHeaderTag', 'H1', true );
+			$_arFormHeaderOptions = PS::o( $arFormOptions, 'formHeaderOptions', array(), true );
+			$_sOut .= PS::tag( $_sFormHeaderTag, $_arFormHeaderOptions, $_sFormHeader );
+		}
+		
 		//	Build out begining of form...
-		$_sOut = PS::openTag( 'div', array( 'class' => $_sContainerClass ) );
+		$_sOut .= PS::openTag( 'div', array( 'class' => $_sContainerClass ) );
 		$_sOut .= PS::openTag( 'div', array( 'class' => $_sContentClass ) );
 		
 		//	Build the form
@@ -1387,6 +1425,46 @@ HTML;
 		return $_oParser->safeTransform( $sText );
 	}
 	
+	/**
+	 * Adds a class to an array of classes.
+	 * @param mixed The existing classes. If a string is passed in, a string is returned. If an array is passed in, an array is returned.
+	 * @param mixed $oClassData
+	 */
+	public static function addClass( $oClass, $oClassData )
+	{
+		$_arClassList = ( ! is_array( $oClass ) ) ? explode( ' ', trim( $oClass ) ) : $oClass;
+		$_arNewClasses = PS::makeArray( $oClassData );
+		
+		foreach ( $_arNewClasses as $_sClass )
+			if ( ! in_array( $_sClass, $_arClassList ) ) $_arClassList[] = $_sClass;
+			
+		return is_array( $oClass ) ? $_arClassList : implode( ' ', $_arClassList );
+	}
+	
+	/**
+	 * Removes a class, or pattern of classes from an array of classes.
+	 * @param mixed The existing classes. If a string is passed in, a string is returned. If an array is passed in, an array is returned.
+	 * @param mixed $oClassData
+	 */
+	public static function removeClass( $oClass, $oClassData )
+	{
+		$_arClassList = ( ! is_array( $oClass ) ) ? explode( ' ', trim( $oClass ) ) : $oClass;
+		$_arNewClasses = PS::makeArray( $oClassData );
+		$_arClass = array();
+		
+		foreach ( $_arClassList as $_sClass )
+		{
+			foreach ( $_arNewClasses as $_sMatch )
+			{
+				//	Not matched? Add to result array
+				if ( $_sClass != $_sMatch && ! preg_match( $_sMatch, $_sClass ) )
+					$_arClass[] = $_sClass;
+			}
+		}
+
+		return is_array( $oClass ) ? $_arClass : implode( ' ', $_arClass );
+	}
+
 	//********************************************************************************
 	//* Protected Methods
 	//********************************************************************************
@@ -1487,7 +1565,7 @@ HTML;
 					break;
 			}
 		}
-		
+
 		return $_arData;
 	}
 	

@@ -126,7 +126,7 @@ button.ps-button { width:auto; overflow:visible; }
 	display: block;
 	position: relative;
 	padding:0px auto;
-	width:96.5%;
+	width:auto;
 	padding-bottom: 5px;
 }
 
@@ -687,4 +687,11 @@ div.ps-edit-container div.yiiForm div.wide {
 	font-weight: bold;
 	font-size: 15px;
 	margin: 10px auto;
+}
+
+/**
+ * Menu Helper
+ */
+.ui-accordion-content a.ps-menu-current {
+	font-weight: bold !important;
 }

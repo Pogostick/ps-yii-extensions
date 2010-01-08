@@ -22,28 +22,6 @@
 class CPSDataGrid implements IPSBase
 {
 	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-	
-	/***
-	* Predefined action types
-	*/
-	const	ACTION_NONE 	= 0;
-	const	ACTION_CREATE 	= 1;
-	const	ACTION_VIEW 	= 2;
-	const	ACTION_EDIT 	= 3;
-	const	ACTION_SAVE 	= 4;
-	const	ACTION_DELETE 	= 5;
-	const	ACTION_ADMIN 	= 6;
-	const	ACTION_LOCK 	= 7;
-	const	ACTION_UNLOCK 	= 8;
-	
-	//	Add your own in between 4 and 997...
-	const	ACTION_RETURN 	= 997;
-	const	ACTION_CANCEL 	= 998;
-	const	ACTION_GENERIC = 999;
-	
-	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
 	
@@ -68,31 +46,31 @@ class CPSDataGrid implements IPSBase
 	*/
 	protected static $m_arMenuButtonMap = array(
 		'none' 		=> null,
-		'new'		=> self::ACTION_CREATE,
-		'create'	=> self::ACTION_CREATE,
-		'view'		=> self::ACTION_VIEW,
-		'edit'		=> self::ACTION_EDIT,
-		'update'	=> self::ACTION_EDIT,
-		'save'		=> self::ACTION_SAVE,
-		'delete'	=> self::ACTION_DELETE,
-		'lock' 		=> self::ACTION_LOCK,
-		'unlock'	=> self::ACTION_UNLOCK,
-		'admin'		=> self::ACTION_ADMIN,
-		'cancel'	=> self::ACTION_CANCEL,
-		'return'	=> self::ACTION_CANCEL,
+		'new'		=> PS::ACTION_CREATE,
+		'create'	=> PS::ACTION_CREATE,
+		'view'		=> PS::ACTION_VIEW,
+		'edit'		=> PS::ACTION_EDIT,
+		'update'	=> PS::ACTION_EDIT,
+		'save'		=> PS::ACTION_SAVE,
+		'delete'	=> PS::ACTION_DELETE,
+		'lock' 		=> PS::ACTION_LOCK,
+		'unlock'	=> PS::ACTION_UNLOCK,
+		'admin'		=> PS::ACTION_ADMIN,
+		'cancel'	=> PS::ACTION_CANCEL,
+		'return'	=> PS::ACTION_CANCEL,
 	);
 
 	/**
 	* Map of predefined row-level actions to names
 	*/
 	protected static $m_arActionMap = array(
-		self::ACTION_CREATE => 'create',
-		self::ACTION_VIEW => 'show',
-		self::ACTION_EDIT => 'edit',
-		self::ACTION_SAVE => 'save',
-		self::ACTION_DELETE => 'delete',
-		self::ACTION_LOCK => 'lock',
-		self::ACTION_UNLOCK => 'unlock',
+		PS::ACTION_CREATE => 'create',
+		PS::ACTION_VIEW => 'show',
+		PS::ACTION_EDIT => 'edit',
+		PS::ACTION_SAVE => 'save',
+		PS::ACTION_DELETE => 'delete',
+		PS::ACTION_LOCK => 'lock',
+		PS::ACTION_UNLOCK => 'unlock',
 	);
 
 	/**
@@ -116,12 +94,12 @@ class CPSDataGrid implements IPSBase
 	public static function createEx( $arModel, $arOptions = array() )
 	{
 		//	Initialize...
-		$_sOut = $_sPager = null;
+		$_sFormHeader = $_sOut = $_sPager = null;
 		self::$m_iColumnCount = 0;
 		self::$m_arGridOptions = $arOptions;
 		
 		//	Register our css...
-		PS::_rcf( Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick.templates.css' ) . DIRECTORY_SEPARATOR . 'ps-data-grid.css' ) );
+		PS::_rcf( PS::_publish( Yii::getPathOfAlias( 'pogostick.templates.css' ) . DIRECTORY_SEPARATOR . 'ps-data-grid.css' ) );
 		
 		//	Store our model, get our options
 		self::$m_arGridOptions['data'] = $arModel;
@@ -135,8 +113,22 @@ class CPSDataGrid implements IPSBase
 		if ( null !== $_arFormHeader )
 		{
 			$_arFormHeader['itemName'] = PS::o( $_arFormHeader, 'itemName', 'item' );
-			echo CPSForm::formHeaderEx( PS::o( $_arFormHeader, 'title', 'Form Header', true ), $_arFormHeader );
+			$_sFormHeader = PS::o( $_arFormHeader, 'title', 'Form Header', true );
 		}
+		else
+		{
+			if ( null !== ( $_arMenuButtons = PS::o( $arOptions, 'menuButtons', null, true ) ) )
+			{
+				$_sFormHeader = PS::o( $_arFormHeader, 'title', 'Form Header', true );
+				$_arFormHeader = array(
+					'menuButtons' => $_arMenuButtons,
+					'itemName' => PS::o( $arOptions, 'dataItemName', 'item' ),
+				);
+			}
+		}
+		
+		//	Make a form header!
+		if ( $_arFormHeader ) echo CPSForm::formHeaderEx( $_sFormHeader, $_arFormHeader );
 		
 		//	Only work with CPSLinkPagers
 		if ( ! is_a( $_sPagerClass, 'CPSLinkPager' ) ) $_sPagerClass = 'CPSLinkPager';
@@ -369,8 +361,8 @@ class CPSDataGrid implements IPSBase
 		//	Build the actions
 		foreach ( $_arActions as $_sKey => $_oParts )
 		{
-			$_eAction = self::ACTION_NONE;
-			$_sAction = ( is_numeric( $_oParts ) && $_oParts <= self::ACTION_GENERIC ) ? self::$m_arActionMap[ $_oParts ] : $_oParts;
+			$_eAction = PS::ACTION_NONE;
+			$_sAction = ( is_numeric( $_oParts ) && $_oParts <= PS::ACTION_GENERIC ) ? self::$m_arActionMap[ $_oParts ] : $_oParts;
 			$_arActionOptions = null;
 			$_arLink = is_array( $_sViewName ) ? $_sViewName : array( $_sViewName );
 
@@ -399,7 +391,7 @@ class CPSDataGrid implements IPSBase
 				continue;
 			
 			//	Skip lock actions on non-lockable columns
-			if ( ! $_sLockColumn and ( $_eAction == self::ACTION_LOCK || $_eAction == self::ACTION_UNLOCK ) )
+			if ( ! $_sLockColumn and ( $_eAction == PS::ACTION_LOCK || $_eAction == PS::ACTION_UNLOCK ) )
 				continue;
 				
 			//	Stuff in the PK(s)
@@ -424,7 +416,7 @@ class CPSDataGrid implements IPSBase
 				/**
 				* Creates a generic "action" button
 				*/
-				case self::ACTION_GENERIC:
+				case PS::ACTION_GENERIC:
 					$_sLabel = PS::o( $_arActionOptions, 'label' );
 					$_sIconName = PS::o( $_arActionOptions, 'icon' );
 					$_sConfirm = PS::o( $_arActionOptions, 'confirm' );
@@ -440,7 +432,7 @@ class CPSDataGrid implements IPSBase
 					);
 					break;
 					
-				case self::ACTION_LOCK:			//	Special case if model contains lock column
+				case PS::ACTION_LOCK:			//	Special case if model contains lock column
 					$_sLockName = ( ! $oModel->{$_sLockColumn} ) ? 'Lock' : 'Unlock';
 					$_sIconName = ( $oModel->{$_sLockColumn} ) ? 'locked' : 'unlocked';
 
@@ -455,15 +447,15 @@ class CPSDataGrid implements IPSBase
 					);
 					break;
 				
-				case self::ACTION_VIEW:
+				case PS::ACTION_VIEW:
 					$_sActions .= PS::jquiButton( 'View', $_arLink, array( 'iconOnly' => true, 'icon' => 'gear', 'iconSize' => 'small' ) );
 					break;
 					
-				case self::ACTION_EDIT:
+				case PS::ACTION_EDIT:
 					$_sActions .= PS::jquiButton( 'Edit', $_arLink, array( 'iconOnly' => true, 'icon' => 'pencil', 'iconSize' => 'small' ) );
 					break;
 					
-				case self::ACTION_DELETE:
+				case PS::ACTION_DELETE:
 					$_sActions .= PS::jquiButton( 'Delete', array( 'delete', $_sPK => $_oId ),
 						array(
 							'confirm' => "Do you really want to delete this {$_sDataName}?",
