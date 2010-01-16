@@ -19,12 +19,9 @@
  * @filesource
  * 
  */
-	CPSHelp::_rcf( Yii::app()->baseUrl . '/css/form.css' );
+ 
+ 	PS::_rcf( $this->getAppBaseUrl() . '/css/form.css' );
 
-	//	I don't like this, I prefer bold-faced labels
-	PS::$afterRequiredLabel = null;
-	PS::$errorCss = 'ui-state-error';
-	
 	if ( Yii::app()->user->hasFlash( 'commentSubmitted' ) )
 	{
 		echo PS::tag( 'h3', array(), 'Thanks!' );
@@ -32,11 +29,13 @@
 		return;
 	}
 
-	//	Show header
-	echo PS::tag( 'h3', array(), 'Leave a Comment' );
-
 	//	Build our form options array...
 	$_arFormOpts = array( 
+		
+		//	Form Title
+		'formTitle' => 'Leave a Comment',
+		'formTitleTag' => 'h3',
+	
 		//	Gimme jQuery UI styling
 		'uiStyle' => PS::UI_JQUERY,
 		

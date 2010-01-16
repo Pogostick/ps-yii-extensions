@@ -21,34 +21,26 @@
  */
  	
  	//	Load our grid css
- 	CPSHelp::_rcf( Yii::app()->baseUrl . '/css/grid.css' );
+ 	PS::_rcf( $this->getAppBaseUrl() . '/css/grid.css' );
  
  	//	Build the header
-	echo CPSForm::formHeader( 'Post Manager', 
-		array( 'new' => 
-			array(
-				'label' => 'New Post',
-				'url' => array( 'create' ),
-				'icon' => 'circle-plus',
-			)
-		)
-	);
+	echo CPSForm::formHeaderEx( 'Post Manager', array( 'menuButtons' => array( 'new' ) ) );
 
 	//	Build the grid
 	$_arOpts = array(
 		'actions' => array( 
-			CPSDataGrid::ACTION_GENERIC => array(
+			PS::ACTION_GENERIC => array(
 				'label' => 'Publish',
 				'url' => array( 'publish', 'id' => '%%id%%' ),
 				'confirm' => 'Publish this post?',
 				'icon' => 'check',
 			),
-			CPSDataGrid::ACTION_EDIT => 'update',
-			CPSDataGrid::ACTION_DELETE,
+			PS::ACTION_EDIT,
+			PS::ACTION_DELETE,
 		),
 		'sort' => $sort,
 		'pages' => $pages,
-		'columns' => array( 'title_text', 'statusText', 'comment_count_nbr', 'create_date' ),
+		'columns' => array( 'title_text', 'statusText', ',comment_count_nbr' ),
 		'pagerOptions' => array( 'header' => '' ),
 		'dataItemName' => 'Post',
 	);

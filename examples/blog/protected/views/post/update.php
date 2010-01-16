@@ -19,28 +19,12 @@
  * @filesource
  * 
  */
-	echo CPSForm::formHeader( 'Edit Post: ' . $model->id, 
-		array( 
-			'save' => array(
-				'label' => 'Save',
-				'url' =>  '_submit_',
-				'icon' => 'disk',
-			),
-			
-			'cancel' => array(
-				'label' => 'Cancel',
-				'url' => array( 'admin' ),
-				'icon' => 'cancel',
-			),
-			
-			'delete' => array(
-				'label' => 'Delete',
-				'url' => array( 'delete' ),
-				'confirm' => 'Do you really want to delete this Post?',
-				'icon' => 'trash',
-			),
-		)
-	);
+	PS::_rcf( Yii::app()->baseUrl . '/css/form.css' );
+
+	//	I don't like this, I prefer bold-faced labels
+	PS::$afterRequiredLabel = null;
+	
+	echo CPSForm::formHeaderEx( 'Edit Post #' . $model->id, array( 'menuButtons' => array( 'save', 'cancel', 'delete' ) ) );
 	
 	echo $this->renderPartial( '_form', array(
 		'model' => $model,

@@ -34,7 +34,7 @@ foreach ( $comments as $_oComment )
 		continue;
 
 	//	Create a link to this post
-	$_sLink = PS::link( '#' . $_oComment->id, array( 'post/show', 'id' => isset( $post ) ? $post->id : $_oComment->post->id, '#' => $_oComment->id ),
+	$_sLink = PS::link( '#' . $_oComment->id, array( 'post/show', 'id' => isset( $post ) ? $post->id : $_oComment->post ? $_oComment->post->id : 'Unknown Post', '#' => $_oComment->id ),
 		array(
 			'class' => 'comment-permalink',
 			'title' => 'Permalink to this comment',

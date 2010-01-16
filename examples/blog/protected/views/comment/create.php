@@ -19,29 +19,9 @@
  * @filesource
  * 
  */
-	echo CPSForm::formHeader( 'New Comment', 
-		array( 
-			'save' => array(
-				'label' => 'Save',
-				'url' => '_submit_',
-				'icon' => 'disk',
-			),
-			
-			'cancel' => array(
-				'label' => 'Cancel',
-				'url' => array( 'admin' ),
-				'icon' => 'cancel',
-			),
-			
-			'return' => array(
-				'label' => 'Comment Manager',
-				'url' => array( 'admin' ),
-				'icon' => 'arrowreturnthick-1-w',
-			),
-		)
-	);
-
-echo $this->renderPartial( '_form', array(
-	'model' => $model,
-	'update' => false,
+	echo CPSForm::formHeaderEx( 'New Comment', array( 'menuButtons' => array( 'save', 'cancel' ) ) );
+	
+	echo $this->renderPartial( '_form', array(
+		'model' => $model,
+		'update' => false,
 ));

@@ -192,9 +192,9 @@ class CPSDataFormatBehavior extends CPSBaseActiveRecordBehavior
 	
 	/**
 	* Apply any formats
-	* @param CModelEvent $oEvent
+	* @param CModelEvent event parameter
 	*/
-	public function beforeValidate( $oEvent ) 
+	public function beforeValidate( $oEvent )
 	{ 
 		return $this->handleEvent( __FUNCTION__, $oEvent ); 
 	}

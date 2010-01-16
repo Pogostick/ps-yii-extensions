@@ -196,7 +196,7 @@ class CPSDataGrid implements IPSBase
 
 		if ( $bAddActions ) 
 		{
-			$_sHeaders .= PS::tag( 'th', array(), 'Actions' );
+			$_sHeaders .= PS::tag( 'th', array( 'class' => 'ps-actions-header' ), 'Actions' );
 			self::$m_iColumnCount++;
 		}
 			

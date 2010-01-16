@@ -170,8 +170,8 @@ class Comment extends BaseModel
 	public function findRecentComments( $iLimit = 10 )
 	{
 		$_oCrit = array(
-			'condition' => 'comment_t.status_nbr = ' . self::STATUS_APPROVED,
-			'order' => 'comment_t.create_date DESC',
+			'condition' => 't.status_nbr = ' . self::STATUS_APPROVED,
+			'order' => 't.create_date DESC',
 			'limit' => $iLimit,
 		);
 		
@@ -198,12 +198,11 @@ class Comment extends BaseModel
 	
 	/***
 	* Before validation
-	* @param string $sScenario
 	*/
-	protected function beforeValidate( $sScenario = null )
+	protected function beforeValidate()
 	{
 		$this->content_display_text = PS::markdownTransform( $this->content_text );
-		return parent::beforeValidate( $sScenario );
+		return parent::beforeValidate();
 	}
 
 	/**

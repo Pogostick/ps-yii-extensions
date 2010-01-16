@@ -19,6 +19,15 @@
 class ThemeRoller extends CPSPortlet
 {
 	//********************************************************************************
+	//* Constants
+	//********************************************************************************
+	
+	/**
+	 * The action to which to post...
+	 */
+	const	POST_ACTION	= '__themeChangeRequest';
+	
+	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 	
@@ -31,5 +40,5 @@ class ThemeRoller extends CPSPortlet
 		parent::preinit();
 		$this->title = 'Choose Your Theme';
 	}
-
+	
 }

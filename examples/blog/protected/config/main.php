@@ -9,8 +9,10 @@ return array(
 	'name' => 'Yii/Pogostick Yii Extensions Blog',
 	'defaultController' => 'post',
 
-	// preloading 'log' component
-	'preload' => array('log'),
+	// preload components
+	'preload' => array(
+		'log',
+	),
 
 	//	Autoloading model and component classes
 	'import' => array(

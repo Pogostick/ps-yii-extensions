@@ -19,7 +19,7 @@
  * @filesource
  * 
  */
-	echo CPSForm::formHeader( 'Comment Manager' );
+	echo CPSForm::formHeaderEx( 'Comment Manager' );
 
 	$_arOpts = array(
 		'actions' => array( 'delete' ),

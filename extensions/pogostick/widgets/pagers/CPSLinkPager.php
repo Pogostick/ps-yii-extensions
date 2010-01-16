@@ -105,6 +105,9 @@ class CPSLinkPager extends CLinkPager implements IPSBase
 	*/
 	public function init()
 	{
+		//	Set pager css class before we call dad
+		$this->htmlOptions['class'] = $this->m_sPagerClass;
+		
 		//	Phone home
 		parent::init();
 		
@@ -131,34 +134,34 @@ class CPSLinkPager extends CLinkPager implements IPSBase
 	public function setPagerLocation( $eValue )
 	{
 		//	Our class for paging...
-		$_arClass = explode( ' ', trim( PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass, true ) ) );
+		$_sClass = PS::o( $this->htmlOptions, 'class', $this->m_sPagerClass, true );
 
 		//	Clear out duplicate types...
 		if ( $eValue != $this->m_iPagerLocation )
-			$_arClass = PS::removeClass( $_arClass, '/^ps-pager-/' );
+			$_sClass = PS::removeClass( $_sClass, '/^ps-pager-/' );
 			
 		$this->m_iPagerLocation = $eValue;
 		
 		switch ( $eValue )
 		{
 			case PS::PL_TOP_RIGHT:
-				$_arClass = PS::addClass( $_arClass, array( 'ps-pager-right', 'ps-pager-top' )  );
+				$_sClass = PS::addClass( $_sClass, array( 'ps-pager-right', 'ps-pager-top' )  );
 				break;
 				
 			case PS::PL_BOTTOM_RIGHT:
-				$_arClass = PS::addClass( $_arClass, array( 'ps-pager-right', 'ps-pager-bottom' )  );
+				$_sClass = PS::addClass( $_sClass, array( 'ps-pager-right', 'ps-pager-bottom' )  );
 				break;
 				
 			case PS::PL_TOP_LEFT:
-				$_arClass = PS::addClass( $_arClass, array( 'ps-pager-left', 'ps-pager-top' )  );
+				$_sClass = PS::addClass( $_sClass, array( 'ps-pager-left', 'ps-pager-top' )  );
 				break;
 				
 			case PS::PL_BOTTOM_LEFT:
-				$_arClass = PS::addClass( $_arClass, array( 'ps-pager-left', 'ps-pager-bottom' )  );
+				$_sClass = PS::addClass( $_sClass, array( 'ps-pager-left', 'ps-pager-bottom' )  );
 				break;
 		}
 		
-		$this->htmlOptions['class'] = implode( ' ', $_arClass );
+		$this->htmlOptions['class'] = $_sClass;
 	}
 	
 	/**
@@ -182,7 +185,7 @@ class CPSLinkPager extends CLinkPager implements IPSBase
 
 		$_arHtmlOptions = $this->htmlOptions;
 		$_arHtmlOptions['id'] = PS::o( $_arHtmlOptions, 'id', $this->getId() );
-		$_arHtmlOptions['class'] = PS::o( $_arHtmlOptions, 'class', 'yiiPager' );
+		$_arHtmlOptions['class'] = PS::o( $_arHtmlOptions, 'class', $this->m_sPagerClass );
 		
 		$_sOut = '<div class="ps-button-bar">';
 			$_sOut .= $this->header;

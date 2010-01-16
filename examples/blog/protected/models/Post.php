@@ -64,6 +64,7 @@ class Post extends BaseModel
         self::STATUS_ARCHIVED => 'Archived',
 	);
  	public function getStatusOptions() { return $this->m_arStatusOptions; }
+ 	
  	/**
  	* Get the status text
  	*/
@@ -112,11 +113,10 @@ class Post extends BaseModel
 	public function relations()
 	{
 		return array(
-			'comments' => array( self::HAS_MANY, 'Comment', 'post_id', 'order' => '??.create_date desc' ),
+			'comments' => array( self::HAS_MANY, 'Comment', 'post_id', 'order' => 't.create_date desc' ),
 			'author' => array( self::BELONGS_TO, 'User', 'author_id' ),
 			'tags' => array( self::MANY_MANY, 'Tag', 'PostTag( post_id, tag_id )' ),
 	        'tagFilter' => array( self::MANY_MANY, 'Tag', 'post_tag_asgn_t( post_id, tag_id )',
-	        	'alias' => 'tagFilter',
 	        	'together' => true,
 	        	'joinType' => 'INNER JOIN',
 	        	'condition' => 'tagFilter.tag_name_text = :tag_name_text'
@@ -138,7 +138,7 @@ class Post extends BaseModel
 			'tags_text' => 'Tags',
 			'status_nbr' => 'Status',
 			'statusText' => 'Status',
-			'comment_count_nbr' => '# of Comments',
+			'comment_count_nbr' => 'Comments',
 			'create_date' => 'Created On',
 			'lmod_date' => 'Modified On',
 		);
@@ -181,13 +181,12 @@ class Post extends BaseModel
 	
 	/**
 	* Before we validate...
-	* @param string $sScenario
 	*/
-	protected function beforeValidate( $sScenario )
+	protected function beforeValidate()
 	{
 		if ( $this->isNewRecord ) $this->author_id = Yii::app()->user->id;
 		$this->content_display_text = PS::markdownTransform( $this->content_text );
-		return parent::beforeValidate( $sScenario );
+		return parent::beforeValidate();
 	}
 	
 }

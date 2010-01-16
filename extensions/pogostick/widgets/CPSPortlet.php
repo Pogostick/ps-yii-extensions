@@ -71,6 +71,10 @@ abstract class CPSPortlet extends CPSWidget
 		echo '</div><!-- ' . $this->cssClass . ' -->';
 	}
 	
+	//********************************************************************************
+	//* Private Methods
+	//********************************************************************************
+	
 	/**
 	* Generate our widget's html
 	* @returns string
@@ -90,10 +94,6 @@ abstract class CPSPortlet extends CPSWidget
 		if ( $this->title ) echo PS::tag( 'div', array( 'class' => $this->headerCssClass ), $this->title ) . PHP_EOL;
 		echo PS::openTag( 'div', array( 'class' => $this->contentCssClass ) ) . PHP_EOL;
 	}
-	
-	//********************************************************************************
-	//* Private Methods
-	//********************************************************************************
 	
 	/**
 	* Renders the content of this portlet.

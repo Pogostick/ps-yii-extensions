@@ -117,9 +117,9 @@ class Tag extends BaseModel
 		
 		$_oCrit = new CDbCriteria(
 			array(
-				'select' => 'tag_name_text, count(post_id) as weight',
-				'join' => 'INNER JOIN post_tag_asgn_t on tag_t.id = post_tag_asgn_t.tag_id',
-				'group' => 'tag_name_text',
+				'select' => 't.tag_name_text, count(post_id) as weight',
+				'join' => 'INNER JOIN post_tag_asgn_t on t.id = post_tag_asgn_t.tag_id',
+				'group' => 't.tag_name_text',
 				'having' => 'count(post_id) > 0',
 				'order' => 'weight desc',
 				'limit' => $iLimit,

@@ -44,6 +44,11 @@ abstract class CPSController extends CController implements IPSBase
 	//	Last...
 	const ACCESS_TO_NONE = 6;
 
+	/**
+	 * The name of our command form field
+	 */
+	const	COMMAND_FIELD_NAME 		= '__psCommand';
+	
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -91,6 +96,12 @@ abstract class CPSController extends CController implements IPSBase
 	* @returns boolean
 	*/
 	public function getIsPostRequest() { return Yii::app()->getRequest()->isPostRequest; }
+	
+	/**
+	 * Returns the base url of the current app
+	 * @returns string
+	 */
+	public function getAppBaseUrl() { return Yii::app()->getBaseUrl(); }
 	
 	/**
 	* The id in the state of our current filter/search criteria
@@ -142,6 +153,15 @@ abstract class CPSController extends CController implements IPSBase
 	* @var array
 	*/
 	protected $m_arActionQueue = array();
+	
+	/**
+	 * A list of actions registered by our portlets
+	 * @var array
+	 */
+	protected $m_arPortletActions = array();
+	public function getPortletActions() { return $this->m_arPortletActions; }
+	public function setPortletActions( $arValue ) { $this->m_arPortletActions = $arValue; }
+	public function addPortletAction( $sName, $arCallback ) { $this->m_arPortletActions[ $sName ] = $arCallback; }
 	
 	/**
 	* @var array An array of actions permitted by any user
@@ -251,6 +271,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	* Provide automatic missing action mapping...
+	* Also handles a theme change request from any portlets
 	* 
 	* @param string $sActionId
 	*/
@@ -281,10 +302,58 @@ abstract class CPSController extends CController implements IPSBase
 		return Yii::app()->getRequest();
 	}
 	
+	/**
+	 * See if there are any commands that need processing
+	 * @param CAction $oAction
+	 * @return boolean
+	 */
+	public function beforeAction( $oAction )
+	{
+		//	If we have commands, give it a shot...
+		if ( count( $this->m_arCommandMap ) && parent::beforeAction( $oAction ) )
+			$this->processCommand();
+		
+		return true;
+	}
+		
+	
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
 	
+	/**
+	* Executes any commands
+	* Maps to {@link CPSController::commandMap} and calls the appropriate method.
+	* 
+	* @returns mixed
+	*/
+	protected function processCommand( $arData = array(), $sIndexName = self::COMMAND_FIELD_NAME )
+	{
+		//	Our return variable
+		$_oResults = null;
+		
+		//	Get command's method...
+		$_sCmd = PS::o( $_REQUEST, $sIndexName );
+		
+		//	Do we have a command mapping?
+		if ( null !== ( $_arCmd = PS::o( $this->m_arCommandMap, $_sCmd ) ) )
+		{
+			//	Get any miscellaneous data into the appropriate array
+			if ( count( $arData ) ) 
+			{
+				if ( $this->getIsPostRequest() ) 
+					$_POST = array_merge( $_POST, $arData );
+				else
+					$_GET = array_merge( $_GET, $arData );
+			}
+
+			$_oResults = call_user_func( $_arCmd[1] );
+		}
+
+		//	Return the results
+		return $_oResults;
+	}
+
 	/**
 	* Saves the data in the model
 	* 
@@ -350,7 +419,7 @@ abstract class CPSController extends CController implements IPSBase
 		//	Make criteria
 		$_oCrit = PS::nvl( $oCriteria, new CDbCriteria() );
 		$_oPage = new CPagination( $this->loadCount( $_oCrit ) );
-		$_oPage->pageSize = PS::nvl( $_REQUEST['perPage'], self::PAGE_SIZE );
+		$_oPage->pageSize = PS::o( $_REQUEST, 'perPage', self::PAGE_SIZE );
 		if ( isset( $_REQUEST, $_REQUEST['page'] ) ) $_oPage->setCurrentPage( intval( $_REQUEST['page'] ) - 1 );
 		$_oPage->applyLimit( $_oCrit );
 		

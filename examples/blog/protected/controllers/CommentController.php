@@ -32,13 +32,27 @@ class CommentController extends CPSCRUDController
 		
 		//	Set model name...
 		$this->setModelName( 'Comment' );
-		
+		$this->addUserAction( self::ACCESS_TO_AUTH, 'list' );
 		$this->addUserAction( self::ACCESS_TO_AUTH, 'approve' );
+		
+		//	Some form defaults
+		PS::$afterRequiredLabel = null;
+		PS::$errorCss = 'ui-state-error';
 	}
  
 	//********************************************************************************
 	//* Actions
 	//********************************************************************************
+	
+	/**
+	 * put your comment there...
+	 * 
+	 */
+	public function actionList( $arExtraParams = array(), $oCriteria = null )
+	{
+		@list( $_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadPaged( true, $oCriteria );
+		$this->render( '_list', array_merge( $arExtraParams, array( 'comments' => $_arModels, 'pages' => $_oPage, 'sort' => $_oSort ) ) );
+	}
 	
 	/**
 	 * Approves a particular comment.

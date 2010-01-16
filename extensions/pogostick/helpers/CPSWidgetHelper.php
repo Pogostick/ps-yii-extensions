@@ -483,7 +483,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		{
 			//	Get any additional params for validation
 			$_sClass = PS::o( $arHtmlOptions, '_validate', null, true );
-			if ( $oModel->isAttributeRequired( $sColName, self::$scenario ) ) $_sClass .= ' required';
+			if ( $oModel->isAttributeRequired( $sColName ) ) PS::addClass( $_sClass, 'required' );
 			$_sClass = ' ' . PS::o( $arHtmlOptions, 'class', null );
 			$arHtmlOptions['class'] = trim( $_sClass );
 		}

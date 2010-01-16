@@ -31,7 +31,7 @@ class PostController extends CPSCRUDController
 		parent::init();
 		
 		$this->defaultAction = 'list';
-		$this->addUserActions( self::ACCESS_TO_ALL, array( 'captcha', 'useTheme', 'postsByDate', 'jquiExamples' ) );
+		$this->addUserActions( self::ACCESS_TO_ALL, array( 'captcha', '__themeChangeRequest', 'postsByDate', 'jquiExamples' ) );
 		$this->setUserActionList( self::ACCESS_TO_AUTH, array() );
 		
 		//	Set model name...
@@ -120,22 +120,6 @@ class PostController extends CPSCRUDController
 				'width' => 200,
 			),
 		);
-	}
-
-	/**
-	* Allows theme switching.
-	*/
-	public function actionUseTheme()
-	{
-		$_arThemes = CPSjqUIWrapper::getValidThemes();
-		$_sTheme = PS::o( $_arThemes, PS::o( $_POST, 'theme' ), CPSjqUIWrapper::getCurrentTheme() );
-		$_sReturn = PS::o( $_POST, 'uri', 'index' );
-		
-		if ( $_sTheme && $_sReturn && in_array( $_sTheme, $_arThemes ) )
-			Yii::app()->user->setState( CPSjqUIWrapper::getStateName(), $_sTheme );
-			
-		//	Return to our action...
-		$this->redirect( $_sReturn );
 	}
 
 	/**
@@ -247,7 +231,7 @@ class PostController extends CPSCRUDController
 		$_arWith = array( 'author' );
 		
 		if ( $_sPostDate = PS::o( $_GET, 'date' ) )
-			$_oCrit->mergeWith( new CDbCriteria( array( 'alias' => 'post_t', 'condition' => 'date(post_t.create_date) = date(:post_date)', 'params' => array( ':post_date' => $_sPostDate ) ) ) );
+			$_oCrit->mergeWith( new CDbCriteria( array( 'condition' => 'date(t.create_date) = date(:post_date)', 'params' => array( ':post_date' => $_sPostDate ) ) ) );
 		
 		if ( $_sTag = PS::o( $_GET, 'tag' ) )
 		{
@@ -291,9 +275,21 @@ class PostController extends CPSCRUDController
 		$this->redirect( array( '/date/' . date( 'Y-m-d', strtotime( PS::o( $_POST, 'dateValue' ) ) ) ) );
 	}
 	
+	/**
+	 * Show's the jQuery UI extension wrapper examples from the pYe
+	 */
 	public function actionJquiExamples()
 	{
 		$this->render( 'pogostick.widgets.examples.jqui_examples' );
 	}
-
+	
+	/**
+	 * User has requested a new theme
+	 * @returns bool
+	 */
+	public function handleThemeChangeRequest()
+	{
+		if ( null !== ( $_oRoller = Yii::app()->getComponent( 'psThemeRoller', false ) ) )
+			$_oRoller->handleThemeChangeRequest();
+	}
 }

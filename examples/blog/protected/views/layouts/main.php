@@ -31,7 +31,7 @@
 				<?php $this->widget( 'UserLogin', array( 'visible' => Yii::app()->user->isGuest ) ); ?>
 				<?php $this->widget( 'UserMenu', array( 'visible' => ! Yii::app()->user->isGuest ) ); ?>
 				<?php $this->widget( 'PostCalendar' ); ?>
-				<?php $this->widget( 'ThemeRoller' ); ?>
+				<?php $this->widget( 'CPSThemeRoller' ); ?>
 				<?php $this->widget( 'TagCloud' ); ?>
 				<?php $this->widget( 'RecentComments' ); ?>
 			</div><!-- sidebar -->

@@ -50,8 +50,8 @@ abstract class CPSCRUDController extends CPSController
 		$this->defaultAction = 'admin';
 
 		//	Add command mappings...
-		$this->addCommandToMap( 'delete' );
-		$this->addCommandToMap( 'undelete' );
+		$this->addCommandToMap( 'delete', array( $this, 'commandDelete' ) );
+		$this->addCommandToMap( 'undelete', array( $this, 'commandUndelete' ) );
 
 		//	Set our access rules..
 		$this->setUserActionList( self::ACCESS_TO_ALL, array( 'index', 'error' ) );
@@ -218,9 +218,8 @@ abstract class CPSCRUDController extends CPSController
 	*/
 	public function actionAdmin( $arExtraParams = array(), $oCriteria = null )
 	{
-		$_oResult = $this->processCommand();
-		if ( $this->m_sModelName ) @list($_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadPaged( true, $oCriteria );
-		$this->render( 'admin', array_merge( $arExtraParams, array( 'models' => $_arModels, 'pages' => $_oPage, 'sort' => $_oSort, 'result' => $_oResult ) ) );
+		if ( $this->m_sModelName ) @list( $_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadPaged( true, $oCriteria );
+		$this->render( 'admin', array_merge( $arExtraParams, array( 'models' => $_arModels, 'pages' => $_oPage, 'sort' => $_oSort ) ) );
 	}
 
 	//********************************************************************************
@@ -251,50 +250,6 @@ abstract class CPSCRUDController extends CPSController
 	//* Private Methods
 	//********************************************************************************
 	
-	/**
-	* Executes any command triggered on the admin page. 
-	* Maps to {@link CPSController::adminCommandMap} and calls the appropriate method.
-	* 
-	* @returns mixed
-	*/
-	protected function processCommand( $arData = array(), $bPOSTSource = true, $sIndexName = 'command' )
-	{
-		//	Our return variable
-		$_oResults = null;
-		
-		//	Get command's method...
-		$_sCmd = strtolower( PS::o( $arData, $sIndexName ) );
-		
-		//	Do we have a command mapping?
-		if ( in_array( $_sCmd, array_keys( $this->m_arCommandMap ) ) )
-		{
-			//	Get the method name to call...
-			$_sMethod = PS::o( $this->m_arCommandMap, $_sCmd );
-			
-			//	No method set? Look for methods named command<Command> to process request
-			if ( null === $_sMethod && method_exists( $this, 'command' . ucwords( $_sCmd ) ) )
-				$_sMethod = 'command' . ucwords( $_sCmd );
-
-			//	Do we have a winner?
-			if ( null !== $_sMethod )
-			{
-				//	Get any miscellaneous data into the appropriate array
-				if ( count( $arData ) ) 
-				{
-					if ( $bPOSTSource ) 
-						$_POST = array_merge( $_POST, $arData );
-					else
-						$_GET = array_merge( $_GET, $arData );
-				}
-
-				$_oResults = $this->{$_sMethod}();
-			}
-		}
-
-		//	Return the results
-		return $_oResults;
-	}
-
 	/**
 	* Index page
 	* 

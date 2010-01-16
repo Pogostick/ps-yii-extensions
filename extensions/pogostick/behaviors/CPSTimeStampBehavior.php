@@ -81,8 +81,7 @@ class CPSTimeStampBehavior extends CPSBaseActiveRecordBehavior
 	
 	/**
 	* Timestamps row
-	* 
-	* @param CEvent $oEvent
+	* @param CModelEvent $oEvent
 	*/
 	public function beforeValidate( $oEvent )
 	{

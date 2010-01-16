@@ -30,7 +30,7 @@ class BaseModel extends CPSModel
 	*/
 	public function beforeFind()
 	{
-		$this->setDefaultSort( 'create_date desc' );
+		$this->setDefaultSort( 't.create_date desc' );
 		return parent::beforeFind();
 	}
 	

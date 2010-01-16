@@ -191,27 +191,20 @@ class CPSModel extends CActiveRecord implements IPSBase
 	* Override of CModel::setAttributes
 	* Populates member variables as well.
 	* @param array $arValues
-	* @param string $sScenario
 	*/
-	public function setAttributes( $arValues = array(), $sScenario = '' )
+	public function setAttributes( $arValues, $bSafeOnly = true )
 	{
-		if ( '' === $sScenario ) $sScenario = $this->getScenario();
-		
-		if ( is_array( $arValues ) )
-		{
-			$_arAttributes = array_flip( $this->getSafeAttributeNames( $sScenario ) );
+		if ( ! is_array( $arValues ) )
+			return;
 			
-			foreach ( $arValues as $_sKey => $_oValue )
-			{
-				$_bIsAttribute = isset( $_arAttributes[ $_sKey ] );
-
-				if ( $_bIsAttribute )
-					$this->setAttribute( $_sKey, $_oValue );
-				else if ( $this->hasProperty( $_sKey ) && $this->canSetProperty( $_sKey ) )
-				{
-					$this->{$_sKey} = $_oValue;
-				}
-			}
+		$_arAttributes = array_flip( $bSafeOnly ? $this->getSafeAttributeNames() : $this->attributeNames() );
+		
+		foreach ( $arValues as $_sName => $_oValue )
+		{
+			if ( $_bIsAttribute = isset( $_arAttributes[ $_sName ] ) )
+				$this->setAttribute( $_sName, $_oValue );
+			else if ( $this->hasProperty( $_sName ) && $this->canSetProperty( $_sName ) )
+				$this->{$_sName} = $_oValue;
 		}
 	}
 

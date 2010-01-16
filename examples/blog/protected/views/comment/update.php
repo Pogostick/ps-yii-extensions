@@ -19,29 +19,8 @@
  * @filesource
  * 
  */
-	echo CPSForm::formHeader( 'Edit Comment: ' . $model->id, 
-		array( 
-			'save' => array(
-				'label' => 'Save',
-				'url' =>  '_submit_',
-				'icon' => 'disk',
-			),
-			
-			'cancel' => array(
-				'label' => 'Cancel',
-				'url' => array( 'admin' ),
-				'icon' => 'cancel',
-			),
-			
-			'delete' => array(
-				'label' => 'Delete',
-				'url' => array( 'delete' ),
-				'confirm' => 'Do you really want to delete this Comment?',
-				'icon' => 'trash',
-			),
-		)
-	);
-	
+	echo CPSForm::formHeaderEx( 'Edit Comment: ' . $model->id, array( 'menuButtons' => array( 'save', 'cancel', 'delete' ) ) );
+
 	echo $this->renderPartial( '_form', array(
 		'model' => $model,
 		'update' => true,
