@@ -41,12 +41,39 @@ class CPSfgMenu extends CPSjqUIWrapper
 	//* Methods
 	//********************************************************************************
 
+	/**
+	* Initialize
+	*/
+	function preinit()
+	{
+		//	Phone home...
+		parent::preinit();
+		
+		//	Add the default options for jqUI stuff
+		$this->addOptions( 
+			array(
+				'prompt_' => 'string:Select One...::true',
+				'valueColumn' => 'string',
+				'imagePath_' => 'string',
+				'anchorId_' => 'string',
+				'data_' => 'array:array()',
+			)
+		);
+	}
+	
+	/**
+	 * Initialize
+	 * 
+	 */
 	public function init()
 	{
 		parent::init();
 	
 		//	Set my name...	
 		$this->widgetName = self::PS_WIDGET_NAME;
+		
+		//	Create an anchor id
+		$this->setOption( 'anchorId', $this->getUniqueId( $this->getValue( 'anchorId', 'fg.menu.a.id' ) ) );
 	}
 		
 	/**
@@ -77,24 +104,24 @@ class CPSfgMenu extends CPSjqUIWrapper
 	*/
 	protected function generateHtml()
 	{
-		return null;
-		
-		$_sHtml .= parent::generateHtml();
+		$_sHtml = parent::generateHtml();
 		
 		//	Get our options...
-		$_sAnchorId = $this->getUniqueId( $this->getOption( 'anchorId', 'fg.menu.a.id' ) );
+		$this->target = $_sId = $this->getId();
+		$_sAnchorId = $this->getValue( 'anchorId' );
 		
-		//	Build HTML
-		$_sHtml .= PS::tag( 'a', array( 'href' => '#' . $_sAnchorId, 'id' => $this->getTargetSelector(), 'class' => 'ps-button ps-button-icon-right ui-widget ui-state-default ui-corner-all' ), 
-			PS::tag( 'span', array( 'class' => 'ui-icon ui-icon-triangle-1-s' ), $this->prompt )
-		);
+		$_sHtml .= PS::hiddenField( $_sId . '_value', $this->getValue( 'value' ) );
+		$_sHtml .= '<a tabindex="0" href="#' . $_sAnchorId . '" class="ps-button ps-button-icon-right ps-button-no-float ui-widget ui-state-default ui-corner-all" id="' . $_sId . '"><span class="ui-icon ui-icon-triangle-1-s"></span>' . $this->prompt . '</a>';
+		$_sHtml .= '<div id="' . $_sAnchorId . '" class="hidden">';
+		$_sHtml .= CPSTransform::asUnorderedList( $this->getValue( 'data', array() ), $this->makeOptions( true, PS::OF_ASSOC_ARRAY, true ) );
+		$_sHtml .= '</div>';
 		
-		$this->id = $_sAnchorId;
+		//	Remove the id...
 		$this->target = $this->getTargetSelector( $_sAnchorId );
 		
-		return $_sHtml . PS::tag( 'div', array( 'id' => $_sAnchorId, 'class' => 'hidden' ), 
-			CPSModel::asUnorderedList( $this->data, $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY, true )  )
-		);
+		$this->unsetOption('valueColumn');
+		
+		return $_sHtml;
 	}
 
 	/**
@@ -107,27 +134,23 @@ class CPSfgMenu extends CPSjqUIWrapper
 	*/
 	protected function generateJavascript( $sTargetSelector = null, $arOptions = null, $sInsertBeforeOptions = null )
 	{
-		return null;
-		
 		//	Get the options...
-		$_arOptions = PS::nvl( $arOptions, $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY ) );
-		$_sId = $this->getTargetSelector( $sTargetSelector );
+		if ( $arOptions ) $this->mergeOptions( $arOptions );
+		$_sId = $this->getId();
 		
-		//	Set a couple of convenient defaults
-		if ( null == PS::o( $_arOptions, 'content', null ) ) $_arOptions['content'] = '$(\'' . $_sId . '\').next().html()';
-		if ( null == PS::o( $_arOptions, 'crumbDefaultText', null ) ) $_arOptions['crumbDefaultText'] = ' ';
-		
-		//	Pull out the data...
-		PS::o( $_arOptions, 'data', null, true );
-			
 		//	Make options
-		$_sOptions = $this->makeOptions( $_arOptions, CPSComponentBehavior::OF_JSON, false, true );
+		$_oData = $this->getOption( 'data', array(), true );
+		$this->unsetOption('name');
+		$this->unsetOption('id');
+		$_sOptions = $this->makeOptions();
+
+		$this->setOption( 'data', $_oData->getValue() );
 
 		//	Jam something in front of options?
 		if ( null != $sInsertBeforeOptions ) $_sOptions = $sInsertBeforeOptions . ( ! empty( $_sOptions ) ? ', ' . $_sOptions : '' );
 
 		$this->script =<<<CODE
-jQuery('{$_sId}').menu({$_arOptions});
+jQuery('#{$_sId}').menu({updateValueId:'#{$_sId}_value',backLink:false,content:jQuery("#{$_sId}").next().html()});
 CODE;
 
 		return $this->script;

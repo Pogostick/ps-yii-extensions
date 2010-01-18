@@ -53,6 +53,7 @@ class CPSjQueryWidget extends CPSWidget
 				'autoRun_' => 'bool:true::true',
 				'autoRegister_' => 'bool:false',
 				'widgetName_' => 'string:::true',
+				'widgetMethodName_' => 'string',
 				'target_' => 'string:::true',
 				'locateScript_' => 'bool:false',
 				'naked_' => 'bool:false',				//	Setting naked = true turns on autoRegister and locateScript
@@ -207,7 +208,10 @@ class CPSjQueryWidget extends CPSWidget
 
 		//	Auto register our script
 		if ( $this->autoRegister )
+		{
 			$this->registerWidgetScript();
+			$this->autoRegister = false;
+		}
 
 		//	Don't forget subclasses
 		return PS::_cs();
@@ -228,8 +232,10 @@ class CPSjQueryWidget extends CPSWidget
 		if ( $this->widgetName == 'datepicker' && $this->hasOption( 'buttonImage' ) && $this->buttonImage === true )
 			$this->buttonImage = $this->getExternalLibraryUrl() . '/jqui/js/images/calendar.gif';
 			
+		$_sMethod = PS::nvl( $this->widgetMethodName, $this->widgetName );
+			
 		//	Get the options...		
-		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
+		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makePublicOptions();
 		$_sId = 'jQuery' . ( ( null != ( $_sTarget = $this->getTargetSelector( $sTargetSelector ) ) ) ? "('{$_sTarget}')" : null );
 		
 		//	Jam something in front of options?
@@ -241,7 +247,7 @@ class CPSjQueryWidget extends CPSWidget
 		}
 
 		$this->script =<<<CODE
-{$_sId}.{$this->widgetName}({$_arOptions});
+{$_sId}.{$_sMethod}({$_arOptions});
 CODE;
 
 		return $this->script;
@@ -308,7 +314,7 @@ CODE;
 		$_oWidget->id = $_oWidget->name = PS::o( $arOptions, 'id', $sName );
 		$_oWidget->name = PS::o( $arOptions, 'name', $_oWidget->id );
 		
-		if ( PS::o( $arOptions, 'naked', false ) )
+		if ( PS::o( $arOptions, 'naked', ( $_sClass == __CLASS__ ) ) )
 		{
 			$_oWidget->locateScript = true;
 			$_oWidget->autoRegister = true;

@@ -102,16 +102,37 @@ class CPSModel extends CActiveRecord implements IPSBase
 	/***
 	* Builds a CPSModel and sets the model name
 	* 
-	* @param array $arAttributes
 	* @param string $sScenario
 	* @return CPSModel
 	*/
-	public function __construct( $arAttributes = array(), $sScenario = '' )
+	public function __construct( $sScenario = 'insert' )
 	{
-		parent::__construct( $arAttributes, $sScenario );
+		parent::__construct( $sScenario );
 		$this->m_sModelName = ( version_compare( PHP_VERSION, '5.3.0' ) > 0 ) ? get_called_class() : get_class( $this );
 	}
 
+	/**
+	 * Checks if a component has an attached behavior
+	 * @param string $sClass
+	 * @returns boolean
+	 */
+	public function hasBehavior( $sClass )
+	{
+		//	Look for behaviors
+		foreach ( $this->behaviors() as $_sKey => $_arBehavior )
+		{
+			if ( $_sBehaviorClass = PS::o( $_arBehavior, 'class' ) )
+				$_sBehaviorClass = Yii::import( $_sBehaviorClass );
+			
+			//	Check...
+			if ( $sClass == $_sKey || $sClass == $_sBehaviorClass )
+				return true;
+		}
+		
+		//	Nope!
+		return false;
+	}
+		
 	/***
 	* Sets our default behaviors. 
 	* All CPSModel's have the DataFormat and Utility behaviors added by default.

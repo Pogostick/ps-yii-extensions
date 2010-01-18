@@ -250,14 +250,14 @@ class CPSOptionHelper implements IPSBase
 		}
 
 		//	Now build our final array...
-		foreach( $oContainer->getRawOptions( true ) as $_sKey => $_oOption )
+		$_arRaw = $oContainer->getRawOptions( true );
+		
+		foreach( $_arRaw as $_sKey => $_oOption )
 		{
-			//	Private option? Skip if public-only
-			if ( $_sKey != 'callbacks' && $bPublicOnly && $_oOption->getIsPrivate() )
-				continue;
-				
 			//	Skip nulls...
-			if ( null !== ( $_oValue = $_oOption->getValue() ) )
+			$_oValue = $_oOption->getValue();
+			
+			if ( ! empty( $_oValue ) || '0' === $_oValue )
 			{
 				$_sExtName = $_oOption->getExternalName();
 
@@ -279,7 +279,15 @@ class CPSOptionHelper implements IPSBase
 					}
 				}
 				else
-					$_arOut[ $_sExtName ] = $_oValue;
+				{
+					if ( self::isScriptCallback( $_oValue ) )
+					{
+						$_arCallbacks[ $_sKey ] = $_oValue;
+						$_arOut[ "__pscb_{$_sKey}" ] = $_sKey;
+					}
+					else
+						$_arOut[ $_sExtName ] = $_oValue;
+				}
 			}
 		}
 		
@@ -300,8 +308,8 @@ class CPSOptionHelper implements IPSBase
 					break;
 					
 				case PS::OF_ASSOC_ARRAY:
-					if ( ! empty( $_arCallbacks ) ) 
-						throw new CPSOptionException( 'Cannot use type "ASSOC_ARRAY" when callbacks are present.' );
+//					if ( ! empty( $_arCallbacks ) ) 
+//						throw new CPSOptionException( 'Cannot use type "ASSOC_ARRAY" when callbacks are present.' );
 						
 					$_sEncodedOptions = $_arOut;
 					break;

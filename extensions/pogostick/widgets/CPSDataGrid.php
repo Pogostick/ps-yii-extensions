@@ -236,8 +236,18 @@ class CPSDataGrid implements IPSBase
 		$_sOut = null;
 		$_iRow = 0;
 		
+		//	Build the output row
+		$_arRowOpts = array();
+		
+		if ( count( $arDivComment ) && $_oModel->hasErrors() )
+			$_arRowOpts = array( 'class' => $arDivComment[1], 'title' => implode( ', ', current( $_oModel->getErrors() ) ) );
+			
+		$_arRowOpts['class'] = PS::o( $_arRowOpts, 'class', ' ui-widget-content' );
+		
 		if ( ! $arModel || ( is_array( $arModel ) && ! count( $arModel ) ) ) 
-			$_sOut .= PS::tag( 'tr', array(), PS::tag( 'td', array( 'class' => 'ps-data-grid-no-data-found', 'colspan' => self::$m_iColumnCount ), 'No Records Found' ) );
+		{
+			$_sOut .= PS::tag( 'tr', $_arRowOpts, PS::tag( 'td', array( 'class' => 'ps-data-grid-no-data-found', 'colspan' => self::$m_iColumnCount ), 'No Records Found' ) );
+		}
 		else
 		{
 			foreach ( $arModel as $_iIndex => $_oModel )
@@ -248,14 +258,6 @@ class CPSDataGrid implements IPSBase
 					
 				//	Build actions...
 				$_sTD .= PS::tag( 'td', array( 'class' => 'ps-grid-actions' ), '<div class="ps-grid-actions-inner">' . self::buildActions( $_oModel ) . '<hr /></div>' );
-				
-				//	Build the output row
-				$_arRowOpts = array();
-				
-				if ( count( $arDivComment ) && $_oModel->hasErrors() )
-					$_arRowOpts = array( 'class' => $arDivComment[1], 'title' => implode( ', ', current( $_oModel->getErrors() ) ) );
-					
-				$_arRowOpts['class'] = PS::o( $_arRowOpts, 'class', ' ui-widget-content' );
 				
 				//	Row id template? Fill it in
 				if ( $_sRowIdTemplate ) 

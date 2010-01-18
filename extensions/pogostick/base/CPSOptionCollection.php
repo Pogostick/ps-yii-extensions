@@ -52,9 +52,15 @@ class CPSOptionCollection extends CAttributeCollection implements IPSOptionConta
 	 */
 	public function add( $sKey, $oValue = null, $oPattern = null )
 	{
-		//	Add to the collection
-		$_oOption = new CPSOption( $sKey, $oValue, $oPattern );
-		parent::add( $_oOption->getName(), $_oOption );
+		//	Already here?
+		if ( $this->contains( $sKey ) )
+			$this->setOption( $sKey, $oValue );
+		else
+		{
+			//	Add to the collection
+			$_oOption = new CPSOption( $sKey, $oValue, $oPattern );
+			parent::add( $_oOption->getName(), $_oOption );
+		}
 	}
 	
 	/**
@@ -97,7 +103,9 @@ class CPSOptionCollection extends CAttributeCollection implements IPSOptionConta
 		$_arOut = array();
 		if ( array() === $arOnlyThese ) $arOnlyThese = null;
 		
-		foreach ( parent::toArray() as $_sKey => $_oOption )
+		$_arData = parent::toArray();
+		
+		foreach ( $_arData as $_sKey => $_oOption )
 		{
 			if ( $bPublicOnly && $_oOption->getIsPrivate() )
 				continue;
@@ -162,11 +170,14 @@ class CPSOptionCollection extends CAttributeCollection implements IPSOptionConta
 	/**
 	* Set options in bulk
 	*
+	* @param boolean If true, the option collection is cleared before the options are added.
 	* @param array $arOptions An array containing option_key => value pairs
 	* @see getOptions
 	*/
-	public function setOptions( array $arOptions ) 
+	public function setOptions( array $arOptions, $bClearFirst = false ) 
 	{ 
+		if ( $bClearFirst ) $this->clear();
+		
 		foreach ( $arOptions as $_sKey => $_oOption ) 
 			$this->setValue( $_sKey, $_oOption );
 	}

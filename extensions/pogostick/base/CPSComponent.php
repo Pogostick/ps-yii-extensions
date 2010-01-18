@@ -267,5 +267,31 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 		//	Pass on to dad
 		return parent::__call( $sName, $arParams );
 	}
+	
+	/**
+	 * Checks if a component has an attached behavior
+	 * @param string $sClass
+	 * @returns boolean
+	 */
+	public function hasBehavior( $sClass )
+	{
+		//	Look for behavior methods
+		foreach ( $this->m_arBehaviorCache as $_sBehavior )
+		{
+			if ( null !== ( $_oBehave = $this->asa( $_sBehavior ) ) )
+			{
+				if ( $_oBehav instanceof $sClass )
+				return true;
+			}
+			
+			//	Check for nicknames...
+			if ( $sClass == $_sBehavior )
+				return true;
+		}
+		
+		//	Nope?
+		return false;
+	}
+		
 
 }

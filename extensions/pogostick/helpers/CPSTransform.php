@@ -479,13 +479,20 @@ class CPSTransform implements IPSBase
 		foreach ( $arModel as $_oModel )
 		{
 			//	Does this model have relational kids?
-			if ( $_oModel instanceof CPSParentChildBehavior )
+			if ( $_oModel instanceof CPSModel && $_oModel->hasBehavior( 'CPSParentChildBehavior' ) )
+			{
 				$_bHasKids = ( in_array( $_sChildrenRelation, array_keys( $_oModel->relations() ) ) && $_oModel->hasChildren() );
+			}
 			else
+			{
 				$_bHasKids = false;
+			}
 					
+			$_arLinkOpts = PS::o( $arOptions, 'linkOptions', array() );
+			
 			$_sContent = $_bEncode ? PS::encode( $_oModel->{$_sValColumn} ) : $_oModel->{$_sValColumn};
-			if ( $_bLinkText ) $_sContent = PS::link( $_sContent, '#', PS::o( $arOptions, 'linkOptions' ) );
+			$_arLinkOpts['rel'] = $_oModel->{$_sKeyColumn};
+			if ( $_bLinkText ) $_sContent = PS::link( $_sContent, '#', $_arLinkOpts );
 			if ( $_bHasKids ) $_sContent .= self::asUnorderedList( $_oModel->{$_sChildrenRelation}, $arOptions );
 
 			$_sOut .= PS::tag( 'li', array(), $_sContent );
@@ -495,7 +502,7 @@ class CPSTransform implements IPSBase
 		if ( $_sId ) $_arOpts['id'] = $_sId;
 		if ( $_sClass ) $_arOpts['class'] = $_sClass;
 
-		return PS::tag( 'ul', $_arOpts, $_sOut );
+		return $_sOut ? PS::tag( 'ul', $_arOpts, $_sOut ) : null;
 	}
 	
 	/**

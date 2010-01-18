@@ -36,7 +36,7 @@ class CPSAuthorizeNET extends CPSPaymentGateway
 		if ( is_array( $arOptions ) ) $this->setOptions( $arOptions );
 		
 		//	Make the post request data...
-		$_sPostData = $this->makeOptions( null, CPSComponentBehavior::HTTP );
+		$_sPostData = $this->makeOptions( true, PS::OF_HTTP );
 		
 		//	Make the request
 		if ( ! ( $_sResult = PS::makeHttpRequest( $this->getTransactionUrl(), $_sPostData, 'POST' ) ) )

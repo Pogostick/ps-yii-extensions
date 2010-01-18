@@ -153,7 +153,7 @@ class CPSPaypal extends CPSPaymentGateway
 		
 		//	Set it and forget it...		
 		$this->apiToUse = self::SET_EXPRESS_CHECKOUT;
-		$this->requestData = array_merge( ( null !== $arRequestData ) ? $arRequestData : $this->requestData, $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY ) );
+		$this->requestData = array_merge( ( null !== $arRequestData ) ? $arRequestData : $this->requestData, $this->makeOptions( true, PS::OF_ASSOC_ARRAY ) );
 		
 		//	Make request and process the response
 		try
@@ -197,7 +197,7 @@ class CPSPaypal extends CPSPaymentGateway
 		
 		//	Set it and forget it...		
 		$this->apiToUse = $this->paymentMethod = self::GET_EXPRESS_CHECKOUT_DETAILS;
-		$this->requestData = $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY );
+		$this->requestData = $this->makeOptions( true, PS::OF_ASSOC_ARRAY );
 
 		try
 		{
@@ -241,7 +241,7 @@ class CPSPaypal extends CPSPaymentGateway
 		
 		//	Set it and forget it...		
 		$this->apiToUse = $this->paymentMethod = self::DO_EXPRESS_CHECKOUT_PAYMENT;
-		$this->requestData = array_merge( ( null !== $arRequestData ) ? $arRequestData : $this->requestData, $this->makeOptions( null, CPSComponentBehavior::ASSOC_ARRAY ) );
+		$this->requestData = array_merge( ( null !== $arRequestData ) ? $arRequestData : $this->requestData, $this->makeOptions( true, PS::OF_ASSOC_ARRAY ) );
 
 		try
 		{

@@ -105,7 +105,9 @@ class CPSModelCommand extends CPSConsoleCommand
 			else
 			{
 				$_sTableName = PS::nvl( $arArgs[ 1 ], $_sClassName );
-				$this->tables[ $_sTableName ] = $_sClassName;
+				$_arTables = $this->tables;
+				$_arTables[ $_sTableName ] = $_sClassName;
+				$this->tables = $_arTables;
 				$this->generateRelations();
 				$this->classes = array( $_sTableName => $_sClassName );
 			}
@@ -207,10 +209,11 @@ EOD;
 	public function generateModel( $sView, $arParams )
 	{
 		$_arRules = $_arLabels = $_arRelations = array();
-		list( $_sClassName, $_sTableName, $_sBaseClass, $this->databaseName, $_sClassFile ) = $arParams;
-		
+		list( $_sClassName, $_sTableName, $_sBaseClass, $this->databaseName ) = $arParams;
+
 		$_sContents = file_get_contents( $sView );
-		
+
+		//	No table? Try view...
 		if ( null !== ( $_oTable = $this->schema->getTable( $_sTableName ) ) )
 		{
 			$_arRequired = $_arIntegers = $_arNumerical = array();
@@ -542,10 +545,9 @@ EOD;
 	{
 		return(
 			array(
-				'schema' => 'object',
-				'relations' => 'array',
-				'tables' => 'array',
-				'classes' => 'array',
+				'relations' => 'array:array()',
+				'tables' => 'array:array()',
+				'classes' => 'array:array()',
 			)
 		);
 	}

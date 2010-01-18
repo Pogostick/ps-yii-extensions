@@ -177,7 +177,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		//	Validate defaults...
 		$_sTheme = $this->theme;
 		
-		if ( empty( $_sTheme ) ) $this->theme = ( ! empty( self::$m_sCurrentTheme ) ) ? self::$m_sCurrentTheme : $_sTheme = 'cupertino';
+		if ( empty( $_sTheme ) ) $this->theme = ( ! empty( self::$m_sCurrentTheme ) ) ? self::$m_sCurrentTheme : $_sTheme = PS::nvl( Yii::app()->params['theme'], 'cupertino' );
 		if ( empty( $this->baseUrl ) ) $this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 		if ( empty( $this->imagePath ) ) $this->imagePath = "{$this->baseUrl}/css/{$this->theme}/images";
 	}
@@ -189,7 +189,8 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	public function run()
 	{
 		//	Register the scripts/css
-		$this->registerClientScripts( $this->locateScript );
+		$_bLocate = $this->locateScript;
+		$this->registerClientScripts( $_bLocate );
 
 		//	Generate the HTML if available
 		echo $this->generateHtml();
@@ -247,7 +248,9 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	*/
 	public static function create( $sName = null, array $arOptions = array() )
 	{
-		return parent::create( $sName, array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
+		$arOptions['class'] = PS::o( $arOptions, 'class', __CLASS__ );
+		if ( $sName == $arOptions['class'] ) $arOptions['naked'] = true;
+		return parent::create( $sName, $arOptions );
 	}
 	
 	/**

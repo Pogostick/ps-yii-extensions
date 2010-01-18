@@ -140,7 +140,7 @@ class CPSOption implements IPSBase
 	public function __construct( $sName, $oValue = null, $oRulePattern = null )
 	{
 		//	Private?
-		$_bPrivate = ( $sName != ( $_sCleanName = trim( $sName, '_' ) ) );
+		$_bPrivate = ( $sName != ( $_sCleanName = rtrim( $sName, ' _' ) ) );
 
 		//	Build a ruleset
 		$this->setRules( $oRulePattern, $_bPrivate );

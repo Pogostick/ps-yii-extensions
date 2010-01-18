@@ -240,7 +240,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 		
 		//	Check our pattern list
 		foreach ( $_arRules as $_sRule => $_sReplace )
-			if ( preg_match( $_sRule, $_sString ) ) return preg_replace( $_sRule, $_sReplace, $sString );
+			if ( preg_match( $_sRule, $sString ) ) return preg_replace( $_sRule, $_sReplace, $sString );
 		
 		return $sString . 's';
 	}
@@ -428,13 +428,14 @@ abstract class CPSConsoleCommand extends CPSComponent
 		$_arOptions = array();
 		
 		//	Rebuild args...
-		for ( $_i = 0, $_iCount = count( $arArgs ); $_i < $_iCount, $_sArg = $arArgs[ $_i ]; $_i++ )
+		for ( $_i = 0, $_iCount = count( $arArgs ); $_i < $_iCount; $_i++ )
 		{
+			$_sArg = $arArgs[ $_i ];
 			$_sOpt = trim( substr( $_sArg, 0, strpos( $_sArg, '=' ) ) );
 
-			if ( $_sOpt[0] == '-' && $_sOpt[1] == '-' )
+			if ( $_sOpt && $_sOpt[0] == '-' && $_sOpt[1] == '-' )
 				$_arOptions[ substr( $_sOpt, 2 ) ] = str_replace( $_sOpt . '=', '', $_sArg );
-			elseif ( $_sOpt[0] == '-' )
+			elseif ( $_sOpt && $_sOpt[0] == '-' )
 				$_arOptions[ substr( $_sOpt, 1 ) ] = str_replace( $_sOpt . '=', '', $_sArg );
 			else
 				$_arResults['rebuilt'][] = $arArgs[ $_i ];
@@ -545,7 +546,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 					
 				default:
 					//	Look through options..
-					foreach ( $this->makeOptions( null, PS::OF_ASSOC_ARRAY, true ) as $_sOptKey => $_sOptValue )
+					foreach ( $this->makeOptions( true, PS::OF_ASSOC_ARRAY, true ) as $_sOptKey => $_sOptValue )
 					{
 						if ( $_sKey == $_sOptKey || $_sKey == CPSTransform::underscorize( $_sOptKey, '-' ) )
 						{
@@ -569,7 +570,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 		$_sOptions = null;
 		
 		//	Look through options..
-		foreach ( $this->makeOptions( null, PS::OF_ASSOC_ARRAY ) as $_sOptKey => $_sOptValue )
+		foreach ( $this->makeOptions( true, PS::OF_ASSOC_ARRAY ) as $_sOptKey => $_sOptValue )
 		{
 			$_sOptions .= str_pad( $this->bold( '  --' . $_sOptKey ), 39, ' ', STR_PAD_RIGHT );
 			if ( $_sOptValue ) $_sOptions .= 'Default value is "' . ( is_array( $_sOptValue ) ? implode( ', ', $_sOptValue ) : $_sOptValue ) . '"';
@@ -625,7 +626,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 	*/
 	protected function displayParameters( $sName, $arExtra = array() )
 	{
-		$_arOptions = array_merge( $arExtra, $this->makeOptions( null, PS::OF_ASSOC_ARRAY, true ) );
+		$_arOptions = array_merge( $arExtra, $this->makeOptions( true, PS::OF_ASSOC_ARRAY, true ) );
 		$_iColWidth = $this->colWidth;
 		
 		//	Update column width based on option keys...
@@ -680,6 +681,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 				'templateName_' => 'string',
 				'baseClass_' => 'string:CPSModel',
 				'colWidth' => 'int:' . self::MIN_COL_WIDTH,
+				'schema' => 'object',
 			)
 		);
 	}

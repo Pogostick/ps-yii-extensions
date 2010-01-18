@@ -138,6 +138,40 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	{
 		return CPSOptionHelper::makeOptions( $this, $bPublicOnly, $iFormat, $bNoCheck );
 	}
+	
+	/**
+	 * Makes a set of public options
+	 * 
+	 * @param integer $iFormat
+	 * @param boolean $bNoCheck
+	 * @return mixed
+	 */
+	public function makePublicOptions( $iFormat = PS::OF_JSON, $bNoCheck = false )
+	{
+		return CPSOptionHelper::makeOptions( $this, true, $iFormat, $bNoCheck );
+	}
+	
+	/**
+	 * Merges an array of options into the component options.
+	 * You can pass in an array of (key=>value) pairs or an array of {@link CPSOption}s
+	 * @param array $arOptions
+	 * @returns mixed
+	 */
+	public function mergeOptions( $arOptions = array() )
+	{
+		foreach ( $arOptions as $_sKey => $_oValue )
+		{
+			if ( $_oValue instanceof CPSOption )
+			{
+				$_sKey = $_oValue->getName();
+				$_oValue = $_oValue->getValue();
+			}
+
+			$this->setOption( $_sKey, $_oValue );
+		}
+		
+		return $this->getOwner();
+	}
 
 	//********************************************************************************
 	//* Interface Requirements
@@ -202,9 +236,10 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	* Set options in bulk
 	*
 	* @param array $arOptions An array containing option_key => value pairs
+	* @param boolean If true, empties array before setting options.
 	* @see getOptions
 	*/
-	public function setOptions( array $arOptions ) { $this->m_oOptions->setOptions( $arOptions ); }
+	public function setOptions( array $arOptions, $bClearFirst = false ) { $this->m_oOptions->setOptions( $arOptions, $bClearFirst ); }
 	
 	/**
 	* Unsets a single option
@@ -215,6 +250,11 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	* @see getOption
 	*/
 	public function unsetOption( $sKey ) { $this->m_oOptions->unsetOption( $sKey ); }
+
+	/**
+	* Resets the collection to empty
+	*/
+	public function clear() { $this->m_oOptions->clear(); }
 
 	/**
 	* Checks if an option exists in the options array...

@@ -62,6 +62,7 @@ function Menu(caller, options){
 	// ----- multi-level menu defaults -----
 		crossSpeed: 200, // cross-fade speed for multi-level menus
 		crumbDefaultText: 'Choose an option:',
+		updateValueId: null,
 		backLink: true, // in the ipod-style menu: instead of breadcrumbs, show only a 'back' link
 		backLinkText: 'Back',
 		flyOut: false, // multi-level menus are ipod-style by default; this parameter overrides to make a flyout instead
@@ -245,8 +246,14 @@ function Menu(caller, options){
 	this.chooseItem = function(item){
 		menu.kill();
 		// edit this for your own custom function/callback:
-		$('#menuSelection').text($(item).text());	
-//		location.href = $(item).attr('href');
+		$(caller).html('<span class="ui-icon ui-icon-triangle-1-s"></span>'+$(item).text());	
+		
+		if ( $(item).attr('rel') && options.updateValueId !== null )
+		{
+			$(options.updateValueId).val($(item).attr('rel'));
+		}
+
+		//		location.href = $(item).attr('href');
 	};
 };
 
