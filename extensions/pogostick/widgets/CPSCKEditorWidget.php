@@ -67,9 +67,9 @@ class CPSCKEditorWidget extends CPSjQueryWidget
 
 		//	Register scripts necessary
 		PS::_rsf( "{$this->baseUrl}/ckeditor.js" );
-	
-		//	Get the javascript for this widget
-		$this->registerWidgetScript();
+		
+		//	Don't forget subclasses
+		return PS::_cs();
 	}
 	
 	//********************************************************************************

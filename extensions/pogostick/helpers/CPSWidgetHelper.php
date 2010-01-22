@@ -63,6 +63,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	const	LABEL 			= 'label';
 	const	LABEL_ACTIVE	= 'activeLabel';
 	const	MULTISELECT		= 'jqMultiselect';
+	const	MCDROPDOWN		= 'mcDropdown';
 
 	/**
 	* Faux methods for tranformation types
@@ -527,6 +528,25 @@ class CPSWidgetHelper extends CPSHelperBase
 				}
 				break;
 				
+			//	Build a McDropdown
+			case self::MCDROPDOWN:
+				$arWidgetOptions[ 'linkText' ] = false;
+				$_sTarget = PS::o( $arWidgetOptions, 'target', $arHtmlOptions['id'] );
+				$_sTargetMenu = PS::o( $arWidgetOptions, 'targetMenu', $arHtmlOptions['id'] . '_menu' );
+				$_sValueColumn = PS::o( $arHtmlOptions, 'valueColumn' );
+
+				//	Insert text field...
+				$_sOut = PS::textField( $arHtmlOptions['name'], $_oValue, array( 'id' => $arHtmlOptions['id'] ) );
+				
+				//	Create menu...
+				$_sOut .= CPSTransform::asUnorderedList( $arData, array( 'class' => 'mcdropdown_menu', 'valueColumn' => $_sValueColumn, 'linkText' => false, 'id' => $_sTargetMenu ) );
+
+				$arWidgetOptions['target'] = $_sTarget;				
+				$arWidgetOptions['targetMenu'] = $_sTargetMenu;
+				
+				CPSMcDropdownWidget::create( null, $arWidgetOptions );
+				return $_sBeforeHtml . $_sOut . $_sAppendHtml;
+			
 			//	Build a Filament Group menu
 			case self::FG_MENU:
 				ob_start();

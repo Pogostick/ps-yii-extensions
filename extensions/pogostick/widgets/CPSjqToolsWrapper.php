@@ -128,9 +128,6 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 //				PS::_rcf( "{$this->baseUrl}/css/{$_sFile}", 'screen' );
 		}
 
-		//	Get the javascript for this widget
-		$this->registerWidgetScript();
-
 		//	Don't forget subclasses
 		return PS::_cs();
 	}

@@ -56,9 +56,6 @@ class CPSjqSelectMenu extends CPSjQueryWidget
 		PS::_rcs( $this->baseUrl . '/ui.selectmenu.css' );
 		PS::_rsf( $this->baseUrl . '/ui.selectmenu.js', CClientScript::POS_END );
 
-		//	Get the javascript for this widget
-		$this->registerWidgetScript();
-
 		//	Don't forget subclasses
 		return PS::_cs();
 	}

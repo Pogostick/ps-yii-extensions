@@ -148,7 +148,8 @@ class CPSForm implements IPSBase
 		}
 		
 		//	Does user want dates? Show 'em
-		if ( $_bShowDates && ! $_oModel->isNewRecord && $_oModel instanceof CPSModel ) $_sOut .= $_oModel->showDates();
+		if ( $_bShowDates && $_oModel instanceof CPSModel && ! $_oModel->isNewRecord ) 
+			$_sOut .= $_oModel->showDates();
 
 		//	Ok, done building form...
 		$_sOut .= PS::endForm();

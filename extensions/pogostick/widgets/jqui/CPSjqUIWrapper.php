@@ -203,8 +203,13 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 	*/
 	public function registerClientScripts( $bLocateScript = false )
 	{
-		//	Daddy...
+		//	Don't auto register
+		$_bAutoReg = $this->autoRegister;
+		$this->autoRegister = false;
+		
+		//	Call dad
 		parent::registerClientScripts( $bLocateScript );
+		$this->autoRegister = $_bAutoReg;
 		
 		//	Register scripts necessary
 		self::loadScripts( $this, $this->theme );
@@ -225,7 +230,8 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 		}
 		
 		//	Get the javascript for this widget
-		$this->registerWidgetScript();
+		if ( $this->autoRegister )
+			$this->registerWidgetScript();
 
 		//	Don't forget subclasses
 		return PS::_cs();

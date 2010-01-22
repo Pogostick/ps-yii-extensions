@@ -40,8 +40,8 @@ function Menu(caller, options){
 	
 	var options = jQuery.extend({
 		content: null,
-		width: 180, // width of menu container, must be set or passed in to calculate widths of child menus
-		maxHeight: 180, // max height of menu (if a drilldown: height does not include breadcrumb)
+		width: 200, // width of menu container, must be set or passed in to calculate widths of child menus
+		maxHeight: 200, // max height of menu (if a drilldown: height does not include breadcrumb)
 		positionOpts: {
 			posX: 'left', 
 			posY: 'bottom',
@@ -276,7 +276,7 @@ Menu.prototype.flyout = function(container, options) {
 			function(){
 				clearTimeout(hideTimer);
 				var subList = $(this).next();
-				if (!fitVertical(subList, $(this).offset().top)) { subList.css({ top: 0, bottom: 'auto' }); };
+				if (!fitVertical(subList, $(this).offset().top)) { subList.css({ "max-height": options.maxHeight, height: options.maxHeight, top: 0, bottom: 'auto' }); };
 				if (!fitHorizontal(subList, $(this).offset().left + 100)) { subList.css({ left: 'auto', right: linkWidth, 'z-index': 999 }); };
 				showTimer = setTimeout(function(){
 					subList.addClass('ui-widget-content').show(options.showSpeed).attr('aria-expanded', 'true');	
@@ -531,15 +531,15 @@ Menu.prototype.setPosition = function(widget, caller, options) {
 	
 	// position the object vertically
 	if (options.positionOpts.directionV == 'up') {
-		el.css({ top: 'auto', bottom: yVal });
+		el.css({ "max-height": options.maxHeight, height: options.maxHeight, top: 'auto', bottom: yVal });
 		if (options.positionOpts.detectV && !fitVertical(el)) {
-			el.css({ bottom: 'auto', top: yVal });
+			el.css({ height: options.maxHeight, 'max-height': options.maxHeight, bottom: 'auto', top: yVal });
 		}
 	} 
 	else {
-		el.css({ bottom: 'auto', top: yVal });
+		el.css({ height: options.maxHeight, 'max-height': options.maxHeight, bottom: 'auto', top: yVal });
 		if (options.positionOpts.detectV && !fitVertical(el)) {
-			el.css({ top: 'auto', bottom: yVal });
+			el.css({ height: options.maxHeight, 'max-height': options.maxHeight, top: 'auto', bottom: yVal });
 		}
 	};
 	

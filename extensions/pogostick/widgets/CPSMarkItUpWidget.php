@@ -74,6 +74,8 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 	public function registerClientScripts( $bLocateScript = false )
 	{
 		//	Daddy...
+		$this->autoRegister = false;
+		
 		parent::registerClientScripts( $bLocateScript );
 		
 		//	Reset the baseUrl
@@ -88,6 +90,9 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 		//	Get the javascript for this widget
 		$_sScript = $this->generateJavascript( $this->multiUseClass ? $this->multiUseClass : null, $this->settingsToUse );
 		$this->registerWidgetScript( $_sScript );
+		
+		//	Don't forget subclasses
+		return PS::_cs();
 	}
 
 	/**

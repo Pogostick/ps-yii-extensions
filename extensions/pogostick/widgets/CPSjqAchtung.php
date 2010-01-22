@@ -59,9 +59,6 @@ class CPSjqAchtung extends CPSjQueryWidget
 		//	Register scripts necessary
 		PS::_rsf( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.js", CClientScript::POS_HEAD );
 
-		//	Get the javascript for this widget
-		$this->registerWidgetScript();
-
 		//	Don't forget subclasses
 		return PS::_cs();
 	}

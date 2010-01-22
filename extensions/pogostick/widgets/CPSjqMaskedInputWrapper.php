@@ -56,9 +56,6 @@ class CPSjqMaskedInputWrapper extends CPSjQueryWidget
 		//	Register scripts necessary
 		PS::_rsf( $this->baseUrl . DIRECTORY_SEPARATOR . "jquery.maskedinput-1.2.2.min.js" );
 
-		//	Get the javascript for this widget
-		$this->registerWidgetScript();
-
 		//	Don't forget subclasses
 		return PS::_cs();
 	}

@@ -257,7 +257,9 @@ class CPSDataGrid implements IPSBase
 				$_sTD = CPSTransform::column( $_oModel, $arColumns, $sLinkView, 'td', array( 'encode' => $bEncode ) );
 					
 				//	Build actions...
-				$_sTD .= PS::tag( 'td', array( 'class' => 'ps-grid-actions' ), '<div class="ps-grid-actions-inner">' . self::buildActions( $_oModel ) . '<hr /></div>' );
+				if ( $_sActions = self::buildActions( $_oModel ) )
+					$_sTD .= PS::tag( 'td', array( 'class' => 'ps-grid-actions' ), '<div class="ps-grid-actions-inner">' . $_sActions . '<hr /></div>' );
+				
 				
 				//	Row id template? Fill it in
 				if ( $_sRowIdTemplate ) 

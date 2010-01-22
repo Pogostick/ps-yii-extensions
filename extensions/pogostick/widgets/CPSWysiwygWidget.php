@@ -65,11 +65,8 @@ class CPSWysiwygWidget extends CPSjqUIWrapper
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 	
-		PS::rsf( "{$this->baseUrl}/jquery.wysiwyg.js" );
-		PS::rcf( "{$this->baseUrl}/jquery.wysiwyg.css" );
-		
-		//	Get the javascript for this widget
-		$this->registerWidgetScript();
+		PS::_rsf( "{$this->baseUrl}/jquery.wysiwyg.js" );
+		PS::_rcf( "{$this->baseUrl}/jquery.wysiwyg.css" );
 		
 		return PS::_cs();
 	}

@@ -488,14 +488,15 @@ class CPSTransform implements IPSBase
 				$_bHasKids = false;
 			}
 					
+			$_oValue = $_oModel->{$_sValColumn};
 			$_arLinkOpts = PS::o( $arOptions, 'linkOptions', array() );
-			
-			$_sContent = $_bEncode ? PS::encode( $_oModel->{$_sValColumn} ) : $_oModel->{$_sValColumn};
+			$_sContent = $_bEncode ? PS::encode( $_oValue ) : $_oValue;
 			$_arLinkOpts['rel'] = $_oModel->{$_sKeyColumn};
-			if ( $_bLinkText ) $_sContent = PS::link( $_sContent, '#', $_arLinkOpts );
+			if ( $_bLinkText ) $_sContent = PS::link( $_sContent, PS::o( $_arLinkOpts, 'href', '#', true), $_arLinkOpts );
 			if ( $_bHasKids ) $_sContent .= self::asUnorderedList( $_oModel->{$_sChildrenRelation}, $arOptions );
 
-			$_sOut .= PS::tag( 'li', array(), $_sContent );
+			$_arLiOpts = array( 'rel' => $_oModel->{$_sKeyColumn} );
+			$_sOut .= PS::tag( 'li', $_arLiOpts, $_sContent );
 		}
 
 		$_arOpts = array();

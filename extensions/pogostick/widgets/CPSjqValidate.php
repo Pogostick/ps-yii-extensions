@@ -59,14 +59,11 @@ class CPSjqValidate extends CPSjQueryWidget
 		PS::_rsf( $this->extLibUrl . '/jquery-plugins/jquery.metadata.js', CClientScript::POS_HEAD );
 		
 		//	Register scripts necessary
-//		PS::_rsf( self::CDN_ROOT . '/jquery.validate.min.js', CClientScript::POS_HEAD );
-		PS::_rsf( $this->baseUrl . '/jquery.validate.min.js', CClientScript::POS_HEAD );
+		PS::_rsf( self::CDN_ROOT . '/jquery.validate.min.js', CClientScript::POS_HEAD );
+//		PS::_rsf( $this->baseUrl . '/jquery.validate.min.js', CClientScript::POS_HEAD );
 			
-//		PS::_rsf( self::CDN_ROOT . '/additional-methods.js', CClientScript::POS_HEAD );
-		PS::_rsf( $this->baseUrl . '/additional-methods.js', CClientScript::POS_HEAD );
-
-		//	Get the javascript for this widget
-		$this->registerWidgetScript();
+		PS::_rsf( self::CDN_ROOT . '/additional-methods.js', CClientScript::POS_HEAD );
+//		PS::_rsf( $this->baseUrl . '/additional-methods.js', CClientScript::POS_HEAD );
 
 		//	Don't forget subclasses
 		return PS::_cs();

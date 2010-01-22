@@ -51,14 +51,14 @@ class CPSjQueryWidget extends CPSWidget
 		$this->addOptions( 
 			array(
 				'autoRun_' => 'bool:true::true',
-				'autoRegister_' => 'bool:false',
+				'autoRegister_' => 'bool:true',
 				'widgetName_' => 'string:::true',
 				'widgetMethodName_' => 'string',
 				'target_' => 'string:::true',
 				'locateScript_' => 'bool:false',
 				'naked_' => 'bool:false',				//	Setting naked = true turns on autoRegister and locateScript
-				'extraCssFiles' => 'array:array()',		//	For nakedness
-				'extraScriptFiles' => 'array:array()',	//	For nakedness
+				'extraCssFiles_' => 'array:array()',		//	For nakedness
+				'extraScriptFiles_' => 'array:array()',	//	For nakedness
 			)
 		);
 	}
