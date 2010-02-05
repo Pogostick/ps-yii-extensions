@@ -1107,7 +1107,7 @@ CSS;
 		$_sType = PS::o( $arOptions, '_forType', 'text' );
 		$_bRequired = PS::o( $arOptions, '_required', false );
 		$arOptions[ 'id' ] = $arOptions['name'] = self::getIdPrefix( 'label' ) . $sName;
-		$_sSuffixToUse = PS::o( $arOptions, 'noSuffix', false, true ) ? '' : $self::$m_sLabelSuffix;
+		$_sSuffixToUse = PS::o( $arOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
 		
 		return self::tag( 'label', $arOptions, ( ( $sLabel == null ) ? $sName : $sLabel ) . $_sSuffixToUse . self::$afterRequiredLabel );
 	}
