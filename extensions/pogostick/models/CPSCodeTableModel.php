@@ -88,8 +88,9 @@ class CPSCodeTableModel extends CPSModel
 		//	Can't really use get_called_class with 5.2...
 		if ( version_compare( PHP_VERSION, '5.3.0' ) < 0 )
 		{
-			if ( ! $_sModelClass = $this->modelName )
-				throw new CDbException( 'You must set the $modelName property before calling this method.' );
+			$_sModelClass = 'Codes';
+//			if ( ! $_sModelClass = $this->modelName )
+//				throw new CDbException( 'You must set the $modelName property before calling this method.' );
 		}
 		else
 			$_sModelClass = get_called_class();

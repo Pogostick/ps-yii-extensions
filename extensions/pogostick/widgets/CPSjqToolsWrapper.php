@@ -159,7 +159,7 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 			case 'flashembed':
 				$_sSrc = $this->getOption( 'src', null );
 				$_arOptions = $this->makeOptions();
-				$_sScript = 'flashembed("' . $this->target . '", "' . $_sSrc . '", ' . $_arOptions . ');';
+				$_sScript = '$("' . $this->target . '").flashembed("' . $_sSrc . '", ' . $_arOptions . ');';
 				break;
 				
 			default:

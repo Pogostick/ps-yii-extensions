@@ -39,7 +39,7 @@ button.ps-button { width:auto; overflow:visible; }
 .ps-button-icon-right-wide .ui-icon { left: auto; right: .2em; margin-left: 0; }
 
 .ps-button-icon-solo { display: inline-block; font-size: 0px; line-height: 0px; width:8px; overflow: hidden; }	 /* solo icon buttons must have block properties for the text-indent to work */	
-.ps-button-icon-solo-small { padding:6px 10px; -moz-border-radius:3px; display: inline-block; font-size: 0px; line-height: 0px; width:0px; height:8px; overflow: hidden; }	 /* solo icon buttons must have block properties for the text-indent to work */	
+.ps-button-icon-solo-small { padding:6px 10px; -moz-border-radius:3px !important; display: inline-block; font-size: 0px; line-height: 0px; width:0px; height:8px; overflow: hidden; }	 /* solo icon buttons must have block properties for the text-indent to work */	
 
 .ps-button-no-float { float:none !important; }
 

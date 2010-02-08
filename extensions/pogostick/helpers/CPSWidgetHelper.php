@@ -1502,30 +1502,6 @@ HTML;
 	}
 	
 	/**
-	 * If value is not set or empty, last passed in argument is returned
-	 * Allows for multiple nvl chains ( nvl(x,y,z,null) )
-	 * 
-	 * @param mixed 
-	 * @returns mixed
-	 */
-	public static function nvl()
-	{
-		$_oDefault = null;
-		
-		for ( $_i = 0, $_iArgs = func_num_args(); $_i < $_iArgs; $_i++ )
-		{
-			$_oArg = func_get_arg( $_i );
-			
-			if ( '0' === $_oArg || ( null !== $_oArg && isset( $_oArg ) && ! empty( $_oArg ) ) )
-				return $_oArg;
-				
-			$_oDefault = $_oArg;
-		}
-
-		return $_oDefault;
-	}
-	
-	/**
 	* Returns a styled menu separator.
 	* @param string $sInner
 	* @returns string

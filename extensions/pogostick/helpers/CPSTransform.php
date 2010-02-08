@@ -368,7 +368,7 @@ class CPSTransform implements IPSBase
 	protected static function codeLookup( $sHow, $oValue )
 	{
 		if ( $_sCodeModel = PS::getCodeModel() )
-			$oValue = $_sCodeModel::getCodeDescription( $oValue );
+			$oValue = call_user_func_array( array( $_sCodeModel, 'getCodeDescription' ), array( $oValue ) );
 
 		return array( $oValue, false, array() );
 	}

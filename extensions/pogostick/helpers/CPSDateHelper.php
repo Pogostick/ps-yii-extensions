@@ -32,13 +32,33 @@ class CPSDateHelper implements IPSBase
 	* @param string $dtEnd
 	* @returns DateInterval
 	*/
-	public static function dateDiff( $dtStart, $dtEnd, $bAbsolute = false )
+	public static function dateDiff( $dtStart, $dtEnd = null, $bAbsolute = false )
 	{
 		$_dtStart = new DateTime( $dtStart );
-		$_dtEnd = new DateTime( $dtEnd );
+		$_dtEnd = new DateTime( PS::nvl( $dtEnd, date( 'Y-m-d H:i:s' ) ) );
 		return $_dtEnd->diff( $_dtStart, $bAbsolute );
 	}
 	
+	/**
+	* Returns the time difference in seconds between two time zones
+	*
+	* @param string $sTimeZone
+	* @param string $sMyZone
+	* @return int
+	*/
+	public static function zoneDiff( $sTimeZone, $sMyZone = null )
+	{
+		$sMyZone = PS::nvl( $sMyZone, date_default_timezone_get() );
+		
+		$_oDest = new DateTimeZone( $sTimeZone );
+		$_oSrc = new DateTimeZone( $sMyZone );
+		
+		$_oDestTime = new DateTime( 'now', $_oDest );
+		$_oSrcTime = new DateTime( 'now', $_oSrc );
+		
+		return $_oDest->getOffset( $_oSrcTime );
+	}
+
 	/**
 	* Returns value (or current date) formatted
 	* 
@@ -72,5 +92,5 @@ class CPSDateHelper implements IPSBase
 	{
 		return date( $sFormat, $dtDate ? strtotime( $dtDate ) : time() );
 	}
-
+	
 }

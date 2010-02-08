@@ -150,23 +150,6 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function o( &$arOptions = array(), $sKey, $oDefault = null, $bUnset = false )
 	{
-		return self::getOption( $arOptions, $sKey, $oDefault, $bUnset );
-	}
-	
-	/**
-	* Retrieves an option from the given array. 
-	* $oDefault is set and returned if $sKey is not 'set'. Optionally will unset option in array.
-	*
-	* @param array $arOptions
-	* @param string $sKey
-	* @param mixed $oDefault
-	* @param boolean $bUnset
-	* @returns mixed
-	* @access public
-	* @static
-	*/
-	public static function getOption( &$arOptions = array(), $sKey, $oDefault = null, $bUnset = false )
-	{
 		$_oValue = $oDefault;
 		
 		if ( is_array( $arOptions ) )
@@ -199,6 +182,23 @@ class CPSHelperBase extends CHtml implements IPSBase
 		//	Return...
 		return $_oValue;
 	}
+	
+	/**
+	* Retrieves an option from the given array. 
+	* $oDefault is set and returned if $sKey is not 'set'. Optionally will unset option in array.
+	*
+	* @param array $arOptions
+	* @param string $sKey
+	* @param mixed $oDefault
+	* @param boolean $bUnset
+	* @returns mixed
+	* @access public
+	* @static
+	*/
+	public static function getOption( &$arOptions = array(), $sKey, $oDefault = null, $bUnset = false )
+	{
+		return self::o( $arOptions, $sKey, $oDefault, $bUnset );
+	}
 
 	/**
 	* Sets an option in the given array. Alias of {@link CPSHelperBase::setOption}
@@ -210,7 +210,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	*/
 	public static function so( array &$arOptions, $sKey, $oValue = null )
 	{
-		return self::setOption( $arOptions, $sKey, $oValue );
+		return $arOptions[ $sKey ] = $oValue;
 	}
 	
 	/**
@@ -224,7 +224,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	*/
 	public static function setOption( array &$arOptions, $sKey, $oValue = null )
 	{
-		return $arOptions[ $sKey ] = $oValue;
+		return self::so( $arOptions, $sKey, $oValue );
 	}
 
 	/**
@@ -232,12 +232,12 @@ class CPSHelperBase extends CHtml implements IPSBase
 	*
 	* @param array $arOptions
 	* @param string $sKey
-	* @returns mixed The new value of the key
+	* @returns mixed The last value of the key
 	* @static
 	*/
 	public static function uo( array &$arOptions, $sKey )
 	{
-		self::unsetOption( $arOptions, $sKey, null );
+		return self::o( $arOptions, $sKey, null, true );
 	}
 	
 	/**
@@ -245,13 +245,12 @@ class CPSHelperBase extends CHtml implements IPSBase
 	*
 	* @param array $arOptions
 	* @param string $sKey
-	* @returns mixed The new value of the key
+	* @returns mixed The last value of the key
 	* @static
 	*/
 	public static function unsetOption( array &$arOptions, $sKey )
 	{
-		if ( in_array( $sKey, $arOptions ) )
-			unset( $arOptions[$sKey] );
+		return self::uo( $arOptions, $sKey );
 	}
 	
 	/**
@@ -520,7 +519,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function makePath()
 	{
-		return implode( DIRECTORY_SEPARATOR, func_get_args() );
+		$_arArgs = func_get_args();
+		return implode( DIRECTORY_SEPARATOR, $_arArgs );
 	}
 	
 	//********************************************************************************
@@ -535,7 +535,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function getClientScript() 
 	{ 
-		return self::$m_oClientScript ? self::$m_oClientScript : self::$m_oClientScript = Yii::app()->getClientScript(); 
+		return self::_cs();
 	}
 
 	/**
@@ -546,7 +546,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	*/
 	public static function _cs() 
 	{ 
-		return self::getClientScript();
+		return self::$m_oClientScript ? self::$m_oClientScript : self::$m_oClientScript = Yii::app()->getClientScript(); 
 	}
 
 	/**
