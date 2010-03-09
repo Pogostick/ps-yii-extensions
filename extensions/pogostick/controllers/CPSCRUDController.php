@@ -153,12 +153,38 @@ abstract class CPSCRUDController extends CPSController
 	//********************************************************************************
 
 	/**
-	* Shows a model
+	* Default login
+	* 
 	*/
-	public function actionShow( $arExtraParams = array() )
-	{ 
-		$_oModel = $this->loadModel();
-		$this->genericAction( 'show', $_oModel, $arExtraParams ); 
+	public function actionLogin()
+	{
+		if ( ! Yii::app()->user->isGuest )
+			return $this->redirect( Yii::app()->user->returnUrl );
+			
+		$_sClass = $this->getLoginFormClass();
+		$_oLogin = new $_sClass();
+		
+		if ( isset( $_POST[ $_sClass ] ) )
+		{
+			$_oLogin->attributes = $_POST[ $_sClass ];
+
+			//	Validate user input and redirect to previous page if valid
+			if ( $_oLogin->validate() ) 
+				return $this->redirect( Yii::app()->user->returnUrl );
+		}
+		
+		//	Display the login form
+		$this->render( 'login', array( 'form' => $_oLogin ) );
+	}
+	
+	/**
+	* Logout the user
+	* 
+	*/
+	public function actionLogout()
+	{
+		Yii::app()->user->logout();
+		$this->redirect( $this->defaultAction );
 	}
 
 	/**
@@ -246,48 +272,4 @@ abstract class CPSCRUDController extends CPSController
 		$this->refresh();
 	}
 	
-	//********************************************************************************
-	//* Private Methods
-	//********************************************************************************
-	
-	/**
-	* Index page
-	* 
-	*/
-	public function actionIndex()
-	{
-		$this->render( 'index' );
-	}
-	
-	/**
-	* Default login
-	* 
-	*/
-	public function actionLogin()
-	{
-		$_sClass = PS::nvl( $this->m_sLoginFormClass, 'LoginForm' );
-		$_oLogin = new $_sClass();
-		
-		if ( isset( $_POST[ $_sClass ] ) )
-		{
-			$_oLogin->attributes = $_POST[ $_sClass ];
-
-			//	Validate user input and redirect to previous page if valid
-			if ( $_oLogin->validate() ) $this->redirect( Yii::app()->user->returnUrl );
-		}
-		
-		//	Display the login form
-		$this->render( 'login', array( 'form' => $_oLogin ) );
-	}
-	
-	/**
-	* Logout the user
-	* 
-	*/
-	public function actionLogout()
-	{
-		Yii::app()->user->logout();
-		$this->actionLogin();
-	}
-
 }

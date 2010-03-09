@@ -1,7 +1,7 @@
 /* Multiselect
 ----------------------------------*/
 
-.ui-multiselect { border: 1px solid; font-size: 0.8em; }
+.ui-multiselect { border: 1px solid #ccc; font-size: 10pt; }
 .ui-multiselect ul { -moz-user-select: none; }
 .ui-multiselect div.list-container { padding: 0; margin: 0; border: 0; float:left;  }
 .ui-multiselect ul.list { position: relative; padding: 0; overflow: auto; overflow-x: hidden; margin: 0; list-style: none; width: 100%; }
@@ -14,7 +14,7 @@
 .ui-multiselect ul.selected { }
 .ui-multiselect ul.selected li { }
 
-.ui-multiselect div.available { border-left: 1px solid; }
+.ui-multiselect div.available { border-left: 1px solid #ccc; }
 .ui-multiselect ul.available { }
 .ui-multiselect ul.available li { }
  
@@ -26,7 +26,7 @@
 .ui-multiselect .remove-all { float: right; padding: 7px; white-space: nowrap; }
 .ui-multiselect .count { cursor: default; float: left; padding: 7px; }
 .ui-multiselect .search { float: left; padding: 1px; opacity: 0.7; margin: 4px; height: 14px; }
-.ui-multiselect .busy { left: 0px; float: left; padding: 7px 7px 7px 25px; z-index: 1; background: url(images/loading.gif) 4px 50% no-repeat; }
+.ui-multiselect .busy { left: 0px; float: left; padding: 7px 7px 7px 25px; z-index: 1; background: url(/images/loader.gif) 4px 50% no-repeat; }
 .ui-multiselect .overlay { background: #aaaaaa; opacity: .30;filter:Alpha(Opacity=30); }
 
 .ui-multiselect li a.action { position: absolute; border: none; right: 0px; top: 1px; padding-right: 2px; }

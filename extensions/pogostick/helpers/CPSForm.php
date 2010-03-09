@@ -93,15 +93,16 @@ class CPSForm implements IPSBase
 						$_sOut .= implode( $_arValue );
 						break;
 					
+					case 'hidden':
+					case 'hiddenfield':
+						$_sType = 'hiddenfield';
+						//	Intentional drop through...
+
 					case 'beginfieldset':
 					case 'endfieldset':
 						$_sOut .= call_user_func_array( array( 'PS', $_sType ), $_arValue );
 						break;
 					
-					case 'hidden':
-						$_sOut .= call_user_func_array( array( 'PS', 'hiddenField' ), $_arValue );
-						break;
-						
 					case 'submit':
 						//	Fix up the argument array
 						$_arSubmit = ( is_array( $_arValue ) && count( $_arValue ) == 1 ) ? $_arValue[0] : $_arValue;
@@ -132,7 +133,10 @@ class CPSForm implements IPSBase
 						}
 
 						//	Make the field
-						$_sOut .= call_user_func_array( array( 'PS', $_sMethod ), $_arValue );
+						if ( version_compare( PHP_VERSION, '5.3.0', '>=' ) )
+							$_sOut .= call_user_func_array( array( 'PS', $_sMethod ), $_arValue );
+						else
+							$_sOut .= call_user_func_array( 'PS::' . $_sMethod, $_arValue );
 						
 						//	CKEditor needs special handing for validate...
 						if ( $_bValidate && $_sType == PS::CKEDITOR )
@@ -359,7 +363,7 @@ HTML;
 					$_arOut[ 'cancel' ] = array(
 						'label' => 'Cancel',
 						'url' => $sAdminAction,
-						'icon' => 'disk',
+						'icon' => 'cancel',
 					);
 					break;
 

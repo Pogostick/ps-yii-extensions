@@ -16,7 +16,7 @@
  */
 
 //	Create our payment component
-$_oPaypal = CPSPayment::create( 'pogostick.components.payment.gateways.CPSPaypal' );
+$_oPaypal = CPSPayment::create( 'pogostick.payment.gateways.CPSPaypal' );
 
 //	Sandbox at this time...
 $_oPaypal->productionMode = false;

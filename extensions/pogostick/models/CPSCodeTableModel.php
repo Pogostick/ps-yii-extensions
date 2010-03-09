@@ -83,7 +83,7 @@ class CPSCodeTableModel extends CPSModel
 	* @param string $sOrder Optional sort order of result set. Defaults to PK (i.e. id)
 	* @return array|string Depending on the parameters supplied, either returns a code row, an array of code rows, or a string.
 	*/
-	protected static function getCodes( $iId = null, $sType = null, $sAbbr = null, $sOrder = null )
+	protected static function getCodes( $iId = null, $sType = null, $sAbbr = null, $sOrder = null, $bActiveOnly = true )
 	{
 		//	Can't really use get_called_class with 5.2...
 		if ( version_compare( PHP_VERSION, '5.3.0' ) < 0 )
@@ -101,7 +101,7 @@ class CPSCodeTableModel extends CPSModel
 		$sOrder = $_oModel->getMetaData()->tableSchema->primaryKey;
 
 		//	Get a single code...
-		if ( null !== $iId ) return $_oModel->findByPk( $iId );
+		if ( null !== $iId ) return $_oModel->active()->findByPk( $iId );
 		
 		//	Get a specific code by type/abbr
 		if ( null !== $sType && null !== $sAbbr )
@@ -112,7 +112,7 @@ class CPSCodeTableModel extends CPSModel
 				'order' => PS::nvl( $sOrder ),
 			);
 
-			return $_oModel->find( $_arCrit );
+			return $_oModel->active()->find( $_arCrit );
 		}
 
 		//	Codes By Type
@@ -134,7 +134,7 @@ class CPSCodeTableModel extends CPSModel
 			);
 		}
 		
-		return $_arCrit ? $_oModel->findAll( $_arCrit ) : null;
+		return $_arCrit ? $_oModel->active()->findAll( $_arCrit ) : null;
 	}
 	
 	/**
@@ -147,8 +147,8 @@ class CPSCodeTableModel extends CPSModel
 			array( 'code_abbr_text', 'length', 'max' => 60 ),
 			array( 'code_desc_text', 'length', 'max' => 255 ),
 			array( 'assoc_text', 'length', 'max' => 255 ),
-			array( 'id, code_type_text, code_abbr_text, code_desc_text, create_date, lmod_date', 'required' ),
-			array( 'id, parnt_code_id', 'numerical', 'integerOnly' => true ),
+			array( 'id, active_ind, code_type_text, code_abbr_text, code_desc_text, create_date, lmod_date', 'required' ),
+			array( 'id, active_ind, parnt_code_id', 'numerical', 'integerOnly' => true ),
 			array( 'assoc_value_nbr', 'numerical' ),
 		);
 	}
@@ -166,6 +166,7 @@ class CPSCodeTableModel extends CPSModel
 			'parnt_code_id' => 'Parent Code Id',
 			'assoc_value_nbr' => 'Associated Number',
 			'assoc_text' => 'Associated Text',
+			'active_ind' => 'Active',
 			'create_date' => 'Created On',
 			'lmod_date' => 'Modified On',
 		);
@@ -284,4 +285,13 @@ class CPSCodeTableModel extends CPSModel
 		return $_oCode ? ( $bReturnIdOnly ? $_oCode->id : $_oCode ) : null;
 	}
 	
+	/**
+	 * Only return active code records as designated by the active_ind
+	 * @returns CPSCodeTableModel
+	 */
+	public function active()
+	{
+		$this->getDbCriteria()->mergeWith( array( 'condition' => 'active_ind = :active_ind', 'params' => array( ':active_ind' => 1 ) ) );
+		return $this;
+	}
 }

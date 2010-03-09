@@ -1,24 +1,24 @@
 <?php
-/**
- * CPSPaymentGatewayResponse class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com Pogostick Yii Extension Library
- * @package psYiiExtensions
- * @subpackage Components
- * @since psYiiExtensions v1.0.5
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
  * CPSPaymentGatewayResponse encapsulates a payment gateway response
- *
- * @package psYiiExtensions
- * @subpackage Components
+ * 
+ * @package 	psYiiExtensions.payments
+ * @subpackage 	base
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN $Id$
+ * @since 		v1.1.0
+ * 
+ * @filesource
+ * @abstract
  */
 abstract class CPSPaymentGatewayResponse extends CPSComponent
 {
@@ -113,6 +113,14 @@ abstract class CPSPaymentGatewayResponse extends CPSComponent
 		//	Phone home...
 		parent::__construct();
 
+		//	Save the raw response...
+		$this->rawResponse = $oResponse;
+	}
+	
+	public function preinit()
+	{
+		parent::preinit();
+	
 		//	Add our component options
 		$this->addOptions(
 			array(
@@ -122,8 +130,6 @@ abstract class CPSPaymentGatewayResponse extends CPSComponent
 			)
 		);
 		
-		//	Save the raw response...
-		$this->rawResponse = $oResponse;
 	}
 
 	//********************************************************************************

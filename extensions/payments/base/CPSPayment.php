@@ -1,24 +1,24 @@
 <?php
-/**
- * CPSPayment class file.
- *
- * @filesource
- * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com Pogostick Yii Extension Library
- * @package psYiiExtensions
- * @subpackage Components
- * @since psYiiExtensions v1.0.5
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
- * @license http://www.pogostick.com/license/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
- * CPSPayment provides authorization of credit card data
- *
- * @package psYiiExtensions
- * @subpackage Components
+ * CPSPayment provides authorization of payment data
+ * 
+ * @package 	psYiiExtensions.payments
+ * @subpackage 	base
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN $Id$
+ * @since 		v1.1.0
+ * 
+ * @filesource
+ * 
  * @property $gateway The object representing the payment gateway to use
  */
 class CPSPayment extends CPSComponent
@@ -29,13 +29,12 @@ class CPSPayment extends CPSComponent
 
 	/**
 	* Build our object
-	* 
 	* @access public
 	*/
-	public function __construct()
+	public function preinit()
 	{
 		//	Phone home...
-		parent::__construct();
+		parent::preinit();
 
 		//	Add our component options
 		$this->addOptions(
@@ -59,7 +58,7 @@ class CPSPayment extends CPSComponent
 	public function init()
 	{
 		//	Check configuration array
-		if ( $this->isEmpty( $this->gatewayConfig ) || ! is_array( $this->gatewayConfig ) || ! array_key_exists( 'class', $this->gatewayConfig ) )
+		if ( $this->gatewayConfig || ! is_array( $this->gatewayConfig ) || ! array_key_exists( 'class', $this->gatewayConfig ) )
 			throw new CPSException( 'Invalid or no payment gateway specified.' );
 			
 		//	Create our gateway
@@ -67,7 +66,7 @@ class CPSPayment extends CPSComponent
 		
 		//	Is it cool?
 		if ( ! ( $_oGateway instanceof CPSPaymentGateway ) )
-			throw new CPSException( 'Payment gateway specified must implement IPSPaymentGateway interface.' );
+			throw new CPSException( 'Payment gateway specified is not compatible.' );
 		
 		$this->gateway = $_oGateway;
 	}
@@ -97,12 +96,12 @@ class CPSPayment extends CPSComponent
 	* @param string $sClass
 	* @returns CPSPayment
 	*/
-	public static function &create( $sGatewayClass, $sClass = __CLASS__ )
+	public static function create( $sGatewayClass, $sClass = __CLASS__ )
 	{
-		$_oObj = new CPSPayment();
+		$_oObj = new self();
 		$_oObj->gatewayConfig = array( 'class' => $sGatewayClass );
 		$_oObj->init();
-		
+
 		return $_oObj;
 	}
 	

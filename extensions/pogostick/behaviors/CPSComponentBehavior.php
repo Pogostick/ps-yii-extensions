@@ -367,6 +367,29 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 		return parent::raiseEvent( $_sOrigName, $oEvent );
 	}
 
+	/**
+	* Logs a message to the application log
+	* 
+	* @param string $sMessage The log message
+	* @param string $sCategory The category for this log entry. Defaults to __METHOD__
+	* @param string $sLevel The level of this log. Defaults to 'trace'
+	*/
+	protected function log( $sMessage, $sCategory = __METHOD__, $sLevel = 'trace' )
+	{
+		return Yii::log( $sMessage, $sLevel, $sCategory );
+	}
+	
+	/**
+	* Log helpers
+	* 
+	* @param string $sMessage The log message
+	* @param string $sCategory The category for this log entry. Defaults to __METHOD__
+	*/
+	protected function logInfo( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'info' ); }
+	protected function logError( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'error' ); }
+	protected function logWarning( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'warning' ); }
+	protected function logTrace( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'trace' ); }
+
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************

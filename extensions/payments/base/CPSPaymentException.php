@@ -15,7 +15,7 @@
  * 
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN $Id$
- * @since 		v1.0.7
+ * @since 		v1.1.0
  * 
  * @filesource
  */

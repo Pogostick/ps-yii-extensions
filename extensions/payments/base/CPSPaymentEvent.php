@@ -10,12 +10,12 @@
 /**
  * CPSPaymentEvent provides specialized events for {@link CPSPaymentGatewayResponse}
  * 
- * @package 	psYiiExtensions
- * @subpackage 	events
+ * @package 	psYiiExtensions.payments
+ * @subpackage 	base
  * 
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id$
- * @since 		v1.0.5
+ * @since 		v1.1.0
  * 
  * @filesource
  * 

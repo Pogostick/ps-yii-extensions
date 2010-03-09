@@ -101,6 +101,36 @@ class CPSMenuHelper extends CPSHelperBase
 	}	
 
 	/**
+	 * Builds a single menu block for use with an accordion or some such device.
+	 * 
+	 * options:
+	 * 
+	 * 	headerTag		The HTML tag for the header element. Defaults to H3
+	 *	headerOptions	Any HTML options for the headerTag
+	 * 	<linkName>		<linkUrl> or array( 'url' => <url>, other options for link tag )
+	 * 
+	 * @param string $sTitle
+	 * @param array $arItems
+	 * @returns string
+	 */
+	public static function buildMenuFromArray( $sIndex, $arMenu = array() )
+	{
+		if ( $_arMenuBlock = PS::o( $arMenu, $sIndex ) )
+		{
+			$_sTitle = PS::o( $_arMenuBlock, 'title' );
+			$_arItems = PS::o( $_arMenuBlock, 'items' );
+			
+			//	If a non-array is passed in, assume it's to be eval'd...
+			if ( ! is_array( $_arItems ) && ! empty( $_arItems ) )
+				$_arItems = eval( 'return ' . $_arItems . ';' );
+
+			return self::buildMenuBlock( $_sTitle, $_arItems );
+		}
+		
+		return null;
+	}	
+
+	/**
 	 * Get's a single formatted menu link
 	 * 
 	 * @param string $sUrl

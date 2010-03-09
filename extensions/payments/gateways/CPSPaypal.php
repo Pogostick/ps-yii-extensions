@@ -1,21 +1,23 @@
 <?php
-/**
- * CPSPaypal class file.
- *
- * @filesource
- * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com Pogostick Yii Extension Library
- * @package psYiiExtensions
- * @subpackage Components
- * @since psYiiExtensions v1.0.5
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
- * @license http://www.pogostick.com/license/
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
+ * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
+
 /**
- * Payment gateway interface for Paypal
+ * Paypal gateway
+ * 
+ * @package 	psYiiExtensions.payments
+ * @subpackage 	gateways
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN $Id$
+ * @since 		v1.1.0
+ * 
+ * @filesource
  */
 class CPSPaypal extends CPSPaymentGateway
 {
@@ -23,13 +25,13 @@ class CPSPaypal extends CPSPaymentGateway
 	//* Public Methods
 	//********************************************************************************
 	
-	const 	SET_EXPRESS_CHECKOUT = 'SetExpressCheckout';
-	const	GET_EXPRESS_CHECKOUT_DETAILS = 'GetExpressCheckoutDetails';
-	const	DO_EXPRESS_CHECKOUT_PAYMENT = 'DoExpressCheckoutPayment';
-	const	REFUND_TRANSACTION = 'RefundTransaction';
+	const 	SET_EXPRESS_CHECKOUT 			= 'SetExpressCheckout';
+	const	GET_EXPRESS_CHECKOUT_DETAILS 	= 'GetExpressCheckoutDetails';
+	const	DO_EXPRESS_CHECKOUT_PAYMENT 	= 'DoExpressCheckoutPayment';
+	const	REFUND_TRANSACTION 				= 'RefundTransaction';
 	
-	const	TOKEN = '_paypalToken';
-	const	PAYER_ID = '_paypalPayerId';
+	const	TOKEN 							= '_paypalToken';
+	const	PAYER_ID 						= '_paypalPayerId';
 	
 	//********************************************************************************
 	//* Member Variables
@@ -41,17 +43,16 @@ class CPSPaypal extends CPSPaymentGateway
 	* @var CPSPaypalResponse
 	*/
 	protected $m_oLastResponse = null;
-	
 	public function getLastResponse() { return $this->m_oLastResponse; }
 	
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 	
-	public function __construct()
+	public function preinit()
 	{
 		//	Phone home...
-		parent::__construct();
+		parent::preinit();
 		
 		//	Augment options...
 		$this->addOptions( 
@@ -176,11 +177,11 @@ class CPSPaypal extends CPSPaymentGateway
 				Yii::app()->request->redirect( $this->redirectUrl . $this->apiToken );
 			}
 			else
-				throw new CPSPaymentException( Yii::t( __CLASS__, 'Error during payment request to Paypal : "{response}" ', array( '{response}' => $_oResponse->rawResponse ) ) );
+				throw new CPSPaymentException( Yii::t( __METHOD__, 'Error during payment request to Paypal : "{response}" ', array( '{response}' => $_oResponse->rawResponse ) ) );
 		}
 		catch ( CPSPaymentException $_ex )
 		{
-			throw new CPSPaymentException( Yii::t( __CLASS__, 'Error during payment request to Paypal : "{response}" ', array( '{response}' => $_ex->getMessage() ) ) );
+			throw new CPSPaymentException( Yii::t( __METHOD__, 'Error during payment request to Paypal : "{response}" ', array( '{response}' => $_ex->getMessage() ) ) );
 		}
 	}
 	
@@ -287,7 +288,7 @@ class CPSPaypal extends CPSPaymentGateway
 		if ( empty( $_arRequestData ) || ! is_array( $_arRequestData ) ) $_arRequestData = array();
 		
 		//	Do we have our Paypal token?
-		if ( $this->isEmpty( $this->apiToken ) )
+		if ( empty( $this->apiToken ) )
 			$_bResult = $this->setExpressCheckout( $_arRequestData );
 			
 		return $_bResult;
@@ -307,15 +308,15 @@ class CPSPaypal extends CPSPaymentGateway
 		if ( empty( $_arRequestData ) || ! is_array( $_arRequestData ) ) $_arRequestData = array();
 		
 		//	Do we have our Paypal token?
-		if ( $this->isEmpty( $this->apiToken ) )
-			throw new CPSPaymentException( Yii::t( __CLASS__, 'You must call beginTransaction() to obtain a token before calling processTransaction().' ) );
+		if ( empty( $this->apiToken ) )
+			throw new CPSPaymentException( Yii::t( __METHOD__, 'You must call beginTransaction() to obtain a token before calling processTransaction().' ) );
 		
 		//	Get the checkout details...
-		if ( $this->isEmpty( $this->apiPayerId ) )
+		if ( empty( $this->apiPayerId ) )
 		{
 			//	Does user want details retrieved?
 			if ( ! $this->getExpressCheckoutDetails() )
-				throw new CPSPaymentException( Yii::t( __CLASS__, 'Error during call to getExpressCheckoutDetails.' ) );
+				throw new CPSPaymentException( Yii::t( __METHOD__, 'Error during call to getExpressCheckoutDetails.' ) );
 		}
 
 		//	Complete the process

@@ -753,6 +753,19 @@ class CPSHelperBase extends CHtml implements IPSBase
 	{
 		return Yii::app()->getAssetManager()->publish( $sPath, $bHashByName, $iLevel );
 	}
+	
+	/**
+	 * Performs a redirect. See {@link CHttpRequest::redirect}
+	 * 
+	 * @param string $sUrl
+	 * @param boolean $bTerminate
+	 * @param int $iStatusCode
+	 * @see CHttpRequest::redirect
+	 */
+	public static function redirect( $sUrl, $bTerminate = true, $iStatusCode = 302 )
+	{
+		Yii::app()->getRequest()->redirect( $sUrl, $bTerminate, $iStatusCode );
+	}
 
 	//********************************************************************************
 	//* Magic Methods

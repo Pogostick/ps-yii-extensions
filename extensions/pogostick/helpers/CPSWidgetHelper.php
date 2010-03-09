@@ -982,10 +982,11 @@ CSS;
 	 */
 	public static function beginForm( $sAction = '', $sMethod = 'POST', $arHtmlOptions = array() )
 	{
+		$_arValidateOptions = PS::o( $arHtmlOptions, 'validateOptions', array(), true );
+		
 		if ( PS::o( $arHtmlOptions, 'validate', false, true ) )
 		{
 			self::$m_bValidating = true;
-			$_arValidateOptions = PS::o( $arHtmlOptions, 'validateOptions', array(), true );
 			if ( ! isset( $_arValidateOptions['target'] ) ) $_arValidateOptions['target'] = self::getFormSelector( $arHtmlOptions );
 			CPSjqValidate::create( null, $_arValidateOptions );
 		}
@@ -1050,7 +1051,7 @@ CSS;
 		//	Set validation error class...
 		if ( PS::o( $arFormOptions, 'validate', false ) == true )
 		{
-			$_arValid = PS::o( $arFormOptions, 'validateOptions', array() );
+			$_arValid = PS::o( $arFormOptions, 'validateOptions', array(), true );
 			$_arValid['errorClass'] = PS::o( $_arValid, 'errorClass', self::$errorCss );
 			$_arValid['ignoreTitle'] = PS::o( $_arValid, 'ignoreTitle', true );
 			$arFormOptions['validateOptions'] = $_arValid;

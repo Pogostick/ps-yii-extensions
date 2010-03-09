@@ -366,14 +366,14 @@ abstract class CPSController extends CController implements IPSBase
 	* @param boolean $bNoCommit If true, transaction will not be committed
 	* @returns boolean
 	*/
-	protected function saveModel( &$oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false )
+	protected function saveModel( &$oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false, $bSafeOnly = false )
 	{
 		$_sMessage = PS::nvl( $sSuccessMessage, 'Your changes have been saved.' );
 		$_sModelName = PS::nvl( $sModelName, PS::nvl( $oModel->modelName, $this->m_sModelName ) );
 
 		if ( isset( $arData, $arData[ $_sModelName ] ) )
 		{
-			if ( ! $bAttributesSet ) $oModel->setAttributes( $arData[ $_sModelName ] );
+			if ( ! $bAttributesSet ) $oModel->setAttributes( $arData[ $_sModelName ], $bSafeOnly );
 			
 			if ( $oModel->save() ) 
 			{

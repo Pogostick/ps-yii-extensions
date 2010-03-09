@@ -74,6 +74,9 @@ class CPSApiBehavior extends CPSComponentBehavior
 				'testApiKey' => 'string:',
 				'testAltApiKey' => 'string:',
 				'userAgent' => 'string:Pogostick Yii Extensions; (+http://www.pogostick.com/yii)',
+				'lastErrorMessage' => 'string:',
+				'lastErrorMessageExtra' => 'string:',
+				'lastErrorCode' => 'string:',
 			)
 		);
 	}

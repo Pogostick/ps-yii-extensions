@@ -1,22 +1,23 @@
 <?php
-/**
- * CPSPaymentGateway class file.
- *
- * @filesource
+/*
+ * This file is part of the psYiiExtensions package.
+ * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
- * @author Jerry Ablan <jablan@pogostick.com>
- * @link http://ps-yii-extensions.googlecode.com Pogostick Yii Extension Library
- * @package psYiiExtensions
- * @subpackage Components
- * @since psYiiExtensions v1.0.5
- * @version SVN: $Revision$
- * @modifiedby $LastChangedBy$
- * @lastmodified  $Date$
- * @license http://www.pogostick.com/license/
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
  */
 
- /**
- * The base payment gateway 
+/**
+ * The base payment gateway
+ * 
+ * @package 	psYiiExtensions.payments
+ * @subpackage 	base
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN $Id$
+ * @since 		v1.1.0
+ * 
+ * @filesource
  * @abstract
  */
 abstract class CPSPaymentGateway extends CPSApiComponent
@@ -25,13 +26,13 @@ abstract class CPSPaymentGateway extends CPSApiComponent
 	//* Constructor
 	//********************************************************************************
 	
-	public function __construct()
+	public function preinit()
 	{
 		//	Phone home...
-		parent::__construct();
+		parent::preinit();
 	
 		//	Add our options...
-//		$this->addOptions( $this->getBaseOptions() );
+		$this->addOptions( $this->getBaseOptions() );
 	}
 
 	/**
