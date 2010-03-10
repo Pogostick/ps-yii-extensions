@@ -35,17 +35,27 @@
 * 
 */
 
+/**
+ * Override as necessary
+ */
 table.ps-data-grid {
-	border-width: 1px;
-	border-style: solid;
-	border-collapse: collapse;
-	border-spacing: 1px;
+	background-color:#FFFFFF;
+	border-collapse:collapse;
+	border-spacing:1px;
+	border-style:solid;
+	border-width:1px;
+	margin-bottom:10px;
+	width:100%;	
 }
 
 table.ps-data-grid th {
 	text-align: left;
 	padding-left: 5px;
 	margin-right: 0px;
+}
+
+table.ps-data-grid tr.ui-widget-header th {
+	padding:5px 10px;
 }
 
 table.ps-data-grid th.ps-actions-header {
@@ -60,6 +70,26 @@ table.ps-data-grid td {
 	border-color: inherit;
 }
 
+div.ps-grid-actions-inner {
+	margin: 0 auto;
+	text-align: center;
+	width: auto;
+}
+
+div.ps-grid-actions-inner a.ps-button {
+	float: none;
+}
+
+div.ps-grid-actions-inner hr {
+	display: block;
+	clear: both; 
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
+}
+
+
+
 table.ps-data-grid th a {
 	text-decoration: none;
 }
@@ -68,8 +98,21 @@ table.ps-data-grid th a:hover {
 	text-decoration: underline;
 }
 
-table.ps-data-grid tr {
-	background-image: none;
+table.ps-data-grid tr.ui-widget-content {
+	background: transparent;
+}
+
+.ps-data-grid-row {
+	background-color: #fff !important;
+}
+
+tr.ps-data-grid-row, 
+tr.ps-data-grid-row.ui-widget-content td a {
+	color: #333 !important;
+}
+
+.ps-data-grid-row-odd {
+	background-color: #eff !important;
 }
 
 /**
@@ -88,4 +131,11 @@ table.ps-data-grid tr {
 	font-weight: bold;
 	font-size: 15px;
 	margin: 10px auto;
+}
+
+div.ps-paged-container {
+	margin:0px;
+	width: auto;
+	position: relative;
+	display: inline-block;
 }
