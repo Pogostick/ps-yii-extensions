@@ -102,7 +102,7 @@ class CPSRESTController extends CPSController
 		if ( null != ( $_sUri = trim( str_ireplace( '/' . $this->getId() . '/' . $_sActionId, '', $_sUri ) ) ) )
 		{
 			$_sUri = trim( $_sUri, '/?' );
-			$_arOpts = explode( '/', $_sUri );
+			$_arOpts = ( ! empty( $_sUri ) ? explode( '/', $_sUri ) : array() );
 			
 			foreach ( $_arOpts as $_sKey => $_oValue )
 			{

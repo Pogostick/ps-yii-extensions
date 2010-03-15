@@ -74,8 +74,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	*/
 	public function getAttributeLabel( $sAttribute )
 	{
-		$_arAttributes = $this->getAttributeLabels();
-		return PS::o( $_arAttributes, $sAttribute, $this->generateAttributeLabel( $sAttribute ) );
+		return PS::o( $this->getAttributeLabels(), $sAttribute, $this->generateAttributeLabel( $sAttribute ) );
 	}
 
 	/**
@@ -211,21 +210,43 @@ class CPSModel extends CActiveRecord implements IPSBase
 	/**
 	* Override of CModel::setAttributes
 	* Populates member variables as well.
+	* Aware of Yii 1.1.0+
+	* 
 	* @param array $arValues
 	*/
 	public function setAttributes( $arValues, $bSafeOnly = true )
 	{
-		if ( ! is_array( $arValues ) )
-			return;
-			
-		$_arAttributes = array_flip( $bSafeOnly ? $this->getSafeAttributeNames() : $this->attributeNames() );
-		
-		foreach ( $arValues as $_sName => $_oValue )
+		if ( version_compare( Yii::getVersion(), '1.1.0', '>=' ) )
 		{
-			if ( $_bIsAttribute = isset( $_arAttributes[ $_sName ] ) )
-				$this->setAttribute( $_sName, $_oValue );
-			else if ( $this->hasProperty( $_sName ) && $this->canSetProperty( $_sName ) )
-				$this->{$_sName} = $_oValue;
+			if ( ! is_array( $arValues ) )
+				return;
+				
+			$_arAttributes = array_flip( $bSafeOnly ? $this->getSafeAttributeNames() : $this->attributeNames() );
+			
+			foreach ( $arValues as $_sName => $_oValue )
+			{
+				if ( $_bIsAttribute = isset( $_arAttributes[ $_sName ] ) )
+					$this->setAttribute( $_sName, $_oValue );
+				else if ( $this->hasProperty( $_sName ) && $this->canSetProperty( $_sName ) )
+					$this->{$_sName} = $_oValue;
+			}
+		}
+		else
+		{
+			$sScenario = ( true === $bSafeOnly ? $this->getScenario() : $bSafeOnly );
+
+			if ( is_array( $arValues ) )
+			{
+				$_arAttributes = array_flip( $this->getSafeAttributeNames( $sScenario ) );
+				
+				foreach ( $arValues as $_sKey => $_oValue )
+				{
+					$_bIsAttribute = isset( $_arAttributes[ $_sKey ] );
+
+					if ( $_bIsAttribute || ( $this->hasProperty( $_sKey ) && $this->canSetProperty( $_sKey ) ) )
+						$this->setAttribute( $_sKey, $_oValue );
+				}
+			}
 		}
 	}
 
@@ -260,4 +281,47 @@ class CPSModel extends CActiveRecord implements IPSBase
 		
 		return null;
 	}
+
+	/**
+	 * Convenience method to get a database connection to a model's database
+	 * @returns CDbConnection
+	 */
+	public static function getDb()
+	{
+		return self::model()->getDbConnection();
+	}
+
+	/**
+	 * Convenience method to get a database command model's database
+	 * @returns CDbCommand
+	 */
+	public static function createCommand( $sSQL )
+	{
+		return self::model()->getDbConnection()->createCommand( $sSQL );
+	}
+
+	/**
+	 * Convenience method to execute a query
+	 * @return integer The number of rows affected by the operation
+	 * @throws CException Execution failed
+	 */
+	public function execute( $sSQL, $arParams = array() )
+	{
+		return $this->getDbConnection()->createCommand( $sSQL )->execute( $arParams );
+	}
+
+	//********************************************************************************
+	//* Event Handlers
+	//********************************************************************************
+	
+	/**
+	* Grab our name
+	* @param string $sClassName
+	*/
+	public function afterConstruct()
+	{
+		$this->m_sModelName = get_class( $this );
+		parent::afterConstruct();
+	}
+	
 }

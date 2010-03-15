@@ -68,6 +68,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 				'apiToUse' => 'string:',
 				'apiSubUrls' => 'array:array()',
 				'httpMethod' => 'string:' . self::HTTP_GET,
+				'returnFormat' => 'string:',
 				'requestData' => 'array:array()',
 				'requestMap' => 'array:array()',
 				'requireApiQueryName' => 'boolean:false',

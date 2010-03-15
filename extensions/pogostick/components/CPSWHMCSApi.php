@@ -1,0 +1,107 @@
+<?php
+/*
+ * This file is part of the Pogostick Yii Extension library
+ * 
+ * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+/**
+ * @package 	psYiiExtensions
+ * @subpackage 	components
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * 
+ * @version 	SVN $Id$
+ * @since 		v1.0.6
+ * 
+ * @filesource
+ */
+class CPSWHMCSApi extends CPSApiComponent
+{
+	//********************************************************************************
+	//* Class Constants
+	//********************************************************************************
+	
+	const CLIENT_API = 'client';
+	const SUPPORT_API = 'support';
+	const MODULE_API = 'module';
+	const QUOTE_API = 'quotes';
+	const ORDER_API = 'orders';
+	const BILLING_API = 'billing';
+	const MISC_API = 'miscellaneous';
+	
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
+	
+	/***
+	* Initialize
+	*/
+	public function preinit()
+	{
+		//	Call daddy...
+		parent::preinit();
+
+		//	Add ours...
+		$this->addOptions( self::getBaseOptions() );
+		
+		//	And our settings...
+		$this->apiQueryName = 'action';
+	}
+	
+	/**
+	 * Makes an API call to the local install of WHMCS
+	 * 
+	 * @param string $sAction
+	 * @param array $arRequestData
+	 */
+	public function makeApiCall( $sAction, $arRequestData = array() )
+	{
+		$_arResults = array();
+		
+		$arRequestData['username'] = PS::o( $arRequestData, 'username', $this->apiUserName );
+		$arRequestData['password'] = md5( PS::o( $arRequestData, 'password', $this->apiPassword ) );
+		$arRequestData['action'] = $sAction;
+		
+		if ( $_arResponse = parent::makeRequest( '/', $arRequestData ) )
+		{
+			if ( $_arData = explode( ';', $_arResponse ) )
+			{
+				foreach ( $_arData as $_oItem )
+				{
+					$_sItem = explode( '=', $_oItem );
+					$_arResults[ $_sItem[0] ] = $_sItem[1];
+				}
+				
+				if ( PS::o( $_arResults, 'result' ) == 'success' )
+					return $_arResults;
+					
+				$this->lastErrorMessage = PS::o( $_arResults, 'message' );
+			}
+		}
+		else
+			$this->lastErrorMessage = 'Error making API call';
+		
+		return false;
+	}
+		
+	//********************************************************************************
+	//* Private Methods
+	//********************************************************************************
+	
+	/**
+	* Allows for single behaviors
+	*/
+	private function getBaseOptions()
+	{
+		return(
+			array(
+				//	API options
+				'apiUserName' => 'string:',
+				'apiPassword' => 'string:',
+			)
+		);
+	}
+
+}

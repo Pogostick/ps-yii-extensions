@@ -108,7 +108,7 @@ class CPSApiComponent extends CPSComponent
 		if ( $this->requireApiQueryName ) $_sQuery = $this->apiQueryName . '=' . $this->apiKey;
 
 		//	Add the request data to the Url...
-		if ( is_array( $this->requestMap ) && ! empty( $sSubType ) )
+		if ( is_array( $this->requestMap ) && ! empty( $sSubType ) && isset( $this->requestMap[ $this->apiToUse ] ) )
 		{
 			$_arRequestMap = $this->requestMap[ $this->apiToUse ][ $sSubType ];
 			$_arDone = array();
@@ -152,9 +152,9 @@ class CPSApiComponent extends CPSComponent
 		//	Handle non-requestMap call...
 		else if ( is_array( $_arRequestData ) )
 		{
-			foreach ( $this->requestData as $_sKey => $_oValue )
+			foreach ( $_arRequestData as $_sKey => $_oValue )
 			{
-				if ( isset( $_arRequestData[ $_sKey ] ) ) $_sQuery .= '&' . $_sKey . '=' . urlencode( $_arRequestData[ $_sKey ] );
+				if ( isset( $_arRequestData[ $_sKey ] ) ) $_sQuery .= '&' . $_sKey . '=' . urlencode( $_oValue );
 			}
 		}
 
@@ -170,7 +170,7 @@ class CPSApiComponent extends CPSComponent
 		$this->onAfterApiCall( $_oEvent );
 
 		//	If user doesn't want JSON output, then reformat
-		switch ( $this->format )
+		switch ( $this->returnFormat )
 		{
 			case 'xml':
 				$_sResults = CPSTransform::arrayToXml( json_decode( $_sResults, true ), 'Results' );
@@ -178,6 +178,9 @@ class CPSApiComponent extends CPSComponent
 
 			case 'array':
 				$_sResults = json_decode( $_sResults, true );
+				break;
+				
+			default:	//	Naked
 				break;
 		}
 
@@ -202,6 +205,11 @@ class CPSApiComponent extends CPSComponent
 	{
 		$this->raiseEvent( 'onBeforeApiCall', $oEvent);
 	}
+	
+	public function beforeApiCall( CPSApiEvent $oEvent )
+	{
+		return true;
+	}
 
 	/**
 	* Raises the onAfterApiCall event. $oEvent contains "raw" return data
@@ -213,6 +221,11 @@ class CPSApiComponent extends CPSComponent
 		$this->raiseEvent( 'onAfterApiCall', $oEvent );
 	}
 
+	public function afterApiCall( CPSApiEvent $oEvent )
+	{
+		return true;
+	}
+
 	/**
 	* Raises the onRequestComplete event. $oEvent contains "processed" return data (if applicable)
 	*
@@ -221,6 +234,11 @@ class CPSApiComponent extends CPSComponent
 	public function onRequestComplete( CPSApiEvent $oEvent )
 	{
 		$this->raiseEvent( 'onRequestComplete', $oEvent );
+	}
+
+	public function requestComplete( CPSApiEvent $oEvent )
+	{
+		return true;
 	}
 
 }
