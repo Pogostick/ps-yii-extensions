@@ -68,8 +68,8 @@ class CPSMcDropdownWidget extends CPSjqUIWrapper
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 	
-		PS::_rsf( "{$this->baseUrl}/lib/jquery.mcdropdown.min.js" );
 		PS::_rsf( "{$this->baseUrl}/lib/jquery.bgiframe.js" );
+		PS::_rsf( "{$this->baseUrl}/lib/jquery.mcdropdown.min.js" );
 		PS::_rcf( "{$this->baseUrl}/css/jquery.mcdropdown.min.css" );
 		
 		//	And register ours...
