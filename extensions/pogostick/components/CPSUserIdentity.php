@@ -79,6 +79,7 @@ class CPSUserIdentity extends CPSComponent implements IUserIdentity
 	protected $m_arAuthAttributes = array( 
 		'username' => 'username',
 		'password' => 'password',
+		'email' => 'email',
 	);
 	public function getAuthAttributes() { return $this->m_arAuthAttributes; }
 	public function setAuthAttributes( $arValue ) { $this->m_arAuthAttributes = $arValue; }	
@@ -102,6 +103,14 @@ class CPSUserIdentity extends CPSComponent implements IUserIdentity
 	 * @var array
 	 */
 	protected $m_arState = array();
+	
+	/**
+	 * If true, users can use their email address to log in as well as a user name
+	 * @var boolean
+	 */
+	protected $m_bAllowEmailLogins = true;
+	public function getAllowEmailLogins() { return $this->m_bAllowEmailLogins; }
+	public function setAllowEmailLogins( $bValue ) { $this->m_bAllowEmailLogins = $bValue; }
 	
 	//********************************************************************************
 	//* Public Methods
@@ -147,7 +156,17 @@ class CPSUserIdentity extends CPSComponent implements IUserIdentity
 			throw new CException( Yii::t( 'psYiiExtensions', '{class}::authModel must be set or {class}::authenticate() must be overridden.', array( '{class}' => get_class( $this ) ) ) );
 		
 		$this->m_sUserName = trim( strtolower( $this->m_sUserName ) );
-		$_oUser = $this->m_oAuthModel->find( $this->m_arAuthAttributes['username'] . ' = :' . $this->m_arAuthAttributes['username'], array( ':' . $this->m_arAuthAttributes['username'] => strtolower( $this->m_sUserName ) ) );
+		
+		$_arCondition = array( $this->m_arAuthAttributes['username'] . ' = :' . $this->m_arAuthAttributes['username'] );
+		$_arParams = array( ':' . $this->m_arAuthAttributes['username'] => $this->m_sUserName );
+		
+		if ( $this->m_bAllowEmailLogins ) 
+		{
+			$_arCondition[] = $this->m_arAuthAttributes['email'] . ' = :' . $this->m_arAuthAttributes['email'];
+			$_arParams[ ':' . $this->m_arAuthAttributes['email'] ] = $this->m_sUserName;
+		}
+		
+		$_oUser = $this->m_oAuthModel->find( implode( ' OR ', $_arCondition ), $_arParams );
 
 		if ( $_oUser === null )
 			$this->errorCode = self::ERROR_USERNAME_INVALID;

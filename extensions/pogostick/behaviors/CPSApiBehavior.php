@@ -156,21 +156,25 @@ class CPSApiBehavior extends CPSComponentBehavior
 	* @see makeMapItem
 	* @see makeMapArray
 	*/
-	public function addRequestMapping( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, $sApiName = null, $sSubApiName = '/' )
+	public function addRequestMapping( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, $sApiName = null, $sSubApiName = null )
 	{
 		//	Save for next call
 		static $_sLastApiName;
 		static $_sLastAction;
 
 		//	Set up statics so next call can omit those parameters.
-		if ( null != $sApiName && $sApiName != $_sLastApiName )
+		if ( null !== $sApiName && $sApiName != $_sLastApiName )
 			$_sLastApiName = $sApiName;
 
-		if (  null != $sSubApiName && $sSubApiName != $_sLastAction )
+		//	Make sure sub API name is set...
+		if ( null === $_sLastAction && null == $sSubApiName )
+			$sSubApiName = '/';
+			
+		if (  null !== $sSubApiName && $sSubApiName != $_sLastAction )
 			$_sLastAction = $sSubApiName;
 
 		//	Build the options
-		$_arTemp = array( 'name' => ( null != $sParamName ) ? $sParamName : $sLabel, 'required' => $bRequired );
+		$_arTemp = array( 'name' => ( null !== $sParamName ) ? $sParamName : $sLabel, 'required' => $bRequired );
 
 		//	Add on any supplied options
 		if ( null != $arOptions )
@@ -181,8 +185,11 @@ class CPSApiBehavior extends CPSComponentBehavior
 			return false;
 
 		//	Add mapping...
-		$_arOptions =& $this->getOptions();
-		$_arOptions[ 'requestMap' ][ $_sLastApiName ][ $_sLastAction ][ $sLabel ] = $_arTemp;
+		if ( ! $_arMap = $this->getValue( 'requestMap' ) )
+			$_arMap = array();
+			
+		$_arMap[$_sLastApiName][$_sLastAction][$sLabel] = $_arTemp;
+		$this->setValue( 'requestMap', $_arMap );
 
 		return true;
 	}

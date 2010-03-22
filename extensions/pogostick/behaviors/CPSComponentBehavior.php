@@ -222,6 +222,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	 */
 	public function getOptions( $bPublicOnly = false, $arOnlyThese = array() ) { return $this->m_oOptions->getOptions( $bPublicOnly, $arOnlyThese ); }
 	public function getRawOptions( $bPublicOnly = false, $arOnlyThese = array() ) { return $this->m_oOptions->toArray( $bPublicOnly, $arOnlyThese ); }
+	public function &getOptionsObject() { return $this->m_oOptions; }
 
 	/**
 	* Sets an option

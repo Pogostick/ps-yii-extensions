@@ -242,7 +242,7 @@ class CPSDataGrid implements IPSBase
 		if ( count( $arDivComment ) && $_oModel->hasErrors() )
 			$_arRowOpts = array( 'class' => $arDivComment[1], 'title' => implode( ', ', current( $_oModel->getErrors() ) ) );
 			
-		$_arRowOpts['class'] = PS::o( $_arRowOpts, 'class', ' ui-widget-content' );
+		$_arRowOpts['class'] = PS::o( $_arRowOpts, 'class', 'ui-widget-content' );
 		
 		if ( ! $arModel || ( is_array( $arModel ) && ! count( $arModel ) ) ) 
 		{
@@ -250,6 +250,8 @@ class CPSDataGrid implements IPSBase
 		}
 		else
 		{
+			$_sBaseClass = $_arOptions['class'];
+			
 			foreach ( $arModel as $_iIndex => $_oModel )
 			{
 				$_sActions = null;
@@ -259,7 +261,6 @@ class CPSDataGrid implements IPSBase
 				//	Build actions...
 				if ( $_sActions = self::buildActions( $_oModel ) )
 					$_sTD .= PS::tag( 'td', array( 'class' => 'ps-grid-actions' ), '<div class="ps-grid-actions-inner">' . $_sActions . '<hr /></div>' );
-				
 				
 				//	Row id template? Fill it in
 				if ( $_sRowIdTemplate ) 
@@ -271,9 +272,20 @@ class CPSDataGrid implements IPSBase
 				}
 				
 				//	Mark odd rows
-				if ( $_iRow % 2 ) $_arRowOpts['class'] .= ' ui-state-highlight ps-data-grid-row-odd';
+				$_sClass = $_sBaseClass;
 				
-				$_sOut .= PS::tag( 'tr', $_arRowOpts, $_sTD );
+				if ( $_iRow % 2 == 0 ) 
+				{
+					$_sClass .= ' ui-state-default ps-data-grid-row-odd';
+				}
+				else
+				{
+					$_sClass .= ' ui-state-active ps-data-grid-row-even';
+				}
+				
+				$_arOptions['class'] = $_sClass;
+				
+				$_sOut .= PS::tag( 'tr', $_arOptions, $_sTD );
 				
 				//	Add subrows...
 				if ( ! empty( $_oModel->subRows ) )
@@ -294,7 +306,6 @@ class CPSDataGrid implements IPSBase
 					}
 				}
 				
-				//	Increment row counter
 				$_iRow++;
 			}
 		}

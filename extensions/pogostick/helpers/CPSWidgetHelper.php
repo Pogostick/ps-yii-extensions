@@ -1070,6 +1070,13 @@ CSS;
 			$_sFormHeaderTag = PS::o( $arFormOptions, 'formHeaderTag', 'H1', true );
 			$_arFormHeaderOptions = PS::o( $arFormOptions, 'formHeaderOptions', array(), true );
 			$_sOut .= PS::tag( $_sFormHeaderTag, $_arFormHeaderOptions, $_sFormHeader );
+
+			if ( $_sFormHeaderContent = PS::o( $arFormOptions, 'formHeaderContent', null, true ) )
+			{
+				$_sFormHeaderContentTag = PS::o( $arFormOptions, 'formHeaderContentTag', 'DIV', true );
+				$_arFormHeaderContentOptions = PS::o( $arFormOptions, 'formHeaderContentOptions', array(), true );
+				$_sOut .= PS::tag( $_sFormHeaderContentTag, $_arFormHeaderContentOptions, $_sFormHeaderContent );
+			}
 		}
 		
 		//	Build out begining of form...
@@ -1592,12 +1599,8 @@ HTML;
 		
 		foreach ( $_arClassList as $_sClass )
 		{
-			foreach ( $_arNewClasses as $_sMatch )
-			{
-				//	Not matched? Add to result array
-				if ( $_sClass != $_sMatch && ! preg_match( $_sMatch, $_sClass ) )
-					$_arClass[] = $_sClass;
-			}
+			if ( ! in_array( $_sClass, $_arNewClasses ) ) 
+				$_arClass[] = $_sClass;
 		}
 
 		return is_array( $oClass ) ? $_arClass : implode( ' ', $_arClass );

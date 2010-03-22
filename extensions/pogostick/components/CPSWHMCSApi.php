@@ -45,7 +45,7 @@ class CPSWHMCSApi extends CPSApiComponent
 
 		//	Add ours...
 		$this->addOptions( self::getBaseOptions() );
-		
+	
 		//	And our settings...
 		$this->apiQueryName = 'action';
 	}
@@ -56,22 +56,23 @@ class CPSWHMCSApi extends CPSApiComponent
 	 * @param string $sAction
 	 * @param array $arRequestData
 	 */
-	public function makeApiCall( $sAction, $arRequestData = array() )
+	public function makeApiCall( $sApiName, $sSubApiName, $arRequestData = array() )
 	{
 		$_arResults = array();
 		
-		$arRequestData['username'] = PS::o( $arRequestData, 'username', $this->apiUserName );
-		$arRequestData['password'] = md5( PS::o( $arRequestData, 'password', $this->apiPassword ) );
-		$arRequestData['action'] = $sAction;
+		$this->apiToUse = $sApiName;
+		$arRequestData['username'] = $this->apiUserName;
+		$arRequestData['password'] = md5( $this->apiPassword );
+		$arRequestData['action'] = $sSubApiName;
 		
-		if ( $_arResponse = parent::makeRequest( '/', $arRequestData ) )
+		if ( $_arResponse = parent::makeRequest( $sSubApiName, $arRequestData, 'POST' ) )
 		{
 			if ( $_arData = explode( ';', $_arResponse ) )
 			{
 				foreach ( $_arData as $_oItem )
 				{
 					$_sItem = explode( '=', $_oItem );
-					$_arResults[ $_sItem[0] ] = $_sItem[1];
+					if ( trim( $_sItem[0] ) ) $_arResults[ $_sItem[0] ] = $_sItem[1];
 				}
 				
 				if ( PS::o( $_arResults, 'result' ) == 'success' )

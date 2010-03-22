@@ -35,14 +35,13 @@ class CPSWHMCSBillingApi extends CPSWHMCSApi
 		$this->apiToUse = self::BILLING_API;
 		
 		//	Billing::AddBillableItem
-		$this->addRequestMapping( 'addBillableItem', 'addbillableitem', true, null, self::BILLING_API );
-		$this->addRequestMapping( 'clientId', 'clientid', true );
+		$this->addRequestMapping( 'clientId', 'clientid', true, null, self::BILLING_API, 'addbillableitem' );
 		$this->addRequestMapping( 'description', 'description', true );
 		$this->addRequestMapping( 'amount', 'amount', true );
 		$this->addRequestMapping( 'recurFrequency', 'recur', true );
 		$this->addRequestMapping( 'recurCycle', 'recurcycle', true );
 		$this->addRequestMapping( 'recurCount', 'recurfor', true );
-		$this->addRequestMapping( 'invoiceAction', 'invoiceAction', true );
+		$this->addRequestMapping( 'invoiceAction', 'invoiceaction', true );
 		$this->addRequestMapping( 'dueDate', 'duedate', true );
 	}
 

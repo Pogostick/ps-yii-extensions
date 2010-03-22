@@ -83,7 +83,12 @@ class CPSForm implements IPSBase
 			
 			//	Handle a runtime conditional column display
 			if ( $_sCondition = PS::o( $_arValue, 'condition', null, true ) )
-				$_bPassed = eval( 'return(' . $_sCondition . ');' );
+			{
+				if ( is_bool( $_sCondition ) )
+					$_bPassed = $_sCondition;
+				else
+					$_bPassed = eval( 'return(' . $_sCondition . ');' );
+			}
 			
 			if ( $_bPassed )
 			{

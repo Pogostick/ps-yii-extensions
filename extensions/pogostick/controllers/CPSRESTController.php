@@ -74,6 +74,42 @@ class CPSRESTController extends CPSController
 
 		return new CPSRESTAction( $this, $_sActionId );
 	}
+	
+	/**
+	 * Converts an array to JSON
+	 * 
+	 * @param array $arData
+	 */
+	public function arrayToJSON( $arData = array() )
+	{
+		$_arOut = array();
+		
+		foreach ( $arData as $_sKey => &$_oValue )
+			$_arOut[] = $_sKey . ':' . $this->toJSON( $_oValue );
+		
+		return '{' . implode( ',', $_arOut ) . '}';
+    }
+    
+    /***
+     * Converts an item to JSON
+     * 
+     * @param mixed $oValue
+     */
+    function toJSON( $oValue )
+    {
+    	if ( is_array( $oValue ) )
+    		$_oOut = $this->arrayToJSON( $oValue );
+    	else if ( is_string( $oValue ) )
+    		$_oOut = '"' . addslashes( $oValue ) . '"';
+   		else if ( is_bool( $oValue ) )
+    		$_oOut = $oValue ? 'true' : 'false';
+    	else if ( is_null( $oValue ) )
+			$_oOut = '""';
+		else
+			$_oOut = $oValue;
+			
+		return $_oOut;
+    }
 
 	//********************************************************************************
 	//* Private Methods
