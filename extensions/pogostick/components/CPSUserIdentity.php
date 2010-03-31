@@ -160,7 +160,7 @@ class CPSUserIdentity extends CPSComponent implements IUserIdentity
 		$_arCondition = array( $this->m_arAuthAttributes['username'] . ' = :' . $this->m_arAuthAttributes['username'] );
 		$_arParams = array( ':' . $this->m_arAuthAttributes['username'] => $this->m_sUserName );
 		
-		if ( $this->m_bAllowEmailLogins ) 
+		if ( $this->m_bAllowEmailLogins && $this->m_arAuthAttributes['email'] ) 
 		{
 			$_arCondition[] = $this->m_arAuthAttributes['email'] . ' = :' . $this->m_arAuthAttributes['email'];
 			$_arParams[ ':' . $this->m_arAuthAttributes['email'] ] = $this->m_sUserName;
@@ -255,7 +255,7 @@ class CPSUserIdentity extends CPSComponent implements IUserIdentity
 	 */
 	public function getState( $sKey, $oDefault = null )
 	{
-		return PS::o( $this->m_arState, $sKey, $oDefault );
+		return Yii::app()->user->getState( $sKey, $oDefault );
 	}
 
 	/**
@@ -266,7 +266,7 @@ class CPSUserIdentity extends CPSComponent implements IUserIdentity
 	 */
 	public function setState($sKey,$oValue)
 	{
-		return PS::so( $this->m_arState, $sKey, $oValue );
+		return Yii::app()->user->setState( $sKey, $oValue );
 	}
 
 	/**
@@ -275,7 +275,7 @@ class CPSUserIdentity extends CPSComponent implements IUserIdentity
 	 */
 	public function clearState( $sKey )
 	{
-		PS::uo( $this->m_arState, $sKey );
+		Yii::app()->user->clearState( $sKey );
 	}
 	
 	//********************************************************************************

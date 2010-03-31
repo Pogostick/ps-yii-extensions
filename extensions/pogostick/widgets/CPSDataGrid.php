@@ -109,10 +109,11 @@ class CPSDataGrid implements IPSBase
 		$_sGridHeader = PS::o( $arOptions, 'gridHeader', null, true );
 		$_oPages = PS::o( $arOptions, 'pages', null, true );
 		$_arFormHeader = PS::o( $arOptions, 'formHeader', null, true );
+		$_sItemName = PS::o( $arOptions, 'itemName', 'itme' );
 		
 		if ( null !== $_arFormHeader )
 		{
-			$_arFormHeader['itemName'] = PS::o( $_arFormHeader, 'itemName', 'item' );
+			$_arFormHeader['itemName'] = PS::o( $_arFormHeader, 'itemName', $_sItemName );
 			$_sFormHeader = PS::o( $_arFormHeader, 'title', 'Form Header', true );
 		}
 		else
@@ -122,7 +123,7 @@ class CPSDataGrid implements IPSBase
 				$_sFormHeader = PS::o( $_arFormHeader, 'title', 'Form Header', true );
 				$_arFormHeader = array(
 					'menuButtons' => $_arMenuButtons,
-					'itemName' => PS::o( $arOptions, 'dataItemName', 'item' ),
+					'itemName' => PS::o( $arOptions, 'dataItemName', $_sItemName ),
 				);
 			}
 		}
@@ -396,12 +397,15 @@ class CPSDataGrid implements IPSBase
 					//	The rest art action options...
 					$_arActionOptions = $_oParts;
 					$_arLink = PS::nvl( PS::o( $_arActionOptions, 'url' ), $_arLink );
+					if ( ! is_array( $_arLink ) ) $_arLink = array( $_arLink );
 				}
 			}
 
 			//	Invalid action? Skip
 			if ( is_numeric( $_sAction ) )
 				$_eAction = intval( $_sAction );
+			else if ( is_array( $_sAction ) && is_numeric( $_sKey ) )
+				$_eAction = intval( $_sKey );
 			else if ( false === ( $_eAction = array_search( $_sAction, self::$m_arActionMap, true ) ) )
 				continue;
 			

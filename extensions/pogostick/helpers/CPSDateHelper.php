@@ -93,4 +93,18 @@ class CPSDateHelper implements IPSBase
 		return date( $sFormat, $dtDate ? strtotime( $dtDate ) : time() );
 	}
 	
+	/**
+	* Checks to see if a date/time is valid
+	* @param string $dtValue
+	*/
+	public static function isValid( $dtValue )
+	{
+		if ( preg_match( "/^(\d{4})-(\d{2})-(\d{2}) ([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/", $dtValue, $_arMatches ) )
+		{
+        	if ( checkdate( $_arMatches[2], $_arMatches[3], $_arMatches[1] ) )
+            	return true;
+        }
+
+	    return false;
+	}
 }

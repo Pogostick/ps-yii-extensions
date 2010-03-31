@@ -221,7 +221,7 @@ abstract class CPSController extends CController implements IPSBase
 		parent::init();
 		
 		//	Find layout...
-		if ( $this->m_bAutoLayout && ! isset( $_SERVER['argv'] ) ) if ( file_exists( Yii::app()->getBasePath() . '/views/layouts/' . $this->getId() . '.php' ) ) $this->layout = $this->getId();
+		if ( $this->m_bAutoLayout && ! Yii::app() instanceof CConsoleApplication ) if ( file_exists( Yii::app()->getBasePath() . '/views/layouts/' . $this->getId() . '.php' ) ) $this->layout = $this->getId();
 		
 		//	Allow errors
 		$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
@@ -316,6 +316,17 @@ abstract class CPSController extends CController implements IPSBase
 		return true;
 	}
 		
+	/**
+	 * @return CWebModule the module that this controller belongs to. It returns Yii::app() if the controller does not belong to any module
+	 * @since 1.0.6
+	 */
+	public function getModule()
+	{
+		if ( ! $_oModule = parent::getModule() )
+			$_oModule = Yii::app();
+			
+		return $_oModule;
+	}
 	
 	//********************************************************************************
 	//* Private Methods

@@ -135,7 +135,7 @@ class CPSDeltaChangeBehavior extends CPSBaseActiveRecordBehavior
 			$_arCheck = $oAttributes;
 			if ( ! is_array( $_arCheck ) ) $_arCheck = array( $_arCheck );
 
-			foreach ( $_arCheck as $_sKey )
+			foreach ( $_arCheck as $_sKey => $_oValue )
 			{
 				if ( $this->checkAttributeChange( $_sKey ) )
 				{

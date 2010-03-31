@@ -163,17 +163,21 @@ class CPSjQueryWidget extends CPSWidget
 				$_sBasePath . '/js/ui.' . $_sWName . '.js',
 			);
 			
-			//	Any others?
-			foreach ( PS::nvl( $this->extraScriptFiles, array() ) as $_sScript )
-				$_arFiles[] = $_sBasePath . '/' . $_sScript;
-				
 			//	Ok, check 'em out...
 			foreach ( $_arFiles as $_sFile )
 			{
 				if ( file_exists( $_sFile ) ) 
+				{
 					$this->pushScriptFile( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sFile ) );
+					break;
+				}
 			}
 				
+			//	Any others?
+			foreach ( PS::nvl( $this->extraScriptFiles, array() ) as $_sScript )
+				$this->pushScriptFile( $_sBasePath . '/' . $_sScript );
+				
+			//	Now css...
 			$_arFiles = array(
 				$_sFilePath . '.min.css',
 				$_sFilePath . '-min.css',
@@ -189,16 +193,19 @@ class CPSjQueryWidget extends CPSWidget
 				$_sBasePath . '/css/ui.' . $_sWName . '.css',
 			);
 			
-			//	Any other css?
-			foreach ( PS::nvl( $this->extraCssFiles, array() ) as $_sCss )
-				$_arFiles[] = $_sBasePath . '/' . $_sCss;
-				
 			foreach ( $_arFiles as $_sFile )
 			{
 				if ( file_exists( $_sFile ) ) 
+				{
 					$this->pushCssFile( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sFile ) );
+					break;
+				}
 			}
 			
+			//	Any other css?
+			foreach ( PS::nvl( $this->extraCssFiles, array() ) as $_sCss )
+				$this->pushCssFile( $_sBasePath . '/' . $_sCss );
+				
 			//	Clear 'em out.
 			$this->extraScriptFiles = $this->extraCssFiles = null;
 		}

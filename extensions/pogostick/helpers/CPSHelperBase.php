@@ -54,9 +54,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	const	ACTION_UNLOCK 	= 8;
 	
 	//	Add your own in between 4 and 997...
-	const	ACTION_RETURN 	= 997;
-	const	ACTION_CANCEL 	= 998;
-	const	ACTION_GENERIC = 999;
+	const	ACTION_RETURN 		= 997;
+	const	ACTION_CANCEL 		= 998;
+	const	ACTION_GENERIC 		= 999;
 	
 	//********************************************************************************
 	//* Private Members
@@ -138,16 +138,33 @@ class CPSHelperBase extends CHtml implements IPSBase
 	}
 	
 	/**
-	 * Alias for {@link CPSHelperBase::getOption)
+	* Similar to {@link PS::o} except it will pull a value from a nested array.
+	* 
 	* @param array $arOptions
-	* @param string $sKey
+	* @param integer|string $sKey
+	* @param integer|string $sSubKey
 	* @param mixed $oDefault
 	* @param boolean $bUnset
-	* @returns mixed
+	* @return mixed
+	*/
+	public static function oo( &$arOptions = array(), $sKey, $sSubKey, $oDefault = null, $bUnset = false )
+	{
+		return PS::o( PS::o( $arOptions, $sKey, array() ), $sSubKey, $oDefault, $bUnset );
+	}
+	
+	/**
+	* Alias for {@link CPSHelperBase::getOption)
+	* 
+	* @param array $arOptions
+	* @param integer|string $sKey
+	* @param integer|string $sSubKey
+	* @param mixed $oDefault
+	* @param boolean $bUnset
+	* @return mixed
 	* @access public
 	* @static
 	* @see CPSHelperBase::getOption
-	 */
+	*/
 	public static function o( &$arOptions = array(), $sKey, $oDefault = null, $bUnset = false )
 	{
 		$_oValue = $oDefault;

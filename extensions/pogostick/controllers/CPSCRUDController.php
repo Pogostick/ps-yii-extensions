@@ -54,9 +54,9 @@ abstract class CPSCRUDController extends CPSController
 		$this->addCommandToMap( 'undelete', array( $this, 'commandUndelete' ) );
 
 		//	Set our access rules..
-		$this->setUserActionList( self::ACCESS_TO_ALL, array( 'index', 'error' ) );
-		$this->setUserActionList( self::ACCESS_TO_GUEST, array( 'login', 'show', 'list', 'contact' ) );
-		$this->setUserActionList( self::ACCESS_TO_AUTH, array( 'logout', 'admin', 'create', 'delete', 'update' ) );
+		$this->addUserAction( self::ACCESS_TO_ALL, 'error' );
+		$this->addUserActions( self::ACCESS_TO_GUEST, array( 'login', 'show', 'list', 'contact' ) );
+		$this->addUserActions( self::ACCESS_TO_AUTH, array( 'logout', 'admin', 'create', 'delete', 'update', 'index' ) );
 	}
 
 	/**
@@ -66,7 +66,9 @@ abstract class CPSCRUDController extends CPSController
 	*/
 	public function filters()
 	{
-		if ( isset( $_SERVER['argv'] ) ) return array();
+		if ( $_SERVER['HTTP_HOST'] == 'localhost' ) return array();
+		
+		Yii::trace( 'Not console: ' . var_export($_SERVER,true) );
 		
 		//	Perform access control for CRUD operations
 		return array(
@@ -84,7 +86,7 @@ abstract class CPSCRUDController extends CPSController
 		static $_arRules;
 		static $_bInit;
 		
-		if ( isset( $_SERVER['argv'] ) ) return array();
+		if ( Yii::app() instanceof CConsoleApplication ) return array();
 		
 		//	Build access rule array...
 		if ( ! isset( $_bInit ) )
@@ -184,7 +186,7 @@ abstract class CPSCRUDController extends CPSController
 	public function actionLogout()
 	{
 		Yii::app()->user->logout();
-		$this->redirect( $this->defaultAction );
+		$this->redirect( Yii::app()->user->loginUrl );
 	}
 
 	/**
@@ -207,7 +209,10 @@ abstract class CPSCRUDController extends CPSController
 	public function actionUpdate( $arExtraParams = array() )
 	{
 		$_oModel = $this->loadModel();
-		if ( Yii::app()->request->isPostRequest ) $this->saveModel( $_oModel, $_POST, 'update' );
+		if ( Yii::app()->request->isPostRequest ) 
+		{
+			$this->saveModel( $_oModel, $_POST, 'update' );
+		}
 		$this->genericAction( 'update', $_oModel, $arExtraParams );
 	}
 

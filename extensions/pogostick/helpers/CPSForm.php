@@ -159,6 +159,10 @@ class CPSForm implements IPSBase
 		//	Does user want dates? Show 'em
 		if ( $_bShowDates && $_oModel instanceof CPSModel && ! $_oModel->isNewRecord ) 
 			$_sOut .= $_oModel->showDates();
+			
+		//	Add legend
+		if ( trim( PS::$afterRequiredLabel ) )
+			$_sOut .= '<div class="ps-form-legend">' . PS::$afterRequiredLabel . ' denotes a required field.</div>';
 
 		//	Ok, done building form...
 		$_sOut .= PS::endForm();
