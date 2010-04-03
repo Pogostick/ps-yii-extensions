@@ -40,8 +40,8 @@ class CPSModel extends CActiveRecord implements IPSBase
 	 * @var string
 	 */
 	protected $m_sTablePrefix = null;
-	public function getTablePrefix() { return ( version_compare( YiiBase::getVersion(), '1.1.0' ) > 0 ) ? $this->getDbConnection()->getTablePrefix() : $this->m_sTablePrefix; }
-	public function setTablePrefix( $sValue ) { ( version_compare( YiiBase::getVersion(), '1.1.0' ) > 0 ) ? $this->getDbConnection()->setTablePrefix( $sValue ) : $this->m_sTablePrefix = $sValue; }
+	public function getTablePrefix() { return ( version_compare( YiiBase::getVersion(), '1.1.0' ) > 0 ) ? $this->getDbConnection()->tablePrefix : $this->m_sTablePrefix; }
+	public function setTablePrefix( $sValue ) { ( version_compare( YiiBase::getVersion(), '1.1.0' ) > 0 ) ? $this->getDbConnection()->tablePrefix = $sValue : $this->m_sTablePrefix = $sValue; }
 	
 	/***
 	* Current transaction if any

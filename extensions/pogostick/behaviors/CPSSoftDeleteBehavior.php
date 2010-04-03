@@ -81,21 +81,26 @@ class CPSSoftDeleteBehavior extends CPSBaseActiveRecordBehavior
 	public function beforeDelete( $oEvent )
 	{
 		//	Pass it on...
-		parent::beforeDelete( $oEvent );
-		
-		//	We want to be the top of the chain...
-		if ( $this->m_sSoftDeleteColumn && $oEvent->isValid && ! $oEvent->handled )
+		if ( parent::beforeDelete( $oEvent ) )
 		{
-			//	Perform a soft delete if this model allows
-			if ( $oEvent->sender->hasAttribute( $this->m_sSoftDeleteColumn ) )
+			//	We want to be the top of the chain...
+			if ( $this->m_sSoftDeleteColumn && $oEvent->isValid && ! $oEvent->handled )
 			{
-				$oEvent->isValid = false;
-				$oEvent->handled = true;
-				$oEvent->sender->setAttribute( $this->m_sSoftDeleteColumn, $this->m_arSoftDeleteValue[ 1 ] );
-				if ( ! $oEvent->sender->update( array( $this->m_sSoftDeleteColumn ) ) )
-					throw new CDbException( 'Error saving soft delete row.' );
+				//	Perform a soft delete if this model allows
+				if ( $oEvent->sender->hasAttribute( $this->m_sSoftDeleteColumn ) )
+				{
+					$oEvent->isValid = false;
+					$oEvent->handled = true;
+					$oEvent->sender->setAttribute( $this->m_sSoftDeleteColumn, $this->m_arSoftDeleteValue[ 1 ] );
+					if ( ! $oEvent->sender->update( array( $this->m_sSoftDeleteColumn ) ) )
+						throw new CDbException( 'Error saving soft delete row.' );
+				}
 			}
+			
+			return true;
 		}
+		
+		return false;
 	}
 	
 	/**
