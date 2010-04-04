@@ -58,6 +58,7 @@ class CPSDataGrid implements IPSBase
 		'admin'		=> PS::ACTION_ADMIN,
 		'cancel'	=> PS::ACTION_CANCEL,
 		'return'	=> PS::ACTION_CANCEL,
+		'preview'	=> PS::ACTION_PREVIEW,
 	);
 
 	/**
@@ -71,6 +72,7 @@ class CPSDataGrid implements IPSBase
 		PS::ACTION_DELETE => 'delete',
 		PS::ACTION_LOCK => 'lock',
 		PS::ACTION_UNLOCK => 'unlock',
+		PS::ACTION_PREVIEW => 'preview',
 	);
 
 	/**

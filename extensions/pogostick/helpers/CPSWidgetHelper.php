@@ -328,9 +328,9 @@ class CPSWidgetHelper extends CPSHelperBase
 		{
 			$eFieldType = PS::TEXT_DISPLAY;
 			$arOptions['transform'] = '*';
-			$arOptions['name'] = $arOptions['id'] = 'disp_' . $oModel->id . $sColName;
+			$arOptions['name'] = $arOptions['id'] = 'disp_' . $oModel->id . '_' . $sColName;
+			$arOptions['class'] = PS::addClass( $arOptions['class'], 'ps-text-display' );
 			$_sOut = PS::activeHiddenField( $oModel, $sColName );
-			$arOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display' ), CPSTransform::valueOf( '*', $oModel->$sColName ) );
 			$_sOut .= PS::field( $eFieldType, $oModel, $sColName, $arOptions );
 		}
 		else if ( $eFieldType == PS::MULTISELECT )
@@ -352,6 +352,7 @@ class CPSWidgetHelper extends CPSHelperBase
 			//	Get our operating parameters
 			$_sLabel = PS::o( $arOptions, 'label', null, true );
 			$_arLabelOptions = PS::o( $arOptions, 'labelOptions', array(), true );
+			if ( $eFieldType == PS::TEXTAREA ) $_arLabelOptions['style'] .= 'vertical-align:top;';
 			$_sSuffixToUse = PS::o( $_arLabelOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
 			$_arWidgetOptions = PS::o( $arOptions, 'widgetOptions', array(), true );
 			$_arData = PS::o( $arOptions, 'data', null, true );
@@ -393,7 +394,7 @@ class CPSWidgetHelper extends CPSHelperBase
 			{
 				//	Set label name
 				$_arLabelOptions['label'] = PS::nvl( $_sLabel, PS::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . $_sSuffixToUse;
-				$_sOut = self::activeLabelEx( $oModel, $sColName, $_arLabelOptions );
+				$_sOut = ( $eFieldType == PS::TEXT_DISPLAY ? self::activeLabel( $oModel, $sColName, $_arLabelOptions ) : self::activeLabelEx( $oModel, $sColName, $_arLabelOptions ) );
 			}
 
 			//	Do a value transform if requested
@@ -512,6 +513,8 @@ class CPSWidgetHelper extends CPSHelperBase
 		{
 			case self::TEXT_DISPLAY:
 				$arHtmlOptions['style'] = PS::o( $arHtmlOptions, 'style' ) . ' border:none; background-color: transparent;';
+				$arHtmlOptions['class'] = PS::addClass( $arOptions['class'], 'ps-text-display' );
+				$arHtmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', CPSTransform::valueOf( '*', $oModel->$sColName ) ) );
 				$eFieldType = self::TEXT;
 				break;
 				

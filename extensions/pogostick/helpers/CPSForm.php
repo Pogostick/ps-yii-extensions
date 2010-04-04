@@ -117,10 +117,6 @@ class CPSForm implements IPSBase
 						$_sOut .= call_user_func_array( array( 'PS', 'submitButtonBar' ), $_arValue );
 						break;
 						
-					case 'label':
-//						$_sOut .= call_user_func_array( array( 'PS', 'label' ), $_arValue );
-						break;
-						
 					default:
 						$_sMethod = $_sType;
 						
@@ -320,12 +316,27 @@ HTML;
 		if ( null === $sAdminName ) $sAdminName = ucfirst( $sItemName ) . ' Manager';
 		if ( null === $sAdminAction ) $sAdminAction = array( 'admin' );
 		
-		foreach ( $arWhich as $_sButton )
+		foreach ( $arWhich as $_sButton => $_arOptions )
 		{
+			if ( is_numeric( $_sButton ) && ! is_array( $_arOptions ) )
+				$_sButton = $_arOptions;
+				
 			$_iButton = CPSDataGrid::getMenuButtonType( $_sButton );
 			
 			switch ( $_iButton )
 			{
+				case PS::ACTION_PREVIEW:
+					$_arOut[ 'preview' ] = array(
+						'label' => 'Preview',
+						'url' => array( '#' ),
+						'icon' => 'lightbulb',
+						'id' => PS::o( $_arOptions, 'id' ),
+					);
+					
+					if ( $_sTarget = PS::o( $_arOptions, 'target' ) )
+						$_arOut['preview']['onClick'] = '$(\'' . $_sTarget . '\').toggle(); return false;';
+					break;
+
 				case PS::ACTION_VIEW:
 					$_arOut[ 'view' ] = array(
 						'label' => 'View',

@@ -54,6 +54,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	const	ACTION_UNLOCK 	= 8;
 	
 	//	Add your own in between 4 and 997...
+	const	ACTION_PREVIEW 		= 996;
 	const	ACTION_RETURN 		= 997;
 	const	ACTION_CANCEL 		= 998;
 	const	ACTION_GENERIC 		= 999;
@@ -124,6 +125,23 @@ class CPSHelperBase extends CHtml implements IPSBase
 		}
 
 		return $_oDefault;
+	}
+	
+	/**
+	* Convenience "in_array" method. Takes variable args.
+	* 
+	*/
+	public static function in()
+	{
+		$_arArgs = func_get_args();
+		
+		if ( count( $_arArgs ) )
+		{
+			$_oNeedle = array_shift( $_arArgs );
+			return in_array( $_oNeedle, $_arArgs );
+		}
+		
+		return false;
 	}
 	
 	/**
