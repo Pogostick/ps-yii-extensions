@@ -31,30 +31,18 @@ $className = 'create view';
 include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_header.php' );
 
 echo <<<HTML
-	echo CPSForm::formHeader( 'New {$modelClass}', 
+	echo CPSForm::formHeaderEx( '', 
 		array( 
-			'save' => array(
-				'label' => 'Save',
-				'url' => '_submit_',
-				'icon' => 'disk',
-			),
-			
-			'cancel' => array(
-				'label' => 'Cancel',
-				'url' => array( 'admin' ),
-				'icon' => 'cancel',
-			),
-			
-			'return' => array(
-				'label' => '{$modelClass} Manager',
-				'url' => array( 'admin' ),
-				'icon' => 'arrowreturnthick-1-w',
-			),
+			'menuButtons' => array( 'save', 'cancel' ),
+			'itemName' => '{$modelClass}',
+			'formId' => 'ps-edit-form',
 		)
 	);
 
-echo \$this->renderPartial( '_form', array(
-	'model' => \$model,
-	'update' => false,
-));
+	echo $this->renderPartial( '_form', 
+		array(
+			'model' => $model,
+			'update' => false,
+		)
+	);
 HTML;

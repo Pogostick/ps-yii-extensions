@@ -316,9 +316,9 @@ EOD;
 	{
 		return(
 			array(
-				'viewTemplateName' => array( CPSOptionManager::META_DEFAULTVALUE => 'view.php', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'controllerBaseClass' => array( CPSOptionManager::META_DEFAULTVALUE => 'CPSController', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
-				'controllerTemplateName' => array( CPSOptionManager::META_DEFAULTVALUE => 'controller.php', CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'string' ) ),
+				'viewTemplateName' => 'string:view.php',
+				'controllerBaseClass' => 'string:CPSController',
+				'controllerTemplateName' => 'string:controller.php',
 			)
 		);
 	}

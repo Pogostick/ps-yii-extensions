@@ -35,24 +35,16 @@ include( Yii::getPathOfAlias( 'pogostick.templates.crud' ) . '/build_template_he
 
 //	And output the rest...
 echo <<<HTML
-	echo CPSForm::formHeader( '{$modelClass} Manager', 
-		array( 'new' => 
-			array(
-				'label' => 'New {$modelClass}',
-				'url' => array( 'create' ),
-				'icon' => 'circle-plus',
-			)
+	echo CPSDataGrid::createEx( $models, 
+		array( 
+			'formHeader' => array( 'title' => '{$modelClass} Manager', 'menuButtons' => array( 'new' ), 'itemName' => '{$modelClass}', ),
+			'dataItem' => 'setting', 
+			'columns' => {$_sCols},
+			'actions' => array( 'edit', 'delete' ), 
+			'sort' => $sort,
+			'pages' => $pages,
+			'pagerOptions' => array( 'header' => '' ),
+			'linkView' => 'update',
 		)
 	);
-
-	\$_arOpts = array(
-		'actions' => array( 'edit', 'delete' ),
-		'sort' => \$sort,
-		'pages' => \$pages,
-		'columns' => {$_sCols},
-		'pagerOptions' => array( 'header' => '' ),
-		'dataItemName' => '{$modelClass}',
-	);
-	
-	echo CPSDataGrid::createEx( \$models, \$_arOpts );
 HTML;

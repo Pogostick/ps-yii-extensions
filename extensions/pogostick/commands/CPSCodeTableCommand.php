@@ -546,10 +546,10 @@ EOD;
 	{
 		return(
 			array(
-				'schema' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'object' ) ),
-				'relations' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'tables' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
-				'classes' => array( CPSOptionManager::META_DEFAULTVALUE => null, CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'schema' => 'object',
+				'relations' => 'array',
+				'tables' => 'array',
+				'classes' => 'array',
 			)
 		);
 	}

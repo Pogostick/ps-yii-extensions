@@ -314,7 +314,7 @@ EOD;
 	{
 		return(
 			array(
-				'actions' => array( CPSOptionManager::META_DEFAULTVALUE => array(), CPSOptionManager::META_RULES => array( CPSOptionManager::META_TYPE => 'array' ) ),
+				'actions' => 'array:array()',
 			)
 		);
 	}
