@@ -1,24 +1,24 @@
 <?php
 /*
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2010 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
 
 /**
- * A collection of helper methods that augment CHtml. 
- * 
+ * A collection of helper methods that augment CHtml.
+ *
  * @package 	psYiiExtensions
  * @subpackage 	helpers
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id$
  * @since 		v1.0.6
- *  
+ *
  * @filesource
- * 
+ *
  * @property string $codeModel The name of the code model for code lookups
  * @property string $hintTemplate The template for displaying hints
  * @property string $blockClass The class in which to wrap label/input pairs.
@@ -33,12 +33,12 @@ class CPSWidgetHelper extends CPSHelperBase
 	//********************************************************************************
 	//* Constants
 	//********************************************************************************
-	
+
 	/**
 	 * A prefix for generated ids
 	 */
 	const ID_PREFIX = 'pye';
-	
+
 	/**
 	* These are a list of form elements that can be used along with the methods in this class.
 	*/
@@ -70,13 +70,13 @@ class CPSWidgetHelper extends CPSHelperBase
 	*/
 	const 	CODE_DISPLAY	= 'inactiveCodeDisplay';		//	Not a real method, just a placeholder
 	const 	TEXT_DISPLAY	= 'inactiveTextDisplay';		//	Not a real method, just a placeholder
-	
+
 	/**
 	* Available UI styles
 	*/
 	const	UI_DEFAULT = 0;
 	const	UI_JQUERY = 1;
-	
+
 	/**
 	 * Available built-in drop-down lists
 	 */
@@ -91,12 +91,12 @@ class CPSWidgetHelper extends CPSHelperBase
 	const	DD_TIME_ZONES = 1007;
 	const	DD_YES_NO_ALL = 1008;
 	const	DD_JQUI_THEMES = 1009;
-	
+
 	/**
 	 * Database-driven drop-down list
 	 */
 	const 	DD_CODE_TABLE = 'activeCodeDropDownList';
-	
+
 	/**
 	 * Types of document headers
 	 */
@@ -108,11 +108,11 @@ class CPSWidgetHelper extends CPSHelperBase
 	const	HTML32 = -1;
 	const	HTML20 = -2;
 	const	LOOSE = -3;
-	
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
-	
+
 	/**
 	* An id counter for generating unique ids
 	* @var integer
@@ -124,7 +124,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	* Maps normal form fields to an input type
 	* @staticvar array
 	*/
-	protected static $m_arInputMap = array( 
+	protected static $m_arInputMap = array(
 		self::TEXTAREA 		=> 'textarea',
 		self::TEXT 			=> 'text',
 		self::HIDDEN 		=> 'hidden',
@@ -133,7 +133,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		self::RADIO 		=> 'radio',
 		self::CHECK 		=> 'checkbox',
 	);
-	
+
 	/**
 	* Whether or not jQuery Validate is being used...
 	* @staticvar boolean
@@ -151,40 +151,40 @@ class CPSWidgetHelper extends CPSHelperBase
 	* @staticvar string
 	*/
 	protected static $m_sOnClass = null;
-	
+
 	/**
 	* The default class for inactive fields when input hover is enabled
 	* @staticvar string
 	*/
 	protected static $m_sOffClass = null;
-	
+
 	/**
 	* Tracks the current form id...
 	* @staticvar string
 	*/
 	protected static $m_sCurrentFormId = null;
 	public static function getCurrentFormId() { return self::$m_sCurrentFormId; }
-	
+
 	/**
 	* The id of the last field that was generated
 	* @var string
 	*/
 	protected static $m_sLastFieldId = null;
 	public static function getLastFieldId() { return self::$m_sLastFieldId; }
-	
+
 	/**
 	* The name of the last field that was generated
 	* @var string
 	*/
 	protected static $m_sLastFieldName = null;
 	public static function getLastFieldName() { return self::$m_sLastFieldName; }
-	
+
 	/**
 	 * Did we load our CSS yet?
 	 * @var boolean
 	 */
 	protected static $m_bCssLoaded = false;
-	
+
 	//********************************************************************************
 	//* Properties
 	//********************************************************************************
@@ -196,7 +196,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	protected static $m_sCodeModel = null;
 	public static function getCodeModel() { return self::$m_sCodeModel; }
 	public static function setCodeModel( $sValue ) { self::$m_sCodeModel = $sValue; }
-	
+
 	/**
 	* Template for hints. They will be displayed right after the div simple/complex tag.
 	* %%HINT%% will be replaced with your hint text.
@@ -205,7 +205,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	protected static $m_sHintTemplate = '<p class="hint">%%HINT%%</p>';
 	public static function getHintTemplate() { return self::$m_sHintTemplate; }
 	public static function setHintTemplate( $sValue ) { self::$m_sHintTemplate = $sValue; }
-	
+
 	/**
 	* Whether or not to use the id prefix. Defaults to false.
 	* @staticvar boolean
@@ -213,7 +213,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	public static $m_bUseIdPrefixes = false;
 	public static function getUseIdPrefixes() { return self::$m_bUseIdPrefixes; }
 	public static function setUseIdPrefixes( $bValue ) { self::$m_bUseIdPrefixes = $bValue; }
-	
+
 	/**
 	* The id prefixes to use.
 	* @staticvar array
@@ -228,7 +228,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		'select' => 'slt_',
 		'file' => 'file_',
 	);
-	public static function getIdPrefix( $sType ) { return self::$m_bUseIdPrefixes ? PS::o( self::$m_arIdPrefixes, $sType ) : null; }
+	public static function getIdPrefix() { return self::$m_bUseIdPrefixes ? PS::o( self::$m_arIdPrefixes, $sType ) : null; }
 
 	/**
 	* Whether or not to use the name prefix. Defaults to false.
@@ -237,7 +237,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	public static $m_bUseNamePrefixes = false;
 	public static function getUseNamePrefixes() { return self::$m_bUseNamePrefixes; }
 	public static function setUseNamePrefixes( $bValue ) { self::$m_bUseNamePrefixes = $bValue; }
-	
+
 	/**
 	* The name prefixes to use.
 	* @staticvar string
@@ -245,7 +245,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	public static $m_arNamePrefixes = array();
 	public static function getNamePrefix( $eType ) { return self::$m_bUseNamePrefixes ? PS::o( self::$m_arNamePrefixes, $eType ) : null; }
 	public static function setNamePrefix( $eType, $sValue ) { self::$m_arNamePrefixes[ $eType ] = $sValue; }
-	
+
 	/**
 	* The HTML for required elements. Defaults to null
 	* @staticvar string
@@ -253,7 +253,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	protected static $m_sRequiredHtml = null;
 	public static function getRequiredHtml() { return self::$m_sRequiredHtml; }
 	public static function setRequiredHtml( $sValue ) { self::$m_sRequiredHtml = $sValue; }
-		
+
 	/**
 	* The suffix for label elements. Appended to labels. Defaults to ':'.
 	* @staticvar string
@@ -261,7 +261,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	protected static $m_sLabelSuffix = ':';
 	public static function getLabelSuffix() { return self::$m_sLabelSuffix; }
 	public static function setLabelSuffix( $sValue ) { self::$m_sLabelSuffix = $sValue; }
-			
+
 	/**
 	* The container tag for form fields
 	* @var string
@@ -269,7 +269,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	protected static $m_sFormFieldContainer = 'div';
 	public static function getFormFieldContainer() { return self::$m_sFormFieldContainer; }
 	public static function setFormFieldContainer( $sValue ) { self::$m_sFormFieldContainer = $sValue; }
-		
+
 	/**
 	* The css class for the container tag for form fields
 	* @var string
@@ -289,7 +289,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	//********************************************************************************
 	//* Public methods
 	//********************************************************************************
-	
+
 	/**
 	* Generate a random ID # for a widget
 	* @param string $sPrefix
@@ -301,15 +301,15 @@ class CPSWidgetHelper extends CPSHelperBase
 
 	/**
 	* Creates a form field
-	* 
+	*
 	* $arOptions may contain any HTML options for the field. Special values are:
-	* 
+	*
 	* label				Label to display
 	* labelOptions		Options for the label tag
 	* data				Data to pass to the field (i.e. select options array)
 	* widgetOptions		Options for the widget
 	* content			Optional content for field. If not specified, it's generated
-	* 
+	*
 	* @param int $eFieldType
 	* @param CModel $oModel
 	* @param string $sColName
@@ -322,7 +322,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	{
 		$_arDivOpts = PS::o( $arOptions, '_divOpts', array(), true );
 		$_sHint = PS::o( $arOptions, 'hint', null, true );
-			
+
 		//	A little switcheroo...
 		if ( $eFieldType == PS::CODE_DISPLAY )
 		{
@@ -362,9 +362,9 @@ class CPSWidgetHelper extends CPSHelperBase
 			$_sTitle = PS::o( $arOptions, 'title', null );
 			$_arValueMap = PS::o( $arOptions, 'valueMap', array(), true );
 			$_sContent = PS::o( $arOptions, 'content', null, true );
-			
+
 			//	Value map...
-			if ( in_array( $oModel->{$sColName}, array_keys( $_arValueMap ) ) && isset( $_arValueMap[$oModel->{$sColName}] ) ) 
+			if ( in_array( $oModel->{$sColName}, array_keys( $_arValueMap ) ) && isset( $_arValueMap[$oModel->{$sColName}] ) )
 				$arOptions['value'] = $_arValueMap[$oModel->{$sColName}];
 
 			//	Do auto-tooltipping...
@@ -372,23 +372,23 @@ class CPSWidgetHelper extends CPSHelperBase
 			{
 				if ( $_arTemp = $oModel->attributeTooltips() )
 				{
-					if ( isset( $_arTemp[$sColName] ) ) 
+					if ( isset( $_arTemp[$sColName] ) )
 						$arOptions['title'] = self::encode( $_arTemp[ $sColName ] );
 				}
 			}
 
 			//	Denote checkbox/radiobutton labels
-			if ( ! $_sDivClass & ( $eFieldType == self::CHECK || $eFieldType == self::RADIO || $eFieldType == self::CHECKLIST || $eFieldType == self::RADIOLIST ) ) 
+			if ( ! $_sDivClass & ( $eFieldType == self::CHECK || $eFieldType == self::RADIO || $eFieldType == self::CHECKLIST || $eFieldType == self::RADIOLIST ) )
 				$_sDivClass = 'chk_label';
-			
+
 			//	Need an id for div tag
 			if ( ! isset( $arOptions[ 'id' ] ) ) $arOptions[ 'id' ] = self::getIdByName( self::resolveName( $oModel, $sColName ) );
-			
+
 			//	Preset class for hover effects if enabled...
-			if ( isset( self::$m_sOffClass ) && ! isset( $arOptions[ 'class' ] ) ) 
+			if ( isset( self::$m_sOffClass ) && ! isset( $arOptions[ 'class' ] ) )
 				$arOptions[ 'class' ] = self::$m_sOffClass;
 
-			if ( null == $oModel )		
+			if ( null == $oModel )
 				$_sOut = self::label( $_sLabel, $arOptions[ 'id' ], $_arLabelOptions );
 			else
 			{
@@ -399,32 +399,32 @@ class CPSWidgetHelper extends CPSHelperBase
 
 			//	Do a value transform if requested
 			if ( $_sTransform && $oModel ) $oModel->{$sColName} = CPSTransform::valueOf( $_sTransform, $oModel->$sColName );
-			
+
 			//	Build our field
 			$_sOut .= ( null !== $_sContent ) ? $_sContent : self::activeField( $eFieldType, $oModel, $sColName, $arOptions, $_arWidgetOptions, $_arData );
 			$_sOut .= $_sHtml;
-			
+
 			//	Construct the div...
 			$_arDivOpts = array_merge(
-				$_arDivOpts, 
-				array( 
+				$_arDivOpts,
+				array(
 					'id' => self::$m_sFormFieldContainerPrefix . '_' . $arOptions['id'],
 					'class' => trim( self::$m_sFormFieldContainerClass . ' ' . $_sDivClass ),
 				)
 			);
 		}
-		
+
 		//	Any hints?
- 		if ( $_sHint ) $_sHint = str_ireplace( '%%HINT%%', $_sHint, self::$m_sHintTemplate );
+		if ( $_sHint ) $_sHint = str_ireplace( '%%HINT%%', $_sHint, self::$m_sHintTemplate );
 
 		return PS::tag( self::$m_sFormFieldContainer, $_arDivOpts, $_sOut . $_sHint );
 	}
 
 	/**
 	* Adds a simple div block with label and field
-	* 
+	*
 	* If $sLabel is null, $sColName is used as your label name
-	* 	
+	*
 	* @param string $eFieldType One of the * constants
 	* @param CModel $oModel The model for this form
 	* @param string $sColName The column/attribute name
@@ -452,12 +452,12 @@ class CPSWidgetHelper extends CPSHelperBase
 
 	/**
 	* Adds an activefield to a form
-	* 
+	*
 	* There are two special options you can use in $arHtmlOptions:
-	* 
+	*
 	*   _appendHtml		--	Extra Html code/scripts to be inserted AFTER the form element has been created
 	*   _widget			--	The name of the jQuery UI widget to create when type = self::JQUI
-	* 
+	*
 	* @param string $eFieldType One of the * constants
 	* @param CModel $oModel The model for this form
 	* @param string $sColName The column/attribute name
@@ -471,19 +471,19 @@ class CPSWidgetHelper extends CPSHelperBase
 		//	Auto set id and name if they aren't already...
 		if ( ! isset( $arHtmlOptions[ 'name' ] ) ) $arHtmlOptions[ 'name' ] = ( null != $oModel ) ? self::resolveName( $oModel, $sColName ) : $sColName;
 		if ( ! isset( $arHtmlOptions[ 'id' ] ) ) $arHtmlOptions[ 'id' ] = self::getIdByName( $arHtmlOptions[ 'name' ] );
-		
+
 		//	Save for callers...
 		self::$m_sLastFieldName = $arHtmlOptions['name'];
 		self::$m_sLastFieldId = $arHtmlOptions['id'];
-		
+
 		//	Non-model field?
 		if ( null === $oModel )
-			return self::inactiveField( $eFieldType, $sColName, $arHtmlOptions, $arWidgetOptions, $arData ); 
+			return self::inactiveField( $eFieldType, $sColName, $arHtmlOptions, $arWidgetOptions, $arData );
 
 		//	Stuff to put after widget
 		$_sBeforeHtml = null;
 		$_sAppendHtml = PS::o( $arHtmlOptions, '_appendHtml', '', true );
-		
+
 		//	Are we validating this form? Add required tags automagically
 		if ( self::$m_bValidating )
 		{
@@ -493,7 +493,7 @@ class CPSWidgetHelper extends CPSHelperBase
 			$_sClass = ' ' . PS::o( $arHtmlOptions, 'class', null );
 			$arHtmlOptions['class'] = trim( $_sClass );
 		}
-		
+
 		//	Get our value...
 		if ( $sColName != ( $_sCleanCol = CPSTransform::cleanColumn( $sColName ) ) )
 		{
@@ -507,7 +507,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		//	Handle custom drop downs...
 		if ( self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, PS::nvl( $oModel->{$sColName} ) ) )
 			$eFieldType = self::DROPDOWN;
-		
+
 		//	Handle special types...
 		switch ( $eFieldType )
 		{
@@ -517,7 +517,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				$arHtmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', CPSTransform::valueOf( '*', $oModel->$sColName ) ) );
 				$eFieldType = self::TEXT;
 				break;
-				
+
 			//	Build a jQuery UI widget
 			case self::JQUI:
 				if ( isset( $arHtmlOptions[ '_widget' ] ) )
@@ -530,7 +530,7 @@ class CPSWidgetHelper extends CPSHelperBase
 					$eFieldType = self::TEXT;
 				}
 				break;
-				
+
 			//	Build a McDropdown
 			case self::MCDROPDOWN:
 				$arWidgetOptions[ 'linkText' ] = false;
@@ -540,16 +540,16 @@ class CPSWidgetHelper extends CPSHelperBase
 
 				//	Insert text field...
 				$_sOut = PS::textField( $arHtmlOptions['name'], $_oValue, array( 'id' => $arHtmlOptions['id'] ) );
-				
+
 				//	Create menu...
 				$_sOut .= CPSTransform::asUnorderedList( $arData, array( 'class' => 'mcdropdown_menu', 'valueColumn' => $_sValueColumn, 'linkText' => false, 'id' => $_sTargetMenu ) );
 
-				$arWidgetOptions['target'] = $_sTarget;				
+				$arWidgetOptions['target'] = $_sTarget;
 				$arWidgetOptions['targetMenu'] = $_sTargetMenu;
-				
+
 				CPSMcDropdownWidget::create( null, $arWidgetOptions );
 				return $_sBeforeHtml . $_sOut . $_sAppendHtml;
-			
+
 			//	Build a Filament Group menu
 			case self::FG_MENU:
 				ob_start();
@@ -558,29 +558,29 @@ class CPSWidgetHelper extends CPSHelperBase
 				$_sOut = ob_get_contents();
 				ob_end_clean();
 				return $_sBeforeHtml . $_sOut . $_sAppendHtml;
-			
+
 			//	Default for text field
 			case self::TEXT:
 				//	Masked input?
 				$_sMask = PS::o( $arHtmlOptions, 'mask', null, true );
 				if ( ! empty( $_sMask ) ) $_oMask = CPSjqMaskedInputWrapper::create( null, array( 'target' => '#' . $arHtmlOptions[ 'id' ], 'mask' => $_sMask ) );
-				
+
 				if ( ! isset( $arHtmlOptions[ 'size' ] ) )
 					$arHtmlOptions[ 'size' ] = 60;
 				break;
-			
+
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
 				CPSWysiwygWidget::create( null, array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
 				$eFieldType = self::TEXTAREA;
-				break;                                                                                
-				
+				break;
+
 			//	CKEditor Plug-in
 			case self::CKEDITOR:
 				CPSCKEditorWidget::create( null, array_merge( $arWidgetOptions, array( 'autoRun' => true, 'target' => $arHtmlOptions[ 'id' ] ) ) );
 				$eFieldType = self::TEXTAREA;
-				break;                                                                                
-				
+				break;
+
 			//	markItUp! Plug-in
 			case self::MARKITUP:
 				$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
@@ -588,7 +588,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				CPSMarkItUpWidget::create( null, $arWidgetOptions );
 				$eFieldType = self::TEXTAREA;
 				break;
-				
+
 			case self::CAPTCHA:
 				$arOptions['hint'] = 'Please enter the letters as they are shown in the image above.<br />Letters are not case-sensitive.';
 				ob_start();
@@ -605,7 +605,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				//	Auto-set prompt if not there...
 				if ( ! isset( $arHtmlOptions[ 'noprompt' ] ) ) $arHtmlOptions[ 'prompt' ] = PS::o( $arHtmlOptions, 'prompt', 'Select One...', true );
 				//	Intentionally fall through to next block...
-				
+
 			case self::CHECKLIST:
 			case self::RADIOLIST:
 			case self::LISTBOX:
@@ -617,12 +617,12 @@ class CPSWidgetHelper extends CPSHelperBase
 
 	/**
 	* Adds a non-model field to a form
-	* 
+	*
 	* There are two special options you can use in $arHtmlOptions:
-	* 
+	*
 	*   _appendHtml		--	Extra Html code/scripts to be inserted AFTER the form element has been created
 	*   _widget			--	The name of the jQuery UI widget to create when type = self::JQUI
-	* 
+	*
 	* @param string $eFieldType One of the * constants
 	* @param string $sColName The column/attribute name
 	* @param array $arHtmlOptions The htmlOptions for the field
@@ -636,7 +636,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		$_sBeforeHtml = null;
 		$_sAppendHtml = PS::o( $arHtmlOptions, '_appendHtml', '', true );
 		$_oValue = PS::o( $arHtmlOptions, 'value', null, true );
-		
+
 		//	Handle special types...
 		switch ( $eFieldType )
 		{
@@ -652,13 +652,13 @@ class CPSWidgetHelper extends CPSHelperBase
 					$_sType = 'text';
 				}
 				break;
-			
+
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
 				CPSWysiwygWidget::create( null, array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
 				$_sType = 'textarea';
-				break;                                                                                
-				
+				break;
+
 			//	markItUp! Plug-in
 			case self::MARKITUP:
 				$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
@@ -666,27 +666,27 @@ class CPSWidgetHelper extends CPSHelperBase
 				CPSMarkItUpWidget::create( null, $arWidgetOptions );
 				$_sType = 'textarea';
 				break;
-				
+
 			case self::TEXT_DISPLAY:
 				$arHtmlOptions['style'] = PS::o( $arHtmlOptions, 'style' ) . ' border:none; background-color: transparent;';
 				$_sType = 'text';
 				break;
-			
+
 			default:
 				$_sType = PS::o( self::$m_arInputMap, $eFieldType );
-             	break;
+				break;
 		}
 
 		//	Do drop downs...
 		if ( null != ( $arData = self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, $_oValue ) ) )
 			return parent::dropDownList( $sColName, $_oValue, $arData, $arHtmlOptions );
-		
+
 		//	Otherwise output the field if we have a type
 		if ( null != $_sType ) return self::inputField( $_sType, $sColName, $_oValue, $arHtmlOptions );
-			
+
 		//	No clue...
 		return;
-		
+
 		//	Are we validating this form? Add required tags automagically
 		if ( self::$m_bValidating )
 		{
@@ -696,7 +696,7 @@ class CPSWidgetHelper extends CPSHelperBase
 			$_sClass = ' ' . PS::o( $arHtmlOptions, 'class', null );
 			$arHtmlOptions['class'] = trim( $_sClass );
 		}
-		
+
 		//	Get our value...
 		if ( $sColName != ( $_sCleanCol = CPSTransform::cleanColumn( $sColName ) ) )
 		{
@@ -710,7 +710,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		//	Handle custom drop downs...
 		if ( self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, PS::nvl( $oModel->{$sColName} ) ) )
 			$eFieldType = self::DROPDOWN;
-		
+
 		//	Handle special types...
 		switch ( $eFieldType )
 		{
@@ -718,7 +718,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				$arHtmlOptions['style'] = PS::o( $arHtmlOptions, 'style' ) . ' border:none; background-color: transparent;';
 				$eFieldType = self::TEXT;
 				break;
-				
+
 			//	Build a jQuery UI widget
 			case self::JQUI:
 				if ( isset( $arHtmlOptions[ '_widget' ] ) )
@@ -731,7 +731,7 @@ class CPSWidgetHelper extends CPSHelperBase
 					$eFieldType = self::TEXT;
 				}
 				break;
-				
+
 			//	Build a Filament Group menu
 			case self::FG_MENU:
 				ob_start();
@@ -740,29 +740,29 @@ class CPSWidgetHelper extends CPSHelperBase
 				$_sOut = ob_get_contents();
 				ob_end_clean();
 				return $_sBeforeHtml . $_sOut . $_sAppendHtml;
-			
+
 			//	Default for text field
 			case self::TEXT:
 				//	Masked input?
 				$_sMask = PS::o( $arHtmlOptions, 'mask', null, true );
 				if ( ! empty( $_sMask ) ) $_oMask = CPSjqMaskedInputWrapper::create( null, array( 'target' => '#' . $arHtmlOptions[ 'id' ], 'mask' => $_sMask ) );
-				
+
 				if ( ! isset( $arHtmlOptions[ 'size' ] ) )
 					$arHtmlOptions[ 'size' ] = 60;
 				break;
-			
+
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
 				CPSWysiwygWidget::create( null, array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
 				$eFieldType = self::TEXTAREA;
-				break;                                                                                
-				
+				break;
+
 			//	CKEditor Plug-in
 			case self::CKEDITOR:
 				CPSCKEditorWidget::create( null, array_merge( $arWidgetOptions, array( 'autoRun' => true, 'target' => $arHtmlOptions[ 'id' ] ) ) );
 				$eFieldType = self::TEXTAREA;
-				break;                                                                                
-				
+				break;
+
 			//	markItUp! Plug-in
 			case self::MARKITUP:
 				$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
@@ -770,7 +770,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				CPSMarkItUpWidget::create( null, $arWidgetOptions );
 				$eFieldType = self::TEXTAREA;
 				break;
-				
+
 			case self::CAPTCHA:
 				$arOptions['hint'] = 'Please enter the letters as they are shown in the image above.<br />Letters are not case-sensitive.';
 				ob_start();
@@ -787,7 +787,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				//	Auto-set prompt if not there...
 				if ( ! isset( $arHtmlOptions[ 'noprompt' ] ) ) $arHtmlOptions[ 'prompt' ] = PS::o( $arHtmlOptions, 'prompt', 'Select One...', true );
 				//	Intentionally fall through to next block...
-				
+
 			case self::CHECKLIST:
 			case self::RADIOLIST:
 			case self::LISTBOX:
@@ -799,7 +799,7 @@ class CPSWidgetHelper extends CPSHelperBase
 
 	/**
 	* Create a drop downlist filled with codes give a code type.
-	* 
+	*
 	* @param CModel $oModel
 	* @param string $sAttribute
 	* @param array $arHtmlOptions
@@ -811,7 +811,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		if ( null != ( $_sCodeModel = PS::o( $arHtmlOptions, 'codeModel', self::$m_sCodeModel, true ) ) )
 		{
 			$_oCodeModel = new $_sCodeModel;
-			
+
 			if ( $_oCodeModel instanceof CPSCodeTableModel )
 			{
 				$_sValType = PS::o( $arHtmlOptions, 'codeType', $sAttribute, true );
@@ -819,7 +819,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				if ( ! $_sValAbbr ) $_sValAbbr = PS::o( $arHtmlOptions, 'codeAbbreviation', null, true );
 				$_sValId = PS::o( $arHtmlOptions, 'codeId', null, true );
 				$_sSort = PS::o( $arHtmlOptions, 'sortOrder', 'code_desc_text', true );
-			
+
 				if ( $_sValId )
 					$_arOptions = self::listData( $_oCodeModel->findById( $_sValId ), 'id', 'code_desc_text' );
 				elseif ( ! $_sValAbbr )
@@ -837,10 +837,10 @@ class CPSWidgetHelper extends CPSHelperBase
 			}
 		}
 	}
-	
+
 	/**
 	* Output a google analytics function...
-	* 
+	*
 	* @param string $sId Your site id for Google Analytics
 	*/
 	public static function googleAnalytics( $sId )
@@ -860,7 +860,7 @@ HTML;
 
 	/**
 	* Enables an input highlight effect when a form field is hovered over
-	* 
+	*
 	* @param string $sSelector The jQuery/CSS selector(s) to apply effect to
 	* @param array $arOptions Options for the generated scripts/CSS
 	* @access public
@@ -870,7 +870,7 @@ HTML;
 	public static function enableInputHover( $sSelector, $arOptions = array() )
 	{
 		$_sTempCss = '';
-		
+
 		//	Basic options...
 		$_sOffClass = self::$m_sOffClass = PS::o( $arOptions, 'offClass', 'idle' );
 		$_sOnClass = self::$m_sOnClass = PS::o( $arOptions, 'onClass', 'activeField' );
@@ -880,44 +880,44 @@ HTML;
 		$_iOnBorderSize = PS::o( $arOptions, 'onBorderSize', 1 );
 		$_sOffBorderColor = PS::o( $arOptions, 'offBorderColor', '#85b1de' );
 		$_iOffBorderSize = PS::o( $arOptions, 'offBorderSize', 1 );
-		
+
 		//	Optional background image for non-hovered field
 		$_sFieldImageUrl = PS::o( $arOptions, 'fieldImageUrl' );
 		$_sFieldImageRepeat = PS::o( $arOptions, 'fieldImageRepeat', 'repeat-x' );
 		$_sFieldImagePosition = PS::o( $arOptions, 'fieldImagePosition', 'top' );
-		
+
 		//	Set up the cool input effects...
 		$_sScript =<<<CODE
 jQuery("{$sSelector}").addClass("{$_sOffClass}");jQuery("{$sSelector}").focus(function(){jQuery(this).addClass("{$_sOnClass}").removeClass("{$_sOffClass}");}).blur(function(){jQuery(this).removeClass("{$_sOnClass}").addClass("{$_sOffClass}");});
 CODE;
-	
+
 		//	Register script
 		PS::registerScript( md5( time() ), $_sScript );
-		
+
 		$_sCss =<<<CODE
-{$sSelector} input[type="text"]:focus, 
-{$sSelector} input[type="password"]:focus, 
-{$sSelector} select:focus 
+{$sSelector} input[type="text"]:focus,
+{$sSelector} input[type="password"]:focus,
+{$sSelector} select:focus
 {
-    background-image: none;
-    background-color: {$_sOnBGColor};
-    border: solid {$_iOnBorderSize}px {$_sOnBorderColor};
-}		
+	background-image: none;
+	background-color: {$_sOnBGColor};
+	border: solid {$_iOnBorderSize}px {$_sOnBorderColor};
+}
 
 .{$_sOnClass}
 {
 	background-image: none;
-    background-color: {$_sOnBGColor};
-    border: solid {$_iOffBorderSize}px {$_sOffBorderColor};
+	background-color: {$_sOnBGColor};
+	border: solid {$_iOffBorderSize}px {$_sOffBorderColor};
 }
 
 .{$_sOffClass}
 {
-    background-color: {$_sOffBGColor};
-    border: solid {$_iOffBorderSize}px {$_sOffBorderColor};
+	background-color: {$_sOffBGColor};
+	border: solid {$_iOffBorderSize}px {$_sOffBorderColor};
 CODE;
 
-		if ( ! empty( $_sFieldImageUrl ) ) 
+		if ( ! empty( $_sFieldImageUrl ) )
 		{
 			$_sTempCss =<<<CSS
 	background-image: url('{$_sFieldImageUrl}');
@@ -926,16 +926,16 @@ CODE;
 CSS;
 		}
 
-		//	Add anything else we've appended...	
+		//	Add anything else we've appended...
 		$_sCss .= $_sTempCss . "\n}";
 
 		//	Register CSS
 		PS::registerCss( md5( time() ), $_sCss );
 	}
-	
+
 	/**
 	* Generates a generic drop-down select list
-	* 
+	*
 	* @param enum $eType
 	* @param string $sName
 	* @param string $sLabel
@@ -968,7 +968,7 @@ CSS;
 			$arOptions['name'] = $sName;
 			$_sOut .= self::tag( 'SELECT', $arOptions, $_sInner );
 		}
-				
+
 		return $_sOut;
 	}
 
@@ -986,23 +986,23 @@ CSS;
 	public static function beginForm( $sAction = '', $sMethod = 'POST', $arHtmlOptions = array() )
 	{
 		$_arValidateOptions = PS::o( $arHtmlOptions, 'validateOptions', array(), true );
-		
+
 		if ( PS::o( $arHtmlOptions, 'validate', false, true ) )
 		{
 			self::$m_bValidating = true;
 			if ( ! isset( $_arValidateOptions['target'] ) ) $_arValidateOptions['target'] = self::getFormSelector( $arHtmlOptions );
 			CPSjqValidate::create( null, $_arValidateOptions );
 		}
-		
+
 		if ( PS::o( $arHtmlOptions, 'selectmenu', false, true ) )
 			CPSjqSelectMenu::create( null, array( 'target' => self::getFormSelector( $arHtmlOptions ) ) );
 
 		if ( $_sFormTitle = PS::o( $arHtmlOptions, 'formTitle', null, true ) )
 			echo PS::tag( PS::o( $arHtmlOptions, 'formTitleTag', 'h1', true ), array(), $_sFormTitle );
-			
+
 		//	Grab current form id
 		self::$m_sCurrentFormId = PS::o( $arHtmlOptions, 'id' );
-			
+
 		return parent::beginForm( $sAction, $sMethod, $arHtmlOptions );
 	}
 
@@ -1019,7 +1019,7 @@ CSS;
 	{
 		//	Make sure we have a form id...
 		if ( ! isset( $arFormOptions['id'] ) ) $arFormOptions['id'] = 'ps-edit-form';
-		
+
 		//	Get the rest of our options
 		$_eUIStyle = PS::o( $arFormOptions, 'uiStyle', self::UI_DEFAULT, true );
 		$_sAction = PS::o( $arFormOptions, 'action', '', true );
@@ -1027,13 +1027,13 @@ CSS;
 		$_bSetPageTitle = PS::o( $arFormOptions, 'setPageTitle', true, true );
 
 		//	Register form CSS if desired...
-		foreach ( PS::o( $arFormOptions, 'cssFiles', array( '/css/form.css' ), true ) as $_sFile ) 
+		foreach ( PS::o( $arFormOptions, 'cssFiles', array( '/css/form.css' ), true ) as $_sFile )
 			PS::_rcf( $_sFile );
-		
+
 		//	And scripts
-		foreach ( PS::o( $arFormOptions, 'scriptFiles', array(), true ) as $_sFile ) 
+		foreach ( PS::o( $arFormOptions, 'scriptFiles', array(), true ) as $_sFile )
 			PS::_rsf( $_sFile );
-			
+
 		//	What type of form?
 		switch ( $_eUIStyle )
 		{
@@ -1042,7 +1042,7 @@ CSS;
 				$_sContentClass = 'yiiForm';
 				PS::$errorCss = $_sErrorClass = 'ui-state-error';
 				break;
-				
+
 			case self::UI_DEFAULT:
 			default:
 				$_sContainerClass = 'ps-edit-container';
@@ -1050,7 +1050,7 @@ CSS;
 				PS::$errorCss = $_sErrorClass = 'ps-validate-error';
 				break;
 		}
-		
+
 		//	Set validation error class...
 		if ( PS::o( $arFormOptions, 'validate', false ) == true )
 		{
@@ -1059,10 +1059,10 @@ CSS;
 			$_arValid['ignoreTitle'] = PS::o( $_arValid, 'ignoreTitle', true );
 			$arFormOptions['validateOptions'] = $_arValid;
 		}
-		
+
 		//	So it begins...
 		$_sOut = null;
-		
+
 		//	Form header info...
 		if ( $_sFormHeader = PS::o( $arFormOptions, 'formHeader', null, true ) )
 		{
@@ -1081,11 +1081,11 @@ CSS;
 				$_sOut .= PS::tag( $_sFormHeaderContentTag, $_arFormHeaderContentOptions, $_sFormHeaderContent );
 			}
 		}
-		
+
 		//	Build out begining of form...
 		$_sOut .= PS::openTag( 'div', array( 'class' => $_sContainerClass ) );
 		$_sOut .= PS::openTag( 'div', array( 'class' => $_sContentClass ) );
-		
+
 		//	Build the form
 		self::$m_bInForm = true;
 		return $_sOut . self::beginForm( $_sAction, $_sMethod, $arFormOptions );
@@ -1102,15 +1102,15 @@ CSS;
 		//	Finish our container
 		$_sAppend = ( self::$m_bInForm ) ? self::closeTag( 'div' ) . PS::closeTag( 'div' ) : null;
 		self::$m_bInForm = false;
-		
+
 		return parent::endForm() . $_sAppend;
 	}
 
 	/**
 	* Outputs a <LABEL>. NOTE: Does not add ID and NAME prefixes...
-	* 
+	*
 	* @param mixed $sName
-	* @param mixed $sLabel     
+	* @param mixed $sLabel
 	* @param mixed $arOptions
 	*/
 	public static function textLabel( $sName, $sLabel = null, $arOptions = array() )
@@ -1119,7 +1119,7 @@ CSS;
 		$_bRequired = PS::o( $arOptions, '_required', false );
 		$arOptions[ 'id' ] = $arOptions['name'] = self::getIdPrefix( 'label' ) . $sName;
 		$_sSuffixToUse = PS::o( $arOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
-		
+
 		return self::tag( 'label', $arOptions, ( ( $sLabel == null ) ? $sName : $sLabel ) . $_sSuffixToUse . self::$afterRequiredLabel );
 	}
 
@@ -1134,7 +1134,7 @@ CSS;
 	public static function submitButton( $sLabel = 'Submit', $arHtmlOptions = array() )
 	{
 		$arHtmlOptions['type'] = 'submit';
-		
+
 		//	jQUI Button?
 		if ( PS::o( $arHtmlOptions, 'jqui', false, true ) ) return self::jquiButton( $sLabel, '_submit_', $arHtmlOptions );
 
@@ -1144,15 +1144,15 @@ CSS;
 
 	/**
 	* Generates a submit button bar.
-	* 
+	*
 	* Additional HTML options are available for the bar div itself:
-	* 
+	*
 	* barClass		The class to apply to the bar's div tag. Defaults to ps-submit-button-bar
 	* noBorder		If true, no border line will be displayed on the top of the bar.
 	* barLeft		If true, submit button will be flush left instead of the default flush right
 	* barCenter		If true, submit button will be centered instead of the default flush right
-	* 
-	* @param array $arHtmlOptions HTML options for the submit button. 
+	*
+	* @param array $arHtmlOptions HTML options for the submit button.
 	*/
 	public static function beginButtonBar( $arHtmlOptions = array() )
 	{
@@ -1169,31 +1169,31 @@ CSS;
 		$_sClass = PS::o( $arHtmlOptions, 'barClass', $_bDialog ? '.ui-dialog .ui-dialog-buttonpane' : 'ps-submit-button-bar' ) . ' ' . $_sDirClass;
 
 		if ( ! $_bNoBorder = PS::o( $arHtmlOptions, 'noBorder', false ) ) $_sClass .= ' ps-submit-button-bar-border';
-		
+
 		return PS::openTag( 'div', array( 'class' => $_sClass ) );
 	}
 
 	/**
 	* End a button bar
-	* 
+	*
 	*/
 	public static function endButtonBar()
 	{
 		return PS::closeTag( 'div' );
 	}
-	
+
 	/**
 	* Generates a submit button bar.
-	* 
+	*
 	* Additional HTML options are available for the bar div itself:
-	* 
+	*
 	* barClass		The class to apply to the bar's div tag. Defaults to ps-submit-button-bar
 	* noBorder		If true, no border line will be displayed on the top of the bar.
 	* barLeft		If true, submit button will be flush left instead of the default flush right
 	* barCenter		If true, submit button will be centered instead of the default flush right
-	* 
+	*
 	* @param string $sLable The button label
-	* @param array $arHtmlOptions HTML options for the submit button. 
+	* @param array $arHtmlOptions HTML options for the submit button.
 	* @returns string The generated button tag
 	* @see clientChange
 	*/
@@ -1206,7 +1206,7 @@ CSS;
 
 	/****
 	* Output a jQuery UI icon, icon button, or plain button
-	* 
+	*
 	* @param string $sLabel
 	* @param string $sLink
 	* @param array $arOptions
@@ -1221,11 +1221,11 @@ CSS;
 		$_sId = PS::o( $arOptions, 'id', self::getWidgetId( self::ID_PREFIX . '.jqbtn' ), true );
 		$_sFormId = PS::o( $arOptions, 'formId', self::$m_sCurrentFormId, true );
 
-		if ( $_sIcon = PS::o( $arOptions, 'icon', null, true ) ) 
+		if ( $_sIcon = PS::o( $arOptions, 'icon', null, true ) )
 		{
 			$_bIconOnly = PS::o( $arOptions, 'iconOnly', false, true );
 			$_sIcon = "<span class=\"ui-icon ui-icon-{$_sIcon}\"></span>";
-			if ( $sLabel && ! $_bIconOnly ) 
+			if ( $sLabel && ! $_bIconOnly )
 				$_sIconPos = "ps-button-icon-" . PS::o( $arOptions, 'iconPosition', 'left', true );
 			else
 			{
@@ -1234,11 +1234,11 @@ CSS;
 			}
 		}
 
-		if ( $_sOnClick = PS::o( $arOptions, 'click', null, true ) ) 
+		if ( $_sOnClick = PS::o( $arOptions, 'click', null, true ) )
 			$_sOnClick = 'onClick="' . $_sOnClick . '"';
 		else
 		{
-			if ( $_sConfirm = PS::o( $arOptions, 'confirm', null, true ) ) 
+			if ( $_sConfirm = PS::o( $arOptions, 'confirm', null, true ) )
 			{
 				$_sHref = $_sLink;
 				$_sForm = ( $_sFormId ) ? "document.getElementById('{$_sFormId}')" : 'this.form';
@@ -1278,51 +1278,51 @@ HTML;
 				}
 			}
 		}
-		
+
 		//	Set our link options
 		$arOptions['id'] = $_sId;
 		$arOptions['title'] = $sLabel;
 		$_sClass = PS::o( $arOptions, 'class', null );
 		$arOptions['class'] = "ps-button {$_sIconPos} ui-state-default ui-corner-all {$_sClass}";
-		
+
 		//	Make sure we add our onClick...
-		if ( $_sOnClick ) 
+		if ( $_sOnClick )
 		{
 			$arOptions['onclick'] = $_sOnClick;
 			$arOptions['encode'] = false;
 		}
-	
+
 		//	Generate the link
 		return self::link( ( $_sIcon . $sLabel ), $_sLink, $arOptions );
 	}
 
 	/**
-	* Formats the created and modified dates 
-	* 
+	* Formats the created and modified dates
+	*
 	* @param mixed $oModel
 	* @deprecated This method has been moved to CPSModel
 	*/
 	public static function showDates( $oModel, $sCreatedColumn = 'created', $sModifiedColumn = 'modified', $sDateFormat = 'm/d/Y h:i:s A' )
 	{
 		$_sOut = null;
-		
+
 		if ( $oModel->hasAttribute( $sCreatedColumn ) && $oModel->hasAttribute( $sModifiedColumn ) )
 		{
 			$_dtCreate = strtotime( $oModel->$sCreatedColumn );
 			$_dtLMod = strtotime( $oModel->$sModifiedColumn );
-			
+
 			//	Fix up dates
 			$_dtCreate = date( $sDateFormat, $_dtCreate );
 			$_dtLMod = date( $sDateFormat, $_dtLMod );
-			
+
 			$_sOut = '<div class="ps-form-footer">';
 			$_sOut .= '<span><strong>Created:</strong>&nbsp;' . $_dtCreate . '</span>' . self::pipe( '/' ) . '<span><strong>Modified:</strong>&nbsp;' . $_dtLMod . '</span>';
 			$_sOut .= '</div>';
 		}
-		
+
 		return $_sOut;
 	}
-	
+
 	/**
 	 * Generates an image button with an optional hover component.
 	 * @param string the button label
@@ -1339,7 +1339,7 @@ HTML;
 		{
 			//	Create the script
 			$htmlOptions['id'] = PS::o( $htmlOptions, 'id', self::ID_PREFIX . self::$count++ );
-			
+
 			$_sScript =<<<HTML
 	jQuery('#{$htmlOptions['id']}').hover(
 		function(){
@@ -1356,7 +1356,7 @@ HTML;
 
 		return self::tag( 'a', array( 'href' => $sHref ), self::image( $src, null, $htmlOptions ) );
 	}
-	
+
 	/**
 	 * Generates an image submit button with an optional hover component.
 	 * @param string the button label
@@ -1372,7 +1372,7 @@ HTML;
 		{
 			//	Create the script
 			$htmlOptions['id'] = PS::o( $htmlOptions, 'id', self::ID_PREFIX . self::$count++ );
-			
+
 			$_sScript =<<<HTML
 	/**
 	* Hover mechanism for image button
@@ -1392,10 +1392,10 @@ HTML;
 
 		return parent::imageButton( $src, $htmlOptions );
 	}
-	
+
 	/**
 	* Retrieves the target selector of a form
-	* 
+	*
 	* @param array $arHtmlOptions
 	* @param string $sDefaultId
 	* @return string
@@ -1405,7 +1405,7 @@ HTML;
 		$_sTarget =	PS::o( $arHtmlOptions, 'id', null );
 		return ( $_sTarget == null ) ? $sDefaultId : '#' . $_sTarget;
 	}
-	
+
 	/**
 	 * Generates a radio button list.
 	 * A radio button list is like a {@link checkBoxList check box list}, except that
@@ -1454,7 +1454,7 @@ HTML;
 
 	/**
 	* Create a field set with optional legend
-	* 
+	*
 	* @param string $sLegend
 	* @param array $arOptions
 	* @return string
@@ -1464,20 +1464,20 @@ HTML;
 		$_arLegendOptions = PS::o( $arOptions, 'legendOptions', array(), true );
 		return self::tag( 'fieldset', $arOptions, ( $sLegend ? self::tag( 'legend', $_arLegendOptions, $sLegend ) : false ), false );
 	}
-	
+
 	/**
 	* Closes an open fieldset
-	* 
+	*
 	* @returns string
 	*/
 	public static function endFieldset()
 	{
 		return self::closeTag( 'fieldset' );
 	}
-	
+
 	/**
 	* Outputs a themed div with a message
-	* 
+	*
 	* @param string $sMsg
 	* @return boolean
 	*/
@@ -1485,15 +1485,15 @@ HTML;
 	{
 		if ( $sMsg )
 		{
-			return self::tag( 'div', 
-				array( 
+			return self::tag( 'div',
+				array(
 					'class' => 'ui-widget'
 				),
-				self::tag( 'div', 
-					array( 
-						'class' => 'ui-state-highlight ui-corner-all', 
-						'style' => 'padding:1em; margin: 5px 0px 15px 0px;' 
-					), 
+				self::tag( 'div',
+					array(
+						'class' => 'ui-state-highlight ui-corner-all',
+						'style' => 'padding:1em; margin: 5px 0px 15px 0px;'
+					),
 					'<p><span class="ui-icon ui-icon-info" style="float: left; margin-right:10px;"></span>' . $sMsg . '</p>'
 				)
 			);
@@ -1511,7 +1511,7 @@ HTML;
 		PS::registerScript( 'ps.flash.display', 'jQuery(".' . $_sDiv . '").animate({opacity: 1.0}, 3000).fadeOut();' );
 		return self::tag( 'div', array( 'class' => $_sDiv ), $_sMsg );
 	}
-	
+
 	/**
 	* Returns a styled menu separator.
 	* @param string $sInner
@@ -1537,26 +1537,26 @@ HTML;
 		$_sContent = null;
 		$_arModel = $oModel;
 		$_bNoIcon = PS::o( $arHtmlOptions, 'noIcon', false, true );
-		self::$errorSummaryCss = 'ps-error-summary ui-state-error';		
-		
+		self::$errorSummaryCss = 'ps-error-summary ui-state-error';
+
 		if ( ! is_array( $_arModel ) ) $_arModel = array( $oModel );
 
 		foreach ( $_arModel as $_oModel )
 		{
 			$_arError = $_oModel->getErrors();
-			
+
 			foreach ( $_arError as $_oError )
 			{
 				foreach ( $_oError as $_sError )
 					if ( ! empty( $_sError ) ) $_sContent .= PS::tag( 'li', array(), $_sError );
 			}
 		}
-		
+
 		if ( $_sContent !== null )
 		{
 			$_sIcon = ( ! $_bNoIcon ) ? '<span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>' : null;
 			if ( ! $sHeader ) $sHeader = self::tag( 'strong', array(), Yii::t( 'yii', 'Please fix the following input errors:' ) );
-			
+
 			$arHtmlOptions['class'] = PS::o( $arHtmlOptions, 'class', self::$errorSummaryCss, true );
 			return self::tag( 'div', $arHtmlOptions, $_sIcon . $sHeader . self::tag( 'ul', array(), $_sContent ) ) . $sFooter;
 		}
@@ -1572,7 +1572,7 @@ HTML;
 		$_oParser = new CMarkdownParser();
 		return $_oParser->safeTransform( $sText );
 	}
-	
+
 	/**
 	 * Adds a class to an array of classes.
 	 * @param mixed The existing classes. If a string is passed in, a string is returned. If an array is passed in, an array is returned.
@@ -1582,13 +1582,13 @@ HTML;
 	{
 		$_arClassList = ( ! is_array( $oClass ) ) ? explode( ' ', trim( $oClass ) ) : $oClass;
 		$_arNewClasses = PS::makeArray( $oClassData );
-		
+
 		foreach ( $_arNewClasses as $_sClass )
 			if ( ! in_array( $_sClass, $_arClassList ) ) $_arClassList[] = $_sClass;
-			
+
 		return is_array( $oClass ) ? $_arClassList : implode( ' ', $_arClassList );
 	}
-	
+
 	/**
 	 * Removes a class, or pattern of classes from an array of classes.
 	 * @param mixed The existing classes. If a string is passed in, a string is returned. If an array is passed in, an array is returned.
@@ -1599,10 +1599,10 @@ HTML;
 		$_arClassList = ( ! is_array( $oClass ) ) ? explode( ' ', trim( $oClass ) ) : $oClass;
 		$_arNewClasses = PS::makeArray( $oClassData );
 		$_arClass = array();
-		
+
 		foreach ( $_arClassList as $_sClass )
 		{
-			if ( ! in_array( $_sClass, $_arNewClasses ) ) 
+			if ( ! in_array( $_sClass, $_arNewClasses ) )
 				$_arClass[] = $_sClass;
 		}
 
@@ -1612,16 +1612,16 @@ HTML;
 	//********************************************************************************
 	//* Protected Methods
 	//********************************************************************************
-	
+
 	/**
 	* Gets the options for pre-fab select boxes
-	* 
+	*
 	* @param mixed $eFieldType
 	* @returns boolean
 	*/
 	protected static function setDropDownValues( $eFieldType, &$arHtmlOptions = array(), &$arData = null, $oSelected = null )
 	{
- 		$_arData = null;
+		$_arData = null;
 
 		//	One of our generics? Set data, type and return
 		if ( $_arData = self::getGenericDropDownValues( $eFieldType, $arHtmlOptions, $arData ) )
@@ -1638,21 +1638,21 @@ HTML;
 				$eFieldType = self::DROPDOWN;
 			}
 		}
-		
+
 		//	Return a copy of the data array
 		return $_arData;
 	}
-	
+
 	/**
 	* Gets the options for pre-fab select boxes
-	* 
+	*
 	* @param mixed $eFieldType
 	* @returns boolean
 	*/
 	protected static function getGenericDropDownValues( $eType, &$arHtmlOptions = array(), &$arData = null )
 	{
 		$_arData = null;
-		
+
 		if ( is_numeric( $eType ) )
 		{
 			switch ( $eType )
@@ -1660,34 +1660,34 @@ HTML;
 				case self::DD_GENERIC:
 					$_arData = PS::nvl( $arData, PS::o( $arHtmlOptions, 'data', null ) );
 					break;
-					
+
 				case self::DD_YES_NO:
 					$_arData = array( 0 => 'No', 1 => 'Yes' );
 					break;
-					
+
 				case self::DD_YES_NO_ALL:
 					$_arData = array( -1 => 'All', 0 => 'No', 1 => 'Yes' );
 					break;
-					
+
 				case self::DD_US_STATES:
 					$_arData = require( 'static/us_state_array.php' );
 					break;
-					
+
 				case self::DD_MONTH_NUMBERS:
 					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('m');
 					$_arData = require( 'static/month_numbers_array.php' );
 					break;
-					
+
 				case self::DD_DAY_NUMBERS:
 					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('d');
 					$_arData = require( 'static/day_numbers_array.php' );
 					break;
-					
+
 				case self::DD_MONTH_NAMES:
 					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('m');
 					$_arData = require( 'static/month_names_array.php' );
 					break;
-					
+
 				case self::DD_YEARS:
 					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('Y');
 					$_iRange = PS::o( $arHtmlOptions, 'range', 5, true );
@@ -1695,15 +1695,15 @@ HTML;
 					$_arData = array();
 					for ( $_i = 0, $_iBaseYear = $_iRangeStart; $_i < $_iRange; $_i++ ) $_arData[ ( $_iBaseYear + $_i ) ] = ( $_iBaseYear + $_i );
 					break;
-					
+
 				case self::DD_CC_TYPES:
 					$_arData = require( 'static/cc_types_array.php' );
 					break;
-					
+
 				case self::DD_TIME_ZONES:
 					$_arData = require( 'static/time_zones_array.php' );
 					break;
-					
+
 				case self::DD_JQUI_THEMES:
 					$_arData = CPSjqUIWrapper::getValidThemes();
 					break;
@@ -1712,5 +1712,5 @@ HTML;
 
 		return $_arData;
 	}
-	
+
 }
