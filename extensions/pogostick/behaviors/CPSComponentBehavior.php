@@ -1,7 +1,7 @@
 <?php
 /*
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -9,14 +9,14 @@
 
 /**
  * Provides a base for the pYe behaviors
- * 
+ *
  * @package 	psYiiExtensions
  * @subpackage 	behaviors
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id$
  * @since 		v1.0.1
- * 
+ *
  * @filesource
  */
 class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSBehavior
@@ -30,7 +30,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	* @var string
 	*/
 	protected $m_sInternalName;
-	
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -40,29 +40,29 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	 * @var CPSOptionCollection
 	 */
 	protected $m_oOptions;
-		
+
 	/**
 	 * Tracks if we have been initialized yet.
 	 * @var boolean
 	 */
 	protected $m_bInitialized = false;
-	
+
 	//********************************************************************************
 	//* Yii Overrides
 	//********************************************************************************
-	
+
 	/**
 	* Constructs a component.
 	*/
 	public function __construct( $arConfig = array() )
 	{
 		//	Log it and check for issues...
-		Yii::trace( 'pogostick.behaviors', '{class} constructed', array( "{class}" => get_class( $this ) ) );
-		
+//		Yii::trace( 'pogostick.behaviors', '{class} constructed', array( "{class}" => get_class( $this ) ) );
+
 		//	Preinitialize
 		$this->preinit();
 	}
-	
+
 	/**
 	 * Preinitialize the component
 	 * Override to add your own functionality before init() is called.
@@ -71,17 +71,17 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	{
 		//	Create our internal name
 		PS::createInternalName( $this );
-		
+
 		//	Create our option collection
 		$this->m_oOptions = new CPSOptionCollection();
-		
+
 		//	Add our options...
 		$this->addOptions( self::getBaseOptions() );
-		
+
 		//	Set the external library path
 		$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick.external' ), true );
 	}
-	
+
 	/**
 	* Initialize our component.
 	*/
@@ -93,15 +93,15 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 			$this->m_bInitialized = true;
 		}
 	}
-	
+
 	/**
 	* Returns only the public options
 	* @returns array A copy of the public options stored...
 	* @see getOptions
 	*/
-	public function getPublicOptions() 
-	{ 
-		return $this->m_oOptions->getOptions( true ); 
+	public function getPublicOptions()
+	{
+		return $this->m_oOptions->getOptions( true );
 	}
 
 	/**
@@ -125,10 +125,10 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	{
 		$this->m_oOptions->setValue( $sKey, $oValue, $bAddIfMissing );
 	}
-	
+
 	/**
 	 * Makes a set of options
-	 * 
+	 *
 	 * @param boolean $bPublicOnly
 	 * @param integer $iFormat
 	 * @param boolean $bNoCheck
@@ -138,10 +138,10 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	{
 		return CPSOptionHelper::makeOptions( $this, $bPublicOnly, $iFormat, $bNoCheck );
 	}
-	
+
 	/**
 	 * Makes a set of public options
-	 * 
+	 *
 	 * @param integer $iFormat
 	 * @param boolean $bNoCheck
 	 * @return mixed
@@ -150,7 +150,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	{
 		return CPSOptionHelper::makeOptions( $this, true, $iFormat, $bNoCheck );
 	}
-	
+
 	/**
 	 * Merges an array of options into the component options.
 	 * You can pass in an array of (key=>value) pairs or an array of {@link CPSOption}s
@@ -169,26 +169,26 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 
 			$this->setOption( $_sKey, $_oValue );
 		}
-		
+
 		return $this->getOwner();
 	}
 
 	//********************************************************************************
 	//* Interface Requirements
 	//********************************************************************************
-	
+
 	/**
 	 * Get our internal name
 	 * @returns string
 	 */
 	public function getInternalName() { return $this->m_sInternalName; }
-	
+
 	/**
 	 * Set our internal name
 	 * @param string $sName
 	 */
 	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
-	
+
 	/**
 	* Adds an option to the collection.
 	* @param string $sKey
@@ -241,7 +241,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	* @see getOptions
 	*/
 	public function setOptions( array $arOptions, $bClearFirst = false ) { $this->m_oOptions->setOptions( $arOptions, $bClearFirst ); }
-	
+
 	/**
 	* Unsets a single option
 	*
@@ -267,7 +267,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	*/
 	public function contains( $sKey ) { return $this->m_oOptions->contains( $sKey ); }
 	public function hasOption( $sKey ) { return $this->contains( $sKey ); }
-	
+
 	//********************************************************************************
 	//* Magic Methods
 	//********************************************************************************
@@ -275,16 +275,16 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	/**
 	 * Gets an option from the collection or passes through to parent.
 	 * @param string $sName the option, property or event name
-	 * @return mixed 
+	 * @return mixed
 	 * @throws CException if the property or event is not defined
 	 * @see __set
 	 */
 	public function __get( $sName )
 	{
 		//	Check my options first...
-		if ( $this->m_oOptions->contains( $sName ) ) 
+		if ( $this->m_oOptions->contains( $sName ) )
 			return $this->m_oOptions->getValue( $sName );
-			
+
 		//	Try daddy...
 		return parent::__get( $sName );
 	}
@@ -299,7 +299,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	public function __set( $sName, $oValue )
 	{
 		//	Check my options first...
-		if ( $this->m_oOptions->contains( $sName ) ) 
+		if ( $this->m_oOptions->contains( $sName ) )
 			return $this->m_oOptions->setValue( $sName, $oValue );
 
 		//	Let parent take a stab. He'll check getter/setters and Behavior methods
@@ -313,12 +313,12 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	public function __isset( $sName )
 	{
 		//	Mine first...
-		if ( $this->m_oOptions->contains( $sName ) ) 
+		if ( $this->m_oOptions->contains( $sName ) )
 			return null !== $this->m_oOptions->getValue( $sName );
-			
+
 		return parent::__isset( $sName );
 	}
-	
+
 	/**
 	 * Unset an option
 	 * @param string $sName
@@ -326,23 +326,23 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	public function __unset( $sName )
 	{
 		//	Check my options first...
-		if ( $this->m_oOptions->contains( $sName ) ) 
+		if ( $this->m_oOptions->contains( $sName ) )
 			$this->m_oOptions->setValue( $sName );
 		else
 			//	Try dad
 			parent::__unset( $sName );
 	}
-	
+
 	//********************************************************************************
 	//* Events
 	//********************************************************************************
-	
+
 	/**
 	* Redirect event to owner object
-	* 
-	* This doesn't actually raise an event. What it does is calls the 
+	*
+	* This doesn't actually raise an event. What it does is calls the
 	* owner's event raiser method. That method will then raise the event.
-	* 
+	*
 	* @param string $sName The event name
 	* @param CPSApiEvent $oEvent The event
 	*/
@@ -350,27 +350,27 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	{
 		//	Save called name...
 		$_sOrigName = $sName;
-		
+
 		//	Handler exists? Call it
 		if ( method_exists( $this->getOwner(), $sName ) )
 			return call_user_func_array( array( $this->getOwner(), $sName ), array( $oEvent ) );
 
 		//	See if pre-handler exists...
-		if ( 0 == strncasecmp( 'on', $sName, 2 ) ) 
+		if ( 0 == strncasecmp( 'on', $sName, 2 ) )
 			$sName = substr( $sName, 2 );
-			
+
 		$sName = lcfirst( $sName );
 
 		if ( method_exists( $this->getOwner(), $sName ) )
 			return call_user_func_array( array( $this->getOwner(), $sName ), array( $oEvent ) );
-			
+
 		//	Not there? Throw error...
 		return parent::raiseEvent( $_sOrigName, $oEvent );
 	}
 
 	/**
 	* Logs a message to the application log
-	* 
+	*
 	* @param string $sMessage The log message
 	* @param string $sCategory The category for this log entry. Defaults to __METHOD__
 	* @param string $sLevel The level of this log. Defaults to 'trace'
@@ -379,10 +379,10 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	{
 		return Yii::log( $sMessage, $sLevel, $sCategory );
 	}
-	
+
 	/**
 	* Log helpers
-	* 
+	*
 	* @param string $sMessage The log message
 	* @param string $sCategory The category for this log entry. Defaults to __METHOD__
 	*/
@@ -413,5 +413,5 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 			)
 		);
 	}
-	
+
 }

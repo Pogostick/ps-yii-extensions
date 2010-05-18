@@ -1,7 +1,7 @@
 <?php
 /*
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -9,14 +9,14 @@
 
 /**
  * Provides a base class for code lookup tables in your database
- * 
+ *
  * @package 	psYiiExtensions
  * @subpackage 	models
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id$
  * @since 		v1.0.6
- *  
+ *
  * @filesource
  */
 class CPSCodeTableModel extends CPSModel
@@ -24,7 +24,7 @@ class CPSCodeTableModel extends CPSModel
 	//********************************************************************************
 	//* Constants
 	//********************************************************************************
-	
+
 	/***
 	* The name of our code table DDL
 	*/
@@ -35,10 +35,10 @@ class CPSCodeTableModel extends CPSModel
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
-	
+
 	/**
 	* Installs a standard code table into the database.
-	* 
+	*
 	* @param CDbConnnection $oDB Defaults to Yii::app()->db
 	* @param string $sName The code table name. Defaults to 'code_t'
 	* @returns boolean
@@ -46,18 +46,20 @@ class CPSCodeTableModel extends CPSModel
 	public static function install( $oDB = null, $sName = self::DDL_TABLE_NAME )
 	{
 		$_oDB = PS::nvl( $oDB, Yii::app()->db );
-		
+
 		if ( $sName && $_oDB )
 		{
-			$_sSQL = file_get_contents( Yii::getPathOfAlias( 'pogostick.templates.ddl' ) . self::DDL_NAME );
+			$_sPath = Yii::getPathOfAlias( 'pogostick.templates.ddl' );
+
+			$_sSQL = file_get_contents( $_sPath . self::DDL_NAME );
 			if ( strlen( $_sSQL ) )
 			{
 				$_sSQL = str_ireplace( '%%TABLE_NAME', $sName, $_sSQL );
 				$_oCmd = $_oDB->createCommand( $_sSQL );
 				if ( $_oCmd->execute() )
 				{
-					$_sSQL = file_get_contents( Yii::getPathOfAlias( 'pogostick.templates.ddl' ) . self::DDL_DATA_NAME );
-					
+					$_sSQL = file_get_contents( $_sPath . self::DDL_DATA_NAME );
+
 					//	Load some codes...
 					if ( strlen( $_sSQL ) )
 					{
@@ -66,17 +68,17 @@ class CPSCodeTableModel extends CPSModel
 						$_oCmd->execute();
 					}
 				}
-				
+
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	* Get code rows
-	* 
+	*
 	* @param int $iId Specific code ID to retrieve
 	* @param string $sType Retrieves all codes that are of this type
 	* @param string $sAbbr Retrieves all codes that are of this abbreviation. If type specicifed, further filters return set
@@ -97,12 +99,12 @@ class CPSCodeTableModel extends CPSModel
 
 		$_arCrit = null;
 		$_oModel = call_user_func( array( $_sModelClass, 'model' ) );
-		
+
 		$sOrder = $_oModel->getMetaData()->tableSchema->primaryKey;
 
 		//	Get a single code...
 		if ( null !== $iId ) return $_oModel->active()->findByPk( $iId );
-		
+
 		//	Get a specific code by type/abbr
 		if ( null !== $sType && null !== $sAbbr )
 		{
@@ -133,10 +135,10 @@ class CPSCodeTableModel extends CPSModel
 				'order' => PS::nvl( $sOrder ),
 			);
 		}
-		
+
 		return $_arCrit ? $_oModel->active()->findAll( $_arCrit ) : null;
 	}
-	
+
 	/**
 	* @return array validation rules for model attributes.
 	*/
@@ -173,9 +175,9 @@ class CPSCodeTableModel extends CPSModel
 	}
 
 	//********************************************************************************
-	//* Statics 
+	//* Statics
 	//********************************************************************************
-	
+
 	/**
 	* Returns the static model of the specified AR class.
 	* @return CActiveRecord the static model class
@@ -184,10 +186,10 @@ class CPSCodeTableModel extends CPSModel
 	{
 		return parent::model( $sClassName );
 	}
-	
+
 	/**
 	* Find a code by type
-	* 
+	*
 	* @param string $sType
 	* @return array
 	* @static
@@ -199,7 +201,7 @@ class CPSCodeTableModel extends CPSModel
 
 	/**
 	* Find a code by type
-	* 
+	*
 	* @param string $sType
 	* @return array
 	* @static
@@ -211,9 +213,9 @@ class CPSCodeTableModel extends CPSModel
 
 	/**
 	* Finds a single code by code_id
-	* 
+	*
 	* Duplicates findByPk, but wanted to be consistent.
-	* 	
+	*
 	* @param integer $iCodeId
 	* @return CActiveRecord
 	* @static
@@ -222,10 +224,10 @@ class CPSCodeTableModel extends CPSModel
 	{
 		return self::getCodes( $iCodeId );
 	}
-	
+
 	/**
 	* Returns a code's description
-	* 
+	*
 	* @param int $iId
 	* @return string
 	*/
@@ -234,10 +236,10 @@ class CPSCodeTableModel extends CPSModel
 		$_oCode = self::getCodes( $iId );
 		return $_oCode ? $_oCode->code_desc_text : null;
 	}
-	
+
 	/**
 	* Returns a code's abbreviation
-	* 
+	*
 	* @param int $iId
 	* @return string
 	*/
@@ -246,10 +248,10 @@ class CPSCodeTableModel extends CPSModel
 		$_oCode = self::getCodes( $iId );
 		return $_oCode ? $_oCode->code_abbr_text : null;
 	}
-	
+
 	/**
 	* Retrieves the associated text for a code
-	* 
+	*
 	* @param int $iId
 	* @return string
 	*/
@@ -258,10 +260,10 @@ class CPSCodeTableModel extends CPSModel
 		$_oCode = self::getCodes( $iId );
 		return $_oCode ? $_oCode->assoc_text : null;
 	}
-	
+
 	/**
 	* Retrieves the associated value for a code
-	* 
+	*
 	* @param int $iId
 	* @return double
 	*/
@@ -270,11 +272,11 @@ class CPSCodeTableModel extends CPSModel
 		$_oCode = self::getCodes( $iId );
 		return $_oCode ? $_oCode->assoc_value_nbr : null;
 	}
-	
+
 	/**
 	* Returns all rows based on type/abbr given
 	* If it's a specific request, (i.e. type & abbr given) a single row is returned.
-	* 
+	*
 	* @param string $sType
 	* @param string $sAbbr
 	* @return int|CPSCodeTableModel|array
@@ -284,7 +286,7 @@ class CPSCodeTableModel extends CPSModel
 		$_oCode = self::getCodes( null, $sType, $sAbbr );
 		return $_oCode ? ( $bReturnIdOnly ? $_oCode->id : $_oCode ) : null;
 	}
-	
+
 	/**
 	 * Only return active code records as designated by the active_ind
 	 * @returns CPSCodeTableModel

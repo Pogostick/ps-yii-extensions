@@ -1,7 +1,7 @@
 <?php
 /*
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -11,16 +11,16 @@
  * CPSComponent is the base class for all psYiiExtensions.
  * It contains functionality to call behavior methods without the need for chaining.
  * All PSComponents have a preinit() method that is called during construction.
- * 
+ *
  * @package 	psYiiExtensions
  * @subpackage 	base
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN $Id$
  * @since 		v1.0.0
- * 
+ *
  * @filesource
- * 
+ *
  * @property-read string $internalName The internal name of the component.
  */
 class CPSComponent extends CApplicationComponent implements IPSComponent
@@ -34,7 +34,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	* @var string
 	*/
 	protected $m_sInternalName;
-	
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -54,21 +54,21 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	//********************************************************************************
 	//* Yii Overrides
 	//********************************************************************************
-	
+
 	/**
 	* Constructs a component.
 	*/
 	public function __construct( $arConfig = array() )
 	{
 		//	No parent constructor
-		
+
 		//	Log it and check for issues...
-		CPSLog::trace( 'pogostick.base', '{class} constructed', array( "{class}" => get_class( $this ) ) );
-		
+//		CPSLog::trace( 'pogostick.base', '{class} constructed', array( "{class}" => get_class( $this ) ) );
+
 		//	Preinitialize
 		$this->preinit();
 	}
-	
+
 	/**
 	 * Preinitialize the component
 	 * Override to add your own functionality before init() is called.
@@ -77,11 +77,11 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	{
 		//	Create our internal name
 		PS::createInternalName( $this );
-		
+
 		//	Attach our default Behavior
 		$this->attachBehavior( 'psComponent', 'pogostick.behaviors.CPSComponentBehavior' );
 	}
-	
+
 	/**
 	* Initialize our component.
 	*/
@@ -95,18 +95,18 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 			//	Call our behaviors init()
 			foreach ( $this->m_arBehaviorCache as $_sName )
 				$this->asa( $_sName )->init();
-				
+
 			//	We are now...
 			$this->m_bInitialized = true;
 		}
 	}
-	
+
 	/**
 	 * Attaches an Behavior to this component.
 	 * This method will create the Behavior object based on the given
 	 * configuration. After that, the Behavior object will be initialized
 	 * by calling its {@link IPSBehavior::attach} method.
-	 * 
+	 *
 	 * @param string $sName the Behavior's name. It should uniquely identify this Behavior.
 	 * @param mixed $oBehavior the Behavior configuration. This is passed as the first parameter to {@link YiiBase::createComponent} to create the Behavior object.
 	 * @return IPSBehavior the Behavior object
@@ -119,10 +119,10 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 			//	Add to our cache...
 			$this->m_arBehaviorCache[] = $sName;
 		}
-		
+
 		return $_oObject;
 	}
-	
+
 	/**
 	 * Alias for setOptions
 	 * @param array $arConfig
@@ -136,19 +136,19 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	//********************************************************************************
 	//* Interface Requirements
 	//********************************************************************************
-	
+
 	/**
 	 * Get our internal name
 	 * @returns string
 	 */
 	public function getInternalName() { return $this->m_sInternalName; }
-	
+
 	/**
 	 * Set our internal name
 	 * @param string $sName
 	 */
 	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
-	
+
 	//********************************************************************************
 	//* Magic Methods
 	//********************************************************************************
@@ -156,7 +156,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	/**
 	 * Gets an option from the collection or passes through to parent.
 	 * @param string $sName the option, property or event name
-	 * @return mixed 
+	 * @return mixed
 	 * @throws CException if the property or event is not defined
 	 * @see __set
 	 */
@@ -165,7 +165,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 		//	Ours?
 		if ( $this->hasProperty( $sName ) )
 			return $this->{$sName};
-			
+
 		//	Then behaviors
 		foreach ( $this->m_arBehaviorCache as $_sBehavior )
 		{
@@ -189,7 +189,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 		//	Ours?
 		if ( $this->hasProperty( $sName ) )
 			return $this->{$sName} = $oValue;
-			
+
 		//	Then behaviors
 		foreach ( $this->m_arBehaviorCache as $_sBehavior )
 		{
@@ -216,7 +216,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 
 		return parent::__isset( $sName );
 	}
-	
+
 	/**
 	 * Unset an option
 	 * @param string $sName
@@ -236,7 +236,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 		//	Try dad
 		parent::__unset( $sName );
 	}
-	
+
 	/**
 	 * Calls the named method which is not a class method.
 	 * Do not call this method. This is a PHP magic method that we override
@@ -249,7 +249,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	public function __call( $sName, $arParams )
 	{
 		$_oEvent = null;
-		
+
 		try
 		{
 			//	Look for behavior methods
@@ -258,7 +258,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 				if ( $_oBehave = $this->asa( $_sBehavior ) )
 				{
 					if ( method_exists( $_oBehave, $sName ) )
-						return call_user_func_array( array( $_oBehave, $sName ), $arParams ); 
+						return call_user_func_array( array( $_oBehave, $sName ), $arParams );
 				}
 			}
 		}
@@ -267,7 +267,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 		//	Pass on to dad
 		return parent::__call( $sName, $arParams );
 	}
-	
+
 	/**
 	 * Checks if a component has an attached behavior
 	 * @param string $sClass
@@ -283,15 +283,15 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 				if ( $_oBehav instanceof $sClass )
 				return true;
 			}
-			
+
 			//	Check for nicknames...
 			if ( $sClass == $_sBehavior )
 				return true;
 		}
-		
+
 		//	Nope?
 		return false;
 	}
-		
+
 
 }

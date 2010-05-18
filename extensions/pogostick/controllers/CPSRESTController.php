@@ -23,30 +23,22 @@
 class CPSRESTController extends CPSController
 {
 	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Member Variables
-	//********************************************************************************
-	
-	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 
 	/**
 	 * Runs the action after passing through all filters.
-	 * This method is invoked by {@link runActionWithFilters} after all 
+	 * This method is invoked by {@link runActionWithFilters} after all
 	 * possible filters have been executed and the action starts to run.
-	 * 
+	 *
 	 * @param CAction $oAction Action to run
 	 */
 	public function runAction( $oAction )
 	{
 		$this->pushAction( $this->getAction() );
-		
+
 		$this->setAction( $oAction );
-		
+
 		if ( $this->beforeAction( $oAction ) )
 		{
 			$this->dispatchRequest( $oAction );
@@ -67,54 +59,54 @@ class CPSRESTController extends CPSController
 	public function createAction( $sActionId )
 	{
 		$_sActionId = ( $sActionId === '' ) ? $this->defaultAction : $sActionId;
-		
+
 		//	Is it a valid request?
 		if ( ! method_exists( $this, 'get' . $_sActionId ) && ! method_exists( $this, 'post' . $_sActionId ) && ! method_exists( $this, 'request' . $_sActionId ) )
 			return $this->missingAction( $_sActionId );
 
 		return new CPSRESTAction( $this, $_sActionId );
 	}
-	
+
 	/**
 	 * Converts an array to JSON
-	 * 
+	 *
 	 * @param array $arData
 	 */
 	public function arrayToJSON( $arData = array() )
 	{
 		$_arOut = array();
-		
+
 		foreach ( $arData as $_sKey => &$_oValue )
 			$_arOut[] = $_sKey . ':' . $this->toJSON( $_oValue );
-		
+
 		return '{' . implode( ',', $_arOut ) . '}';
-    }
-    
-    /***
-     * Converts an item to JSON
-     * 
-     * @param mixed $oValue
-     */
-    function toJSON( $oValue )
-    {
-    	if ( is_array( $oValue ) )
-    		$_oOut = $this->arrayToJSON( $oValue );
-    	else if ( is_string( $oValue ) )
-    		$_oOut = '"' . addslashes( $oValue ) . '"';
-   		else if ( is_bool( $oValue ) )
-    		$_oOut = $oValue ? 'true' : 'false';
-    	else if ( is_null( $oValue ) )
+	}
+
+	/***
+	 * Converts an item to JSON
+	 *
+	 * @param mixed $oValue
+	 */
+	function toJSON( $oValue )
+	{
+		if ( is_array( $oValue ) )
+			$_oOut = $this->arrayToJSON( $oValue );
+		else if ( is_string( $oValue ) )
+			$_oOut = '"' . addslashes( $oValue ) . '"';
+		else if ( is_bool( $oValue ) )
+			$_oOut = $oValue ? 'true' : 'false';
+		else if ( is_null( $oValue ) )
 			$_oOut = '""';
 		else
 			$_oOut = $oValue;
-			
+
 		return $_oOut;
-    }
+	}
 
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
-	
+
 	/**
 	 * Runs the named REST action.
 	 * Filters specified via {@link filters()} will be applied.
@@ -139,41 +131,44 @@ class CPSRESTController extends CPSController
 		{
 			$_sUri = trim( $_sUri, '/?' );
 			$_arOpts = ( ! empty( $_sUri ) ? explode( '/', $_sUri ) : array() );
-			
+
 			foreach ( $_arOpts as $_sKey => $_oValue )
 			{
 				if ( false !== strpos( $_oValue, '=' ) )
 				{
 					if ( null != ( $_arTemp = explode( '=', $_oValue ) ) )
 						$_arOpts[ $_arTemp[0] ] = $_arTemp[1];
-						
+
 					unset( $_arOpts[ $_sKey ] );
 				}
 				else
 					$_arOpts[ $_sKey ] = $_oValue;
 			}
 		}
-		
+
 		//	Any query string? (?x=y&...)
 		if ( null != ( $_sQuery = parse_url( $_sUri, PHP_URL_QUERY ) ) )
 			$_arOpts = array_merge( explode( '=', $_sQuery ), $_arOpts );
-		
+
 		//	load into url params
 		foreach ( $_arOpts as $_sKey => $_sValue )
 			if ( ! isset( $_arUrlParams[ $_sKey ] ) ) $_arUrlParams[ $_sKey ] = $_sValue;
-		
+
 		//	Is it a valid request?
 		$_sType = strtolower( $this->getRequest()->getRequestType() );
 		$_sMethod = $_sType . ucfirst( $_sActionId );
-		
-		foreach ( ( $_sType == 'post' ? $_POST : $_GET ) as $_sKey => $_oValue )
+
+		if ( $_sType == 'post' )
 		{
-			if ( ! is_array( $_oValue ) )
-				$_arUrlParams[ $_sKey ] = $_oValue;
-			else
+			foreach ( $_POST as $_sKey => $_oValue )
 			{
-				foreach ( $_oValue as $_sSubKey => $_oSubValue )
-					$_arUrlParams[ $_sSubKey ] = $_oSubValue;
+				if ( ! is_array( $_oValue ) )
+					$_arUrlParams[ $_sKey ] = $_oValue;
+				else
+				{
+					foreach ( $_oValue as $_sSubKey => $_oSubValue )
+						$_arUrlParams[ $_sSubKey ] = $_oSubValue;
+				}
 			}
 		}
 

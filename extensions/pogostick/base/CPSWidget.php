@@ -1,23 +1,23 @@
 <?php
 /*
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
 
 /**
- * CPSWidget is the base class for all Pogostick widgets for Yii. This object 
+ * CPSWidget is the base class for all Pogostick widgets for Yii. This object
  * is pretty much identical to CPSComponent but offers a little bit of extra functionality.
- * 
+ *
  * @package 	psYiiExtensions
  * @subpackage 	base
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id$
  * @since 		v1.0.0
- * 
+ *
  * @filesource
  */
 class CPSWidget extends CInputWidget implements IPSComponent
@@ -31,13 +31,13 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	* @var string
 	*/
 	protected $m_sInternalName;
-	
+
 	/**
 	 * Tracks if we have been initialized yet.
 	 * @var boolean
 	 */
 	protected $m_bInitialized = false;
-	
+
 	/**
 	 * Our behaviors. Cached for speed here...
 	 * @var array
@@ -49,31 +49,31 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	* @var array
 	*/
 	protected $m_arCssFiles = array();
-	
+
 	/**
 	* Our JS files
 	* @var array
 	*/
 	protected $m_arScriptFiles = array();
-	
+
 	//********************************************************************************
 	//* Yii Overrides
 	//********************************************************************************
-	
+
 	/**
 	* Constructs a widget
 	*/
 	public function __construct( $oOwner = null )
 	{
 		parent::__construct( $oOwner );
-		
+
 		//	Log it and check for issues...
-		CPSLog::trace( 'pogostick.base', '{class} constructed', array( "{class}" => get_class( $this ) ) );
-		
+//		CPSLog::trace( 'pogostick.base', '{class} constructed', array( "{class}" => get_class( $this ) ) );
+
 		//	Preinitialize
 		$this->preinit();
 	}
-	
+
 	/**
 	 * Preinitialize the component
 	 * Override to add your own functionality before init() is called.
@@ -82,11 +82,11 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	{
 		//	Create our internal name
 		PS::createInternalName( $this );
-		
+
 		//	Attach our default Behavior
 		$this->attachBehavior( 'psWidget', 'pogostick.behaviors.CPSWidgetBehavior' );
 	}
-	
+
 	/**
 	* Initialize our component.
 	*/
@@ -96,7 +96,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 		{
 			//	Now call parent's init...
 			parent::init();
-			
+
 			if ( empty( $this->name ) ) $this->name = $this->m_sInternalName;
 
 			//	Call our behaviors init() method if they exist
@@ -110,9 +110,9 @@ class CPSWidget extends CInputWidget implements IPSComponent
 			$this->m_bInitialized = true;
 		}
 	}
-	
+
 	/**
-	* Pushes a css file onto the page load stack. 
+	* Pushes a css file onto the page load stack.
 	* @param string $sPath Path of css relative to doc_root
 	* @param string $sId
 	*/
@@ -122,8 +122,8 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	}
 
 	/**
-	* Pushes a script onto the page load stack. 
-	* 
+	* Pushes a script onto the page load stack.
+	*
 	* @param string $sPath Path of script relative to doc_root
 	* @param integer $iPosition
 	* @param string $sId
@@ -141,7 +141,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	{
 		//	Register a special CSS file if we have one...
 		if ( $this->cssFile ) $this->pushCssFile( $this->cssFile );
-			
+
 		//	Load css files and unset from array...
 		foreach ( $this->m_arCssFiles as $_sKey => $_arFile )
 		{
@@ -155,11 +155,11 @@ class CPSWidget extends CInputWidget implements IPSComponent
 			PS::_rsf( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
 			unset( $this->m_arScriptFiles[ $_sKey ] );
 		}
-			
+
 		//	Send upstream for convenience
 		return PS::_cs();
 	}
-	
+
 	/**
 	 * Registers a widget script.
 	 * If no script is provided, the object's generateJavascript() method is called to get the sript.
@@ -174,7 +174,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 
 	/**
 	 * Attaches an Behavior to this component.
-	 * We just cache the names here for lookup speed. 
+	 * We just cache the names here for lookup speed.
 	 * @param string the Behavior's name. It should uniquely identify this Behavior.
 	 * @param mixed the Behavior configuration. This is passed as the first parameter to {@link YiiBase::createComponent} to create the Behavior object.
 	 * @return IPSBehavior the Behavior object
@@ -187,10 +187,10 @@ class CPSWidget extends CInputWidget implements IPSComponent
 			//	Add to our cache...
 			$this->m_arBehaviorCache[] = $sName;
 		}
-		
+
 		return $_oObject;
 	}
-	
+
 	/**
 	 * Alias for setOptions
 	 * @param array $arConfig
@@ -203,7 +203,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 
 	/**
 	* Given an ID, a unique name is built and returned
-	* 
+	*
 	* @param string $sId
 	* @returns string
 	*/
@@ -213,9 +213,9 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	}
 
 	//********************************************************************************
-	//* Private Methods 
+	//* Private Methods
 	//********************************************************************************
-	
+
 	/**
 	* Generates the javascript code for the widget
 	* @return string
@@ -235,19 +235,19 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	//********************************************************************************
 	//* Interface Requirements
 	//********************************************************************************
-	
+
 	/**
 	 * Get our internal name
 	 * @returns string
 	 */
 	public function getInternalName() { return $this->m_sInternalName; }
-	
+
 	/**
 	 * Set our internal name
 	 * @param string $sName
 	 */
 	public function setInternalName( $sValue ) { $this->m_sInternalName = $sValue; }
-	
+
 	//********************************************************************************
 	//* Magic Methods
 	//********************************************************************************
@@ -255,7 +255,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	/**
 	 * Gets an option from the collection or passes through to parent.
 	 * @param string $sName the option, property or event name
-	 * @return mixed 
+	 * @return mixed
 	 * @throws CException if the property or event is not defined
 	 * @see __set
 	 */
@@ -307,7 +307,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 
 		return parent::__isset( $sName );
 	}
-	
+
 	/**
 	 * Unset an option
 	 * @param string $sName
@@ -315,13 +315,13 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	public function __unset( $sName )
 	{
 		//	Check my options first...
-		if ( ! $this->m_oOptions->contains( $sName ) ) 
+		if ( ! $this->m_oOptions->contains( $sName ) )
 			$this->unsetOption( $sName );
 		else
 			//	Try dad
 			parent::__unset( $sName );
 	}
-	
+
 	/**
 	 * Calls the named method which is not a class method.
 	 * Do not call this method. This is a PHP magic method that we override
@@ -334,7 +334,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	public function __call( $sName, $arParams )
 	{
 		$_oEvent = null;
-		
+
 		try
 		{
 			//	Look for behavior methods
@@ -343,7 +343,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 				if ( $_oBehave = $this->asa( $_sBehavior ) )
 				{
 					if ( method_exists( $_oBehave, $sName ) )
-						return call_user_func_array( array( $_oBehave, $sName ), $arParams ); 
+						return call_user_func_array( array( $_oBehave, $sName ), $arParams );
 				}
 			}
 		}
@@ -354,15 +354,15 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	}
 
 	//********************************************************************************
-	//* Statics 
+	//* Statics
 	//********************************************************************************
-	
+
 	/**
 	* Constructs and returns a widget
-	* 
-	* The options passed in are dynamically added to the options array and will be accessible 
+	*
+	* The options passed in are dynamically added to the options array and will be accessible
 	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
-	* 
+	*
 	* @param string $sName The type of widget to create
 	* @param array $arOptions The options for the widget
 	* @return CPSWidget
@@ -372,17 +372,17 @@ class CPSWidget extends CInputWidget implements IPSComponent
 		//	Instantiate...
 		$_sName = PS::nvl( $sName, ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $sName );
 		$_sClass = PS::o( $arOptions, 'class', ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $_sName, true );
- 		$_oWidget = new $_sClass();
+		$_oWidget = new $_sClass();
 		$_oWidget->widgetName = $_sName;
 		$_oWidget->id = $_oWidget->name = PS::o( $arOptions, 'id', $_sName );
 		$_oWidget->name = PS::o( $arOptions, 'name', $_oWidget->id );
 
 		//	Push any optional scripts
-		foreach ( PS::o( $arOptions, '_scripts', array(), true ) as $_sScript ) 
+		foreach ( PS::o( $arOptions, '_scripts', array(), true ) as $_sScript )
 			$_oWidget->pushScriptFile( $_oWidget->baseUrl . $_sScript );
-				
+
 		//	And CSS
-		foreach ( PS::o( $arOptions, '_cssFiles', array(), true ) as $_sCss ) 
+		foreach ( PS::o( $arOptions, '_cssFiles', array(), true ) as $_sCss )
 			$_oWidget->pushCssFile( $_oWidget->baseUrl . $_sCss);
 
 		//	Now process the rest of the options...
@@ -390,7 +390,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 
 		//	Initialize our widget
 		$_oWidget->init();
-		
+
 		//	And run it...
 		if ( $_oWidget->autoRun )
 			$_oWidget->run();
