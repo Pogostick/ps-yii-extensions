@@ -393,7 +393,10 @@ class CPSWidgetHelper extends CPSHelperBase
 			else
 			{
 				//	Set label name
-				$_arLabelOptions['label'] = PS::nvl( $_sLabel, PS::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . $_sSuffixToUse;
+				if ( $_sLabel === false )
+					$_arLabelOptions['label'] = false;
+				else
+					$_arLabelOptions['label'] = PS::nvl( $_sLabel, PS::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . $_sSuffixToUse;
 				$_sOut = ( $eFieldType == PS::TEXT_DISPLAY ? self::activeLabel( $oModel, $sColName, $_arLabelOptions ) : self::activeLabelEx( $oModel, $sColName, $_arLabelOptions ) );
 			}
 
