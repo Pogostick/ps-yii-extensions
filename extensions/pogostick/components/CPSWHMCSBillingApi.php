@@ -43,6 +43,77 @@ class CPSWHMCSBillingApi extends CPSWHMCSApi
 		$this->addRequestMapping( 'recurCount', 'recurfor', true );
 		$this->addRequestMapping( 'invoiceAction', 'invoiceaction', true );
 		$this->addRequestMapping( 'dueDate', 'duedate', true );
+        
+        //    Billing::AddOrder
+        $this->addRequestMapping( 'clientId', 'clientid', true, null, self::BILLING_API, 'addorder' );
+        $this->addRequestMapping( 'productId', 'pid', true );
+        $this->addRequestMapping( 'domain', 'domain' );
+        $this->addRequestMapping( 'addOns', 'addons' );
+        $this->addRequestMapping( 'customFields', 'customfields' );
+        $this->addRequestMapping( 'configOptions', 'configOptions' );
+        $this->addRequestMapping( 'domainType', 'domainType' );
+        $this->addRequestMapping( 'registrationPeriod', 'regperiod' );
+        $this->addRequestMapping( 'dnsManagement', 'dnsmanagement' );
+        $this->addRequestMapping( 'emailForwarding', 'emailforwarding' );
+        $this->addRequestMapping( 'idProtection', 'idprotection' );
+        $this->addRequestMapping( 'eppCode', 'eppcode' );
+        $this->addRequestMapping( 'ns1', 'ns1' );
+        $this->addRequestMapping( 'ns2', 'ns2' );
+        $this->addRequestMapping( 'ns3', 'ns3' );
+        $this->addRequestMapping( 'ns4', 'ns4' );
+        $this->addRequestMapping( 'paymentMethod', 'paymentmethod' );
+        $this->addRequestMapping( 'promoCode', 'promocode' );
+        $this->addRequestMapping( 'noInvoice', 'noInvoice' );
+        $this->addRequestMapping( 'noEmail', 'noemail' );
+        $this->addRequestMapping( 'clientIP', 'clientip' );
+
+		//	Billing::AcceptOrder
+		$this->addRequestMapping( 'orderId', 'orderid', true, null, self::BILLING_API, 'acceptorder' );
+
+        //	Billing::GetOrders
+        $this->addRequestMapping( 'limitStart', 'limitstart', true, null, self::BILLING_API, 'getorders' );
+        $this->addRequestMapping( 'limitNumber', 'limitnum' );
 	}
+
+	/**
+	 * Adds an order to the system
+	 *
+	 * @param array $arRequestData
+	 */
+	public function addOrder( $arRequestData = array() )
+	{
+		return $this->makeApiCall( self::BILLING_API, 'addorder', $arRequestData );
+	}
+
+	/**
+	 * Gets orders from the system
+	 *
+	 * @param array $arRequestData
+	 */
+	public function getOrders( $arRequestData = array() )
+	{
+		return $this->makeApiCall( self::BILLING_API, 'getorders', $arRequestData );
+	}
+
+	/**
+	 * Accepts an order in the system
+	 *
+	 * @param array $arRequestData
+	 */
+	public function acceptOrder( $arRequestData = array() )
+	{
+		return $this->makeApiCall( self::BILLING_API, 'acceptorder', $arRequestData );
+	}
+
+	/**
+	 * Adds an item to an order
+	 *
+	 * @param array $arRequestData
+	 */
+	public function addBillableItem( $arRequestData = array() )
+	{
+		return $this->makeApiCall( self::BILLING_API, 'addbillableitem', $arRequestData );
+	}
+
 
 }

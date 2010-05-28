@@ -67,22 +67,33 @@ class CPSWHMCSApi extends CPSApiComponent
 		
 		if ( $_arResponse = parent::makeRequest( $sSubApiName, $arRequestData, 'POST' ) )
 		{
-			if ( $_arData = explode( ';', $_arResponse ) )
+			if ( false !== strpos( $_arResponse, '<?xml' ) )
 			{
-				foreach ( $_arData as $_oItem )
+				$_oXml = simplexml_load_string( $_arResponse );
+				if ( $_oXml->result == 'success' )
+					return $_oXml;
+
+				$this->lastErrorMessage = $_oXml->message;
+			}
+			else
+			{
+				if ( $_arData = explode( ';', $_arResponse ) )
 				{
-					$_sItem = explode( '=', $_oItem );
-					if ( trim( $_sItem[0] ) ) $_arResults[ $_sItem[0] ] = $_sItem[1];
+					foreach ( $_arData as $_oItem )
+					{
+						$_sItem = explode( '=', $_oItem );
+						if ( trim( $_sItem[0] ) ) $_arResults[ $_sItem[0] ] = $_sItem[1];
+					}
+
+					if ( PS::o( $_arResults, 'result' ) == 'success' )
+						return $_arResults;
+
+					$this->lastErrorMessage = PS::o( $_arResults, 'message' );
 				}
-				
-				if ( PS::o( $_arResults, 'result' ) == 'success' )
-					return $_arResults;
-					
-				$this->lastErrorMessage = PS::o( $_arResults, 'message' );
 			}
 		}
 		else
-			$this->lastErrorMessage = 'Error making API call';
+			$this->lastErrorMessage = 'Unknown error making API call';
 		
 		return false;
 	}

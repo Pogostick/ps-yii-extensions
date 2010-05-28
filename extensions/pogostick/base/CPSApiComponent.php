@@ -79,7 +79,7 @@ class CPSApiComponent extends CPSComponent
 		$_arRequestData = $this->requestData;
 
 		//	Check data...
-		if ( null != $arRequestData ) $_arRequestData = array_merge( $_arRequestData, $arRequestData );
+		if ( null != $arRequestData && is_array( $arRequestData ) ) $_arRequestData = array_merge( $_arRequestData, $arRequestData );
 
 		//	Check subtype...
 		if ( ! empty( $sSubType ) && is_array( $this->requestMap[ $this->apiToUse ] ) )
@@ -158,12 +158,18 @@ class CPSApiComponent extends CPSComponent
 			}
 		}
 
+		CPSLog::trace( __METHOD__, 'Calling onBeforeApiCall' );
+
 		//	Handle events...
 		$_oEvent = new CPSApiEvent( $_sUrl, $_sQuery, null, $this );
 		$this->onBeforeApiCall( $_oEvent );
 
+		CPSLog::trace( __METHOD__, 'Making request: ' . $_sQuery );
+
 		//	Ok, we've build our request, now let's get the results...
 		$_sResults = PS::makeHttpRequest( $_sUrl, $_sQuery, $sMethod, $this->userAgent );
+
+		CPSLog::trace( __METHOD__, 'Call complete: ' . var_export( $_sResults, true ) );
 
 		//	Handle events...
 		$_oEvent->urlResults = $_sResults;

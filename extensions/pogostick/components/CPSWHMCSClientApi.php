@@ -88,6 +88,12 @@ class CPSWHMCSClientApi extends CPSWHMCSApi
 		$this->addRequestMapping( 'gateway', null, true );
 		$this->addRequestMapping( 'noEmail', 'noemail' );
 		$this->addRequestMapping( 'paymentDate', 'date' );
+
+		//	Client::GetClientsDetails
+		$this->addRequestMapping( 'clientId', 'clientid', true, null, self::CLIENT_API, 'getclientsdetails' );
+
+		//	Client::GetClientsProducts
+		$this->addRequestMapping( 'clientId', 'clientid', true, null, self::CLIENT_API, 'getclientsproducts' );
 	}
 	
 	/**
@@ -113,11 +119,43 @@ class CPSWHMCSClientApi extends CPSWHMCSApi
 	/**
 	 * Deletes a client
 	 * 
-	 * @param array $arRequestData
+	 * @param integer $iClientId
 	 */
-	public function deleteClient( $arRequestData = array() )
+	public function deleteClient( $iClientId )
 	{
-		return $this->makeApiCall( self::CLIENT_API, 'deleteclient', $arRequestData );
+		$_arData = array(
+			'clientId' => $iClientId,
+		);
+
+		return $this->makeApiCall( self::CLIENT_API, 'deleteclient', $_arData );
+	}
+
+	/**
+	 * Retrieves a clients' details
+	 *
+	 * @param integer $iClientId
+	 */
+	public function getClientsDetails( $iClientId )
+	{
+		$_arData = array(
+			'clientId' => $iClientId,
+		);
+
+		return $this->makeApiCall( self::CLIENT_API, 'getclientsdetails', $_arData );
+	}
+
+	/**
+	 * Retrieves a clients' products
+	 *
+	 * @param integer $iClientId
+	 */
+	public function getClientsProducts( $iClientId )
+	{
+		$_arData = array(
+			'clientId' => $iClientId,
+		);
+
+		return $this->makeApiCall( self::CLIENT_API, 'getclientsproducts', $_arData );
 	}
 
 	/**
