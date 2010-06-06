@@ -115,6 +115,7 @@ class CPSDataGrid implements IPSBase
 		
 		if ( null !== $_arFormHeader )
 		{
+			$_arFormHeader['flashMessage'] = PS::o( $arOptions, 'flashMessage' );
 			$_arFormHeader['itemName'] = PS::o( $_arFormHeader, 'itemName', $_sItemName );
 			$_sFormHeader = PS::o( $_arFormHeader, 'title', 'Form Header', true );
 		}

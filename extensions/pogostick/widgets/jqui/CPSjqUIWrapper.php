@@ -289,16 +289,16 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 			$_oWidget->theme = $_sTheme;
 			
 			//	Register scripts necessary
-			PS::_rsf( "http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js" );
+			PS::_rsf( "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js" );
+
 			PS::_rsf( PS::makePath( $_oWidget->baseUrl, 'js', 'jquery.pogostick.hover.js' ), CClientScript::POS_END );
 
 			//	Register css files if we have a theme...
 			if ( $_oWidget->theme )
 			{
 	//	Uncomment to use CDN
-	//			$_oCS->registerCssFile( "http://jqueryui.com/latest/themes/{$_oWidget->theme}/ui.all.css" );
-
-				PS::_rcf( PS::makePath( $_oWidget->baseUrl, 'css', $_oWidget->theme, 'ui.all.css' ) );
+				PS::_rcf( "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/{$_oWidget->theme}/jquery-ui.css" );
+	//			PS::_rcf( PS::makePath( $_oWidget->baseUrl, 'css', $_oWidget->theme, 'ui.all.css' ) );
 				PS::_rcf( PS::makePath( $_oWidget->baseUrl, 'css', 'ui.pogostick.css' ) );
 			}
 			

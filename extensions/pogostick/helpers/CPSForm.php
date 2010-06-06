@@ -205,7 +205,8 @@ class CPSForm implements IPSBase
 		
 		$sDivClass = PS::o( $arOptions, 'divClass', 'ps-form-header' );
 		$bShowFlashDiv = PS::o( $arOptions, 'showFlashDiv', true );
-		$sHtmlInject = PS::o( $arOptions, 'htmlInject', null );
+		$_sHtmlInjection = PS::o( $arOptions, 'htmlInject', null );
+		$_sFlashMessage = PS::o( $arOptions, 'flashMessage' );
 		$_sSubHeader = PS::o( $arOptions, 'subHeader', null );
 		$_sFormId = PS::o( $arOptions, 'formId', 'ps-edit-form', true );
 
@@ -213,6 +214,8 @@ class CPSForm implements IPSBase
 		$_sClass = $_sLink = $_sOut = null;
 		$_sFlash = $bShowFlashDiv ? PS::flashMessage( 'success', true ) : null;
 		$_sExtra = null;//'style="margin-bottom:' . ( $_sFlash ? '32px' : '10px' ) . '";"';
+
+		if ( $_sFlashMessage ) $_sFlashMessage = '<div class="ps-subheader-flash">' . $_sFlashMessage . '</div>';
 
 		if ( in_array( 'menuButtons', $arOptions ) ) 
 		{
@@ -248,7 +251,7 @@ class CPSForm implements IPSBase
 			<h1 class="ps-form-header-left">{$sTitle}</h1>{$_sFlash}
 			<p style="clear:both;">{$_sOut}</p>
 			<div style="clear:both"></div>
-			{$sHtmlInject}
+			{$_sHtmlInjection}{$_sFlashMessage}
 		</div>
 		{$_sSubHeader}
 HTML;
@@ -259,7 +262,7 @@ HTML;
 	* Makes a nice form header
 	* @deprecated Use formHeaderEx
 	*/
-	public static function formHeader( $sTitle, $arMenuItems = array(), $sDivClass = 'ps-form-header', $bShowFlashDiv = true, $sHtmlInject = null )
+	public static function formHeader( $sTitle, $arMenuItems = array(), $sDivClass = 'ps-form-header', $bShowFlashDiv = true, $_sHtmlInjection = null )
 	{
 		//	Be nice and let people call this instead
 		if ( in_array( 'menuItems', $arMenuItems ) ) return self::formHeaderEx( $sTitle, $arMenuItems );

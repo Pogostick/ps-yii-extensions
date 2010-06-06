@@ -1028,6 +1028,7 @@ CSS;
 		$_sAction = PS::o( $arFormOptions, 'action', '', true );
 		$_sMethod = PS::o( $arFormOptions, 'method', 'POST', true );
 		$_bSetPageTitle = PS::o( $arFormOptions, 'setPageTitle', true, true );
+		$_sErrorCss = PS::o( $arFormOptions, 'errorCss', 'ui-state-error' );
 
 		//	Register form CSS if desired...
 		foreach ( PS::o( $arFormOptions, 'cssFiles', array( '/css/form.css' ), true ) as $_sFile )
@@ -1043,7 +1044,7 @@ CSS;
 			case self::UI_JQUERY:
 				$_sContainerClass = 'ui-edit-container ui-widget-content';
 				$_sContentClass = 'yiiForm';
-				PS::$errorCss = $_sErrorClass = 'ui-state-error';
+				PS::$errorCss = $_sErrorClass = $_sErrorCss;
 				break;
 
 			case self::UI_DEFAULT:

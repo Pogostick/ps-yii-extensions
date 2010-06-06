@@ -691,6 +691,10 @@ div.ps-edit-container div.yiiForm div.wide {
 	margin: 10px auto;
 }
 
+.ps-form-legend {
+	font-size: 10pt;
+}
+
 /**
  * Menu Helper
  */

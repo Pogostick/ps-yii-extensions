@@ -557,7 +557,47 @@ class CPSHelperBase extends CHtml implements IPSBase
 		$_arArgs = func_get_args();
 		return implode( DIRECTORY_SEPARATOR, $_arArgs );
 	}
-	
+
+	/**
+	 * Multidimensional array search.
+	 *
+	 * @param <type> $arHaystack
+	 * @param <type> $arNeedle
+	 * @param <type> $arResult
+	 * @param <type> $arPath
+	 * @param <type> $sCurrentKey
+	 */
+	public static function array_search( $arHaystack, $arNeedle, &$arResult, &$arPath = null, $sCurrentKey = '')
+	{
+		if ( is_array( $arHaystack ) )
+		{
+			$_iCount = count( $arHaystack );
+			$_i = 0;
+
+			foreach ( $arHaystack as $_sKey => $_oStraw )
+			{
+				$_bNext = ( ++$_i == $_iCount ) ? false : true;
+				if ( is_array( $_oStraw ) ) $arPath[ $_sKey ] = $_sKey;
+				self::array_search( $_oStraw, $arNeedle, $arResult, $arPath, $_sKey );
+				if (!$_bNext) unset( $arPath[ $currentKey ] );
+			}
+		}
+		else
+		{
+			$_oStraw = $arHaystack;
+
+			if ( $_oStraw == $arNeedle )
+			{
+				if ( ! isset( $arPath ) )
+					$_sPath = "\$arResult[$sCurrentKey] = \$arNeedle;";
+				else
+					$_sPath = "\$arResult['".join("']['",$arPath)."'][$sCurrentKey] = \$arNeedle;";
+
+				eval( $_sPath );
+			}
+		}
+	}
+
 	//********************************************************************************
 	//* Yii Convenience Mappings
 	//********************************************************************************
