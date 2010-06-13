@@ -96,7 +96,16 @@ class CPSjqValidate extends CPSjQueryWidget
 	*/
 	protected function generateJavascript( $sTargetSelector = null, $arOptions = null, $sInsertBeforeOptions = null )
 	{
-		//	Get the options...		
+		//	Don't screw with div formatting...
+		if ( ! empty( $arOptions ) && ! in_array( 'errorPlacement', $arOptions ) )
+			$arOptions['errorPlacement'] = 'function(error,element){error.appendTo(element.parent("div"));}';
+		else
+		{
+			if ( empty( $this->errorPlacement ) || ! $this->hasOption( 'errorPlacement' ) )
+				$this->addOption( 'errorPlacement', 'function(error,element){error.appendTo(element.parent("div"));}' );
+		}
+
+		//	Get the options...
 		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
 		$_sId = $this->getTargetSelector( $sTargetSelector );
 		

@@ -98,6 +98,12 @@ abstract class CPSController extends CController implements IPSBase
 	public function getIsPostRequest() { return Yii::app()->getRequest()->isPostRequest; }
 
 	/**
+	* Convenience access to isAjaxRequest
+	* @returns boolean
+	*/
+	public function getIsAjaxRequest() { return Yii::app()->getRequest()->isAjaxRequest; }
+
+	/**
 	 * Returns the base url of the current app
 	 * @returns string
 	 */
@@ -275,9 +281,19 @@ abstract class CPSController extends CController implements IPSBase
 	*
 	* @param string $sActionId
 	*/
-	public function missingAction( $sActionId )
+	public function missingAction( $sActionId = null )
 	{
-		if ( $this->m_bAutoMissing ) if ( $this->getViewFile( $sActionId ) ) $this->render( $sActionId );
+		if ( $this->m_bAutoMissing )
+		{
+			if ( empty( $sActionId ) ) $sActionId = $this->defaultAction;
+
+			if ( $this->getViewFile( $sActionId ) )
+			{
+				$this->render( $sActionId );
+				return;
+			}
+		}
+		
 		parent::missingAction( $sActionId );
 	}
 
@@ -287,10 +303,15 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	public function actionError()
 	{
-		if ( ! $_oError = Yii::app()->errorHandler->error )
-			throw new CHttpException( 404, 'Page not found.' );
+		if ( ! $_arError = Yii::app()->errorHandler->error )
+		{
+			if ( $this->isAjaxRequest )
+				echo $_arError['message'];
+			else
+				throw new CHttpException( 404, 'Page not found.' );
+		}
 
-		$this->render( 'error', array( 'error' => $_oError ) );
+		$this->render( 'error', $_arError );
 	}
 
 	/**

@@ -62,7 +62,7 @@ class CPSForm implements IPSBase
 		$_sFormId = PS::o( $arOptions, 'id', 'ps-edit-form' );
 		$_eUIStyle = PS::o( $arOptions, 'uiStyle', PS::UI_DEFAULT );
 		if ( ! isset( $arOptions['name'] ) ) $arOptions['name'] = $_sFormId;
-		
+
 		//	Our model?
 		$_oModel = PS::o( $arOptions, 'formModel', null, true );
 		

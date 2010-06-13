@@ -356,7 +356,8 @@ class CPSWidgetHelper extends CPSHelperBase
 			$_sSuffixToUse = PS::o( $_arLabelOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
 			$_arWidgetOptions = PS::o( $arOptions, 'widgetOptions', array(), true );
 			$_arData = PS::o( $arOptions, 'data', null, true );
-			$_sHtml = PS::o( $arOptions, '_appendHtml', '', true );
+			$_sHtml = PS::o( $arOptions, '_appendHtml', null, true );
+			$_sPrependHtml = PS::o( $arOptions, '_prependHtml', null, true );
 			$_sDivClass = PS::o( $arOptions, '_divClass', null, true );
 			$_sTransform = PS::o( $arOptions, 'transform', null, true );
 			$_sTitle = PS::o( $arOptions, 'title', null );
@@ -404,6 +405,7 @@ class CPSWidgetHelper extends CPSHelperBase
 			if ( $_sTransform && $oModel ) $oModel->{$sColName} = CPSTransform::valueOf( $_sTransform, $oModel->$sColName );
 
 			//	Build our field
+			$_sOut .= $_sPrependHtml;
 			$_sOut .= ( null !== $_sContent ) ? $_sContent : self::activeField( $eFieldType, $oModel, $sColName, $arOptions, $_arWidgetOptions, $_arData );
 			$_sOut .= $_sHtml;
 
