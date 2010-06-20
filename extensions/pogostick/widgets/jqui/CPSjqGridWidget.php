@@ -58,26 +58,16 @@ class CPSjqGridWidget extends CPSjqUIWrapper
 	*/
 	protected function generateHtml()
 	{
+		if ( $_sPager = $this->pager )
+			$_sPager = trim( $_sPager, '.#' );
+
 		$_sHtml =<<<CODE
 <table id="{$this->id}" class="scroll"></table>
-<div id="{$this->pagerId}" class="scroll" style="text-align:center;"></div>
+<div id="{$_sPager}" class="scroll" style="text-align:center;"></div>
 CODE;
 		return( $_sHtml );
 	}
 
-	/**
-	* Override of makeOptions to insert correct pager jQuery code
-	*
-	*/
-	protected function makeOptions()
-	{
-		$this->widgetName = 'jqGrid';
-		
-		//	Fix up the pager...
-		$_sPagerId = $this->pagerId;
-		return str_replace( "'pagerId':'{$_sPagerId}'", "pager: jQuery('#{$_sPagerId}')", parent::makeOptions() );
-	}
-	
 	/**
 	* Generates the javascript code for the widget
 	*
@@ -88,7 +78,7 @@ CODE;
 		$_arOptions = $this->makeOptions();
 
 		$this->script =<<<CODE
-jQuery('#{$this->id}').{$this->widgetName}({$_arOptions}).navGrid('#{$this->pagerId}',{edit:false,add:false,del:false});
+jQuery('#{$this->id}').{$this->widgetName}({$_arOptions}).navGrid('#{$this->pager}',{edit:false,add:false,del:false});
 CODE;
 
 		return $this->script;

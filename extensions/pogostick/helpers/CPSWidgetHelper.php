@@ -1205,9 +1205,13 @@ CSS;
 	*/
 	public static function submitButtonBar( $sLabel = 'Submit', $arHtmlOptions = array() )
 	{
+		$_sLegend = null;
+		
 		//	Make sure current form id is set if we have it...
 		$arHtmlOptions['formId'] = PS::o( $arHtmlOptions, 'formId', self::$m_sCurrentFormId );
-		return self::beginButtonBar( $arHtmlOptions ) . self::submitButton( $sLabel, $arHtmlOptions ) . self::endButtonBar();
+		if ( trim( PS::$afterRequiredLabel ) ) $_sLegend = '<span class="ps-form-legend"><span class="required">' . PS::$afterRequiredLabel . '</span> denotes required fields</span>';
+
+		return self::beginButtonBar( $arHtmlOptions ) . $_sLegend . self::submitButton( $sLabel, $arHtmlOptions ) . self::endButtonBar();
 	}
 
 	/****

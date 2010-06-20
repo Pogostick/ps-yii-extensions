@@ -50,6 +50,8 @@ class CPSForm implements IPSBase
 	*/
 	public static function create( $arOptions = array() )
 	{
+		$_bHaveButtonBar = false;
+
 		//	Make sure we have some form fields...
 		if ( ! $_arFields = PS::o( $arOptions, 'fields', null, true ) )
 			throw new CPSException( 'You must define form fields to use this method.' );
@@ -115,6 +117,7 @@ class CPSForm implements IPSBase
 						if ( PS::UI_JQUERY == $_eUIStyle ) $_arSubmit['jqui'] = true;
 						$_arValue = array( $_sLabel, $_arSubmit, 'formId' => $_sFormId );
 						$_sOut .= call_user_func_array( array( 'PS', 'submitButtonBar' ), $_arValue );
+						$_bHaveButtonBar = true;
 						break;
 						
 					default:
@@ -157,8 +160,8 @@ class CPSForm implements IPSBase
 			$_sOut .= $_oModel->showDates();
 			
 		//	Add legend
-		if ( trim( PS::$afterRequiredLabel ) )
-			$_sOut .= '<div class="ps-form-legend">' . PS::$afterRequiredLabel . ' denotes a required field.</div>';
+		if ( ! $_bHaveButtonBar && trim( PS::$afterRequiredLabel ) )
+			$_sOut .= '<div class="ps-form-legend"><span class="required">' . PS::$afterRequiredLabel . '</span> denotes required fields</div>';
 
 		//	Ok, done building form...
 		$_sOut .= PS::endForm();

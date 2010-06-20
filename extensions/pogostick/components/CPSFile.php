@@ -33,7 +33,7 @@
  * A quicky down and dirty file object
  *
  * @package 	psYiiExtensions
- * @subpackage	base
+ * @subpackage	components
  *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN $Id$
@@ -122,6 +122,9 @@ class CPSFile extends CPSComponent
 		return $this->validHandle() && ftell( $this->m_iFileHandle );
 	}
 
+	/**
+	 * Retrieves a string from the current file
+	 */
 	public function fgets( $iOffset = 0 )
 	{
 		if ( false !== $this->ftell() )
