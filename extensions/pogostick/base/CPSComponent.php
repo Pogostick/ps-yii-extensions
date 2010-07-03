@@ -35,6 +35,14 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	*/
 	protected $m_sInternalName;
 
+	/**
+	 * Tracks the status of debug mode for component
+	 * @var boolean Enable/disable debug mode
+	 */
+	protected $m_bDebugMode = false;
+	public function getDebugMode() { return $this->m_bDebugMode; }
+	public function setDebugMode( $bValue ) { $this->m_bDebugMode = $bValue; }
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -293,5 +301,16 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 		return false;
 	}
 
+	/**
+	 * Outputs a debug string if in debug mode.
+	 * @param <type> $sMessage The message
+	 * @param <type> $sCategory The category/method of the output
+	 * @param <type> $sRoute The destination of output. Can be 'echo', 'trace|info|error|debug|etc...', 'http', 'firephp'
+	 */
+	public function _debug( $sMessage, $sCategory = null, $sRoute = null )
+	{
+		if ( $this->m_bDebugMode )
+			echo $sMessage . '<BR />';
+	}
 
 }

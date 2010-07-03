@@ -57,6 +57,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	const 	CKEDITOR 		= 'CPSCKEditorWidget';
 	const 	MARKITUP 		= 'markItUp';
 	const 	CODEDD 			= 'activeCodeDropDownList';
+	const 	DATADD 			= 'activeDataDropDownList';
 	const 	JQUI 			= 'CPSjqUIWrapper';
 	const 	FG_MENU 		= 'CPSfgMenu';
 	const	CAPTCHA 		= 'CCaptcha';
@@ -96,6 +97,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	 * Database-driven drop-down list
 	 */
 	const 	DD_CODE_TABLE = 'activeCodeDropDownList';
+	const	DD_DATA_LOOKUP = 'activeDataDropDownList';
 
 	/**
 	 * Types of document headers
@@ -819,16 +821,19 @@ class CPSWidgetHelper extends CPSHelperBase
 
 			if ( $_oCodeModel instanceof CPSCodeTableModel )
 			{
-				$_sValType = PS::o( $arHtmlOptions, 'codeType', $sAttribute, true );
-				$_sValAbbr = PS::o( $arHtmlOptions, 'codeAbbr', null, true );
+				$_sValType = strtoupper( PS::o( $arHtmlOptions, 'codeType', $sAttribute, true ) );
+				$_sValAbbr = strtoupper( PS::o( $arHtmlOptions, 'codeAbbr', null, true ) );
+				$_iValFilter = PS::o( $arHtmlOptions, 'valueFilter', null, true );
+				$_oCodeModel->setValueFilter( $_iValFilter );
 				if ( ! $_sValAbbr ) $_sValAbbr = PS::o( $arHtmlOptions, 'codeAbbreviation', null, true );
 				$_sValId = PS::o( $arHtmlOptions, 'codeId', null, true );
 				$_sSort = PS::o( $arHtmlOptions, 'sortOrder', 'code_desc_text', true );
+				$_arOptions = array();
 
 				if ( $_sValId )
 					$_arOptions = self::listData( $_oCodeModel->findById( $_sValId ), 'id', 'code_desc_text' );
 				elseif ( ! $_sValAbbr )
-					$_arOptions = self::listData( $_oCodeModel->findAllByType( $_sValType, $_sSort ), 'id', 'code_desc_text' );
+					$_arOptions = self::listData( $_oCodeModel->findAllByType( $_sValType, $_sSort, $_iValFilter ), 'id', 'code_desc_text' );
 				elseif ( $_sValAbbr )
 					$_arOptions = self::listData( $_oCodeModel->findAllByAbbreviation( $_sValAbbr, $_sValType, $_sSort ), 'id', 'code_desc_text' );
 
@@ -841,6 +846,41 @@ class CPSWidgetHelper extends CPSHelperBase
 				return self::activeDropDownList( $oModel, $sAttribute, $_arOptions, $arHtmlOptions );
 			}
 		}
+	}
+
+	/**
+	* Create a drop downlist filled with data from a table
+	*
+	* @param CModel $oModel
+	* @param string $sAttribute
+	* @param array $arHtmlOptions
+	* @param integer $iDefaultUID
+	* @return string
+	*/
+	public static function activeDataDropDownList( $oModel, $sAttribute, &$arHtmlOptions = array(), $iDefaultUID = 0 )
+	{
+		if ( null != ( $_sModel = PS::o( $arHtmlOptions, 'model', null, true ) ) )
+		{
+			$_oModel = new $_sModel();
+
+			$_sId = PS::o( $arHtmlOptions, 'id', 'id', true );
+			$_sName = PS::o( $arHtmlOptions, 'name', null, true );
+
+			if ( $_sId && $_sName )
+			{
+				$_arOptions = self::listData( $_oModel->findAll( array( 'select' => $_sId . ',' . $_sName, 'order' => $_sName ) ), $_sId, $_sName );
+
+				if ( isset( $arHtmlOptions[ 'multiple' ] ) )
+				{
+					if ( substr( $arHtmlOptions[ 'name' ], -2 ) !== '[]' )
+						$arHtmlOptions[ 'name' ] .= '[]';
+				}
+
+				return self::activeDropDownList( $oModel, $sAttribute, $_arOptions, $arHtmlOptions );
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -1712,6 +1752,21 @@ HTML;
 
 				case self::DD_TIME_ZONES:
 					$_arData = require( 'static/time_zones_array.php' );
+					break;
+
+				case self::DD_DATA_LOOKUP:
+					$_sId = PS::o( $arHtmlOptions, 'id' );
+					$_sName = PS::o( $arHtmlOptions, 'name' );
+					$_sModel = PS::o( $arHtmlOptions, 'model' );
+
+					if ( $_sId && $_sName && $_sModel )
+					{
+						if ( $_arModels = $_sModel::model()->findAll( array( 'select' => $_sId . ',' . $_sName ) ) )
+						{
+							foreach ( $_arModel as $_oModel )
+								$_ardata[ $_oModel->getAttribute( $_sId ) ] = $_oModel->getAttribute( $_sName );
+						}
+					}
 					break;
 
 				case self::DD_JQUI_THEMES:

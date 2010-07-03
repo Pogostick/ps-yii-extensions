@@ -68,7 +68,7 @@ abstract class CPSCRUDController extends CPSController
 	{
 		if ( $_SERVER['HTTP_HOST'] == 'localhost' ) return array();
 
-		Yii::trace( 'Not console: ' . var_export($_SERVER,true) );
+//		Yii::trace( 'Not console: ' . var_export($_SERVER,true) );
 
 		//	Perform access control for CRUD operations
 		return array(

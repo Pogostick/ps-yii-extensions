@@ -80,12 +80,13 @@ class CPSMenuHelper extends CPSHelperBase
 	public static function buildMenuBlock( $sTitle, $arOptions = array() )
 	{
 		$_sOut = null;
+		$_sLink = PS::o( $arOptions, 'link', '#', true );
 
 		//	Make the header
 		$_sHeader = PS::tag(
 			PS::o( $arOptions, 'headerTag', 'h3', true ),
 			PS::o( $arOptions, 'headerOptions', array(), true ),
-			PS::link( $sTitle )
+			PS::link( $sTitle, $_sLink )
 		);
 
 		//	build the links
@@ -124,7 +125,10 @@ class CPSMenuHelper extends CPSHelperBase
 		if ( $_arMenuBlock = PS::o( $arMenu, $sIndex ) )
 		{
 			$_sTitle = PS::o( $_arMenuBlock, 'title' );
+			$_sLink = PS::o( $_arMenuBlock, 'link', '#', true );
 			$_arItems = PS::o( $_arMenuBlock, 'items' );
+
+			$_arItems['link'] = $_sLink;
 
 			//	If a non-array is passed in, assume it's to be eval'd...
 			if ( ! is_array( $_arItems ) && ! empty( $_arItems ) )

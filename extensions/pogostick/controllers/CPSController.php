@@ -311,7 +311,7 @@ abstract class CPSController extends CController implements IPSBase
 				throw new CHttpException( 404, 'Page not found.' );
 		}
 
-		$this->render( 'error', $_arError );
+		$this->render( 'error', array( 'error' => $_arError ) );
 	}
 
 	/**

@@ -32,6 +32,10 @@ class CPSCodeTableModel extends CPSModel
 	const DDL_TABLE_NAME = 'code_t';
 	const DDL_DATA_NAME = 'code_install_data.sql';
 
+	protected $m_iValueFilter = null;
+	public function getValueFilter() { return $this->m_iValueFilter; }
+	public function setValueFilter( $iValue ) { $this->m_iValueFilter = $iValue; }
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -85,7 +89,7 @@ class CPSCodeTableModel extends CPSModel
 	* @param string $sOrder Optional sort order of result set. Defaults to PK (i.e. id)
 	* @return array|string Depending on the parameters supplied, either returns a code row, an array of code rows, or a string.
 	*/
-	protected static function getCodes( $iId = null, $sType = null, $sAbbr = null, $sOrder = null, $bActiveOnly = true )
+	protected static function getCodes( $iId = null, $sType = null, $sAbbr = null, $sOrder = null, $bActiveOnly = true, $iValueFilter = null )
 	{
 		//	Can't really use get_called_class with 5.2...
 		if ( version_compare( PHP_VERSION, '5.3.0' ) < 0 )
@@ -103,7 +107,7 @@ class CPSCodeTableModel extends CPSModel
 		$sOrder = $_oModel->getMetaData()->tableSchema->primaryKey;
 
 		//	Get a single code...
-		if ( null !== $iId ) return $_oModel->active()->findByPk( $iId );
+		if ( null !== $iId ) return $_oModel->valueFilter( $iValueFilter )->active()->findByPk( $iId );
 
 		//	Get a specific code by type/abbr
 		if ( null !== $sType && null !== $sAbbr )
@@ -114,7 +118,7 @@ class CPSCodeTableModel extends CPSModel
 				'order' => PS::nvl( $sOrder ),
 			);
 
-			return $_oModel->active()->find( $_arCrit );
+			return $_oModel->valueFilter( $iValueFilter )->active()->find( $_arCrit );
 		}
 
 		//	Codes By Type
@@ -136,7 +140,7 @@ class CPSCodeTableModel extends CPSModel
 			);
 		}
 
-		return $_arCrit ? $_oModel->active()->findAll( $_arCrit ) : null;
+		return $_arCrit ? $_oModel->valueFilter( $iValueFilter )->active()->findAll( $_arCrit ) : null;
 	}
 
 	/**
@@ -194,9 +198,9 @@ class CPSCodeTableModel extends CPSModel
 	* @return array
 	* @static
 	*/
-	public static function findAllByType( $sType, $sOrder = 'code_desc_text' )
+	public static function findAllByType( $sType, $sOrder = 'code_desc_text', $iValueFilter = null )
 	{
-		return self::getCodes( null, $sType, null, $sOrder );
+		return self::getCodes( null, $sType, null, $sOrder, true, $iValueFilter );
 	}
 
 	/**
@@ -223,6 +227,23 @@ class CPSCodeTableModel extends CPSModel
 	public static function findById( $iCodeId )
 	{
 		return self::getCodes( $iCodeId );
+	}
+
+	/**
+	* Retrieves the associated value for a code
+	*
+	* @param int $iId
+	* @return double
+	*/
+	public function valueFilter( $iValue = null )
+	{
+		if ( null !== $iValue ) {
+			$this->getDbCriteria()->mergeWith( array( 'condition' => '( assoc_value_nbr is null or assoc_value_nbr = :assoc_value_nbr )', 'params' => array( ':assoc_value_nbr' => $iValue ) ) );
+			CPSLog::trace(__METHOD__,'added value');
+		}
+		else
+			CPSLog::trace(__METHOD__,'no value');
+		return $this;
 	}
 
 	/**

@@ -78,6 +78,13 @@ abstract class CPSJobProcess extends CPSComponent
 	protected $m_oJobData = null;
 	public function getJobData() { return $this->m_oJobData; }
 	public function setJobData( $oValue ) { $this->m_oJobData = $oValue; }
+
+	/**
+	 * The results of this job
+	 * @var mixed
+	 */
+	protected $m_oResult = null;
+	public function getResult() { return $this->m_oResult; }
 	
 	//********************************************************************************
 	//* Public Methods

@@ -224,6 +224,7 @@ class CPSDataGrid implements IPSBase
 	protected static function getDataGridRows()
 	{
 		//	Pull are variables from the options
+		$_sNoDataMessage = PS::o( self::$m_arGridOptions, 'noDataMessage', 'No Records Found', true );
 		$arModel = PS::o( self::$m_arGridOptions, 'data', array() );
 		$sLinkView = PS::o( self::$m_arGridOptions, 'linkView', null );
 		$arColumns = PS::o( self::$m_arGridOptions, 'columns', array() );
@@ -250,7 +251,7 @@ class CPSDataGrid implements IPSBase
 		
 		if ( ! $arModel || ( is_array( $arModel ) && ! count( $arModel ) ) ) 
 		{
-			$_sOut .= PS::tag( 'tr', $_arRowOpts, PS::tag( 'td', array( 'class' => 'ps-data-grid-no-data-found', 'colspan' => self::$m_iColumnCount ), 'No Records Found' ) );
+			$_sOut .= PS::tag( 'tr', $_arRowOpts, PS::tag( 'td', array( 'class' => 'ps-data-grid-no-data-found', 'colspan' => self::$m_iColumnCount ), $_sNoDataMessage ) );
 		}
 		else
 		{

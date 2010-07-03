@@ -1,7 +1,7 @@
 <?php
 /*
  * This file is part of the Pogostick Yii Extension library
- * 
+ *
  * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -9,12 +9,12 @@
 /**
  * @package 	psYiiExtensions
  * @subpackage 	components
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
- * 
+ *
  * @version 	SVN $Id$
  * @since 		v1.0.6
- * 
+ *
  * @filesource
  */
 class CPSWHMCSBillingApi extends CPSWHMCSApi
@@ -22,7 +22,7 @@ class CPSWHMCSBillingApi extends CPSWHMCSApi
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
-	
+
 	/***
 	* Initialize
 	*/
@@ -33,7 +33,7 @@ class CPSWHMCSBillingApi extends CPSWHMCSApi
 
 		//	Billing API
 		$this->apiToUse = self::BILLING_API;
-		
+
 		//	Billing::AddBillableItem
 		$this->addRequestMapping( 'clientId', 'clientid', true, null, self::BILLING_API, 'addbillableitem' );
 		$this->addRequestMapping( 'description', 'description', true );
@@ -43,7 +43,7 @@ class CPSWHMCSBillingApi extends CPSWHMCSApi
 		$this->addRequestMapping( 'recurCount', 'recurfor', true );
 		$this->addRequestMapping( 'invoiceAction', 'invoiceaction', true );
 		$this->addRequestMapping( 'dueDate', 'duedate', true );
-        
+
         //    Billing::AddOrder
         $this->addRequestMapping( 'clientId', 'clientid', true, null, self::BILLING_API, 'addorder' );
         $this->addRequestMapping( 'productId', 'pid', true );
@@ -73,6 +73,24 @@ class CPSWHMCSBillingApi extends CPSWHMCSApi
         //	Billing::GetOrders
         $this->addRequestMapping( 'limitStart', 'limitstart', true, null, self::BILLING_API, 'getorders' );
         $this->addRequestMapping( 'limitNumber', 'limitnum' );
+
+        //	Billing::CreateInvoice
+        $this->addRequestMapping( 'clientId', 'userid', true, null, self::BILLING_API, 'createinvoice' );
+        $this->addRequestMapping( 'date', 'date', true );
+        $this->addRequestMapping( 'dueDate', 'duedate' );
+        $this->addRequestMapping( 'paymentMethod', 'paymentmethod' );
+        $this->addRequestMapping( 'sendInvoice', 'sendinvoice' );
+        $this->addRequestMapping( 'itemDescription', 'itemdescription1' );
+        $this->addRequestMapping( 'itemAmount', 'itemamount1' );
+        $this->addRequestMapping( 'itemTaxed', 'itemtaxed1' );
+
+        //	Billing::GetInvoice
+        $this->addRequestMapping( 'invoiceId', 'invoiceid', true, null, self::BILLING_API, 'getinvoice' );
+
+		//	Billing::addCredit
+        $this->addRequestMapping( 'clientId', 'clientid', true, null, self::BILLING_API, 'addcredit' );
+        $this->addRequestMapping( 'description', 'description', true );
+		$this->addRequestMapping( 'amount', 'amount', true );
 	}
 
 	/**
@@ -115,5 +133,38 @@ class CPSWHMCSBillingApi extends CPSWHMCSApi
 		return $this->makeApiCall( self::BILLING_API, 'addbillableitem', $arRequestData );
 	}
 
+	/**
+	 * Adds a credit to an account
+	 *
+	 * @param array $arRequestData
+	 */
+	public function addCredit( $arRequestData = array() )
+	{
+		return $this->makeApiCall( self::BILLING_API, 'addcredit', $arRequestData );
+	}
+
+	/**
+	 * Creates an invoice
+	 *
+	 * @param array $arRequestData
+	 */
+	public function createInvoice( $arRequestData = array() )
+	{
+		return $this->makeApiCall( self::BILLING_API, 'createinvoice', $arRequestData );
+	}
+
+	/**
+	 * Retrieves an invoice
+	 *
+	 * @param array $arRequestData
+	 */
+	public function getInvoice( $iInvoiceId )
+	{
+		$_arRequestData = array(
+			'invoiceId' => $iInvoiceId,
+		);
+
+		return $this->makeApiCall( self::BILLING_API, 'getinvoice', $_arRequestData );
+	}
 
 }
