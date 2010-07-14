@@ -1,5 +1,409 @@
-Please read The Installation instructions bellow
+3.6 version
+===========
+Bug Fixes
+---------
+   * Fix problem with getAbsoluteIndex on IE8
+   * Fix in triggerReload grid to reset the savedRow array.
+   * Fix in setGridWidth  method when try to resize a grid a and there is no data.
+   * Fix header aligment in ie8
+   * Fix in createEl function to check for val and not for html when select
+   * making getChangedCells method compatible with unformat function if defined
+   * Fixed record count when scroll true
+   * Fix in setSelection method to accept numbers
+   * Fix IE header checkbox when multiselect is true
+   * Fix for searching DOM elements with id containing special characters
+   * Fix a checkbox checking in form editing module.
+   * Fix getCol to use unformat function
+   * Better looking buttons in form editing
+   * Fix searchFilter in IE7 and IE6 not to return undefined value when more 
+than one field is searched.
+   * Some fixes for datepicker UI in inline and cell edit (when present)
+   * Fix in setLabel method not to clear the sort icons when we set new label
+   * Fix in form edit when a formatter select is used
+   * Fix the id pollution when multiselect is enabled. Now the id of every 
+common multiselect is combination of cb_ + id of the grid 
+   * Fixed bug when deselectAfterSort false and we are in multiselect mode
+   * Fix in unformat number and currency
+   * Fixed bug when creating a select with dataUrl and select is set to multiple.
+   * Fix a bug when creating select with multiple option. Also the attribute 
+should be set immediatley after the element is created and not after.
+   * Fix a bug in form edit. The comapared values should be trimed since of 
+split(",") which cause the elements to begin with space.
+   * Fix a jqGrid loader (development version) for IE browsers
+   * Fix for form icons in Opera
+   * Fix getGridParam to return values 0 or false 
+   * Avoiding the overhead of local functions and maintenance issues when the 
+parameters change
+   * Opera fix for cursor col-resize
+   * Fix in editGridRow when a save key is defined and the key is Eneter we 
+should not do save when we are in teaxtarea element
+   * Fix in formatter checkbox when the value is undefined. We also add a 
+default format for the checkbox too
+   * Fix addRowData to use key:true (keyIndex) when rowid is not defined
+   * Fix formatter bug for the select to use the defaultFormat
+   * Adding a 3 parameter to the unformat function - the cellobject.
+   * Fix alternate rows when we sort data locally.
+   * Fix in addRowData for alternate rows when we add item as last
+   * Fix collapseRow in treegrid preventing infinite recursion
+   * Fix in stripHtml function to parse numeric values
+   * Fix in delGridRow to get "fresh" Data from delData object
+   * Fix problems with width option if set as string.
+   * Fixing $jgrid.format function in base module to accept undefined parameter.
+   * Fix for saveRow method in aftersave function. Also we pass the request and 
+not the responseText. Also both aftersave and  success functions have the 
+same type parameter - the response
+   * Fix for serchhidden in searchGrid method
+   * Fix for setGridWidth method
+   * Fix  setColWidth function
+   * Fix for topinfo and bottom info in formedit to appear separatley in edit and add dialogs
+   * Fix searchFilter css to work when called from subgrid 
+   * Fix celledit to work better when datepicker is attached
+   * Fix in viewGrid row to vizualize only the columns that only not hidden.
+
+   
+Additions and changes
+---------------------
+   * New API
+   * RTL Support
+   * Column reordering
+   * Added life scrolling of data
+   * Added gridResize method which can resize the grid. Also use a jQuery UI 
+resizable and can use any options of this widget
+   * Added sortableRows method which allow us to sort rows with drag and drop
+   * Added gridDnD method. The method connect two or more grids so that drag and drop rows
+between these is possible
+   * Add columnChooser method which allows choosing/sorting columns at the same 
+time. This method requiere multiselect plugin
+   * Now getRowData can return all rows when rowid is not set.
+   * getCol now can return summary, average and count of the selected row. The 
+3 parameter determines this (valid are sum, avg, count). If this parameter 
+is set and is valid, the returned value is a scalar.If the param is not 
+valid the returned value is empty array. 
+   * To setRowData we add a 3 parameter. If the parameter is string we use 
+addClass to add classes. If the parameter is object we use css to add css 
+properties. Note that we can set properties and classes without data, in 
+this case we should set data to false 
+   * Adding a event object to ondblClickRow and onRightClickRow events as 4 parameter
+   * Add a ant based build system which allow us to minify the JS code
+   * Added custom validation property in editing modules
+   * Added possibility to create custom element in editing modules
+   * Adding support to configure the ajax request in a way that user want. This
+is done in all modules where ajax is used.
+   * Added class in cell edit and inline edit so that the cell or row can not
+be edited - the corresponding classes are 'not-editable-cell' and
+'not-editable-row'.
+   * Added Hebrew Translation
+   * Added a beforeCheckValues event in editGridRow method. The execution is 
+before checking the values. Should return object of the posted data.
+   * Added Romanian translation 
+   * Added a property classes in colModel where we can attach classes to column.
+   * info_dialog function can be used as separate modal dialog
+   * Added a class ui-ellipsis in grid css file. Also work in FireFox too.
+   * Changind the order of calling the events beforeSearch and beforeClear in 
+filterToolbar method. Also the events are called immediatley after triggering the grid
+   * To onCellSelect we replace the 4 parameter with the more natuaral event instead of e.target - 
+sorry if this will bring to some confusions.
+   * Added searchoptions value parameter in order to separate the editing module and search module.
+We first look for such option in searchoptions and if not found we use the
+editoptions value
+   * Added fixed property in colModel which allow us not to change the  
+column width if shrinkToFit is true and we set new width of the grid.
+   * Added buildSelect function to deserialize data for the select. This is option
+can be added in editoptions or search options
+
+   
+Please read The Installation instructions first in install.txt
 ================================================
+3.5 beta (buld6- build11)
+
+New Properties and methods
+==========================
+
+- Added new grid parameter hoverrows. When set to false the mouse hovering is
+disabled in the grid data rows.
+
+- Added rowid as parameter to error function in saveRow method - inline 
+editing module
+
+- treeGrid to be initially work with datatype local 
+
+- Added new method updateGridRows (grid.custom.js)
+This method update the existing data in the grid by given id rowname.
+
+Syntax: updateGridRows (data, rowidname, jsonreader)
+
+data is a array of data in format
+[{name:value,name1:value1...},{name:value,name2:value2...}]
+where the name is the name from colModel and value is the actuall value.
+It is not neccessary that all columns are present in the data item object
+(the same as setRowData method)
+
+rowidname (string) - is the name of the row which should acts as id.
+If not set the name "id" is used.
+
+jsonreader (boolean) default false. If set to true a jsonReader definition
+is used to set the data. Note that this work only of the item in jsonReader
+object 'repeatitems' is set to true.
+
+- Switch to namedItems JS function. This improve the speed. Previously we
+walk throught the entry rowset to find the rowIndex of the given rowid.
+Now we use the build in javaScript method namedItems which do the same.
+
+- multiselect is enabled in inline edit module.
+
+- To the  importComplete event in jqGridImport method we pass the response.
+
+- Added support for alternate rows. Also added new jqGrid option altclass.
+The default value is 'ui-priority-secondary' THis way we can develop our own
+alternate class.
+
+- Added ShrinkToFit option in setColumns method which fit columns to the grid 
+width. Default value is false.
+
+- Extend tableToGrid method to use custom options when building the grid.
+The call to this function is
+tableToGrid(selector, options)
+where options is the object with jqGrid options.
+
+- Adding 4px right to the view records text for better view 
+
+- Add a onClose event to all modals in form editing (except alert dialog)
+The default value is null. This event can be passed in editGridRow, delGridRow,
+viewGridRow, and setColumns methods. The event raised when a close icon is clicked,
+a cancel button is clicked or ESC key is pressed (if this is enabled).
+
+- Significant speed improvents in tree Grid when a relative large data is loaded.
+
+- Added dataheight parameter to all modal windows, where we can control the
+scrolling content. Intitially this parameter is auto.
+To summarize - we have two parameters for controlling the height of the modal.
+height and dataheight.
+The height parameter control the height of the entry modal, dataheight parameter
+control the height of the scrolling content.  The buttons of the modals are
+allways visible at the bottom of the modal.Also some improvments in jqDnR.
+
+- In setColumns method we add colnameview and closeAfterSubmit parameters. The
+colnameview (default true). If set to false the names from colModel are not
+visible. closeAfterSubmit if defined cleses the dialog after the submit
+button is clicked.
+
+- Added parameter viewsortcols in jqGrid parameters. The purpose of this
+parameter is to define different look and behavior of sorting icons that
+appear near the header. This parameter is array with the following default
+options
+viewsortcols : [false,'vertical',true]
+
+The first parameter determines if all icons should be viewed at the same time
+when all columns  have sort property set to true.
+The default of false determines that only the icons of the current sorting column
+should be viewed.
+Setting this parameter to true causes all icons in all sortable columns to be viewed.
+
+The second parameter determines how icons should be placed - vertical means that
+the sorting icons are one under another. 'horizontal' means that the icons should
+be one near other.
+
+The third parameter determines the click functionality. If set to true the columns are
+sorted if the header is clicked. If set to false the columns are sorted only when
+the icons are clicked.
+
+Important note: When set a third parameter to false be a sure that the first parameter
+is set to true, otherwise you will lost the sorting.
+
+
+Fixes
+=====
+- Fixed bug in filterToolbar. We search now by index and when not found by 
+name. 
+
+- Fix in searchGrid method. We search now by index and when not found by 
+name. 
+
+- Fixed bug in IE when resizing columns. The function getOffset is changed
+so that the resizing speed is the same as in Safari and FF.
+
+- Fix multiple select bug in createEl function. Now we set the options before
+checking for multiple:true
+
+- Fixed bug in treegrid. The strict comparation in getNodeParent method
+causes bad results.
+
+- Fix in setGridWidth method. We do not initialize correct the new width which
+causes after the first set of the width to not work in other grid in the same
+page.
+
+- Fixed bug in GridExport. We delete the columns that are generated 
+dynamically - multiselect, subgrid, treegrid or rownumbers. This way the
+import is without errors 
+
+- Fixed a bug in addRowData method to add data with id = 0 (number)
+
+- Fixed a forever loading bug in IE.
+
+- Fixed altRows bug in delRowData method
+
+- navGrid method fix for warning modal and IE6
+
+- Fix setColumns method to the common apprach of forms and modals
+
+- Fix for IE8 in getAbsoluteIndex method. IE8 seems to work as other browsers
+
+- Fixed bug in delRowData - the grid does not resize when first row is 
+deleted.
+
+- Fixed bug when rownumbers and subgrid are used together 
+
+- Fixed bug in row editing when the column name contain dot.
+
+- Fixing bug in viewGridRow - also the id manes of the form are changed in order
+to be not equal of those in editGridRow
+
+
+
+3.5 beta (buld5)
+
+FormEditing
+===========
+- added options checkOnUpdate (default false) in editGridRow method.
+Also available in add and edit mode.
+When this option is set to true the behaviour as follow:
+When something is changed in the form and the user click on
+Cancel button, navigator buttons, close button (on upper right corner of the
+form), in overlay (if available) or press Esc key (if set) a message box apper
+asking the user to save the changes, not to save the changes and go back in the
+form or cancel all changes (this will close the modal form)
+Note that checkOnSubmit option will work only when a submit button is clicked.
+When nothing is changed we contionue with the action.
+
+- added option -  rowabove (default false) in colModel formoptions
+When set to true a new empty row is added above this row in form editing.
+- added option - rowcontent (default empty) in colModel formoptions.
+This option have sense only when rowabove option is set to true.
+With this option is possible to set a content to the new added empty row in
+the form. In order to style easy these rows a class 'contentinfo' is set.
+
+- added new items in the language files to support the checkOnUpdate option
+
+- added class 'delmsg' in the delGridRow method. This allow us to change the
+message dynamically using a beforeShow or afterSow eventrs. The class is added
+to a element td.
+
+Fixes
+=====
+- fix in Bulgarian translations files.
+- fix in searchGrid method. Now we search by index (from colModel) and only if
+it is not available we search by name.
+- Fix for date parser in the base module. Now we can sort locally on
+dates that contain month names
+- Fixed bug in searchGrid. The translation messages for the operations does not 
+apper when not set in colModel
+- removed some not needed events  from base grid. Also return false do these
+by default;
+- Fix bug to check if datepicker is available in searchGrid.
+- Fix a bug in searchGrid in IE6, where the data value is not set for elements
+after the first 
+- Fixed bug when calling of jqModal multiple times on the same element. We 
+need the initialization only once and not every time. This cause a memory 
+leaks
+- Fixed bug in formatter where the data containing ' causes break in IE 
+- Fixed bug in base module when adding data where the data contain a ' char.
+This breaks in IE browsers.
+- Fixed bug in checkboxes. We add the value setted in the editoptions. Also 
+converting to lower case make the option checkOnUpdate to be true every time. 
+- We replace white-space nowrap with pre in td element in the CSS file. This fixes
+the bug in IE where the first row does not wrap when the text is longer than
+the column width. Also this requiere DOCTYPE declaration in the document.
+- Fixed bug in viewGridRow method where when resizing the modal causes the data
+to apper bad.
+
+
+3.5 beta (buld4)
+Base
+====
+- added option footerrow - default false. If set to true this will place a
+footer table with one row below the gird records and above the pager.
+The number of columns equal of these from colModel
+
+-added option userDataOnFooter(default false) which directly place the user data
+array at footer. The rules are as follow: If the userData array contain name
+which is equal to those of colModel then the value is placed in that column.
+If there are no such values nothing is palced. Note that if this option
+is used we use the current formatter options (if available) for that column.
+
+-Added method getCol(colname). Colname can be either number which represents
+the index of the column or name from colModel. The method return array with
+the values of the coulmn.
+
+- Added method footerData ( action, data, format). This method get or set data
+on footer.
+
+action - can be 'get' or 'set'. If not set default is get.
+When set to 'get' - the result is object of type name:value, where the name is
+a name from colModel. This will return a data from the footer. The other two
+options  does not have effect in this case.
+
+When set to 'set' a data array (object) should be set. This will place
+the values in the footer.
+
+format - default is true. This instruct the method to use the formmater
+(if set in colModel) when a new values are set.
+Setting to false will disable the using of formatter.
+
+Related css items in the ui.jqgrid.css
+.ui-jqgrid-sdiv - is a div container for the footer
+.ui-jqgrid-ftable - is the class for the table
+tr.footrow - is the class for the footer row
+tr.footrow td is the item for the cell formating
+
+In order to format every cell in a way that you want
+maybe you can use
+
+jQuery("tr.footrow td:eq(2)","#gbox_mygrid").css(...)
+where the td:eq(2)  point to the third column
+and mygrid is the id of the grid. The id of the global grid container
+is constructed via "gbox_"+the id of the grid.
+
+There are no methods to show and hide the footer row dynamically, but
+following the above example we can do
+
+jQuery(".ui-jqgrid-sdiv","#gbox_mygrid").hide() - this will hide the footer row.
+
+jQuery(".ui-jqgrid-sdiv","#gbox_mygrid").show() - this will show the footer row.
+
+
+Form Editing
+============
+aded option in editGridRow - checkOnSubmit (default false)
+This option only work in editing mode and not in add.
+When set to true - the method looks if any data is changed in the form and
+if this is a case a dilog message appear where the user is asked to confirm the
+changes or cancel it. Pressing cancel will return to the form, but does not
+set the values to its original state.
+
+Note that this causes a some changes in the language file.
+
+Fixes
+=====
+
+- Removed imgpath from cell edit and inline edit modules and common module.
+This parameter is no longer valid in 3.5
+- Replace $ with jQuery in grid.common.js which causes problems when used with
+other librariers like prototype.
+- removed a checking e.srcElement from base module. jQuery allready fix this.
+- fixing the size option in select when using ajax to load selects.
+- Fixed bug in IE browsers, when clicked on href tag with child nodes,
+IE incorrect report in all cases that this is a href element. This couses
+onSelectCell not to behave correct.
+- Fixed bug in searchGrid - group options are not passed to serchFilter in 
+order get them from Language file.
+- Fix in bulgarian trnslations.
+- Fix on sorting column. The initial sort check first for index and then for 
+column name. Before the checking for the index was missed.
+Sortorder converted to lower case in order to avoid some cofusions.
+- Fix in set columns module. The modal does not appear correctly due to 
+missed parameter 
+
+
 
 3.5 beta (buld3)
 
@@ -110,47 +514,7 @@ Upgrade from 3.4.x to 3.5 beta.
 
 1. Installation
 --------------
-Download the jqGrid package from the www.trirand/blog site section downloads.
-Note the new download manager where you can choose which modules you want to
-include in the download.
-
-In order to use jqGrid 3.5, first a UI theme css file should be loaded.
-Download the desired theme (or build a custom one) from jQueryUI site
-(www.jqueryui.com) and point in your link tag in head section the path to the
-theme css
-
-<link rel="stylesheet" type="text/css" media="screen" href="path_to_ui_css_file/jquery-ui-1.7.1.custom.css" />
-
-where the path_to_ui_css_file is a valid path to the ui theme file
-
-Extract the jqGrid package and copy the ui.jqgrid.css from css directory to
-your webserver directory. It is not necessary that the jqgrid css file is in
-the same directory as those of the jquery ui css.
-
-<link rel="stylesheet" type="text/css" media="screen" href="path_to_jqgrid_css_file/ui.jqgrid.css" />
-
-Starting with this version, jqGrid does not use a loader (which loads the
-needed files one by one), but all the needed code is contained in one file.
-The desired modules can be built using the jqGrid download manager from the
-site pointed above. In order to use this, first a language file should be
-loaded and then the jqgrid file.
-
-Copy the desired language file from js/i18n directory to your web server
-directory where you store the java script files. Every language file is
-named grid.locale-XX.js, where XX is a two-letter code for the language.
-Copy the jquery.jqGid.min.js file to the same or other valid directory in
-your web server
-
-Include both the files in script tags in the head section
-
-<script src="path_to_js_files/grid.locale-en.js" type="text/javascript"></script>
-<script src="path_to_js_files/jquery.jqGrid.min.js" type="text/javascript"></script>
-
-For debugging purposes, I have created a grid.loader.js which does the same
-loading of the files as in previous versions. The location of the file is in
-src directory of the package. In order to use this, the variable pathojsfiles
-should be adjusted to point to the appropriate folder - see 3.4.x docs.
-
+See install.txt
 
 2. Code changes
 ---------------
