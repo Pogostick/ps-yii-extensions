@@ -330,7 +330,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		{
 			$eFieldType = PS::TEXT_DISPLAY;
 			$arOptions['transform'] = '*';
-			$arOptions['name'] = $arOptions['id'] = 'disp_' . $oModel->id . '_' . $sColName;
+			$arOptions['name'] = $arOptions['id'] = 'disp_' . self::getNextIdCount() . '_' . $sColName;
 			$arOptions['class'] = PS::addClass( $arOptions['class'], 'ps-text-display' );
 			$_sOut = PS::activeHiddenField( $oModel, $sColName );
 			$_sOut .= PS::field( $eFieldType, $oModel, $sColName, $arOptions );

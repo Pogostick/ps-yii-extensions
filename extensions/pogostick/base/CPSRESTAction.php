@@ -34,7 +34,7 @@ class CPSRESTAction extends CAction implements IPSBase
 	{
 		$_oController = $this->getController();
 		
-		if ( ! ( $_oController instanceof CPSRESTController ) )
+		if ( ! ( $_oController instanceof IPSRest ) )
 		{
 			$_oController->missingAction( $this->getId() );
 			return;

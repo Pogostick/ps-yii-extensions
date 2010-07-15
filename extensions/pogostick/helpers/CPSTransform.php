@@ -442,7 +442,49 @@ class CPSTransform implements IPSBase
 	//********************************************************************************
 	//* as* Transformation Methods
 	//********************************************************************************
-	
+
+	public static function asUnorderedListFromArray( $arList, $arOptions = array(), $bRecursiveCall = false )
+	{
+		$_arKeys = array_keys( $arList );
+		$_i = 0;
+		$_count = count( $arList );
+		$_sOut = null;
+		$_listOptions = PS::o( $arOptions, 'listOptions', array(), true );
+
+		while ( $_i < $_count )
+		{
+			$_oValue = $arList[ $_arKeys[ $_i ] ];
+
+			$_sOut .= PS::tag( 
+				'li',
+				PS::o( $arOptions, 'itemOptions', array() ),
+				PS::link( 
+					is_array( $_oValue ) ? $_arKeys[ $_i ] : $_oValue,
+					$_arKeys[ $_i ],
+					PS::o( $arOptions, 'linkOptions', array() )
+				),
+				false
+			) . PHP_EOL;
+			
+			if ( is_array( $_oValue ) )
+			{
+				$_sOut .= PS::tag(
+					'ul',
+					array(),
+					CPSTransform::asUnorderedListFromArray( $arList[ $_arKeys[ $_i ] ], $arOptions, true )
+				) . PHP_EOL;
+			}
+
+			$_sOut .= PS::closeTag( 'li' ) . PHP_EOL;
+
+			$_i++;
+		}
+
+		if ( $bRecursiveCall ) return $_sOut;
+
+		return PS::tag( 'ul', $_listOptions, $_sOut ) . PHP_EOL;
+	}
+
 	/**
 	* Outputs a string of UL/LI tags from an array of models suitable
 	* for menu structures

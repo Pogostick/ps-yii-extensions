@@ -58,13 +58,13 @@ class CPSjqGridWidget extends CPSjqUIWrapper
 	*/
 	protected function generateHtml()
 	{
-		if ( $_sPager = $this->pager )
-			$_sPager = trim( $_sPager, '.#' );
-
 		$_sHtml =<<<CODE
-<table id="{$this->id}" class="scroll"></table>
-<div id="{$_sPager}" class="scroll" style="text-align:center;"></div>
+<table id="{$this->id}"></table>
 CODE;
+
+		if ( $_sPager = trim( $this->pager, '.#' ) )
+			$_sHtml .= '<div id="' . $_sPager . '"></div>';
+
 		return( $_sHtml );
 	}
 
@@ -75,11 +75,23 @@ CODE;
 	*/
 	protected function generateJavascript()
 	{
+		$_id = $this->getId();
+
+		$_apiOptions = $this->getOption( 'apiOptions', array(), true );
 		$_arOptions = $this->makeOptions();
 
 		$this->script =<<<CODE
-jQuery('#{$this->id}').{$this->widgetName}({$_arOptions}).navGrid('#{$this->pager}',{edit:false,add:false,del:false});
+jQuery('#{$_id}').jqGrid({$_arOptions});
+
 CODE;
+
+		if ( $_options = $_apiOptions->getValue() )
+		{
+			foreach ( $_options as $_key => $_option )
+				$this->script .= 'jQuery(\'#' . $_id . '\').jqGrid(\'' . $_key . '\',\'' . $this->pager . '\',' . json_encode( $_option ) . ');' . PHP_EOL;
+		}
+		else
+			$this->script .= 'jQuery(\'#' . $_id . '\').jqGrid(\'navGrid\',\'' . $this->pager . '\',{edit:false,add:false,del:false,search:true});' . PHP_EOL;
 
 		return $this->script;
 	}

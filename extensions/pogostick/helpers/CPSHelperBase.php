@@ -128,9 +128,17 @@ class CPSHelperBase extends CHtml implements IPSBase
 	}
 	
 	/**
-	* Convenience "in_array" method. Takes variable args.
-	* 
-	*/
+	 * Convenience "in_array" method. Takes variable args.
+	 *
+	 * The first argument is the needle, the rest are considered in the haystack. For example:
+	 *
+	 * CPSHelperBase::in( 'x', array( 'x', 'y', 'z' ) ) returns true
+	 * CPSHelperBase::in( 'a', array( 'x', 'y', 'z' ) ) returns false
+	 *
+	 * @param mixed
+	 * @return boolean
+	 *
+	 */
 	public static function in()
 	{
 		$_arArgs = func_get_args();
