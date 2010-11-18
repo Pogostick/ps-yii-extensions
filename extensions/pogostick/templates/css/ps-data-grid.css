@@ -1,0 +1,141 @@
+/*
+ * This file is part of the psYiiExtensions package
+ * 
+ * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+ 
+/**
+ * @package 	psYiiExtensions.templates
+ * @subpackage 	css
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN $Id$
+ * @since 		v1.0.6
+ * 
+ * @filesource
+ */
+ 
+/**
+* Styles for grids
+* 
+* Grid blocks are as follows:
+* 
+* 	<table class="dataGrid">
+* 		<tr>
+* 			<th>Header Items</th>
+* 			...
+*		</tr>
+* 		<tr>
+* 			<td>Data Row</td>
+* 		</tr>
+* 		...
+* 	</table>
+* 
+*/
+
+/**
+ * Override as necessary
+ */
+table.ps-data-grid {
+	background-color:#FFFFFF;
+	border-collapse:collapse;
+	border-spacing:1px;
+	border-style:solid;
+	border-width:1px;
+	margin-bottom:10px;
+	width:100%;	
+}
+
+table.ps-data-grid th {
+	text-align: left;
+	padding-left: 5px;
+	margin-right: 0px;
+}
+
+table.ps-data-grid tr.ui-widget-header th {
+	padding:5px 10px;
+}
+
+table.ps-data-grid th.ps-actions-header {
+	text-align: center;
+}
+
+table.ps-data-grid th, 
+table.ps-data-grid td {
+	padding: 5px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: inherit;
+}
+
+div.ps-grid-actions-inner {
+	margin: 0 auto;
+	text-align: center;
+	width: auto;
+}
+
+div.ps-grid-actions-inner a.ps-button {
+	float: none;
+}
+
+div.ps-grid-actions-inner hr {
+	display: block;
+	clear: both; 
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
+}
+
+
+
+table.ps-data-grid th a {
+	text-decoration: none;
+}
+
+table.ps-data-grid th a:hover {
+	text-decoration: underline;
+}
+
+table.ps-data-grid tr.ui-widget-content {
+	background: transparent;
+}
+
+.ps-data-grid-row {
+	background-color: #fff !important;
+}
+
+tr.ps-data-grid-row, 
+tr.ps-data-grid-row.ui-widget-content td a {
+	color: #333 !important;
+}
+
+.ps-data-grid-row-odd {
+	background-color: #eff !important;
+}
+
+/**
+* Miscellaneous styles
+*/
+.ps-data-grid-sort-arrow {
+	display:inline-block;
+	margin:0 auto;
+	vertical-align:bottom;
+	padding:0px;
+	padding-left:5px;
+}
+
+.ps-data-grid-no-data-found {
+	text-align:	center;
+	font-weight: bold;
+	font-size: 15px;
+	margin: 10px auto;
+}
+
+div.ps-paged-container {
+	margin:0px;
+	width: auto;
+	position: relative;
+	display: inline-block;
+}

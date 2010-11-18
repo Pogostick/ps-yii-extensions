@@ -1,0 +1,76 @@
+.wrap  {
+	display: block;
+	padding: 0 1px 0 0;
+	position: relative;
+	}
+
+.wrap .shadow {
+	color: #000;
+	position: absolute;
+	line-height: inherit;
+	top: 0px;
+	left: 1px;
+	}
+
+.wrap .shadow a { color: #000; }
+
+.wrap .highlight {
+	color: #fff;
+	opacity: 0.7;
+	position: absolute;
+	line-height: inherit;
+	top: 1px;
+	left: 0px;
+	}
+
+.wrap .source {
+	position: relative;
+	}
+
+.rainbow,.rainbows-highlight,.rainbows-shadow {
+	xline-height: 1;
+	}
+
+.rainbow {
+	background: transparent;
+	display: block;
+	position: relative;
+	height: 1px;
+	overflow: hidden;
+	z-index: 4;
+	}
+
+	.rainbow span {
+		position: absolute;
+		top: 0;
+		left: 1px;
+		display: block;
+		xwhite-space: nowrap;
+		}
+	
+	a .rainbow span {
+		white-space: nowrap;
+		}
+
+.rainbows-highlight {
+	color: #fff !important;
+	display: block;
+	position: absolute;
+	top: -1px;
+	left: 0px;
+	z-index: 2;
+	}
+
+.rainbows-shadow {
+	color: #000 !important;
+	display:block;
+	position: absolute;
+	top: 1px;
+	left: 2px; /* can be one or two depending on 90 or 135 degree global light */
+	z-index: 3;
+	}
+
+.back .text .rainbows-shadow {
+	color: #fff !important;
+	opacity: 0.3;
+	}

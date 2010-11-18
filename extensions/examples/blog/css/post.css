@@ -1,0 +1,201 @@
+/*
+ * This file is part of psYiiExtensions blog example
+ * 
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ */
+
+/**
+ * @package 	blog
+ * @subpackage 	css
+ * 
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN $Id$
+ * @since 		v1.0.6
+ * 
+ * @filesource
+ */
+
+/**
+* Styles for post.
+* 
+* Post blocks are as follows:
+* 
+* 	<post-item>
+* 		<post-title><h1></h1></post-title>
+* 		<post-author><span class="archived|draft|published"></span></post-author>
+* 		<post-content>post Text</post-content>
+* 		<post-nav>
+* 			<fieldset>
+* 				<legend>Tags</legend>
+* 				<post-nav-tag-links>tag</post-nav-tag-links>
+* 			</fieldset>
+* 
+* 			<post-nav-links></post-nav-links>
+* 		</post-nav>
+* 	</post-item>
+* 
+*/
+.post-item {
+	font-family: arial, helvetica, sans-serif;
+}
+
+.post-title h1 {
+	margin-top:10px;
+	font-size:14pt;
+	font-weight: bold;
+}
+
+.post-title h1,
+.post-title h1 a {
+	padding-bottom:0px;
+	margin-bottom:0px;
+}
+
+.post-author {
+	padding-top:2px;
+	font-size: 10px;
+}
+
+post-author span {
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.post-author span.published {
+}
+
+.post-author span.draft {
+}
+
+.post-author span.archived {
+}
+
+.post-content {
+	font-size: 13px;
+}
+
+.post-nav {
+	font-size: 11px;
+}
+
+.post-nav fieldset {
+	border:1px solid #eee;
+	margin:0px 0px 5px;
+	padding:5px;
+}
+
+.post-nav fieldset legend {
+	font-weight:bold;
+	font-size:11px;
+}
+
+.post-nav .post-nav-tag-links {
+	padding: 3px;
+	font-size: 13px;
+	display: inline-block;
+	font-family: tahoma, arial, helvetica, sans-serif;
+}
+
+.post-nav .post-nav-links {
+	padding-top: 3px;
+	font-size: 11px;
+	text-transform: lowercase;
+	text-align: right;
+}
+
+/**
+* Styles for comments.
+* 
+* Comment blocks are as follows:
+* 
+* <div id="comments">
+* 	<comment-item id="c[id]">
+* 		<comment-link><comment-permalink></content-permalink></comment-link>
+* 		<comment-author>
+* 			<comment-time>date/time of comment</comment-time>
+* 		</comment-author>
+* 		<comment-nav>Navivation</comment-nav>
+* 		<comment-content>Comment Text</comment-content>
+* 	</comment-item>
+* 	...
+* </div>
+* 
+*/
+
+/* Comments header */
+#comments h2 {
+	margin-bottom: 5px;
+}
+
+.comment-item
+{
+	padding: 5px;
+	margin: 5px 0;
+	font-size:10pt;
+	font-weight: normal;
+	border-top: none !important;
+	border-right: none !important;
+}
+
+.comment-author
+{
+	font-style: italic;
+	font-family: arial, helvetica, sans-serif;
+}
+
+.comment-author a:hover
+{
+}
+
+.comment-time
+{
+}
+
+.comment-link
+{
+	float:right;
+	padding:0px 5px 2px 5px;
+	margin:0px;
+}
+
+.comment-permalink
+{
+	font-size:1.5em;
+	font-weight:bold;
+}
+
+a.comment-permalink:hover
+{
+}
+
+.comment-content
+{
+	font-family: arial, helvetica, sans-serif;
+}
+
+.comment-nav {
+	font-size:8pt;
+	font-family: arial, helvetica, sans-serif;
+
+
+.comment-pending
+{
+	color:red;
+}
+
+fieldset.comment-preview
+{
+	font-family: arial, helvetica, sans-serif;
+	border:1px solid #ccc;
+	margin-top:10px;
+	padding:5px 10px;
+	font-size: 9pt;
+}
+
+fieldset.comment-preview legend {
+	padding:0px 5px;
+	font-weight: bold;
+}
+

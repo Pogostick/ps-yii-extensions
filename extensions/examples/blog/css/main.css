@@ -1,0 +1,130 @@
+/**
+* Generic classes & styles
+*/
+body
+{
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	font-size: 11px;
+}
+
+a, 
+a:visited
+{
+	text-decoration: none;
+}
+
+a:hover
+{
+	text-decoration: underline;
+}
+
+pre
+{
+	border-left-width:5px;
+	font-family:"Courier New",Courier,mono;
+	margin:0.3em;
+	padding:0.5em;
+}
+
+/* Overload font size of theme. */
+.ui-widget {
+	font-size: 10pt !important;
+}	
+
+/***
+* Page Classes
+*/
+.page-wrapper
+{
+	min-width: 800px;
+	width: 800px;
+	margin:0 auto;
+	padding:0px;
+	text-align: left;
+}
+
+.page-header
+{
+	padding: 0 10px 0 20px;
+	border-left-width:0px !important;
+	border-right-width:0px !important;
+	border-top-width:0px !important;
+}
+
+.page-header h1
+{
+	margin: 0px auto;
+	padding: 10px 5px 15px 5px;
+}
+
+.page-header a
+{
+	text-decoration: none;
+}
+
+.page-content-wrapper
+{
+	border: none !important;
+	min-width: 800px;
+	width: 800px;
+	margin:0px;
+	padding:0px;
+	height: 100%;
+	display: inline-block;
+}
+
+.page-content-wrapper h1 {
+	margin-top: 5px;
+	padding-top:2px;
+	margin-bottom:5px;
+}
+
+.page-content
+{
+	display: inline-block;
+	width: 540px;
+	margin:0px;
+	padding:0px 20px 20px 20px;
+}
+
+.page-sidebar
+{
+	float: right;
+	width: 200px;
+	padding: 15px 10px;
+	display: inline;
+	border: none !important;
+}
+
+/**
+* Footer
+*/
+.page-footer
+{
+	clear: both;
+	margin:0;
+	padding: 0 10px 0 10px;
+	font-size: 0.8em;
+	border-left-width:0px !important;
+	border-right-width:0px !important;
+	border-bottom-width:0px !important;
+}
+
+.page-footer p
+{
+	margin: 0;
+	padding: 10px 0;
+}
+
+.errorMessage
+{
+	color: red;
+}
+
+span.tag
+{
+	padding: 0 4px 0 0;
+}

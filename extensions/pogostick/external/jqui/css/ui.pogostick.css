@@ -1,0 +1,703 @@
+/*
+ * This file is part of the psYiiExtensions package.
+ *
+ * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @link http://www.pogostick.com Pogostick, LLC.
+ * @license http://www.pogostick.com/licensing
+ *
+ * Portions hijacked from Filament Group Labs (http://www.filamentgroup.com/lab/styling_buttons_and_toolbars_with_the_jquery_ui_css_framework/)!
+ */
+
+/**
+ * CSS styles for psYiiExtensions automated widgets and whatnot
+ *
+ * @package 	psYiiExtensions.external.jqui
+ * @subpackage 	css
+ *
+ * @author 		Jerry Ablan <jablan@pogostick.com>
+ * @version 	SVN: $Id: CPSController.php 319 2009-12-23 06:23:25Z jerryablan@gmail.com $
+ * @since 		v1.0.3
+ *
+ * @filesource
+ */
+
+.ps-button { outline: 0; margin:0 4px 0 0; padding: .4em 1em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
+.ps-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }
+
+a.ps-button { float:left; }
+a.ps-no-float { float:none; }
+
+/* remove extra button width in IE */
+button.ps-button { width:auto; overflow:visible; }
+
+.ps-button-icon-left { padding-left: 2.1em; }
+.ps-button-icon-right { padding-right: 2.1em; }
+.ps-button-icon-right-wide { padding-right: 8.5em; }
+
+.ps-button-icon-left .ui-icon { right: auto; left: .2em; margin-left: 0; }
+.ps-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; }
+.ps-button-icon-right-wide .ui-icon { left: auto; right: .2em; margin-left: 0; }
+
+.ps-button-icon-solo { text-indent:-9999px; display: inline-block; font-size: 0px; line-height: 0px; width:8px; overflow: hidden; }	 /* solo icon buttons must have block properties for the text-indent to work */
+.ps-button-icon-solo-small { text-indent:-9999px; padding:6px 10px; -moz-border-radius:3px !important; display: inline-block; font-size: 0px; line-height: 0px; width:0px; height:8px; overflow: hidden; }	 /* solo icon buttons must have block properties for the text-indent to work */
+
+.ps-button-no-float { float:none !important; }
+
+.ps-buttonset { float:left; }
+.ps-buttonset .ps-button { float: left; }
+.ps-buttonset-single .ps-button,
+.ps-buttonset-multi .ps-button { margin-right: -1px;}
+
+.ps-toolbar { padding: .5em; margin: 0; }
+.ps-toolbar .ps-buttonset { margin-right:1.5em; padding-left: 1px; }
+.ps-toolbar .ps-button { font-size: 1em; }
+
+.fg-menu-ipod .fg-menu li { width: 95%; }
+.fg-menu-ipod .ui-widget-content { border:0; }
+
+/**
+* Miscellaneous classes/styles
+*/
+.ps-pipe {
+	color: #ccc;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.ps-lpipe {
+	color: #333;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.ps-footer-pipe {
+	color: #ccc;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.ps-extra-wide {
+	width: 325px !important;
+	min-width: 325px !important;
+}
+
+.ps-wide {
+	width: 200px !important;
+	min-width: 200px !important;
+}
+
+.ps-short {
+	width: 100px !important;
+	min-width: 100px !important;
+}
+
+.ps-tiny {
+	width: 50px !important;
+	min-width: 50px !important;
+}
+
+.ps-hidden {
+	position: absolute;
+	top: 0;
+	left:-9999px;
+	width:1px;
+	height:1px;
+	overflow:hidden;
+}
+
+/**
+* In form submit button bar
+*/
+.ps-button-bar {
+	clear: both;
+	display: block;
+	position: relative;
+	padding:0px auto;
+}
+
+.ps-button-bar a.ps-button
+{
+	float:none !important;
+	display: inline-block;
+}
+
+.ps-submit-button-bar {
+	clear: both;
+	display: block;
+	position: relative;
+	padding:0px auto;
+	width:auto;
+	padding-bottom: 5px;
+}
+
+.ps-submit-button-bar-right {
+	text-align:right;
+}
+
+.ps-submit-button-bar-left {
+	text-align:left;
+}
+
+.ps-submit-button-bar-center {
+	text-align:center;
+}
+
+.ps-submit-button-bar-border {
+	border-top:1px solid #ccc;
+	margin-top: 5px;
+	padding-top: 10px;
+}
+
+.ps-submit-button-bar a.ps-button
+{
+	float:none !important;
+	display: inline-block;
+	margin-right:5px;
+	margin-left:5px;
+}
+
+.ps-submit-button-bar a.ps-button,
+.ps-submit-button-bar-right a.ps-button
+{
+	margin-right:0px;
+}
+
+.ps-submit-button-bar-left a.ps-button
+{
+	margin-left:0px;
+}
+
+.ps-submit-button-bar hr {
+	display: block;
+	clear: both;
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
+}
+
+/**
+* Form header flash display
+*/
+.ps-flash-display {
+	float:right;
+	font-size:13px;
+	color: yellow;
+	z-index:5;
+	display: inline;
+	margin-right:5px;
+	padding-right:5px;
+	height: 22px;
+	font-weight:bold;
+}
+
+.ps-flash-display-left {
+	float:left;
+	font-size:13px;
+	color: yellow;
+	z-index:5;
+	display: inline;
+	padding-left:5px;
+	padding-top:4px;
+	font-weight:bold;
+	margin: 0px auto;
+	margin-top:0.5em;
+	vertical-align: middle; opacity: 1;
+}
+
+.ps-form-header {
+	margin-bottom:10px;
+}
+
+.ps-form-header p {
+	padding-left:0px !important;
+}
+
+h1.ps-form-header-left {
+	float: left;
+	margin-right: 15px;
+}
+
+/**
+* Form header search bar
+*/
+
+.ps-search-bar {
+	display: block;
+	text-align:left;
+	margin-bottom:10px;
+}
+
+.ps-form-search-label {
+	font-size:13px;
+	color: #fff;
+	font-weight:bold;
+}
+
+.ps-form-search-field {
+	margin-right:15px;
+}
+
+.ps-form-search-field-select,
+.ps-form-search-field-text {
+	padding:3px;
+	font-size:13px;
+	font-weight:normal;
+	margin-left:5px;
+}
+
+.ps-form-search-field-text {
+	border:1px solid #ccc;
+	min-width: 150px;
+}
+
+.ps-search-bar .ps-button
+{
+	padding-bottom:7px;
+}
+
+.ps-search-bar a.ps-button
+{
+	margin:5px auto 0px auto;
+	float:none !important;
+	display: inline-block;
+	padding:5px auto 10px auto;
+}
+
+.ps-search-bar hr {
+	display: block;
+	clear: both;
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
+}
+
+/**
+* Form footers
+*/
+.ps-form-footer {
+	position:absolute;
+	bottom:5px;
+	right:5px;
+	text-align:right;
+	font-size:80%;
+}
+
+/**
+* Data lists
+*/
+.ps-data-list-container {
+	display: block;
+}
+
+.ps-data-list-row {
+	display: block;
+}
+
+.ps-data-list-container label {
+	width: 200px;
+	float:left;
+	background: #fff;
+	color: #000;
+}
+
+.ps-data-list-row-data span {
+	float:left;
+	background:black;
+	color:white;
+}
+
+/* Grid Actions */
+td.ps-grid-actions {
+	text-align: center;
+	min-width:100px;
+}
+
+td.ps-grid-actions div.ps-grid-actions-inner {
+	margin:2px auto;
+	height:22px;
+	min-width:100px;
+}
+
+td.ps-grid-actions div.ps-grid-actions-inner a.ps-button {
+	float:none;
+	display: inline-block;
+	margin:0px 3px;
+}
+
+td.ps-grid-actions div.ps-grid-actions-inner hr {
+	display: block;
+	clear: left;
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
+}
+
+/**
+* Pager Styles
+*/
+.ps-pager a,
+.psPager a {
+	padding:3px 5px;
+	margin-right:2px;
+	margin-top:0px;
+}
+
+ul.ps-pager li,
+ul.psPager li
+{
+	display:inline;
+}
+
+ul.ps-pager li.hidden,
+ul.psPager li.hidden
+{
+	display:none;
+}
+
+.ps-pager li a,
+.psPager li a {
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+
+.ps-pager .ps-button,
+.psPager .ps-button {
+	float:none;
+}
+
+ul.ps-pager,
+ul.psPager {
+	border:0;
+	margin:0 auto 10px;
+	padding:0;
+	display:block;
+}
+
+ul.ps-pager.ps-pager-left,
+ul.psPager.ps-pager-left {
+	float: left;
+}
+
+ul.ps-pager.ps-pager-right,
+ul.psPager.ps-pager-right {
+	float: right;
+}
+
+ul.ps-pager.ps-pager-top,
+ul.psPager.ps-pager-top {
+	margin:0px auto 10px auto;
+}
+
+ul.ps-pager.ps-pager-bottom,
+ul.psPager.ps-pager-bottom {
+	margin:10px auto 0px auto;
+}
+
+ul.ps-pager .first,
+ul.psPager .first,
+ul.ps-pager .last,
+ul.psPager .last
+{
+}
+
+ul.ps-pager a:link,
+ul.psPager a:link,
+ul.ps-pager a:visited,
+ul.psPager a:visited {
+}
+
+ul.ps-pager a:hover,
+ul.psPager a:hover {
+}
+
+ul.ps-pager .selected a,
+ul.psPager .selected a
+{
+	font-weight:bold;
+}
+
+ul.ps-pager li.ps-link-pager span,
+ul.psPager li.ps-link-pager span {
+}
+
+ul.ps-pager li.ps-link-pager li a span.ui-icon,
+ul.psPager li.ps-link-pager li a span.ui-icon {
+	margin-left:0px;
+}
+
+ul.ps-pager li.ps-link-pager a.ps-button,
+ul.psPager li.ps-link-pager a.ps-button {
+	padding:5px 7px;
+	margin-top:2px;
+}
+
+ul.ps-pager li.ps-link-pager a.ps-button-icon-right,
+ul.psPager li.ps-link-pager a.ps-button-icon-right {
+	padding-right: 25px;
+}
+
+ul.ps-pager li.ps-link-pager a.ps-button-icon-left,
+ul.psPager li.ps-link-pager a.ps-button-icon-left {
+	padding-left: 25px;
+}
+
+span.ps-link-pager-footer {
+	float: left;
+	font-size: 9px;
+	padding-top:15px;
+	padding-left: 10px;
+}
+
+/**
+* Our generic edit container
+*/
+
+div.ps-edit-container div.yiiForm {
+	color:#555;
+	margin:15px 10px 5px 0px;
+	padding-top:10px;
+	background-color:#EEFFFF;
+	width:500px;
+	border:1px solid #CCFFFF;
+}
+
+div.ps-edit-container div.yiiForm label {
+/*	color: #000;*/
+}
+
+div.ps-edit-container div.yiiForm.ps-wide-form {
+	min-width:800px;
+	width:800px;
+}
+
+div.ps-edit-container div.yiiForm fieldset
+{
+	border: #ccc 1px solid;
+	margin:0 auto;
+	padding:5px;
+	margin-bottom:5px;
+	padding-bottom:10px;
+}
+
+div.ps-edit-container div.yiiForm fieldset legend
+{
+	font-weight: bold;
+	font-size:13px;
+	color: #47AA42;
+	padding:0px 6px;
+}
+
+div.ps-edit-container div.yiiForm fieldset hr
+{
+	border:1px solid #eee;
+	color: #eee;
+	height: 1px;
+	width:80%;
+}
+
+div.ps-edit-container select {
+	border:1px solid #ccc;
+	padding:2px;
+	min-width: 235px;
+}
+
+div.ps-edit-container div.yiiForm input[type="text"],
+div.ps-edit-container div.yiiForm textarea,
+div.ps-edit-container div.yiiForm input[type="password"] {
+	width: 225px;
+	border:1px solid #ccc;
+	padding:3px;
+}
+
+div.ps-edit-container div.yiiForm textarea {
+	width:340px;
+}
+
+
+div.ps-edit-container input[type="text"].number {
+	text-align:right;
+}
+
+div.ps-edit-container div.yiiForm div.simple div,
+div.ps-edit-container div.yiiForm div.complex div
+{
+	margin-left: 180px;
+}
+
+div.ps-edit-container div.yiiForm div.simple div.cke_toolbox,
+div.ps-edit-container div.yiiForm div.complex div.cke_toolbox
+{
+	margin-left: 0px;
+}
+
+div.ps-edit-container div.yiiForm div.action
+{
+	margin-left: 180px;
+	padding: 0.25em 0;
+}
+
+div.ps-edit-container div.yiiForm div.simple label,
+div.ps-edit-container div.yiiForm div.complex span
+{
+	width: 170px;
+	font-weight: bold;
+}
+
+div.ps-edit-container div.yiiForm div.simple label.ps-text-display
+{
+	padding-left: 2px;
+	text-align:left !important;
+	width: auto;
+}
+
+div.ps-edit-container div.yiiForm div.selectList {
+	clear:both;
+	margin:0 auto;
+	vertical-align:middle;
+}
+
+div.ps-edit-container div.yiiForm div.selectList label {
+	color:#333;
+	font-weight: bold;
+}
+
+div.ps-edit-container div.yiiForm div.selectList input[type="checkbox"] {
+	margin-left:25px;
+	vertical-align:middle;
+}
+
+div.ps-edit-container div.yiiForm div.selectList label.cbList {
+	margin-left:0px;
+	margin-top:0px;
+	vertical-align:middle;
+}
+
+/**
+* DATEPICKER styling
+*/
+
+div.ps-edit-container div.yiiForm img.ui-datepicker-trigger {
+	padding:0px 0px 2px 5px;
+	margin:0px auto;
+	vertical-align: middle;
+}
+
+/**
+* ERROR STYLES
+*/
+
+/**
+* These style the labels *BEFORE* the form field
+*/
+div.ps-edit-container div.yiiForm div.simple label.error {
+	color: red;
+	margin-left:0px;
+	display:inline-block;
+}
+
+div.ps-edit-container div.yiiForm label.error {
+	float: none;
+	color: red;
+	padding-left:0;
+	vertical-align: top;
+}
+
+div.ps-edit-container div.yiiForm div.uploadifyQueue,
+div.ps-edit-container div.yiiForm div.uploadifyQueue div {
+	margin-left:0px !important;
+	padding-left: 180px;
+}
+
+/**
+* This styles the label that is inserted *UNDERNEATH* the form field
+*/
+label.ps-validate-error {
+	display:inline-block;
+}
+
+div.ps-edit-container div.yiiForm label.ps-validate-error {
+	color: red;
+	margin-left:175px;
+	text-align: left;
+	width: 100% !important;
+	vertical-align: top;
+	font-size:90%;
+}
+
+div.ps-edit-container div.yiiForm div.simple select.error,
+div.ps-edit-container div.yiiForm div.simple textarea.error,
+div.ps-edit-container div.yiiForm div.simple input.error {
+	border:1px solid #f8082C;
+}
+
+div.ps-edit-container div.yiiForm span.cbDivider {
+	float:left;
+	width:170px;
+}
+
+div.ps-edit-container div.yiiForm :disabled {
+	background: transparent;
+	border:0;
+	padding-left:0px;
+	font-weight: bold;
+	color: #666;
+}
+
+/**
+* WIDTH STYLES
+*/
+
+div.ps-edit-container div.yiiForm input[type="text"].hasDatepicker {
+	width: 175px !important;
+}
+
+div.ps-edit-container div.yiiForm input[type="text"].date {
+	width: 70px;
+}
+
+div.ps-edit-container div.yiiForm input[type="text"].datetime {
+	width: 110px;
+}
+
+div.ps-edit-container div.yiiForm div.wide span {
+	color: #777;
+	font-weight: normal;
+	font-size: 11px;
+	float:none !important;
+	margin:0;
+	padding:0;
+}
+
+div.ps-edit-container div.yiiForm div.wide {
+	margin:5px 0px;
+	font-weight: bold;
+}
+
+/**
+* Data Grids
+*/
+.ps-data-grid-sort-arrow {
+	display:inline-block;
+	margin:0 auto;
+	vertical-align:bottom;
+	padding:0px;
+	padding-left:5px;
+}
+
+.ps-data-grid-no-data-found {
+	text-align:	center;
+	font-weight: bold;
+	font-size: 15px;
+	margin: 10px auto;
+}
+
+.ps-form-legend {
+	font-size: 13px;
+}
+
+/**
+ * Menu Helper
+ */
+.ui-accordion-content a.ps-menu-current {
+	font-weight: bold !important;
+}
