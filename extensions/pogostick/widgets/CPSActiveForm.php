@@ -47,7 +47,7 @@ class CPSActiveForm extends CActiveForm
 	 */
 	public function run()
 	{
-		$this->_buildForm( $properties );
+		$this->_buildForm();
 		return parent::run();
 	}
 
