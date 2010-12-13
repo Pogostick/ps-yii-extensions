@@ -1,0 +1,713 @@
+/*
+ * jQuery UI Formtastic! CSS 1.0a
+ *
+ * Copyright (c) 2010 Jerry Ablan <jablan@pogostick.com>.
+ * @link http://www.pogostick.com Pogostick, LLC.
+ *
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * @license http://jquery.org/license
+ *
+ * We share the same open source ideals as does the jQuery team, and
+ * we love them so much we like to quote their license statement:
+ *
+ * You may use our open source libraries under the terms of either the MIT
+ * License or the Gnu General Public License (GPL) Version 2.
+ *
+ * The MIT License is recommended for most projects. It is simple and easy to
+ * understand, and it places almost no restrictions on what you can do with
+ * our code.
+ *
+ * If the GPL suits your project better, you are also free to use our code
+ * under that license.
+ *
+ * You don’t have to do anything special to choose one license or the other,
+ * and you don’t have to notify anyone which license you are using.
+ *
+ */
+
+.formtastic-button { outline: 0; margin:0 4px 0 0; padding: .4em 1em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
+.formtastic-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }
+
+a.formtastic-button { float:left; }
+a.formtastic-no-float { float:none; }
+
+/* remove extra button width in IE */
+button.formtastic-button { width:auto; overflow:visible; }
+
+.formtastic-button-icon-left { padding-left: 2.1em; }
+.formtastic-button-icon-right { padding-right: 2.1em; }
+.formtastic-button-icon-right-wide { padding-right: 8.5em; }
+
+.formtastic-button-icon-left .ui-icon { right: auto; left: .2em; margin-left: 0; }
+.formtastic-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; }
+.formtastic-button-icon-right-wide .ui-icon { left: auto; right: .2em; margin-left: 0; }
+
+.formtastic-button-icon-solo { text-indent:-9999px; display: inline-block; font-size: 0px; line-height: 0px; width:8px; overflow: hidden; }	 /* solo icon buttons must have block properties for the text-indent to work */
+.formtastic-button-icon-solo-small { text-indent:-9999px; padding:6px 10px; -moz-border-radius:3px !important; display: inline-block; font-size: 0px; line-height: 0px; width:0px; height:8px; overflow: hidden; }	 /* solo icon buttons must have block properties for the text-indent to work */
+
+.formtastic-button-no-float { float:none !important; }
+
+.formtastic-buttonset { float:left; }
+.formtastic-buttonset .formtastic-button { float: left; }
+.formtastic-buttonset-single .formtastic-button,
+.formtastic-buttonset-multi .formtastic-button { margin-right: -1px;}
+
+.formtastic-toolbar { padding: .5em; margin: 0; }
+.formtastic-toolbar .formtastic-buttonset { margin-right:1.5em; padding-left: 1px; }
+.formtastic-toolbar .formtastic-button { font-size: 1em; }
+
+.fg-menu-ipod .fg-menu li { width: 95%; }
+.fg-menu-ipod .ui-widget-content { border:0; }
+
+/**
+* Miscellaneous classes/styles
+*/
+.formtastic-pipe {
+	color: #ccc;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.formtastic-lpipe {
+	color: #333;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.formtastic-footer-pipe {
+	color: #ccc;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.formtastic-extra-wide {
+	width: 325px !important;
+	min-width: 325px !important;
+}
+
+.formtastic-wide {
+	width: 200px !important;
+	min-width: 200px !important;
+}
+
+.formtastic-short {
+	width: 100px !important;
+	min-width: 100px !important;
+}
+
+.formtastic-tiny {
+	width: 50px !important;
+	min-width: 50px !important;
+}
+
+.formtastic-hidden {
+	position: absolute;
+	top: 0;
+	left:-9999px;
+	width:1px;
+	height:1px;
+	overflow:hidden;
+}
+
+/**
+* In form submit button bar
+*/
+.formtastic-button-bar {
+	clear: both;
+	display: block;
+	position: relative;
+	padding:0px auto;
+}
+
+.formtastic-button-bar a.formtastic-button
+{
+	float:none !important;
+	display: inline-block;
+}
+
+.formtastic-submit-button-bar {
+	clear: both;
+	display: block;
+	position: relative;
+	padding:0px auto;
+	width:auto;
+	padding-bottom: 5px;
+}
+
+.formtastic-submit-button-bar-right {
+	text-align:right;
+}
+
+.formtastic-submit-button-bar-left {
+	text-align:left;
+}
+
+.formtastic-submit-button-bar-center {
+	text-align:center;
+}
+
+.formtastic-submit-button-bar-border {
+	border-top:1px solid #ccc;
+	margin-top: 5px;
+	padding-top: 10px;
+}
+
+.formtastic-submit-button-bar a.formtastic-button
+{
+	float:none !important;
+	display: inline-block;
+	margin-right:5px;
+	margin-left:5px;
+}
+
+.formtastic-submit-button-bar a.formtastic-button,
+.formtastic-submit-button-bar-right a.formtastic-button
+{
+	margin-right:0px;
+}
+
+.formtastic-submit-button-bar-left a.formtastic-button
+{
+	margin-left:0px;
+}
+
+.formtastic-submit-button-bar hr {
+	display: block;
+	clear: both;
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
+}
+
+/**
+* Form header flash display
+*/
+.formtastic-flash-display {
+	float:right;
+	font-size:13px;
+	color: yellow;
+	z-index:5;
+	display: inline;
+	margin-right:5px;
+	padding-right:5px;
+	height: 22px;
+	font-weight:bold;
+}
+
+.formtastic-flash-display-left {
+	float:left;
+	font-size:13px;
+	color: yellow;
+	z-index:5;
+	display: inline;
+	padding-left:5px;
+	padding-top:4px;
+	font-weight:bold;
+	margin: 0px auto;
+	margin-top:0.5em;
+	vertical-align: middle; opacity: 1;
+}
+
+.formtastic-form-header {
+	margin-bottom:10px;
+}
+
+.formtastic-form-header p {
+	padding-left:0px !important;
+}
+
+h1.formtastic-form-header-left {
+	float: left;
+	margin-right: 15px;
+}
+
+/**
+* Form header search bar
+*/
+
+.formtastic-search-bar {
+	display: block;
+	text-align:left;
+	margin-bottom:10px;
+}
+
+.formtastic-form-search-label {
+	font-size:13px;
+	color: #fff;
+	font-weight:bold;
+}
+
+.formtastic-form-search-field {
+	margin-right:15px;
+}
+
+.formtastic-form-search-field-select,
+.formtastic-form-search-field-text {
+	padding:3px;
+	font-size:13px;
+	font-weight:normal;
+	margin-left:5px;
+}
+
+.formtastic-form-search-field-text {
+	border:1px solid #ccc;
+	min-width: 150px;
+}
+
+.formtastic-search-bar .formtastic-button
+{
+	padding-bottom:7px;
+}
+
+.formtastic-search-bar a.formtastic-button
+{
+	margin:5px auto 0px auto;
+	float:none !important;
+	display: inline-block;
+	padding:5px auto 10px auto;
+}
+
+.formtastic-search-bar hr {
+	display: block;
+	clear: both;
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
+}
+
+/**
+* Form footers
+*/
+.formtastic-form-footer {
+	position:absolute;
+	bottom:5px;
+	right:5px;
+	text-align:right;
+	font-size:80%;
+}
+
+/**
+* Data lists
+*/
+.formtastic-data-list-container {
+	display: block;
+}
+
+.formtastic-data-list-row {
+	display: block;
+}
+
+.formtastic-data-list-container label {
+	width: 200px;
+	float:left;
+	background: #fff;
+	color: #000;
+}
+
+.formtastic-data-list-row-data span {
+	float:left;
+	background:black;
+	color:white;
+}
+
+/* Grid Actions */
+td.formtastic-grid-actions {
+	text-align: center;
+	min-width:100px;
+}
+
+td.formtastic-grid-actions div.formtastic-grid-actions-inner {
+	margin:2px auto;
+	height:22px;
+	min-width:100px;
+}
+
+td.formtastic-grid-actions div.formtastic-grid-actions-inner a.formtastic-button {
+	float:none;
+	display: inline-block;
+	margin:0px 3px;
+}
+
+td.formtastic-grid-actions div.formtastic-grid-actions-inner hr {
+	display: block;
+	clear: left;
+	margin:0 0;
+	visibility: hidden;
+	width:1px;
+}
+
+/**
+* Pager Styles
+*/
+.formtastic-pager a,
+.psPager a {
+	padding:3px 5px;
+	margin-right:2px;
+	margin-top:0px;
+}
+
+ul.formtastic-pager li,
+ul.psPager li
+{
+	display:inline;
+}
+
+ul.formtastic-pager li.hidden,
+ul.psPager li.hidden
+{
+	display:none;
+}
+
+.formtastic-pager li a,
+.psPager li a {
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+
+.formtastic-pager .formtastic-button,
+.psPager .formtastic-button {
+	float:none;
+}
+
+ul.formtastic-pager,
+ul.psPager {
+	border:0;
+	margin:0 auto 10px;
+	padding:0;
+	display:block;
+}
+
+ul.formtastic-pager.formtastic-pager-left,
+ul.psPager.formtastic-pager-left {
+	float: left;
+}
+
+ul.formtastic-pager.formtastic-pager-right,
+ul.psPager.formtastic-pager-right {
+	float: right;
+}
+
+ul.formtastic-pager.formtastic-pager-top,
+ul.psPager.formtastic-pager-top {
+	margin:0px auto 10px auto;
+}
+
+ul.formtastic-pager.formtastic-pager-bottom,
+ul.psPager.formtastic-pager-bottom {
+	margin:10px auto 0px auto;
+}
+
+ul.formtastic-pager .first,
+ul.psPager .first,
+ul.formtastic-pager .last,
+ul.psPager .last
+{
+}
+
+ul.formtastic-pager a:link,
+ul.psPager a:link,
+ul.formtastic-pager a:visited,
+ul.psPager a:visited {
+}
+
+ul.formtastic-pager a:hover,
+ul.psPager a:hover {
+}
+
+ul.formtastic-pager .selected a,
+ul.psPager .selected a
+{
+	font-weight:bold;
+}
+
+ul.formtastic-pager li.formtastic-link-pager span,
+ul.psPager li.formtastic-link-pager span {
+}
+
+ul.formtastic-pager li.formtastic-link-pager li a span.ui-icon,
+ul.psPager li.formtastic-link-pager li a span.ui-icon {
+	margin-left:0px;
+}
+
+ul.formtastic-pager li.formtastic-link-pager a.formtastic-button,
+ul.psPager li.formtastic-link-pager a.formtastic-button {
+	padding:5px 7px;
+	margin-top:2px;
+}
+
+ul.formtastic-pager li.formtastic-link-pager a.formtastic-button-icon-right,
+ul.psPager li.formtastic-link-pager a.formtastic-button-icon-right {
+	padding-right: 25px;
+}
+
+ul.formtastic-pager li.formtastic-link-pager a.formtastic-button-icon-left,
+ul.psPager li.formtastic-link-pager a.formtastic-button-icon-left {
+	padding-left: 25px;
+}
+
+span.formtastic-link-pager-footer {
+	float: left;
+	font-size: 9px;
+	padding-top:15px;
+	padding-left: 10px;
+}
+
+/**
+* Our generic edit container
+*/
+
+div.formtastic-edit-container div.form,
+div.formtastic-edit-container div.yiiForm {
+	color:#555;
+	margin:15px 10px 5px 0px;
+	padding-top:10px;
+	background-color:#EEFFFF;
+	width:500px;
+	border:1px solid #CCFFFF;
+}
+
+div.formtastic-edit-container div.form label,
+div.formtastic-edit-container div.yiiForm label {
+/*	color: #000;*/
+}
+
+div.formtastic-edit-container div.form.formtastic-wide-form,
+div.formtastic-edit-container div.yiiForm.formtastic-wide-form {
+	min-width:800px;
+	width:800px;
+}
+
+div.formtastic-edit-container div.form fieldset,
+div.formtastic-edit-container div.yiiForm fieldset
+{
+	border: #ccc 1px solid;
+	margin:0 auto;
+	padding:5px;
+	margin-bottom:5px;
+	padding-bottom:10px;
+}
+
+div.formtastic-edit-container div.form fieldset legend,
+div.formtastic-edit-container div.yiiForm fieldset legend
+{
+	font-weight: bold;
+	font-size:13px;
+	color: #47AA42;
+	padding:0px 6px;
+}
+
+div.formtastic-edit-container div.form fieldset hr,
+div.formtastic-edit-container div.yiiForm fieldset hr
+{
+	border:1px solid #eee;
+	color: #eee;
+	height: 1px;
+	width:80%;
+}
+
+div.formtastic-edit-container select {
+	border:1px solid #ccc;
+	padding:2px;
+	min-width: 235px;
+}
+
+div.formtastic-edit-container div.yiiForm input[type="text"],
+div.formtastic-edit-container div.yiiForm textarea,
+div.formtastic-edit-container div.yiiForm input[type="password"] {
+	width: 225px;
+	border:1px solid #ccc;
+	padding:3px;
+}
+
+div.formtastic-edit-container div.yiiForm textarea {
+	width:340px;
+}
+
+
+div.formtastic-edit-container input[type="text"].number {
+	text-align:right;
+}
+
+div.formtastic-edit-container div.yiiForm div.simple div,
+div.formtastic-edit-container div.yiiForm div.complex div
+{
+	margin-left: 180px;
+}
+
+div.formtastic-edit-container div.yiiForm div.simple div.cke_toolbox,
+div.formtastic-edit-container div.yiiForm div.complex div.cke_toolbox
+{
+	margin-left: 0px;
+}
+
+div.formtastic-edit-container div.yiiForm div.action
+{
+	margin-left: 180px;
+	padding: 0.25em 0;
+}
+
+div.formtastic-edit-container div.yiiForm div.simple label,
+div.formtastic-edit-container div.yiiForm div.complex span
+{
+	width: 170px;
+	font-weight: bold;
+}
+
+div.formtastic-edit-container div.yiiForm div.simple label.formtastic-text-display
+{
+	padding-left: 2px;
+	text-align:left !important;
+	width: auto;
+}
+
+div.formtastic-edit-container div.yiiForm div.selectList {
+	clear:both;
+	margin:0 auto;
+	vertical-align:middle;
+}
+
+div.formtastic-edit-container div.yiiForm div.selectList label {
+	color:#333;
+	font-weight: bold;
+}
+
+div.formtastic-edit-container div.yiiForm div.selectList input[type="checkbox"] {
+	margin-left:25px;
+	vertical-align:middle;
+}
+
+div.formtastic-edit-container div.yiiForm div.selectList label.cbList {
+	margin-left:0px;
+	margin-top:0px;
+	vertical-align:middle;
+}
+
+/**
+* DATEPICKER styling
+*/
+
+div.formtastic-edit-container div.yiiForm img.ui-datepicker-trigger {
+	padding:0px 0px 2px 5px;
+	margin:0px auto;
+	vertical-align: middle;
+}
+
+/**
+* ERROR STYLES
+*/
+
+/**
+* These style the labels *BEFORE* the form field
+*/
+div.formtastic-edit-container div.yiiForm div.simple label.error {
+	color: red;
+	margin-left:0px;
+	display:inline-block;
+}
+
+div.formtastic-edit-container div.yiiForm label.error {
+	float: none;
+	color: red;
+	padding-left:0;
+	vertical-align: top;
+}
+
+div.formtastic-edit-container div.yiiForm div.uploadifyQueue,
+div.formtastic-edit-container div.yiiForm div.uploadifyQueue div {
+	margin-left:0px !important;
+	padding-left: 180px;
+}
+
+/**
+* This styles the label that is inserted *UNDERNEATH* the form field
+*/
+label.formtastic-validate-error {
+	display:inline-block;
+}
+
+div.formtastic-edit-container div.yiiForm label.formtastic-validate-error {
+	color: red;
+	margin-left:175px;
+	text-align: left;
+	width: 100% !important;
+	vertical-align: top;
+	font-size:90%;
+}
+
+div.formtastic-edit-container div.yiiForm div.simple select.error,
+div.formtastic-edit-container div.yiiForm div.simple textarea.error,
+div.formtastic-edit-container div.yiiForm div.simple input.error {
+	border:1px solid #f8082C;
+}
+
+div.formtastic-edit-container div.yiiForm span.cbDivider {
+	float:left;
+	width:170px;
+}
+
+div.formtastic-edit-container div.yiiForm :disabled {
+	background: transparent;
+	border:0;
+	padding-left:0px;
+	font-weight: bold;
+	color: #666;
+}
+
+/**
+* WIDTH STYLES
+*/
+
+div.formtastic-edit-container div.yiiForm input[type="text"].hasDatepicker {
+	width: 175px !important;
+}
+
+div.formtastic-edit-container div.yiiForm input[type="text"].date {
+	width: 70px;
+}
+
+div.formtastic-edit-container div.yiiForm input[type="text"].datetime {
+	width: 110px;
+}
+
+div.formtastic-edit-container div.yiiForm div.wide span {
+	color: #777;
+	font-weight: normal;
+	font-size: 11px;
+	float:none !important;
+	margin:0;
+	padding:0;
+}
+
+div.formtastic-edit-container div.yiiForm div.wide {
+	margin:5px 0px;
+	font-weight: bold;
+}
+
+/**
+* Data Grids
+*/
+.formtastic-data-grid-sort-arrow {
+	display:inline-block;
+	margin:0 auto;
+	vertical-align:bottom;
+	padding:0px;
+	padding-left:5px;
+}
+
+.formtastic-data-grid-no-data-found {
+	text-align:	center;
+	font-weight: bold;
+	font-size: 15px;
+	margin: 10px auto;
+}
+
+.formtastic-form-legend {
+	font-size: 13px;
+}
+
+/**
+ * Menu Helper
+ */
+.ui-accordion-content a.formtastic-menu-current {
+	font-weight: bold !important;
+}
