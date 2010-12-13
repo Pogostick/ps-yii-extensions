@@ -31,18 +31,18 @@ class CPSRESTController extends CPSController
 	 * This method is invoked by {@link runActionWithFilters} after all
 	 * possible filters have been executed and the action starts to run.
 	 *
-	 * @param CAction $oAction Action to run
+	 * @param CAction $action Action to run
 	 */
-	public function runAction( $oAction )
+	public function runAction( $action )
 	{
 		$this->pushAction( $this->getAction() );
 
-		$this->setAction( $oAction );
+		$this->setAction( $action );
 
-		if ( $this->beforeAction( $oAction ) )
+		if ( $this->beforeAction( $action ) )
 		{
-			$this->dispatchRequest( $oAction );
-			$this->afterAction( $oAction );
+			$this->dispatchRequest( $action );
+			$this->afterAction( $action );
 		}
 
 		$this->setAction( $this->popAction() );
@@ -58,13 +58,13 @@ class CPSRESTController extends CPSController
 	 */
 	public function createAction( $sActionId )
 	{
-		$_sActionId = ( $sActionId === '' ) ? $this->defaultAction : $sActionId;
+		$_actionId = ( $sActionId === '' ) ? $this->defaultAction : $sActionId;
 
 		//	Is it a valid request?
-		if ( ! method_exists( $this, 'get' . $_sActionId ) && ! method_exists( $this, 'post' . $_sActionId ) && ! method_exists( $this, 'request' . $_sActionId ) )
-			return $this->missingAction( $_sActionId );
+		if ( ! method_exists( $this, 'get' . $_actionId ) && ! method_exists( $this, 'post' . $_actionId ) && ! method_exists( $this, 'request' . $_actionId ) )
+			return $this->missingAction( $_actionId );
 
-		return new CPSRESTAction( $this, $_sActionId );
+		return new CPSRESTAction( $this, $_actionId );
 	}
 
 	/**
@@ -76,8 +76,8 @@ class CPSRESTController extends CPSController
 	{
 		$_arOut = array();
 
-		foreach ( $arData as $_sKey => &$_oValue )
-			$_arOut[] = $_sKey . ':' . $this->toJSON( $_oValue );
+		foreach ( $arData as $_key => &$_value )
+			$_arOut[] = $_key . ':' . $this->toJSON( $_value );
 
 		return '{' . implode( ',', $_arOut ) . '}';
 	}
@@ -117,75 +117,74 @@ class CPSRESTController extends CPSController
 	 * @see runAction
 	 * @access protected
 	 */
-	protected function dispatchRequest( CAction $oAction )
+	protected function dispatchRequest( CAction $action )
 	{
-		$_sActionId = $oAction->getId();
-		$_arParams = $_REQUEST;
-		$_arUrlParams = array();
-		$_arOpts = array();
+		$_actionId = $action->getId();
+		$_parameters = $_REQUEST;
+		$_urlParameters = array();
+		$_options = array();
 
 		//	If additional parameters are specified in the URL, convert to parameters...
-		$_sUri = Yii::app()->getRequest()->getRequestUri();
+		$_uri = PS::_gr()->getRequestUri();
 
-		if ( null != ( $_sUri = trim( str_ireplace( '/' . $this->getId() . '/' . $_sActionId, '', $_sUri ) ) ) )
+		if ( null != ( $_uri = trim( str_ireplace( '/' . $this->getId() . '/' . $_actionId, '', $_uri ) ) ) )
 		{
-			$_sUri = trim( $_sUri, '/?' );
-			$_arOpts = ( ! empty( $_sUri ) ? explode( '/', $_sUri ) : array() );
+			$_uri = trim( $_uri, '/?' );
+			$_options = ( ! empty( $_uri ) ? explode( '/', $_uri ) : array() );
 
-			foreach ( $_arOpts as $_sKey => $_oValue )
+			foreach ( $_options as $_key => $_value )
 			{
-				if ( false !== strpos( $_oValue, '=' ) )
+				if ( false !== strpos( $_value, '=' ) )
 				{
-					if ( null != ( $_arTemp = explode( '=', $_oValue ) ) )
-						$_arOpts[ $_arTemp[0] ] = $_arTemp[1];
+					if ( null != ( $_list = explode( '=', $_value ) ) )
+						$_options[ $_list[0] ] = $_list[1];
 
-					unset( $_arOpts[ $_sKey ] );
+					unset( $_options[ $_key ] );
 				}
 				else
-					$_arOpts[ $_sKey ] = $_oValue;
+					$_options[ $_key ] = $_value;
 			}
 		}
 
 		//	Any query string? (?x=y&...)
-		if ( null != ( $_sQuery = parse_url( $_sUri, PHP_URL_QUERY ) ) )
-			$_arOpts = array_merge( explode( '=', $_sQuery ), $_arOpts );
+		if ( null != ( $_queryString = parse_url( $_uri, PHP_URL_QUERY ) ) )
+			$_options = array_merge( explode( '=', $_queryString ), $_options );
 
 		//	load into url params
-		foreach ( $_arOpts as $_sKey => $_sValue )
-			if ( ! isset( $_arUrlParams[ $_sKey ] ) ) $_arUrlParams[ $_sKey ] = $_sValue;
+		foreach ( $_options as $_key => $_value )
+			if ( ! isset( $_urlParameters[ $_key ] ) ) $_urlParameters[ $_key ] = $_value;
 
 		//	Is it a valid request?
-		$_sType = strtolower( $this->getRequest()->getRequestType() );
-		$_sMethod = $_sType . ucfirst( $_sActionId );
+		$_requestType = strtolower( $this->getRequest()->getRequestType() );
+		$_requestMethod = $_requestType . ucfirst( $_actionId );
 
-		if ( $_sType == 'post' )
+		if ( $_requestType == 'post' )
 		{
-			foreach ( $_POST as $_sKey => $_oValue )
+			foreach ( $_POST as $_key => $_value )
 			{
-				if ( ! is_array( $_oValue ) )
-					$_arUrlParams[ $_sKey ] = $_oValue;
+				if ( ! is_array( $_value ) )
+					$_urlParameters[ $_key ] = $_value;
 				else
 				{
-					foreach ( $_oValue as $_sSubKey => $_oSubValue )
-						$_arUrlParams[ $_sSubKey ] = $_oSubValue;
+					foreach ( $_value as $_subKey => $_subValue )
+						$_urlParameters[ $_subKey ] = $_subValue;
 				}
 			}
 		}
 
-		if ( ! method_exists( $this, $_sMethod ) )
+		if ( ! method_exists( $this, $_requestMethod ) )
 		{
 			//	Is it a valid catchall request?
-			if ( ! method_exists( $this, 'request' . $_sActionId ) )
+			if ( ! method_exists( $this, 'request' . $_actionId ) )
 				//	No clue what it is, so must be bogus. Hand off to missing action...
-				return $this->missingAction( $_sActionId );
+				return $this->missingAction( $_actionId );
 
-			$_sMethod = 'request' . $_sActionId;
+			$_requestMethod = 'request' . $_actionId;
 		}
 
-		//	All rest methods echo their output
-//		CPSLog::trace( __METHOD__, 'Calling: ' . $_sMethod . ' with ' . count( $_arUrlParams ) . ' parameter(s) : ' . print_r( $_arUrlParams, true ) );
+		CPSLog::trace( __METHOD__, 'calling ' . $_requestMethod );
 
-		echo call_user_func_array( array( $this, $_sMethod ), array_values( $_arUrlParams ) );
+		echo call_user_func_array( array( $this, $_requestMethod ), array_values( $_urlParameters ) );
 	}
 
 	/**
@@ -216,7 +215,7 @@ class CPSRESTController extends CPSController
 			$_response = array(
 				'result' => 'success',
 			);
-			
+
 			if ( $resultList )
 				$_response['resultData'] = $resultList;
 		}

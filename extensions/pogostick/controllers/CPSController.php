@@ -295,7 +295,7 @@ abstract class CPSController extends CController implements IPSBase
 			$this->_extraViewDataList = array();
 		
 		//	Add "currentUser" value to extra view data
-		if ( null == PS::o( $this->_extraViewDataList, $this->_extraViewDataPrefix . 'currentUser' ) )
+		if ( null === PS::o( $this->_extraViewDataList, $this->_extraViewDataPrefix . 'currentUser' ) )
 			$this->_extraViewDataList[ $this->_extraViewDataPrefix . 'currentUser' ] = PS::_gcu();
 		
 		//	And some defaults...

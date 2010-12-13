@@ -120,7 +120,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	{
 		//	Intialize my variables...
 		self::$_thisApp = Yii::app();
-		
+
 		//	May or may not be available...
 		try { self::$_clientScript = self::$_thisApp->getClientScript(); } catch ( Exception $_ex ) {}
 		try { self::$_thisUser = self::$_thisApp->getUser(); } catch ( Exception $_ex ) {}
@@ -160,14 +160,14 @@ class CPSHelperBase extends CHtml implements IPSBase
 	{
 		$_default = null;
 		$_args = func_num_args();
-		$_argumentList = func_get_args();
+		$_haystack = func_get_args();
 
 		for ( $_i = 0; $_i < $_args; $_i++ )
 		{
-			if ( isset( $_argumentList[ $_i ] ) && ! empty( $_argumentList[ $_i ] ) )
-				return $_argumentList[ $_i ];
+			if ( isset( $_haystack[ $_i ] ) && ! empty( $_haystack[ $_i ] ) )
+				return $_haystack[ $_i ];
 
-			$_default = $_argumentList[ $_i ];
+			$_default = $_haystack[ $_i ];
 		}
 
 		return $_default;
@@ -178,8 +178,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 *
 	 * The first argument is the needle, the rest are considered in the haystack. For example:
 	 *
-	 * CPSHelperBase::in( 'x', array( 'x', 'y', 'z' ) ) returns true
-	 * CPSHelperBase::in( 'a', array( 'x', 'y', 'z' ) ) returns false
+	 * CPSHelperBase::in( 'x', 'x', 'y', 'z' ) returns true
+	 * CPSHelperBase::in( 'a', 'x', 'y', 'z' ) returns false
 	 *
 	 * @param mixed
 	 * @return boolean
@@ -187,12 +187,12 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function in()
 	{
-		$_argumentList = func_get_args();
+		$_haystack = func_get_args();
 
-		if ( count( $_argumentList ) )
+		if ( count( $_haystack ) > 1 )
 		{
-			$_oNeedle = array_shift( $_argumentList );
-			return in_array( $_oNeedle, $_argumentList );
+			$_needle = array_shift( $_haystack );
+			return in_array( $_needle, $_haystack );
 		}
 
 		return false;
@@ -618,8 +618,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function makePath()
 	{
-		$_argumentList = func_get_args();
-		return implode( DIRECTORY_SEPARATOR, $_argumentList );
+		$_haystack = func_get_args();
+		return implode( DIRECTORY_SEPARATOR, $_haystack );
 	}
 
 	/**
@@ -1020,6 +1020,16 @@ class CPSHelperBase extends CHtml implements IPSBase
 	}
 
 	/**
+	 * @return CComponent The component, if found
+	 * @see CWebApplication::getComponent
+	 */
+	public static function getComponent( $id, $createIfNull = true ) { return self::_gco( $id, $createIfNull ); }
+	public static function _gco( $id, $createIfNull = true )
+	{
+		return self::$_thisApp->getComponent( $id, $createIfNull );
+	}
+
+	/**
 	 * Convenience access to CAssetManager::publish()
 	 *
 	 * Publishes a file or a directory.
@@ -1081,7 +1091,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	{
 		return self::_unserialize( self::_gu()->getState( $stateName, self::_serialize( $defaultValue ) ) );
 	}
-	
+
 	/**
 	 * Alternative to {@link CWebUser::getState} that takes an array of key parts and assembles them into a hashed key
 	 * @param array Array of key parts
@@ -1151,7 +1161,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Creates and returns a CDbCommand object from the specified SQL
-	 * 
+	 *
 	 * @param string $sql
 	 * @return CDbCommand
 	 */
@@ -1188,13 +1198,13 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _sqlAllScalar( $sql, $parameterList = null, $dbToUse = null )
 	{
 		$_resultList = null;
-		
+
 		if ( null !== ( $_db = PS::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
 		{
 			if ( null !== ( $_rowList = $_db->createCommand( $sql )->queryAll( $parameterList ) ) )
 			{
 				$_resultList = array();
-				
+
 				foreach ( $_rowList as $_row )
 					$_resultList[] = $_row[0];
 			}
@@ -1242,10 +1252,17 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	protected static function _serialize( $value )
 	{
-		if ( $value instanceof SimpleXMLElement )
-			return $value->asXML();
+		try
+		{
+			if ( $value instanceof SimpleXMLElement || $value instanceof Util_SpXmlElement )
+				return $value->asXML();
 
-		return serialize( $value );
+			return serialize( $value );
+		}
+		catch ( Exception $_ex )
+		{
+			return $value;
+		}
 	}
 
 	/**
@@ -1255,10 +1272,17 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	protected static function _unserialize( $value )
 	{
-		if ( $value instanceof SimpleXMLElement )
-			return simplexml_load_string( $value );
+		try
+		{
+			if ( $value instanceof SimpleXMLElement || $value instanceof Util_SpXmlElement )
+				return simplexml_load_string( $value );
 
-		return unserialize( $value );
+			return unserialize( $value );
+		}
+		catch ( Exception $_ex )
+		{
+			return $value;
+		}
 	}
 }
 

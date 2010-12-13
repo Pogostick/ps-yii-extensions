@@ -72,58 +72,91 @@ class CPSFacebookAppController extends CPSController
 	protected $_facebookApi;
 	public function getFacebookApi() { return $this->_facebookApi; }
 
+	/**
+	 * @var array The Facebook session data
+	 */
 	protected $_session;
 	public function getSession() { return $this->_session; }
 
+	/**
+	 * @var string User's access token
+	 */
 	protected $_accessToken;
 	public function getAccessToken() { return $this->_accessToken; }
 
+	/**
+	 * @var string The user's Facebook ID
+	 */
 	protected $_fbUserId;
 	public function getFBUserId() { return $this->_fbUserId; }
 
+	/**
+	 * @var array The user's Facebook info
+	 */
 	protected $_me;
 	public function getMe() { return $this->_me; }
 
+	/**
+	 * @var string Login Url
+	 */
 	protected $_firstName;
 	public function getFirstName() { return $this->_firstName; }
 
 	/**
-	 * Login Url
+	 * @var string Login Url
 	 */
 	protected $_loginUrl = '';
 	public function getLoginUrl() { return $this->_loginUrl; }
 
 	/**
-	 * Logout Url
+	 * @var string Logout Url
 	 */
 	protected $_logoutUrl = '';
 	public function getLogoutUrl() { return $this->_logoutUrl; }
 
+	/**
+	 * @var User The current user
+	 */
 	protected $_user = null;
 	public function getUser() { return $this->_user; }
 
-	protected $_chosenProfiles = null;
-	public function getChosenProfiles() { return $this->_chosenProfiles; }
-
+	/**
+	 * @var array The users' list of friends
+	 */
 	protected $_friendList = null;
 	public function getFriendList() { return $this->_friendList; }
 
+	/**
+	 * @var array The users' list of friends who also use this app
+	 */
 	protected $_appFriendList = null;
 	public function getAppFriendList() { return $this->_appFriendList; }
 
-	protected $_redirectToLoginUrl = true;
-	public function getRedirectToLoginUrl() { return $this->_redirectToLoginUrl; }
-	public function setRedirectToLoginUrl( $value ) { $this->_redirectToLoginUrl = $value; return $this; }
-	
+	/**
+	 * @var boolean If true, user's albums and pictures are loaded and cached
+	 */
 	protected $_autoLoadPictures = true;
 	public function getAutoLoadPictures() { return $this->_autoLoadPictures; }
 	public function setAutoLoadPictures( $value ) { $this->_autoLoadPictures = $value; return $this; }
 	
+	/**
+	 * @var boolean True if user has authorized the app
+	 */
 	protected $_isConnected = false;
 	public function getIsConnected() { return $this->_isConnected; }
 
+	/**
+	 * @var boolean True if this is a deauthorization request
+	 */
 	protected $_isDeauthRequest = false;
 	public function getIsDeauthRequest() { return $this->_isDeauthRequest; }
+
+	/**
+	 * @var boolean If true, user is redirected to invite friends page after allowing application
+	 */
+	protected $_inviteAfterInstall = true;
+	public function getInviteAfterInstall() { return $this->_inviteAfterInstall; }
+	public function setInviteAfterInstall( $value ) { $this->_inviteAfterInstall = $value; }
 
 	//********************************************************************************
 	//* Public Methods
@@ -156,7 +189,10 @@ class CPSFacebookAppController extends CPSController
 
 		//	Set up events...
 		$this->onFacebookLogin = array( $this, 'facebookLogin' );
+		
+		return true;
 
+		//	Ignore ajax requests...
 		if ( ! Yii::app()->getRequest()->getIsAjaxRequest() )
 		{
 			//	Set up the session for the page
@@ -176,7 +212,7 @@ class CPSFacebookAppController extends CPSController
 
 		//	Perform access control for CRUD operations
 		return array(
-			'accessControl',
+//			'accessControl',
 		);
 	}
 
@@ -187,6 +223,7 @@ class CPSFacebookAppController extends CPSController
 	*/
 	public function accessRules()
     {
+		//	The base rules allow only authorized users
         return array(
             array( 'allow',
                 'actions' => array( '*' ),
@@ -200,7 +237,7 @@ class CPSFacebookAppController extends CPSController
 	//********************************************************************************
 
 	/**
-	 * Set our custom game shell layout
+	 * Home page
 	 */
 	public function actionIndex()
 	{
@@ -231,6 +268,7 @@ class CPSFacebookAppController extends CPSController
 
 	/**
 	 * Called when user removes app and/or permissions
+	 * @todo when Facebook fixes their shit and actually send a user id along with this, it will be useful.
 	 */
 	public function actionDeauthorize()
 	{
@@ -249,11 +287,9 @@ class CPSFacebookAppController extends CPSController
 		}
 	}
 
-	public function actionAbout()
-	{
-		$this->render( 'about' );
-	}
-
+	/**
+	 * Invite page
+	 */
 	public function actionInviteFriends()
 	{
 		$this->render( 'inviteFriends' );
@@ -264,14 +300,16 @@ class CPSFacebookAppController extends CPSController
 	 */
 	public function actionError()
 	{
-		$this->layout = 'blankShell';
-
 	    if ( $error = Yii::app()->errorHandler->error )
 	    {
 	    	if ( Yii::app()->request->isAjaxRequest )
+			{
+				$this->layout = false;
 	    		echo $error['message'];
-	    	else
-	        	$this->render( 'error', $error );
+				return;
+			}
+			
+        	$this->render( 'error', $error );
 	    }
 	}
 
@@ -304,6 +342,7 @@ class CPSFacebookAppController extends CPSController
 
 	/**
 	 * Get all friend data
+	 * @return array
 	 */
 	protected function _getAllFriends()
 	{
@@ -330,6 +369,7 @@ class CPSFacebookAppController extends CPSController
 
 	/**
 	 * Get friend data who have this app
+	 * @return array
 	 */
 	protected function _getAppFriends()
 	{
@@ -369,6 +409,7 @@ class CPSFacebookAppController extends CPSController
 
 	/**
 	 * Initialize the Facebook stuff
+	 * @return boolean
 	 */
 	protected function _initializeFacebook()
 	{
@@ -439,131 +480,87 @@ class CPSFacebookAppController extends CPSController
 
 	/**
 	 * Loads the user from the database. If the user is not found, a new row is added.
+	 * @return boolean 
 	 */
 	protected function _loadUser()
 	{
 		$_user = null;
 
-		//	Is this a new app user?
-		if ( ! empty( $this->_fbUserId ) )
+		//	NO user id? Bail!
+		if ( empty( $this->_fbUserId ) )
 		{
-			$_user = User::model()->find( array(
-				'condition' => 'pform_user_id_text = :pform_user_id_text and pform_type_code = :pform_type_code',
-				'params' => array(
-					':pform_user_id_text' => $this->_fbUserId,
-					':pform_type_code' => 1000,
-				)
-			));
-
-			//	Not found, assume new...
-			if ( ! $_user )
-			{
-				//	New user...
-				$_user = new User();
-				$_user->pform_user_id_text = $this->_fbUserId;
-				$_user->pform_type_code = 1000;
-				$_user->app_add_date = date( 'Y-m-d h:i:s' );
-				$_user->app_del_date = null;
-			}
-
-			//	Set new stuff
-			$_user->session_key_text = $this->_accessToken;
-			$_user->last_visit_date = date( 'Y-m-d h:i:s' );
-			
-			//	User installed app this time?
-			if ( '1' == PS::o( $_REQUEST, 'installed' ) )
-			{
-				$_user->app_add_date = date( 'Y-m-d h:i:s' );
-				$_user->app_del_date = null;
-				$_user->app_add_count_nbr += 1;
-			}
-
-			if ( $this->_me )
-			{
-				$_user->first_name_text = $this->_firstName;
-				$_user->last_name_text = PS::o( $this->_me, 'last_name' );
-				$_user->email_addr_text = PS::o( $this->_me, 'email' );
-				$_user->full_name_text = $this->_firstName . ' ' . strtoupper( substr( PS::o( $this->_me, 'last_name' ), 0, 1 ) . '.' );
-			}
-
-			//	Load app friends
-			$this->_getAppFriends();
-			
-			//	Save info...
-			$_user->save();
-
-			//	Set our current user...
-			PS::_ss( 'currentUser', $this->_user = $_user );
-			
-			//	Raise the facebook login event
-			$this->onFacebookLogin( new CEvent( $_user ) );
-
-			return true;
-		}
-		else
 			CPSLog::error(__METHOD__,'FBUID EMPTY!' . $this->_fbUserId );
+			return false;
+		}
 
-		return false;
+		//	Is this a new app user?
+		$_user = User::model()->find( array(
+			'condition' => 'pform_user_id_text = :pform_user_id_text and pform_type_code = :pform_type_code',
+			'params' => array(
+				':pform_user_id_text' => $this->_fbUserId,
+				':pform_type_code' => 1000,
+			)
+		));
+
+		//	Not found, assume new...
+		if ( ! $_user )
+		{
+			//	New user...
+			$_user = new User();
+			$_user->pform_user_id_text = $this->_fbUserId;
+			$_user->pform_type_code = 1000;
+			$_user->app_add_date = date( 'Y-m-d h:i:s' );
+			$_user->app_del_date = null;
+		}
+
+		//	Set new stuff
+		$_user->session_key_text = $this->_accessToken;
+		$_user->last_visit_date = date( 'Y-m-d h:i:s' );
+
+		//	User installed app this time?
+		if ( '1' == PS::o( $_REQUEST, 'installed' ) )
+		{
+			$_user->app_add_date = date( 'Y-m-d h:i:s' );
+			$_user->app_del_date = null;
+			$_user->app_add_count_nbr += 1;
+
+			//	Invite friends?
+			if ( $this->_inviteAfterInstall )
+			{
+				$this->redirect( 'inviteFriends', true, 301 );
+				return false;
+			}
+		}
+
+		if ( $this->_me )
+		{
+			$_user->first_name_text = $this->_firstName;
+			$_user->last_name_text = PS::o( $this->_me, 'last_name' );
+			$_user->email_addr_text = PS::o( $this->_me, 'email' );
+			$_user->full_name_text = $this->_firstName . ' ' . strtoupper( substr( PS::o( $this->_me, 'last_name' ), 0, 1 ) . '.' );
+		}
+
+		//	Load app friends
+		$this->_getAppFriends();
+
+		//	Save info...
+		$_user->save();
+
+		//	Set our current user...
+		PS::_ss( 'currentUser', $this->_user = $_user );
+
+		//	Raise the facebook login event
+		$this->onFacebookLogin( new CEvent( $_user ) );
+
+		return true;
 	}
 
 	/**
-	 * Returns an RSS feed of the top x scorers
+	 * Returns an RSS feed 
 	 * @param integer items to return
 	 */
 	protected function _getRssFeed( $items = 5 )
 	{
-		$_baseUrl = $_url = PS::_gp('appUrl');
-		$_rssDataUrl = $_baseUrl . '/?rss';
-
-		$_rssData = <<<HTML
-<?xml version="1.0" encoding="UTF-8"?>
-	<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
-		<channel>
-			<title>Generation Station: Recent Posts</title>
-			<link target="_top" rel="_top"><![CDATA[{$_rssDataUrl}]]></link>
-		    <atom:link type="application/rss+xml" href="{$_rssDataUrl}" rel="self"/>
-			<description>Generation Station: Recent Posts</description>
-			<language>en-us</language>
-HTML;
-
- 		$_users = User::model()->findAll(
-			array(
-				'select' => 'pform_user_id_text, high_score_nbr, full_name_text',
-				'condition' => 'pform_type_code = 1000',
-				'limit' => $items,
-				'order' => 'high_score_nbr desc'
-			)
-		);
-
-		$_count = 1;
-
-		foreach ( $_users as $_user )
-		{
-			$_displayName = PS::nvl( $_user->full_name_text, 'Mystery Player' );
-			$_score = number_format( $_user->high_score_nbr, 0);
-			$_details =<<<HTML
-		<div style="text-align:center!important;width:150px!important;border:2px solid #ccc!important;-moz-border-radius:8px!important;-webkit-border-radius:8px!important;">
-			#{$_count}<br />
-			<img src="http://graph.facebook.com/{$_user->pform_user_id_text}/picture" /><br />
-			{$_displayName}<br />
-			{$_score}
-		</div>
-HTML;
-
-			$_rssData .=<<<HTML
-			<item>
-				<title><![CDATA[{$_displayName}]]></title>
-				<link target="_top" rel="_top"><![CDATA[{$_url}]]></link>
-				<description><![CDATA[{$_details}]]></description>
-			</item>
-HTML;
-
-			$_count++;
-		}
-
-		$_rssData .= '</channel></rss>';
-
-		return $_rssData;
 	}
 	
 	/**

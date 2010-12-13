@@ -21,13 +21,59 @@
  * 
  */
 
- //	Get the defaults from the config file...
+$_propList = null;
+
+//	Get the defaults from the config file...
 if ( ! $_sCopyright = Yii::app()->params['@copyright'] ) $_sCopyright = 'Copyright &copy; ' . date( 'Y' ) . ' You!';
 if ( ! $_sAuthor = Yii::app()->params['@author'] ) $_sAuthor = 'Your Name <your@email.com>';
 if ( ! $_sLink = Yii::app()->params['@link'] ) $_sLink = 'http://wwww.you.com';
 if ( ! $_sPackage = Yii::app()->params['@package'] ) $_sPackage = Yii::app()->id;
 if ( ! isset( $baseClass ) ) $baseClass = 'CPSModel';
 if ( ! isset( $dbToUse ) ) $dbToUse = 'db';
+
+//	Make property lines
+if ( isset( $columns ) )
+{
+	foreach ( $columns as $_column )
+		$_propList .= ' * @property ' . $_column->type . ' $' . $_column->name . PHP_EOL;
+}
+
+if ( isset( $relations ) && ! empty( $relations ) )
+{
+	foreach ( $relations as $_name => $_relation )
+	{
+		$_propList .= ' * @property ';
+
+		$_types = array(
+			'' => '',
+			'' => '',
+			'' => 'array',
+			'' => 'array',
+		);
+
+		$_defaultType = 'mixed';
+
+		if ( preg_match( "~^array\(self::([^,]+), '([^']+)', '([^']+)'\)$~", $_relation, $_matches ) )
+		{
+			switch ( $_matches[1] )
+			{
+				case 'HAS_ONE':
+				case 'BELONGS_TO':
+					$_propList .= $_matches[2] . ' $' . $_name . PHP_EOL;
+					break;
+
+				case 'HAS_MANY':
+				case 'MANY_MANY':
+					$_propList .= $_matches[2] . '[] $' . $_name . PHP_EOL;
+					break;
+
+				default:
+					echo 'mixed $' . $_name . PHP_EOL;
+					break;
+			}
+		}
+	}
+}
 
 //	Output the header...
 echo <<<HTML
@@ -38,7 +84,6 @@ echo <<<HTML
  * @copyright {$_sCopyright}
  * @link {$_sLink}
  */
-
 /**
  * {$className} file
  * 
@@ -46,11 +91,10 @@ echo <<<HTML
  * @subpackage 	
  * 
  * @author 		{$_sAuthor}
- * @version 	SVN: \$Id\$
- * @since 		v1.0.6
+ * @version 	\$Id\$
  *  
  * @filesource
- * 
+ *
+ * {$_propList}
  */
-
 HTML;
