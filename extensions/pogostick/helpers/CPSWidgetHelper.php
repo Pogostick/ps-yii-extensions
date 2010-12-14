@@ -320,108 +320,111 @@ class CPSWidgetHelper extends CPSHelperBase
 	* widgetOptions		Options for the widget
 	* content			Optional content for field. If not specified, it's generated
 	*
-	* @param int $eFieldType
-	* @param CModel $oModel
-	* @param string $sColName
+	* @param int $inputFieldType
+	* @param CModel $model
+	* @param string $attributeName
 	* @param array $arOptions
 	* @return string
 	* @static
 	* @access public
 	*/
-	public static function field( $eFieldType, CModel $oModel, $sColName, $arOptions = array() )
+	public static function field( $inputFieldType, CModel $model, $attributeName, $arOptions = array() )
 	{
 		$_arDivOpts = PS::o( $arOptions, '_divOpts', array(), true );
 		$_sHint = PS::o( $arOptions, 'hint', null, true );
 
 		//	A little switcheroo...
-		if ( $eFieldType == PS::CODE_DISPLAY )
+		if ( $inputFieldType == PS::CODE_DISPLAY )
 		{
-			$eFieldType = PS::TEXT_DISPLAY;
+			$inputFieldType = PS::TEXT_DISPLAY;
 			$arOptions['transform'] = '*';
-			$arOptions['name'] = $arOptions['id'] = 'disp_' . self::getNextIdCount() . '_' . $sColName;
+			$arOptions['name'] = $arOptions['id'] = 'disp_' . self::getNextIdCount() . '_' . $attributeName;
 			$arOptions['class'] = PS::addClass( $arOptions['class'], 'ps-text-display' );
-			$_output = PS::activeHiddenField( $oModel, $sColName );
-			$_output .= PS::field( $eFieldType, $oModel, $sColName, $arOptions );
+			$_output = PS::activeHiddenField( $model, $attributeName );
+			$_output .= PS::field( $inputFieldType, $model, $attributeName, $arOptions );
 		}
-		else if ( $eFieldType == PS::MULTISELECT )
+		else if ( $inputFieldType == PS::MULTISELECT )
 		{
 			//	Another special dealio
-			$arWidgetOptions = PS::o( $arOptions, 'widgetOptions', array(), true );
-			$arWidgetOptions['name'] = PS::o( $arOptions, 'name', $sColName, true );
-			$arWidgetOptions['id'] = PS::o( $arOptions, 'id', $arWidgetOptions['name'], true );
-			$arWidgetOptions['naked'] = true;
-			$_oSelected = PS::o( $arOptions, 'selected', null, true );
-			$arWidgetOptions['extraScriptFiles'] = array( 'js/plugins/blockUI/jquery.blockUI.js', 'js/plugins/localisation/jquery.localisation-min.js', 'js/plugins/tmpl/jquery.tmpl.1.1.1.js' );
-			CPSjQueryWidget::create( 'multiselect', $arWidgetOptions );
+			$widgetOptions = PS::o( $arOptions, 'widgetOptions', array(), true );
+			$widgetOptions['name'] = PS::o( $arOptions, 'name', $attributeName, true );
+			$widgetOptions['id'] = PS::o( $arOptions, 'id', $widgetOptions['name'], true );
+			$widgetOptions['naked'] = true;
+			$widgetOptions['extraScriptFiles'] = array( 'js/plugins/blockUI/jquery.blockUI.js', 'js/plugins/localisation/jquery.localisation-min.js', 'js/plugins/tmpl/jquery.tmpl.1.1.1.js' );
+
+			$_selectedItem = PS::o( $arOptions, 'selected', null, true );
+
+			CPSjQueryWidget::create( 'multiselect', $widgetOptions );
 			$arOptions['class'] = PS::addClass( PS::o( $arOptions, 'class', null ), 'multiselect' );
 			$arOptions['multiple'] = 'multiple';
-			return self::dropDownList( $sColName, $_oSelected, PS::o( $arOptions, 'data', null, true ), $arOptions );
+
+			return self::dropDownList( $attributeName, $_selectedItem, PS::o( $arOptions, 'data', null, true ), $arOptions );
 		}
 		else
 		{
 			//	Get our operating parameters
-			$_sLabel = PS::o( $arOptions, 'label', null, true );
-			$_arLabelOptions = PS::o( $arOptions, 'labelOptions', array(), true );
-			if ( $eFieldType == PS::TEXTAREA ) $_arLabelOptions['style'] .= 'vertical-align:top;';
-			$_sSuffixToUse = PS::o( $_arLabelOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
-			$_arWidgetOptions = PS::o( $arOptions, 'widgetOptions', array(), true );
-			$_arData = PS::o( $arOptions, 'data', null, true );
+			$_label = PS::o( $arOptions, 'label', null, true );
+			$_labelOptions = PS::o( $arOptions, 'labelOptions', array(), true );
+			if ( $inputFieldType == PS::TEXTAREA ) $_labelOptions['style'] .= 'vertical-align:top;';
+			$_suffixToUse = PS::o( $_labelOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
+			$_widgetOptions = PS::o( $arOptions, 'widgetOptions', array(), true );
+			$_arData = PS::o( $arOptions, 'data', array(), true );
 			$_sHtml = PS::o( $arOptions, '_appendHtml', null, true );
-			$_sPrependHtml = PS::o( $arOptions, '_prependHtml', null, true );
-			$_sDivClass = PS::o( $arOptions, '_divClass', null, true );
-			$_sTransform = PS::o( $arOptions, 'transform', null, true );
-			$_sTitle = PS::o( $arOptions, 'title', null );
-			$_arValueMap = PS::o( $arOptions, 'valueMap', array(), true );
-			$_sContent = PS::o( $arOptions, 'content', null, true );
+			$_prependHtml = PS::o( $arOptions, '_prependHtml', null, true );
+			$_divClass = PS::o( $arOptions, '_divClass', null, true );
+			$_transform = PS::o( $arOptions, 'transform', null, true );
+			$_title = PS::o( $arOptions, 'title', null );
+			$_valueMap = PS::o( $arOptions, 'valueMap', array(), true );
+			$_content = PS::o( $arOptions, 'content', null, true );
 
 			//	Value map...
-			if ( in_array( $oModel->{$sColName}, array_keys( $_arValueMap ) ) && isset( $_arValueMap[$oModel->{$sColName}] ) )
-				$arOptions['value'] = $_arValueMap[$oModel->{$sColName}];
+			if ( in_array( $model->{$attributeName}, array_keys( $_valueMap ) ) && isset( $_valueMap[$model->{$attributeName}] ) )
+				$arOptions['value'] = $_valueMap[$model->{$attributeName}];
 
 			//	Do auto-tooltipping...
-			if ( ! $_sTitle && $oModel && method_exists( $oModel, 'attributeTooltips' ) )
+			if ( ! $_title && $model && method_exists( $model, 'attributeTooltips' ) )
 			{
-				if ( $_arTemp = $oModel->attributeTooltips() )
+				if ( $_arTemp = $model->attributeTooltips() )
 				{
-					if ( isset( $_arTemp[$sColName] ) )
-						$arOptions['title'] = self::encode( $_arTemp[ $sColName ] );
+					if ( isset( $_arTemp[$attributeName] ) )
+						$arOptions['title'] = self::encode( $_arTemp[ $attributeName ] );
 				}
 			}
 
 			//	Denote checkbox/radiobutton labels
-			if ( ! $_sDivClass & ( $eFieldType == self::CHECK || $eFieldType == self::RADIO || $eFieldType == self::CHECKLIST || $eFieldType == self::RADIOLIST ) )
-				$_sDivClass = 'chk_label';
+			if ( ! $_divClass & ( $inputFieldType == self::CHECK || $inputFieldType == self::RADIO || $inputFieldType == self::CHECKLIST || $inputFieldType == self::RADIOLIST ) )
+				$_divClass = 'chk_label';
 
 			//	Need an id for div tag
-			if ( ! isset( $arOptions[ 'id' ] ) ) $arOptions[ 'id' ] = self::getIdByName( self::resolveName( $oModel, $sColName ) );
+			if ( ! isset( $arOptions[ 'id' ] ) ) $arOptions[ 'id' ] = self::getIdByName( self::resolveName( $model, $attributeName ) );
 
 			//	Preset class for hover effects if enabled...
 			if ( isset( self::$m_sOffClass ) && ! isset( $arOptions[ 'class' ] ) )
 				$arOptions[ 'class' ] = self::$m_sOffClass;
 
-			if ( null == $oModel )
-				$_output = self::label( $_sLabel, $arOptions[ 'id' ], $_arLabelOptions );
+			if ( null == $model )
+				$_output = self::label( $_label, $arOptions[ 'id' ], $_labelOptions );
 			else
 			{
 				//	Set label name
-				if ( $_sLabel === false )
-					$_arLabelOptions['label'] = false;
+				if ( $_label === false )
+					$_labelOptions['label'] = false;
 				else
-					$_arLabelOptions['label'] = PS::nvl( $_sLabel, PS::nvl( $oModel->getAttributeLabel( $sColName ), $sColName ) ) . $_sSuffixToUse;
+					$_labelOptions['label'] = PS::nvl( $_label, PS::nvl( $model->getAttributeLabel( $attributeName ), $attributeName ) ) . $_suffixToUse;
 				
-				$_output = ( $eFieldType == PS::TEXT_DISPLAY ? self::activeLabel( $oModel, $sColName, $_arLabelOptions ) : self::activeLabelEx( $oModel, $sColName, $_arLabelOptions ) );
+				$_output = ( $inputFieldType == PS::TEXT_DISPLAY ? self::activeLabel( $model, $attributeName, $_labelOptions ) : self::activeLabelEx( $model, $attributeName, $_labelOptions ) );
 			}
 
 			//	Do a value transform if requested
-			if ( $_sTransform && $oModel ) $oModel->{$sColName} = CPSTransform::valueOf( $_sTransform, $oModel->$sColName );
+			if ( $_transform && $model ) $model->{$attributeName} = CPSTransform::valueOf( $_transform, $model->$attributeName );
 
 			//	Build our field
-			$_output .= $_sPrependHtml;
-			$_output .= ( null !== $_sContent ) ? $_sContent : self::activeField( $eFieldType, $oModel, $sColName, $arOptions, $_arWidgetOptions, $_arData );
+			$_output .= $_prependHtml;
+			$_output .= ( null !== $_content ) ? $_content : self::activeField( $inputFieldType, $model, $attributeName, $arOptions, $_widgetOptions, $_arData );
 			$_output .= $_sHtml;
 
 			$_arDivOpts['id'] = self::$m_sFormFieldContainerPrefix . '_' . PS::nvl( PS::o( $_arDivOpts, 'id' ), $arOptions['id'] );
-			$_arDivOpts['class'] = PS::addClass( $_sDivClass, PS::$m_sFormFieldContainerClass . ' ' . PS::o( $_arDivOpts, 'class' ) );
+			$_arDivOpts['class'] = PS::addClass( $_divClass, PS::$m_sFormFieldContainerClass . ' ' . PS::o( $_arDivOpts, 'class' ) );
 		}
 
 		//	Any hints?
@@ -433,28 +436,28 @@ class CPSWidgetHelper extends CPSHelperBase
 	/**
 	* Adds a simple div block with label and field
 	*
-	* If $sLabel is null, $sColName is used as your label name
+	* If $sLabel is null, $attributeName is used as your label name
 	*
-	* @param string $eFieldType One of the * constants
-	* @param CModel $oModel The model for this form
-	* @param string $sColName The column/attribute name
+	* @param string $inputFieldType One of the * constants
+	* @param CModel $model The model for this form
+	* @param string $attributeName The column/attribute name
 	* @param array $arOptions The htmlOptions for the field
 	* @param string $sLabel The real name of the attribute if different
 	* @param array $arLabelOptions The htmlOptions for the label
-	* @param array $arData Any data necessary for the field (i.e. drop down data)
+	* @param array $listData Any data necessary for the field (i.e. drop down data)
 	* @returns string
 	* @deprecated
 	*/
-	public static function simpleActiveBlock( $eFieldType, $oModel, $sColName, $arOptions = array(), $sLabel = null, $arLabelOptions = array(), $arData = null, $arWidgetOptions = array() )
+	public static function simpleActiveBlock( $inputFieldType, $model, $attributeName, $arOptions = array(), $sLabel = null, $arLabelOptions = array(), $listData = null, $widgetOptions = array() )
 	{
-		return self::field( $eFieldType, $oModel, $sColName,
+		return self::field( $inputFieldType, $model, $attributeName,
 			array_merge(
 				$arOptions,
 				array(
 					'label' => $sLabel,
 					'labelOptions' => $arLabelOptions,
-					'data' => $arData,
-					'widgetOptions' => $arWidgetOptions,
+					'data' => $listData,
+					'widgetOptions' => $widgetOptions,
 				)
 			)
 		);
@@ -463,247 +466,263 @@ class CPSWidgetHelper extends CPSHelperBase
 	/**
 	* Adds an activefield to a form
 	*
-	* There are two special options you can use in $arHtmlOptions:
+	* There are two special options you can use in $htmlOptions:
 	*
 	*   _appendHtml		--	Extra Html code/scripts to be inserted AFTER the form element has been created
 	*   _widget			--	The name of the jQuery UI widget to create when type = self::JQUI
 	*
-	* @param string $eFieldType One of the * constants
-	* @param CModel $oModel The model for this form
-	* @param string $sColName The column/attribute name
-	* @param array $arHtmlOptions The htmlOptions for the field
-	* @param array $arWidgetOptions The widget options for the field
-	* @param array $arData Any data necessary for the field (i.e. drop down data)
+	* @param string $inputFieldType One of the * constants
+	* @param CModel $model The model for this form
+	* @param string $attributeName The column/attribute name
+	* @param array $htmlOptions The htmlOptions for the field
+	* @param array $widgetOptions The widget options for the field
+	* @param array $listData Any data necessary for the field (i.e. drop down data)
 	* @returns string
 	*/
-	public static function activeField( $eFieldType, $oModel, $sColName, $arHtmlOptions = array(), $arWidgetOptions = array(), $arData = null )
+	public static function activeField( $inputFieldType, $model, $attributeName, $htmlOptions = array(), $widgetOptions = array(), $listData = null )
 	{
 		//	Auto set id and name if they aren't already...
-		if ( ! isset( $arHtmlOptions[ 'name' ] ) ) $arHtmlOptions[ 'name' ] = ( null != $oModel ) ? self::resolveName( $oModel, $sColName ) : $sColName;
-		if ( ! isset( $arHtmlOptions[ 'id' ] ) ) $arHtmlOptions[ 'id' ] = self::getIdByName( $arHtmlOptions[ 'name' ] );
+		if ( ! isset( $htmlOptions[ 'name' ] ) ) $htmlOptions[ 'name' ] = ( null != $model ) ? self::resolveName( $model, $attributeName ) : $attributeName;
+		if ( ! isset( $htmlOptions[ 'id' ] ) ) $htmlOptions[ 'id' ] = self::getIdByName( $htmlOptions[ 'name' ] );
 
 		//	Save for callers...
-		self::$m_sLastFieldName = $arHtmlOptions['name'];
-		self::$m_sLastFieldId = $arHtmlOptions['id'];
+		self::$m_sLastFieldName = $htmlOptions['name'];
+		self::$m_sLastFieldId = $htmlOptions['id'];
 
 		//	Non-model field?
-		if ( null === $oModel )
-			return self::inactiveField( $eFieldType, $sColName, $arHtmlOptions, $arWidgetOptions, $arData );
+		if ( null === $model )
+			return self::inactiveField( $inputFieldType, $attributeName, $htmlOptions, $widgetOptions, $listData );
 
 		//	Stuff to put after widget
-		$_sBeforeHtml = null;
-		$_sAppendHtml = PS::o( $arHtmlOptions, '_appendHtml', '', true );
+		$_beforeHtml = null;
+		$_appendHtml = PS::o( $htmlOptions, '_appendHtml', '', true );
 
 		//	Are we validating this form? Add required tags automagically
 		if ( self::$m_bValidating )
 		{
 			//	Get any additional params for validation
-			$_sClass = PS::o( $arHtmlOptions, '_validate', null, true );
-			$_isRequired = ( false !== stripos( PS::o( $arHtmlOptions, 'class' ), 'required' ) );
+			$_sClass = PS::o( $htmlOptions, '_validate', null, true );
+			$_isRequired = ( false !== stripos( PS::o( $htmlOptions, 'class' ), 'required' ) );
 			
-			if ( ! $_isRequired && $oModel->isAttributeRequired( $sColName ) ) PS::addClass( $_sClass, 'required' );
+			if ( ! $_isRequired && $model->isAttributeRequired( $attributeName ) ) PS::addClass( $_sClass, 'required' );
 			
-			if ( ! $_isRequired && $oModel->isAttributeRequired( $sColName ) ) 
+			if ( ! $_isRequired && $model->isAttributeRequired( $attributeName ) )
 			{
 				PS::addClass( $_sClass, 'required' );
-//				PS::addClass( $arHtmlOptions['labelOptions']['class'], 'required' );
-//				$arHtmlOptions['required'] = true;
-//				$arHtmlOptions['labelOptions']['required'] = true;
+//				PS::addClass( $htmlOptions['labelOptions']['class'], 'required' );
+//				$htmlOptions['required'] = true;
+//				$htmlOptions['labelOptions']['required'] = true;
 			}
-			$arHtmlOptions['class'] = trim( PS::addClass( $_sClass, PS::o( $arHtmlOptions, 'class' ) ) );
+			$htmlOptions['class'] = trim( PS::addClass( $_sClass, PS::o( $htmlOptions, 'class' ) ) );
 		}
 
 		//	Get our value...
-		if ( $sColName != ( $_sCleanCol = CPSTransform::cleanColumn( $sColName ) ) )
+		if ( $attributeName != ( $_cleanedAttribute = CPSTransform::cleanColumn( $attributeName ) ) )
 		{
 			//	Use our handy transformer...
-			$sColName = $_sCleanCol;
-			$_oValue = CPSTransform::getValue( $oModel, $sColName );
+			$attributeName = $_cleanedAttribute;
+			$_value = CPSTransform::getValue( $model, $attributeName );
 		}
 		else
-			$_oValue = PS::o( $arHtmlOptions, 'value', $oModel->{$sColName}, true );
+			$_value = PS::o( $htmlOptions, 'value', $model->{$attributeName}, true );
 
 		//	Handle custom drop downs...
-		if ( self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, PS::nvl( $oModel->{$sColName} ) ) )
-			$eFieldType = self::DROPDOWN;
+		if ( self::setDropDownValues( $inputFieldType, $htmlOptions, $listData, PS::nvl( $model->{$attributeName} ) ) )
+			$inputFieldType = self::DROPDOWN;
 
 		//	Handle special types...
-		switch ( $eFieldType )
+		switch ( $inputFieldType )
 		{
 			case self::TEXT_DISPLAY:
-				$arHtmlOptions['style'] = PS::o( $arHtmlOptions, 'style' ) . ' border:none; background-color: transparent;';
-				$arHtmlOptions['class'] = PS::addClass( $arOptions['class'], 'ps-text-display' );
-				$arHtmlOptions['readonly'] = 'readonly';
-				$arHtmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', CPSTransform::valueOf( '*', $oModel->$sColName ) ) );
-				$eFieldType = self::TEXT;
+				$htmlOptions['style'] = PS::o( $htmlOptions, 'style' ) . ' border:none; background-color: transparent;';
+				$htmlOptions['class'] = PS::addClass( $arOptions['class'], 'ps-text-display' );
+				$htmlOptions['readonly'] = 'readonly';
+				$htmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', CPSTransform::valueOf( '*', $model->$attributeName ) ) );
+				$inputFieldType = self::TEXT;
 				break;
 
 			//	Build a jQuery UI widget
 			case self::JQUI:
-				if ( isset( $arHtmlOptions[ '_widget' ] ) )
+				if ( isset( $htmlOptions[ '_widget' ] ) )
 				{
-					$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
-					$arWidgetOptions[ 'id' ] = $arHtmlOptions[ 'id' ];
-					$_sWidget = $arHtmlOptions[ '_widget' ];
-					unset( $arHtmlOptions[ '_widget' ] );
-					CPSjqUIWrapper::create( $_sWidget, $arWidgetOptions );
-					$eFieldType = self::TEXT;
+					$widgetOptions[ 'name' ] = $htmlOptions[ 'name' ];
+					$widgetOptions[ 'id' ] = $htmlOptions[ 'id' ];
+					$_sWidget = $htmlOptions[ '_widget' ];
+					unset( $htmlOptions[ '_widget' ] );
+					CPSjqUIWrapper::create( $_sWidget, $widgetOptions );
+					$inputFieldType = self::TEXT;
 				}
 				break;
 
 			//	Build a McDropdown
 			case self::MCDROPDOWN:
-				$arWidgetOptions[ 'linkText' ] = false;
-				$_sTarget = PS::o( $arWidgetOptions, 'target', $arHtmlOptions['id'] );
-				$_sTargetMenu = PS::o( $arWidgetOptions, 'targetMenu', $arHtmlOptions['id'] . '_menu' );
-				$_sValueColumn = PS::o( $arHtmlOptions, 'valueColumn' );
+				$widgetOptions[ 'linkText' ] = false;
+				$_sTarget = PS::o( $widgetOptions, 'target', $htmlOptions['id'] );
+				$_sTargetMenu = PS::o( $widgetOptions, 'targetMenu', $htmlOptions['id'] . '_menu' );
+				$_sValueColumn = PS::o( $htmlOptions, 'valueColumn' );
 
 				//	Insert text field...
-				$_output = PS::textField( $arHtmlOptions['name'], $_oValue, array( 'id' => $arHtmlOptions['id'] ) );
+				$_output = PS::textField( $htmlOptions['name'], $_value, array( 'id' => $htmlOptions['id'] ) );
 
 				//	Create menu...
-				$_output .= CPSTransform::asUnorderedList( $arData, array( 'class' => 'mcdropdown_menu', 'valueColumn' => $_sValueColumn, 'linkText' => false, 'id' => $_sTargetMenu ) );
+				$_output .= CPSTransform::asUnorderedList( $listData, array( 'class' => 'mcdropdown_menu', 'valueColumn' => $_sValueColumn, 'linkText' => false, 'id' => $_sTargetMenu ) );
 
-				$arWidgetOptions['target'] = $_sTarget;
-				$arWidgetOptions['targetMenu'] = $_sTargetMenu;
+				$widgetOptions['target'] = $_sTarget;
+				$widgetOptions['targetMenu'] = $_sTargetMenu;
 
-				CPSMcDropdownWidget::create( null, $arWidgetOptions );
-				return $_sBeforeHtml . $_output . $_sAppendHtml;
+				CPSMcDropdownWidget::create( null, $widgetOptions );
+				return $_beforeHtml . $_output . $_appendHtml;
 
 			//	Build a Filament Group menu
 			case self::FG_MENU:
 				ob_start();
-				$arWidgetOptions[ 'prompt' ] = PS::o( $arHtmlOptions, 'prompt', 'Select One...', true );
-				CPSfgMenu::create( null, $arWidgetOptions );
+				$widgetOptions[ 'prompt' ] = PS::o( $htmlOptions, 'prompt', 'Select One...', true );
+				CPSfgMenu::create( null, $widgetOptions );
 				$_output = ob_get_contents();
 				ob_end_clean();
-				return $_sBeforeHtml . $_output . $_sAppendHtml;
+				return $_beforeHtml . $_output . $_appendHtml;
 
 			//	Default for text field
 			case self::TEXT:
 				//	Masked input?
-				$_sMask = PS::o( $arHtmlOptions, 'mask', null, true );
-				if ( ! empty( $_sMask ) ) $_oMask = CPSjqMaskedInputWrapper::create( null, array( 'target' => '#' . $arHtmlOptions[ 'id' ], 'mask' => $_sMask ) );
+				$_sMask = PS::o( $htmlOptions, 'mask', null, true );
+				if ( ! empty( $_sMask ) ) $_oMask = CPSjqMaskedInputWrapper::create( null, array( 'target' => '#' . $htmlOptions[ 'id' ], 'mask' => $_sMask ) );
 
-				if ( ! isset( $arHtmlOptions[ 'size' ] ) )
-					$arHtmlOptions[ 'size' ] = 60;
+				if ( ! isset( $htmlOptions[ 'size' ] ) )
+					$htmlOptions[ 'size' ] = 60;
 				break;
 
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
-				CPSWysiwygWidget::create( null, array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
-				$eFieldType = self::TEXTAREA;
+				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
+				$inputFieldType = self::TEXTAREA;
 				break;
 
 			//	CKEditor Plug-in
 			case self::CKEDITOR:
-				CPSCKEditorWidget::create( null, array_merge( $arWidgetOptions, array( 'autoRun' => true, 'target' => $arHtmlOptions[ 'id' ] ) ) );
-				$eFieldType = self::TEXTAREA;
+				CPSCKEditorWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'target' => $htmlOptions[ 'id' ] ) ) );
+				$inputFieldType = self::TEXTAREA;
 				break;
 
 			//	markItUp! Plug-in
 			case self::MARKITUP:
-				$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
-				$arWidgetOptions[ 'id' ] = $arHtmlOptions[ 'id' ];
-				CPSMarkItUpWidget::create( null, $arWidgetOptions );
-				$eFieldType = self::TEXTAREA;
+				$widgetOptions[ 'name' ] = $htmlOptions[ 'name' ];
+				$widgetOptions[ 'id' ] = $htmlOptions[ 'id' ];
+				CPSMarkItUpWidget::create( null, $widgetOptions );
+				$inputFieldType = self::TEXTAREA;
 				break;
 
 			case self::CAPTCHA:
 				$arOptions['hint'] = 'Please enter the letters as they are shown in the image above.<br />Letters are not case-sensitive.';
 				ob_start();
 				echo PS::openTag( 'div', array( 'class' => 'ps-captcha-container' ) );
-				Yii::app()->getController()->widget( self::CAPTCHA, $arWidgetOptions );
+				Yii::app()->getController()->widget( self::CAPTCHA, $widgetOptions );
 				echo PS::closeTag( 'div' );
-				$_sBeforeHtml = ob_get_contents();
+				$_beforeHtml = ob_get_contents();
 				ob_end_clean();
-				$eFieldType = self::TEXT;
+				$inputFieldType = self::TEXT;
 				break;
 
 			//	These guys need data in third parameter
 			case self::DROPDOWN:
 				//	Auto-set prompt if not there...
-				if ( ! isset( $arHtmlOptions[ 'noprompt' ] ) ) $arHtmlOptions[ 'prompt' ] = PS::o( $arHtmlOptions, 'prompt', 'Select One...', true );
+				if ( ! isset( $htmlOptions[ 'noprompt' ] ) ) $htmlOptions[ 'prompt' ] = PS::o( $htmlOptions, 'prompt', 'Select One...', true );
 				//	Intentionally fall through to next block...
 
 			case self::CHECKLIST:
 			case self::RADIOLIST:
 			case self::LISTBOX:
-				return self::$eFieldType( $oModel, $sColName, $arData, $arHtmlOptions );
+				return self::$inputFieldType( $model, $attributeName, $listData, $htmlOptions );
 		}
 
-		return $_sBeforeHtml . self::$eFieldType( $oModel, $sColName, $arHtmlOptions ) . $_sAppendHtml;
+		$_fieldOutput = null;
+
+		try
+		{
+			CPSLog::trace( __METHOD__, 'Rendering field "' . $attributeName . '" of type "' . $inputFieldType . '"' );
+
+			if ( method_exists( 'CPSWidgetHelper', $inputFieldType ) )
+				$_fieldOutput = self::$inputFieldType( $model, $attributeName, $htmlOptions );
+			else
+				throw new Exception( 'Unknown input field type: ' . $inputFieldType );
+		}
+		catch ( Exception $_ex )
+		{
+			CPSLog::error( __METHOD__, 'Error rendering field "' . $attributeName . '" of type "' . $inputFieldType . '": ' . $_ex->getMessage() );
+		}
+
+		return $_beforeHtml . $_fieldOutput . $_appendHtml;
 	}
 
 	/**
 	* Adds a non-model field to a form
 	*
-	* There are two special options you can use in $arHtmlOptions:
+	* There are two special options you can use in $htmlOptions:
 	*
 	*   _appendHtml		--	Extra Html code/scripts to be inserted AFTER the form element has been created
 	*   _widget			--	The name of the jQuery UI widget to create when type = self::JQUI
 	*
-	* @param string $eFieldType One of the * constants
-	* @param string $sColName The column/attribute name
-	* @param array $arHtmlOptions The htmlOptions for the field
-	* @param array $arWidgetOptions The widget options for the field
-	* @param array $arData Any data necessary for the field (i.e. drop down data)
+	* @param string $inputFieldType One of the * constants
+	* @param string $attributeName The column/attribute name
+	* @param array $htmlOptions The htmlOptions for the field
+	* @param array $widgetOptions The widget options for the field
+	* @param array $listData Any data necessary for the field (i.e. drop down data)
 	* @returns string
 	*/
-	public static function inactiveField( $eFieldType, $sColName, $arHtmlOptions = array(), $arWidgetOptions = array(), $arData = null )
+	public static function inactiveField( $inputFieldType, $attributeName, $htmlOptions = array(), $widgetOptions = array(), $listData = null )
 	{
 		//	Settings
-		$_sBeforeHtml = null;
-		$_sAppendHtml = PS::o( $arHtmlOptions, '_appendHtml', '', true );
-		$_oValue = PS::o( $arHtmlOptions, 'value', null, true );
+		$_beforeHtml = null;
+		$_appendHtml = PS::o( $htmlOptions, '_appendHtml', '', true );
+		$_value = PS::o( $htmlOptions, 'value', null, true );
 
 		//	Handle special types...
-		switch ( $eFieldType )
+		switch ( $inputFieldType )
 		{
 			//	Build a jQuery UI widget
 			case self::JQUI:
-				if ( isset( $arHtmlOptions[ '_widget' ] ) )
+				if ( isset( $htmlOptions[ '_widget' ] ) )
 				{
-					$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
-					$arWidgetOptions[ 'id' ] = $arHtmlOptions[ 'id' ];
-					$_sWidget = $arHtmlOptions[ '_widget' ];
-					unset( $arHtmlOptions[ '_widget' ] );
-					CPSjqUIWrapper::create( $_sWidget, $arWidgetOptions );
+					$widgetOptions[ 'name' ] = $htmlOptions[ 'name' ];
+					$widgetOptions[ 'id' ] = $htmlOptions[ 'id' ];
+					$_sWidget = $htmlOptions[ '_widget' ];
+					unset( $htmlOptions[ '_widget' ] );
+					CPSjqUIWrapper::create( $_sWidget, $widgetOptions );
 					$_sType = 'text';
 				}
 				break;
 
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
-				CPSWysiwygWidget::create( null, array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
+				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
 				$_sType = 'textarea';
 				break;
 
 			//	markItUp! Plug-in
 			case self::MARKITUP:
-				$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
-				$arWidgetOptions[ 'id' ] = $arHtmlOptions[ 'id' ];
-				CPSMarkItUpWidget::create( null, $arWidgetOptions );
+				$widgetOptions[ 'name' ] = $htmlOptions[ 'name' ];
+				$widgetOptions[ 'id' ] = $htmlOptions[ 'id' ];
+				CPSMarkItUpWidget::create( null, $widgetOptions );
 				$_sType = 'textarea';
 				break;
 
 			case self::TEXT_DISPLAY:
-				$arHtmlOptions['style'] = PS::o( $arHtmlOptions, 'style' ) . ' border:none; background-color: transparent;';
-				$arHtmlOptions['readonly'] = 'readonly';
+				$htmlOptions['style'] = PS::o( $htmlOptions, 'style' ) . ' border:none; background-color: transparent;';
+				$htmlOptions['readonly'] = 'readonly';
 				$_sType = 'text';
 				break;
 
 			default:
-				$_sType = PS::o( self::$m_arInputMap, $eFieldType );
+				$_sType = PS::o( self::$m_arInputMap, $inputFieldType );
 				break;
 		}
 
 		//	Do drop downs...
-		if ( null != ( $arData = self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, $_oValue ) ) )
-			return parent::dropDownList( $sColName, $_oValue, $arData, $arHtmlOptions );
+		if ( null != ( $listData = self::setDropDownValues( $inputFieldType, $htmlOptions, $listData, $_value ) ) )
+			return parent::dropDownList( $attributeName, $_value, $listData, $htmlOptions );
 
 		//	Otherwise output the field if we have a type
-		if ( null != $_sType ) return self::inputField( $_sType, $sColName, $_oValue, $arHtmlOptions );
+		if ( null != $_sType ) return self::inputField( $_sType, $attributeName, $_value, $htmlOptions );
 
 		//	No clue...
 		return;
@@ -712,136 +731,136 @@ class CPSWidgetHelper extends CPSHelperBase
 		if ( self::$m_bValidating )
 		{
 			//	Get any additional params for validation
-			$_sClass = PS::o( $arHtmlOptions, '_validate', null, true );
-			if ( $oModel->isAttributeRequired( $sColName ) ) PS::addClass( $_sClass, 'required' );
-			$_sClass = ' ' . PS::o( $arHtmlOptions, 'class', null );
-			$arHtmlOptions['class'] = trim( $_sClass );
+			$_sClass = PS::o( $htmlOptions, '_validate', null, true );
+			if ( $model->isAttributeRequired( $attributeName ) ) PS::addClass( $_sClass, 'required' );
+			$_sClass = ' ' . PS::o( $htmlOptions, 'class', null );
+			$htmlOptions['class'] = trim( $_sClass );
 		}
 
 		//	Get our value...
-		if ( $sColName != ( $_sCleanCol = CPSTransform::cleanColumn( $sColName ) ) )
+		if ( $attributeName != ( $_cleanedAttribute = CPSTransform::cleanColumn( $attributeName ) ) )
 		{
 			//	Use our handy transformer...
-			$sColName = $_sCleanCol;
-			$_oValue = CPSTransform::getValue( $oModel, $sColName );
+			$attributeName = $_cleanedAttribute;
+			$_value = CPSTransform::getValue( $model, $attributeName );
 		}
 		else
-			$_oValue = PS::o( $arHtmlOptions, 'value', $oModel->{$sColName}, true );
+			$_value = PS::o( $htmlOptions, 'value', $model->{$attributeName}, true );
 
 		//	Handle custom drop downs...
-		if ( self::setDropDownValues( $eFieldType, $arHtmlOptions, $arData, PS::nvl( $oModel->{$sColName} ) ) )
-			$eFieldType = self::DROPDOWN;
+		if ( null !== self::setDropDownValues( $inputFieldType, $htmlOptions, $listData, PS::nvl( $model->{$attributeName} ) ) )
+			$inputFieldType = self::DROPDOWN;
 
 		//	Handle special types...
-		switch ( $eFieldType )
+		switch ( $inputFieldType )
 		{
 			case self::TEXT_DISPLAY:
-				$arHtmlOptions['style'] = PS::o( $arHtmlOptions, 'style' ) . ' border:none; background-color: transparent;';
-				$eFieldType = self::TEXT;
+				$htmlOptions['style'] = PS::o( $htmlOptions, 'style' ) . ' border:none; background-color: transparent;';
+				$inputFieldType = self::TEXT;
 				break;
 
 			//	Build a jQuery UI widget
 			case self::JQUI:
-				if ( isset( $arHtmlOptions[ '_widget' ] ) )
+				if ( isset( $htmlOptions[ '_widget' ] ) )
 				{
-					$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
-					$arWidgetOptions[ 'id' ] = $arHtmlOptions[ 'id' ];
-					$_sWidget = $arHtmlOptions[ '_widget' ];
-					unset( $arHtmlOptions[ '_widget' ] );
-					CPSjqUIWrapper::create( $_sWidget, $arWidgetOptions );
-					$eFieldType = self::TEXT;
+					$widgetOptions[ 'name' ] = $htmlOptions[ 'name' ];
+					$widgetOptions[ 'id' ] = $htmlOptions[ 'id' ];
+					$_sWidget = $htmlOptions[ '_widget' ];
+					unset( $htmlOptions[ '_widget' ] );
+					CPSjqUIWrapper::create( $_sWidget, $widgetOptions );
+					$inputFieldType = self::TEXT;
 				}
 				break;
 
 			//	Build a Filament Group menu
 			case self::FG_MENU:
 				ob_start();
-				$arWidgetOptions[ 'prompt' ] = PS::o( $arHtmlOptions, 'prompt', 'Select One...', true );
-				CPSfgMenu::create( null, $arWidgetOptions );
+				$widgetOptions[ 'prompt' ] = PS::o( $htmlOptions, 'prompt', 'Select One...', true );
+				CPSfgMenu::create( null, $widgetOptions );
 				$_output = ob_get_contents();
 				ob_end_clean();
-				return $_sBeforeHtml . $_output . $_sAppendHtml;
+				return $_beforeHtml . $_output . $_appendHtml;
 
 			//	Default for text field
 			case self::TEXT:
 				//	Masked input?
-				$_sMask = PS::o( $arHtmlOptions, 'mask', null, true );
-				if ( ! empty( $_sMask ) ) $_oMask = CPSjqMaskedInputWrapper::create( null, array( 'target' => '#' . $arHtmlOptions[ 'id' ], 'mask' => $_sMask ) );
+				$_sMask = PS::o( $htmlOptions, 'mask', null, true );
+				if ( ! empty( $_sMask ) ) $_oMask = CPSjqMaskedInputWrapper::create( null, array( 'target' => '#' . $htmlOptions[ 'id' ], 'mask' => $_sMask ) );
 
-				if ( ! isset( $arHtmlOptions[ 'size' ] ) )
-					$arHtmlOptions[ 'size' ] = 60;
+				if ( ! isset( $htmlOptions[ 'size' ] ) )
+					$htmlOptions[ 'size' ] = 60;
 				break;
 
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
-				CPSWysiwygWidget::create( null, array_merge( $arWidgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
-				$eFieldType = self::TEXTAREA;
+				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
+				$inputFieldType = self::TEXTAREA;
 				break;
 
 			//	CKEditor Plug-in
 			case self::CKEDITOR:
-				CPSCKEditorWidget::create( null, array_merge( $arWidgetOptions, array( 'autoRun' => true, 'target' => $arHtmlOptions[ 'id' ] ) ) );
-				$eFieldType = self::TEXTAREA;
+				CPSCKEditorWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'target' => $htmlOptions[ 'id' ] ) ) );
+				$inputFieldType = self::TEXTAREA;
 				break;
 
 			//	markItUp! Plug-in
 			case self::MARKITUP:
-				$arWidgetOptions[ 'name' ] = $arHtmlOptions[ 'name' ];
-				$arWidgetOptions[ 'id' ] = $arHtmlOptions[ 'id' ];
-				CPSMarkItUpWidget::create( null, $arWidgetOptions );
-				$eFieldType = self::TEXTAREA;
+				$widgetOptions[ 'name' ] = $htmlOptions[ 'name' ];
+				$widgetOptions[ 'id' ] = $htmlOptions[ 'id' ];
+				CPSMarkItUpWidget::create( null, $widgetOptions );
+				$inputFieldType = self::TEXTAREA;
 				break;
 
 			case self::CAPTCHA:
 				$arOptions['hint'] = 'Please enter the letters as they are shown in the image above.<br />Letters are not case-sensitive.';
 				ob_start();
 				echo PS::openTag( 'div', array( 'class' => 'ps-captcha-container' ) );
-				Yii::app()->getController()->widget( self::CAPTCHA, $arWidgetOptions );
+				Yii::app()->getController()->widget( self::CAPTCHA, $widgetOptions );
 				echo PS::closeTag( 'div' );
-				$_sBeforeHtml = ob_get_contents();
+				$_beforeHtml = ob_get_contents();
 				ob_end_clean();
-				$eFieldType = self::TEXT;
+				$inputFieldType = self::TEXT;
 				break;
 
 			//	These guys need data in third parameter
 			case self::DROPDOWN:
 				//	Auto-set prompt if not there...
-				if ( ! isset( $arHtmlOptions[ 'noprompt' ] ) ) $arHtmlOptions[ 'prompt' ] = PS::o( $arHtmlOptions, 'prompt', 'Select One...', true );
+				if ( ! isset( $htmlOptions[ 'noprompt' ] ) ) $htmlOptions[ 'prompt' ] = PS::o( $htmlOptions, 'prompt', 'Select One...', true );
 				//	Intentionally fall through to next block...
 
 			case self::CHECKLIST:
 			case self::RADIOLIST:
 			case self::LISTBOX:
-				return self::$eFieldType( $oModel, $sColName, $arData, $arHtmlOptions );
+				return self::$inputFieldType( $model, $attributeName, $listData, $htmlOptions );
 		}
 
-		return $_sBeforeHtml . self::$eFieldType( $oModel, $sColName, $arHtmlOptions ) . $_sAppendHtml;
+		return $_beforeHtml . self::$inputFieldType( $model, $attributeName, $htmlOptions ) . $_appendHtml;
 	}
 
 	/**
 	* Create a drop downlist filled with codes give a code type.
 	*
-	* @param CModel $oModel
+	* @param CModel $model
 	* @param string $sAttribute
-	* @param array $arHtmlOptions
+	* @param array $htmlOptions
 	* @param integer $iDefaultUID
 	* @return string
 	*/
-	public static function activeCodeDropDownList( $oModel, $sAttribute, &$arHtmlOptions = array(), $iDefaultUID = 0 )
+	public static function activeCodeDropDownList( $model, $sAttribute, &$htmlOptions = array(), $iDefaultUID = 0 )
 	{
-		if ( null != ( $_sCodeModel = PS::o( $arHtmlOptions, 'codeModel', self::$m_sCodeModel, true ) ) )
+		if ( null != ( $_sCodeModel = PS::o( $htmlOptions, 'codeModel', self::$m_sCodeModel, true ) ) )
 		{
 			$_model = new $_sCodeModel;
 
 			if ( $_model instanceof CPSCodeTableModel )
 			{
-				$_sValType = strtoupper( PS::o( $arHtmlOptions, 'codeType', $sAttribute, true ) );
-				$_sValAbbr = strtoupper( PS::o( $arHtmlOptions, 'codeAbbr', null, true ) );
-				$_valueFilter = PS::o( $arHtmlOptions, 'valueFilter', null, true );
+				$_sValType = strtoupper( PS::o( $htmlOptions, 'codeType', $sAttribute, true ) );
+				$_sValAbbr = strtoupper( PS::o( $htmlOptions, 'codeAbbr', null, true ) );
+				$_valueFilter = PS::o( $htmlOptions, 'valueFilter', null, true );
 				$_model->setValueFilter( $_valueFilter );
-				if ( ! $_sValAbbr ) $_sValAbbr = PS::o( $arHtmlOptions, 'codeAbbreviation', null, true );
-				$_sValId = PS::o( $arHtmlOptions, 'codeId', null, true );
-				$_sSort = PS::o( $arHtmlOptions, 'sortOrder', 'code_desc_text', true );
+				if ( ! $_sValAbbr ) $_sValAbbr = PS::o( $htmlOptions, 'codeAbbreviation', null, true );
+				$_sValId = PS::o( $htmlOptions, 'codeId', null, true );
+				$_sSort = PS::o( $htmlOptions, 'sortOrder', 'code_desc_text', true );
 				$_arOptions = array();
 
 				if ( $_sValId )
@@ -851,13 +870,13 @@ class CPSWidgetHelper extends CPSHelperBase
 				elseif ( $_sValAbbr )
 					$_arOptions = self::listData( $_model->findAllByAbbreviation( $_sValAbbr, $_sValType, $_sSort ), 'id', 'code_desc_text' );
 
-				if ( isset( $arHtmlOptions[ 'multiple' ] ) )
+				if ( isset( $htmlOptions[ 'multiple' ] ) )
 				{
-					if ( substr( $arHtmlOptions[ 'name' ], -2 ) !== '[]' )
-						$arHtmlOptions[ 'name' ] .= '[]';
+					if ( substr( $htmlOptions[ 'name' ], -2 ) !== '[]' )
+						$htmlOptions[ 'name' ] .= '[]';
 				}
 
-				return self::activeDropDownList( $oModel, $sAttribute, $_arOptions, $arHtmlOptions );
+				return self::activeDropDownList( $model, $sAttribute, $_arOptions, $htmlOptions );
 			}
 		}
 	}
@@ -865,34 +884,34 @@ class CPSWidgetHelper extends CPSHelperBase
 	/**
 	* Create a drop downlist filled with data from a table
 	*
-	* @param CModel $oModel
+	* @param CModel $model
 	* @param string $sAttribute
-	* @param array $arHtmlOptions
+	* @param array $htmlOptions
 	* @param integer $iDefaultUID
 	* @return string
 	*/
-	public static function activeDataDropDownList( $oModel, $sAttribute, &$arHtmlOptions = array(), $iDefaultUID = 0 )
+	public static function activeDataDropDownList( $model, $sAttribute, &$htmlOptions = array(), $iDefaultUID = 0 )
 	{
-		if ( null != ( $_sModel = PS::o( $arHtmlOptions, 'dataModel', null, true ) ) )
+		if ( null != ( $_sModel = PS::o( $htmlOptions, 'dataModel', null, true ) ) )
 		{
 			$_oModel = new $_sModel;
 
-			$_sId = PS::o( $arHtmlOptions, 'dataId', 'id', true );
-			$_sName = PS::o( $arHtmlOptions, 'dataName', null, true );
-			$_condition = PS::o( $arHtmlOptions, 'dataCondition', null, true );
-			$_order = PS::o( $arHtmlOptions, 'dataOrder', null, true );
+			$_sId = PS::o( $htmlOptions, 'dataId', 'id', true );
+			$_sName = PS::o( $htmlOptions, 'dataName', null, true );
+			$_condition = PS::o( $htmlOptions, 'dataCondition', null, true );
+			$_order = PS::o( $htmlOptions, 'dataOrder', null, true );
 
 			if ( $_sId && $_sName )
 			{
 				$_arOptions = self::listData( $_oModel->findAll( array( 'select' => $_sId . ', ' . $_sName, 'order' => PS::nvl( $_order, $_sName ), 'condition' => $_condition ) ), $_sId, $_sName );
 
-				if ( isset( $arHtmlOptions[ 'multiple' ] ) )
+				if ( isset( $htmlOptions[ 'multiple' ] ) )
 				{
-					if ( substr( $arHtmlOptions[ 'name' ], -2 ) !== '[]' )
-						$arHtmlOptions[ 'name' ] .= '[]';
+					if ( substr( $htmlOptions[ 'name' ], -2 ) !== '[]' )
+						$htmlOptions[ 'name' ] .= '[]';
 				}
 
-				return self::activeDropDownList( $oModel, $sAttribute, $_arOptions, $arHtmlOptions );
+				return self::activeDropDownList( $model, $sAttribute, $_arOptions, $htmlOptions );
 			}
 		}
 
@@ -1007,7 +1026,7 @@ CSS;
 	{
 		$_output = null;
 		$_sValue = PS::o( $arOptions, 'value', null, true );
-		$_sLabelClass = PS::o( $arOptions, 'labelClass', null, true );
+		$_labelClass = PS::o( $arOptions, 'labelClass', null, true );
 
 		if ( $sLabel ) $_output = self::label( $sLabel, $sName, $arOptions );
 
@@ -1044,27 +1063,27 @@ CSS;
 	 * @since 1.0.4
 	 * @see endForm
 	 */
-	public static function beginForm( $sAction = '', $sMethod = 'POST', $arHtmlOptions = array() )
+	public static function beginForm( $sAction = '', $sMethod = 'POST', $htmlOptions = array() )
 	{
-		$_validListateOptions = PS::o( $arHtmlOptions, 'validateOptions', array(), true );
+		$_validListateOptions = PS::o( $htmlOptions, 'validateOptions', array(), true );
 
-		if ( PS::o( $arHtmlOptions, 'validate', false, true ) )
+		if ( PS::o( $htmlOptions, 'validate', false, true ) )
 		{
 			self::$m_bValidating = true;
-			if ( ! isset( $_validListateOptions['target'] ) ) $_validListateOptions['target'] = self::getFormSelector( $arHtmlOptions );
+			if ( ! isset( $_validListateOptions['target'] ) ) $_validListateOptions['target'] = self::getFormSelector( $htmlOptions );
 			CPSjqValidate::create( null, $_validListateOptions );
 		}
 
-		if ( PS::o( $arHtmlOptions, 'selectmenu', false, true ) )
-			CPSjqSelectMenu::create( null, array( 'target' => self::getFormSelector( $arHtmlOptions ) ) );
+		if ( PS::o( $htmlOptions, 'selectmenu', false, true ) )
+			CPSjqSelectMenu::create( null, array( 'target' => self::getFormSelector( $htmlOptions ) ) );
 
-		if ( $_sFormTitle = PS::o( $arHtmlOptions, 'formTitle', null, true ) )
-			echo PS::tag( PS::o( $arHtmlOptions, 'formTitleTag', 'h1', true ), array(), $_sFormTitle );
+		if ( $_sFormTitle = PS::o( $htmlOptions, 'formTitle', null, true ) )
+			echo PS::tag( PS::o( $htmlOptions, 'formTitleTag', 'h1', true ), array(), $_sFormTitle );
 
 		//	Grab current form id
-		self::$m_sCurrentFormId = PS::o( $arHtmlOptions, 'id' );
+		self::$m_sCurrentFormId = PS::o( $htmlOptions, 'id' );
 
-		return parent::beginForm( $sAction, $sMethod, $arHtmlOptions );
+		return parent::beginForm( $sAction, $sMethod, $htmlOptions );
 	}
 
 	/**
@@ -1179,9 +1198,9 @@ CSS;
 		$_sType = PS::o( $arOptions, '_forType', 'text' );
 		$_bRequired = PS::o( $arOptions, '_required', false );
 		$arOptions[ 'id' ] = $arOptions['name'] = self::getIdPrefix( 'label' ) . $sName;
-		$_sSuffixToUse = PS::o( $arOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
+		$_suffixToUse = PS::o( $arOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
 
-		return self::tag( 'label', $arOptions, ( ( $sLabel == null ) ? $sName : $sLabel ) . $_sSuffixToUse . self::getRequiredLabel() ) ;
+		return self::tag( 'label', $arOptions, ( ( $sLabel == null ) ? $sName : $sLabel ) . $_suffixToUse . self::getRequiredLabel() ) ;
 	}
 
 	/**
@@ -1192,15 +1211,15 @@ CSS;
 	 * @return string the generated button tag
 	 * @see clientChange
 	 */
-	public static function submitButton( $sLabel = 'Submit', $arHtmlOptions = array() )
+	public static function submitButton( $sLabel = 'Submit', $htmlOptions = array() )
 	{
-		$arHtmlOptions['type'] = 'submit';
+		$htmlOptions['type'] = 'submit';
 
 		//	jQUI Button?
-		if ( PS::o( $arHtmlOptions, 'jqui', false, true ) ) return self::jquiButton( $sLabel, '_submit_', $arHtmlOptions );
+		if ( PS::o( $htmlOptions, 'jqui', false, true ) ) return self::jquiButton( $sLabel, '_submit_', $htmlOptions );
 
 		//	Otherwise use regular button
-		return self::button( $sLabel, $arHtmlOptions );
+		return self::button( $sLabel, $htmlOptions );
 	}
 
 	/**
@@ -1213,23 +1232,23 @@ CSS;
 	* barLeft		If true, submit button will be flush left instead of the default flush right
 	* barCenter		If true, submit button will be centered instead of the default flush right
 	*
-	* @param array $arHtmlOptions HTML options for the submit button.
+	* @param array $htmlOptions HTML options for the submit button.
 	*/
-	public static function beginButtonBar( $arHtmlOptions = array() )
+	public static function beginButtonBar( $htmlOptions = array() )
 	{
-		$_bDialog = PS::o( $arHtmlOptions, 'jquiDialog', false );
+		$_bDialog = PS::o( $htmlOptions, 'jquiDialog', false );
 
 		//	Get orientation of buttons
-		if ( PS::o( $arHtmlOptions, 'barLeft' ) )
+		if ( PS::o( $htmlOptions, 'barLeft' ) )
 			$_sDirClass = 'ps-submit-button-bar-left';
-		else if ( PS::o( $arHtmlOptions, 'barCenter' ) )
+		else if ( PS::o( $htmlOptions, 'barCenter' ) )
 			$_sDirClass = 'ps-submit-button-bar-center';
 		else
 			$_sDirClass = 'ps-submit-button-bar-right';
 
-		$_sClass = PS::o( $arHtmlOptions, 'barClass', $_bDialog ? '.ui-dialog .ui-dialog-buttonpane' : 'ps-submit-button-bar' ) . ' ' . $_sDirClass;
+		$_sClass = PS::o( $htmlOptions, 'barClass', $_bDialog ? '.ui-dialog .ui-dialog-buttonpane' : 'ps-submit-button-bar' ) . ' ' . $_sDirClass;
 
-		if ( ! $_bNoBorder = PS::o( $arHtmlOptions, 'noBorder', false ) ) $_sClass .= ' ps-submit-button-bar-border';
+		if ( ! $_bNoBorder = PS::o( $htmlOptions, 'noBorder', false ) ) $_sClass .= ' ps-submit-button-bar-border';
 
 		return PS::openTag( 'div', array( 'class' => $_sClass ) );
 	}
@@ -1254,19 +1273,19 @@ CSS;
 	* barCenter		If true, submit button will be centered instead of the default flush right
 	*
 	* @param string $sLable The button label
-	* @param array $arHtmlOptions HTML options for the submit button.
+	* @param array $htmlOptions HTML options for the submit button.
 	* @returns string The generated button tag
 	* @see clientChange
 	*/
-	public static function submitButtonBar( $sLabel = 'Submit', $arHtmlOptions = array() )
+	public static function submitButtonBar( $sLabel = 'Submit', $htmlOptions = array() )
 	{
 		$_sLegend = null;
 		
 		//	Make sure current form id is set if we have it...
-		$arHtmlOptions['formId'] = PS::o( $arHtmlOptions, 'formId', self::$m_sCurrentFormId );
+		$htmlOptions['formId'] = PS::o( $htmlOptions, 'formId', self::$m_sCurrentFormId );
 		if ( self::$_showRequiredLabel && trim( self::$afterRequiredLabel ) ) $_sLegend = '<span class="ps-form-legend"><span class="required">' . self::getRequiredLabel() . '</span> denotes required fields</span>';
 
-		return self::beginButtonBar( $arHtmlOptions ) . $_sLegend . self::submitButton( $sLabel, $arHtmlOptions ) . self::endButtonBar();
+		return self::beginButtonBar( $htmlOptions ) . $_sLegend . self::submitButton( $sLabel, $htmlOptions ) . self::endButtonBar();
 	}
 
 	/****
@@ -1364,17 +1383,17 @@ HTML;
 	/**
 	* Formats the created and modified dates
 	*
-	* @param mixed $oModel
+	* @param mixed $model
 	* @deprecated This method has been moved to CPSModel
 	*/
-	public static function showDates( $oModel, $sCreatedColumn = 'created', $sModifiedColumn = 'modified', $sDateFormat = 'm/d/Y h:i:s A' )
+	public static function showDates( $model, $sCreatedColumn = 'created', $sModifiedColumn = 'modified', $sDateFormat = 'm/d/Y h:i:s A' )
 	{
 		$_output = null;
 
-		if ( $oModel->hasAttribute( $sCreatedColumn ) && $oModel->hasAttribute( $sModifiedColumn ) )
+		if ( $model->hasAttribute( $sCreatedColumn ) && $model->hasAttribute( $sModifiedColumn ) )
 		{
-			$_dtCreate = strtotime( $oModel->$sCreatedColumn );
-			$_dtLMod = strtotime( $oModel->$sModifiedColumn );
+			$_dtCreate = strtotime( $model->$sCreatedColumn );
+			$_dtLMod = strtotime( $model->$sModifiedColumn );
 
 			//	Fix up dates
 			$_dtCreate = date( $sDateFormat, $_dtCreate );
@@ -1461,13 +1480,13 @@ HTML;
 	/**
 	* Retrieves the target selector of a form
 	*
-	* @param array $arHtmlOptions
+	* @param array $htmlOptions
 	* @param string $sDefaultId
 	* @return string
 	*/
-	protected static function getFormSelector( $arHtmlOptions = array(), $sDefaultId = 'div.yiiForm>form' )
+	protected static function getFormSelector( $htmlOptions = array(), $sDefaultId = 'div.yiiForm>form' )
 	{
-		$_sTarget =	PS::o( $arHtmlOptions, 'id', null );
+		$_sTarget =	PS::o( $htmlOptions, 'id', null );
 		return ( $_sTarget == null ) ? $sDefaultId : '#' . $_sTarget;
 	}
 
@@ -1597,20 +1616,20 @@ HTML;
 	 * @see CModel::getErrors
 	 * @see errorSummaryCss
 	 */
-	public static function errorSummary( $oModel, $sHeader = null, $sFooter = null, $arHtmlOptions = array() )
+	public static function errorSummary( $model, $sHeader = null, $sFooter = null, $htmlOptions = array() )
 	{
-		$_sContent = null;
+		$_content = null;
 		$_errorCount = 0;
-		$_arModel = $oModel;
-		$_bNoIcon = PS::o( $arHtmlOptions, 'noIcon', false, true );
-		$_iconClass = PS::o( $arHtmlOptions, 'errorIconClass', null, true );
-		$_headerTag = PS::o( $arHtmlOptions, 'headerTag', 'strong', true );
-		$_errorListClass = PS::o( $arHtmlOptions, 'errorListClass', null, true );
-		$_singleErrorListClass = PS::o( $arHtmlOptions, 'singleErrorListClass', $_errorListClass, true );
+		$_arModel = $model;
+		$_bNoIcon = PS::o( $htmlOptions, 'noIcon', false, true );
+		$_iconClass = PS::o( $htmlOptions, 'errorIconClass', null, true );
+		$_headerTag = PS::o( $htmlOptions, 'headerTag', 'strong', true );
+		$_errorListClass = PS::o( $htmlOptions, 'errorListClass', null, true );
+		$_singleErrorListClass = PS::o( $htmlOptions, 'singleErrorListClass', $_errorListClass, true );
 
 		self::$errorSummaryCss = 'ps-error-summary ui-state-error';
 
-		if ( ! is_array( $_arModel ) ) $_arModel = array( $oModel );
+		if ( ! is_array( $_arModel ) ) $_arModel = array( $model );
 
 		foreach ( $_arModel as $_oModel )
 		{
@@ -1622,14 +1641,14 @@ HTML;
 				{
 					if ( ! empty( $_sError ) )
 					{
-						$_sContent .= PS::tag( 'li', array(), $_sError );
+						$_content .= PS::tag( 'li', array(), $_sError );
 						$_errorCount++;
 					}
 				}
 			}
 		}
 
-		if ( $_sContent !== null )
+		if ( $_content !== null )
 		{
 			if ( ! $_iconClass ) 
 				$_sIcon = ( ! $_bNoIcon ) ? '<span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>' : null;
@@ -1641,8 +1660,8 @@ HTML;
 			//	Different class for single errors perhaps?
 			if ( $_errorCount == 1 ) $_errorListClass = $_singleErrorListClass;
 
-			$arHtmlOptions['class'] = PS::o( $arHtmlOptions, 'class', self::$errorSummaryCss, true );
-			return self::tag( 'div', $arHtmlOptions, $_sIcon . $sHeader . self::tag( 'ul', array( 'class' => $_errorListClass ), $_sContent ) ) . $sFooter;
+			$htmlOptions['class'] = PS::o( $htmlOptions, 'class', self::$errorSummaryCss, true );
+			return self::tag( 'div', $htmlOptions, $_sIcon . $sHeader . self::tag( 'ul', array( 'class' => $_errorListClass ), $_content ) ) . $sFooter;
 		}
 	}
 
@@ -1700,26 +1719,26 @@ HTML;
 	/**
 	* Gets the options for pre-fab select boxes
 	*
-	* @param mixed $eFieldType
+	* @param mixed $inputFieldType
 	* @returns boolean
 	*/
-	protected static function setDropDownValues( $eFieldType, &$arHtmlOptions = array(), &$arData = null, $oSelected = null )
+	protected static function setDropDownValues( &$inputFieldType, &$htmlOptions = array(), &$listData = null, $oSelected = null )
 	{
 		$_arData = null;
 
 		//	One of our generics? Set data, type and return
-		if ( $_arData = self::getGenericDropDownValues( $eFieldType, $arHtmlOptions, $arData ) )
+		if ( $_arData = self::getGenericDropDownValues( $inputFieldType, $htmlOptions, $listData ) )
 		{
-			$eFieldType = self::DROPDOWN;
-			$arData = $_arData;
+			$inputFieldType = self::DROPDOWN;
+			$listData = $_arData;
 		}
 		else
 		{
 			//	Generic or dropdown? Set data, type and return
-			if ( $eFieldType == self::DD_GENERIC || $eFieldType == self::DROPDOWN )
+			if ( $inputFieldType == self::DD_GENERIC || $inputFieldType == self::DROPDOWN )
 			{
-				$_arData = $arData;
-				$eFieldType = self::DROPDOWN;
+				$_arData = $listData;
+				$inputFieldType = self::DROPDOWN;
 			}
 		}
 
@@ -1730,10 +1749,10 @@ HTML;
 	/**
 	* Gets the options for pre-fab select boxes
 	*
-	* @param mixed $eFieldType
+	* @param mixed $inputFieldType
 	* @returns boolean
 	*/
-	protected static function getGenericDropDownValues( $eType, &$arHtmlOptions = array(), &$arData = null )
+	protected static function getGenericDropDownValues( $eType, &$htmlOptions = array(), &$listData = null )
 	{
 		$_arData = null;
 
@@ -1742,7 +1761,7 @@ HTML;
 			switch ( $eType )
 			{
 				case self::DD_GENERIC:
-					$_arData = PS::nvl( $arData, PS::o( $arHtmlOptions, 'data', null ) );
+					$_arData = PS::nvl( $listData, PS::o( $htmlOptions, 'data', null ) );
 					break;
 
 				case self::DD_YES_NO:
@@ -1758,24 +1777,24 @@ HTML;
 					break;
 
 				case self::DD_MONTH_NUMBERS:
-					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('m');
+					if ( null == PS::o( $htmlOptions, 'value' ) ) $htmlOptions['value'] = date('m');
 					$_arData = require( 'static/month_numbers_array.php' );
 					break;
 
 				case self::DD_DAY_NUMBERS:
-					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('d');
+					if ( null == PS::o( $htmlOptions, 'value' ) ) $htmlOptions['value'] = date('d');
 					$_arData = require( 'static/day_numbers_array.php' );
 					break;
 
 				case self::DD_MONTH_NAMES:
-					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('m');
+					if ( null == PS::o( $htmlOptions, 'value' ) ) $htmlOptions['value'] = date('m');
 					$_arData = require( 'static/month_names_array.php' );
 					break;
 
 				case self::DD_YEARS:
-					if ( null == PS::o( $arHtmlOptions, 'value' ) ) $arHtmlOptions['value'] = date('Y');
-					$_iRange = PS::o( $arHtmlOptions, 'range', 5, true );
-					$_iRangeStart = PS::o( $arHtmlOptions, 'rangeStart', date('Y'), true );
+					if ( null == PS::o( $htmlOptions, 'value' ) ) $htmlOptions['value'] = date('Y');
+					$_iRange = PS::o( $htmlOptions, 'range', 5, true );
+					$_iRangeStart = PS::o( $htmlOptions, 'rangeStart', date('Y'), true );
 					$_arData = array();
 					for ( $_i = 0, $_iBaseYear = $_iRangeStart; $_i < $_iRange; $_i++ ) $_arData[ ( $_iBaseYear + $_i ) ] = ( $_iBaseYear + $_i );
 					break;
@@ -1789,10 +1808,10 @@ HTML;
 					break;
 
 				case self::DD_DATA_LOOKUP:
-					$_sId = PS::o( $arHtmlOptions, 'dataId', null, true );
-					$_sName = PS::o( $arHtmlOptions, 'dataName', null, true );
-					$_sModel = PS::o( $arHtmlOptions, 'dataModel', null, true );
-					$_condition = PS::o( $arHtmlOptions, 'dataCondition', null, true );
+					$_sId = PS::o( $htmlOptions, 'dataId', null, true );
+					$_sName = PS::o( $htmlOptions, 'dataName', null, true );
+					$_sModel = PS::o( $htmlOptions, 'dataModel', null, true );
+					$_condition = PS::o( $htmlOptions, 'dataCondition', null, true );
 
 					if ( $_sId && $_sName && $_sModel )
 					{
@@ -1823,7 +1842,9 @@ HTML;
 	*/
 	public static function getExternalLibraryUrl()
 	{
-		return Yii::app()->getAssetManager()->getPublishedUrl( Yii::getPathOfAlias( 'pogostick.external' ), true );
+		$_path = str_replace( PS::_gbu(), '', Yii::app()->getAssetManager()->getPublishedUrl( Yii::getPathOfAlias( 'pogostick.external' ), true ) );
+		CPSLog::trace( __METHOD__, 'External Library URL: ' . $_path );
+		return $_path;
 	}
 
 	/**
@@ -1833,7 +1854,9 @@ HTML;
 	*/
 	public static function getExternalLibraryPath()
 	{
-		return Yii::app()->getAssetManager()->getPublishedPath( Yii::getPathOfAlias( 'pogostick.external' ), true );
+		$_path = str_replace( PS::_gbp(), '', Yii::app()->getAssetManager()->getPublishedPath( Yii::getPathOfAlias( 'pogostick.external' ), true ) );
+		CPSLog::trace( __METHOD__, 'External Library Path: ' . $_path );
+		return $_path;
 	}
 
 	/**

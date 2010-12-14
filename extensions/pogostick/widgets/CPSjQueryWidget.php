@@ -90,8 +90,8 @@ class CPSjQueryWidget extends CPSWidget
 	*/
 	public function addScripts( $arScripts = array() )
 	{
-		foreach ( $arScripts as $_sScript )
-			$this->m_arScripts[] = $_sScript;
+		foreach ( $arScripts as $_scriptFile )
+			$this->m_arScripts[] = $_scriptFile;
 	}
 
 	/**
@@ -126,85 +126,86 @@ class CPSjQueryWidget extends CPSWidget
 	* @param boolean If true, system will try to find jquery plugins based on the pattern jquery.<plugin-name[.min].js
 	* @returns CClientScript The current app's ClientScript object
 	*/
-	public function registerClientScripts( $bLocateScript = false )
+	public function registerClientScripts( $autoLocateScript = false )
 	{
 		//	Additional scripts, let dad load them.
 		if ( ! empty( $this->m_arScripts ) && is_array( $this->m_arScripts ) )
 		{
-			foreach ( $this->m_arScripts as $_sScript )
-				$this->pushScriptFile( $_sScript );
+			foreach ( $this->m_arScripts as $_scriptFile )
+				$this->pushScriptFile( $_scriptFile );
 		}
 
 		//	Do we have a registered script?
-		if ( $bLocateScript )
+		if ( $autoLocateScript )
 		{
-			$_sWName = $this->widgetName;
+			$_yiiBase = PS::_gbu();
+			$_widgetName = $this->widgetName;
 
 			//	Try and auto-find script file...
-			$_sBasePath = self::getExternalLibraryPath() . '/jquery-plugins/' . $_sWName;
-			$_sFilePath = $_sBasePath . '/jquery.' . $_sWName;
+			$_basePath = self::getExternalLibraryPath() . '/jquery-plugins/' . $_widgetName;
+			$_filePath = $_basePath . '/jquery.' . $_widgetName;
 
-			$_sBaseUrl = self::getExternalLibraryUrl() . '/jquery-plugins/' . $_sWName;
-			$_sFileUrl = $_sBaseUrl . '/jquery.' . $_sWName;
+			$_baseUrl = self::getExternalLibraryUrl() . '/jquery-plugins/' . $_widgetName;
+			$_fileUrl = $_baseUrl . '/jquery.' . $_widgetName;
 
 			//	See if we have such a plug-in
-			$_arFiles = array(
-				$_sFilePath . '.min.js',
-				$_sFilePath . '-min.js',
-				$_sFilePath . '.js',
-				$_sBasePath . '/ui.' . $_sWName . '.min.js',
-				$_sBasePath . '/ui.' . $_sWName . '-min.js',
-				$_sBasePath . '/ui.' . $_sWName . '.js',
-				$_sBasePath . '/js/jquery.' . $_sWName . '.min.js',
-				$_sBasePath . '/js/jquery.' . $_sWName . '-min.js',
-				$_sBasePath . '/js/jquery.' . $_sWName . '.js',
-				$_sBasePath . '/js/ui.' . $_sWName . '.min.js',
-				$_sBasePath . '/js/ui.' . $_sWName . '-min.js',
-				$_sBasePath . '/js/ui.' . $_sWName . '.js',
+			$_fileList = array(
+				$_filePath . '.min.js',
+				$_filePath . '-min.js',
+				$_filePath . '.js',
+				$_basePath . '/ui.' . $_widgetName . '.min.js',
+				$_basePath . '/ui.' . $_widgetName . '-min.js',
+				$_basePath . '/ui.' . $_widgetName . '.js',
+				$_basePath . '/js/jquery.' . $_widgetName . '.min.js',
+				$_basePath . '/js/jquery.' . $_widgetName . '-min.js',
+				$_basePath . '/js/jquery.' . $_widgetName . '.js',
+				$_basePath . '/js/ui.' . $_widgetName . '.min.js',
+				$_basePath . '/js/ui.' . $_widgetName . '-min.js',
+				$_basePath . '/js/ui.' . $_widgetName . '.js',
 			);
 
 			//	Ok, check 'em out...
-			foreach ( $_arFiles as $_sFile )
+			foreach ( $_fileList as $_file )
 			{
-				if ( file_exists( $_sFile ) )
+				if ( file_exists( $_file ) )
 				{
-					$this->pushScriptFile( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sFile ) );
+					$this->pushScriptFile( str_replace( $_SERVER['DOCUMENT_ROOT'] . $_yiiBase, '', $_file ) );
 					break;
 				}
 			}
 
 			//	Any others?
-			foreach ( PS::nvl( $this->extraScriptFiles, array() ) as $_sScript )
-				$this->pushScriptFile( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sBasePath . '/' . $_sScript ) );
+			foreach ( PS::nvl( $this->extraScriptFiles, array() ) as $_scriptFile )
+				$this->pushScriptFile( str_replace( $_SERVER['DOCUMENT_ROOT'] . $_yiiBase, '', $_basePath . DIRECTORY_SEPARATOR . $_scriptFile ) );
 
 			//	Now css...
-			$_arFiles = array(
-				$_sFilePath . '.min.css',
-				$_sFilePath . '-min.css',
-				$_sFilePath . '.css',
-				$_sBasePath . '/ui.' . $_sWName . '.min.css',
-				$_sBasePath . '/ui.' . $_sWName . '-min.css',
-				$_sBasePath . '/ui.' . $_sWName . '.css',
-				$_sBasePath . '/css/jquery.' . $_sWName . '.min.css',
-				$_sBasePath . '/css/jquery.' . $_sWName . '-min.css',
-				$_sBasePath . '/css/jquery.' . $_sWName . '.css',
-				$_sBasePath . '/css/ui.' . $_sWName . '.min.css',
-				$_sBasePath . '/css/ui.' . $_sWName . '-min.css',
-				$_sBasePath . '/css/ui.' . $_sWName . '.css',
+			$_fileList = array(
+				$_filePath . '.min.css',
+				$_filePath . '-min.css',
+				$_filePath . '.css',
+				$_basePath . '/ui.' . $_widgetName . '.min.css',
+				$_basePath . '/ui.' . $_widgetName . '-min.css',
+				$_basePath . '/ui.' . $_widgetName . '.css',
+				$_basePath . '/css/jquery.' . $_widgetName . '.min.css',
+				$_basePath . '/css/jquery.' . $_widgetName . '-min.css',
+				$_basePath . '/css/jquery.' . $_widgetName . '.css',
+				$_basePath . '/css/ui.' . $_widgetName . '.min.css',
+				$_basePath . '/css/ui.' . $_widgetName . '-min.css',
+				$_basePath . '/css/ui.' . $_widgetName . '.css',
 			);
 
-			foreach ( $_arFiles as $_sFile )
+			foreach ( $_fileList as $_file )
 			{
-				if ( file_exists( $_sFile ) )
+				if ( file_exists( $_file ) )
 				{
-					$this->pushCssFile( str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_sFile ) );
+					$this->pushCssFile( str_replace( $_SERVER['DOCUMENT_ROOT'] . $_yiiBase, '', $_file ) );
 					break;
 				}
 			}
 
 			//	Any other css?
 			foreach ( PS::nvl( $this->extraCssFiles, array() ) as $_sCss )
-				$this->pushCssFile( $_sBasePath . '/' . $_sCss );
+				$this->pushCssFile( str_replace( $_SERVER['DOCUMENT_ROOT'] . $_yiiBase, '', $_basePath . DIRECTORY_SEPARATOR . $_sCss ) );
 
 			//	Clear 'em out.
 			$this->extraScriptFiles = $this->extraCssFiles = null;
@@ -348,12 +349,12 @@ CODE;
 		if ( is_array( $arOptions ) )
 		{
 			//	Check for scripts...
-			foreach ( PS::o( $arOptions, '_scripts', array(), true ) as $_sScript )
-				$this->registerWidgetScript( $_sScript );
+			foreach ( PS::o( $arOptions, '_scripts', array(), true ) as $_scriptFile )
+				$this->registerWidgetScript( $_scriptFile );
 
 			//	Check for scripts...
-			foreach ( PS::o( $arOptions, '_scriptFiles', array(), true ) as $_sScript )
-				$this->pushScriptFile( $this->baseUrl . $_sScript );
+			foreach ( PS::o( $arOptions, '_scriptFiles', array(), true ) as $_scriptFile )
+				$this->pushScriptFile( $this->baseUrl . $_scriptFile );
 
 			//	Check for css...
 			foreach ( PS::o( $arOptions, '_cssFiles', array(), true ) as $_sCss )

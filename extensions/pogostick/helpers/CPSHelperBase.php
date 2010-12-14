@@ -708,6 +708,15 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function getBaseUrl( $absolute = false ) { return self::$_thisApp->getBaseUrl( $absolute ); }
 	public static function _gbu( $absolute = false ) { return self::$_thisApp->getBaseUrl( $absolute ); }
 
+	/**
+	 * Convienice methond Returns the base path of the current app
+	 * @see CWebApplication::getBasePath
+	 * @see CHttpRequest::getBasePath
+	 * @returns string
+	 */
+	public static function getBasePath() { return self::$_thisApp->getBasePath(); }
+	public static function _gbu() { return self::$_thisApp->getBaseUrl(); }
+
 	/***
 	 * Retrieves and caches the Yii ClientScript object
 	 * @returns CClientScript
