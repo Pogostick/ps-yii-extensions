@@ -2,4 +2,6 @@
 assets
 protected/runtime
 nbproject
+orig
+/orig
 
