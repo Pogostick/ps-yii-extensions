@@ -25,16 +25,29 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	//********************************************************************************
 
 	/**
-	* Our Facebook user id
-	*
-	* @var int
+	* @var string Our user id
 	*/
-	protected $_facebookId;
-	public function getId() { return $this->_facebookId; }
-	public function setId( $value ) { $this->_facebookId = $value; }
-	
+	protected $_id = null;
+	public function getId() { return $this->_id; }
+	public function setId( $value ) { $this->_id = $value; }
+
+	/**
+	 * @var array The user's Facebook info
+	 */
+	protected $_me;
+	public function getMe() { return $this->_me; }
+
+	/**
+	 * @var CPSFacebook An instance of our Facebook API object
+	 */
 	protected $_facebookApi;
 	public function getFacebookApi() { return $this->_facebookApi; }
+
+	/**
+	 * @var string The Facebook ID of the logged in user
+	 * @return string The Facebook ID of the logged in user
+	 */
+	public function getFBUserId() { return $this->_facebookApi->getFBUserId(); }
 
 	//********************************************************************************
 	//* Public Methods
@@ -43,10 +56,10 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	/**
 	 * Constructor.
 	 *
-	 * @param string user name
+	 * @param CPSFacebook
 	 * @param string password
 	 */
-	public function __construct( $facebookApi )
+	public function __construct( CPSFacebook $facebookApi )
 	{
 		$this->_facebookApi = $facebookApi;
 
@@ -63,26 +76,25 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	public function authenticate()
 	{
 		$this->errorCode = self::ERROR_UNKNOWN_IDENTITY;
-		
+
 		if ( $this->_facebookApi )
 		{
-			$_session = $this->_facebookApi->getFacebookApi()->getSession();
-			$_me = $this->_facebookApi->getMe();
-			
-			if ( $_session && $_me )
+			$_session = $this->_facebookApi->getSession();
+			$this->_me = $this->_facebookApi->api( '/me' );
+
+			if ( $_session && $this->_me )
 			{
 				$this->errorCode = self::ERROR_NONE;
-				$this->username = trim( $_me['name'] );
-				$this->setId( $this->_facebookApi->getFBUserId() );
+				$this->username = trim( $this->_me['name'] );
 
 				//	Raise our event
-				$this->onLoginSuccess( new CPSAuthenticationEvent( $this, $_me, $this ) );
-				
+				$this->onLoginSuccess( new CPSAuthenticationEvent( $this, $this->_me, $this ) );
+
 				return true;
 			}
 		}
-		
-		$this->onLoginFailure( new CPSAuthenticationEvent( $this, $_me, $this ) );
+
+		$this->onLoginFailure( new CPSAuthenticationEvent( $this, $this->_me, $this ) );
 
 		return false;
 	}
@@ -93,20 +105,20 @@ class CPSFacebookUserIdentity extends CUserIdentity
 
 	/**
 	* Raises the onLoginFailure event
-	* @param CPSAuthenticationEvent $oEvent
+	* @param CPSAuthenticationEvent $event
 	*/
-	public function onLoginFailure( CPSAuthenticationEvent $oEvent )
+	public function onLoginFailure( CPSAuthenticationEvent $event )
 	{
-		$this->raiseEvent( 'onLoginFailure', $oEvent );
+		$this->raiseEvent( 'onLoginFailure', $event );
 	}
 
 	/**
 	* Raises the onLoginSuccess event
-	* @param CPSAuthenticationEvent $oEvent
+	* @param CPSAuthenticationEvent $event
 	*/
-	public function onLoginSuccess( CPSAuthenticationEvent $oEvent )
+	public function onLoginSuccess( CPSAuthenticationEvent $event )
 	{
-		$this->raiseEvent( 'onLoginSuccess', $oEvent );
+		$this->raiseEvent( 'onLoginSuccess', $event );
 	}
 
 }

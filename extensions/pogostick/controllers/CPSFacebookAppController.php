@@ -1,26 +1,26 @@
 <?php
 /*
  * CSFacebookAppController.php
- * 
+ *
  * Copyright (c) 2010 Jerry Ablan <jablan@pogostick.com>.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
- * 
+ *
  * This file is part of Pogostick : Yii Extensions.
- * 
+ *
  * We share the same open source ideals as does the jQuery team, and
  * we love them so much we like to quote their license statement:
- * 
+ *
  * You may use our open source libraries under the terms of either the MIT
  * License or the Gnu General Public License (GPL) Version 2.
- * 
+ *
  * The MIT License is recommended for most projects. It is simple and easy to
  * understand, and it places almost no restrictions on what you can do with
  * our code.
- * 
+ *
  * If the GPL suits your project better, you are also free to use our code
  * under that license.
- * 
+ *
  * You don’t have to do anything special to choose one license or the other,
  * and you don’t have to notify anyone which license you are using.
  */
@@ -52,8 +52,8 @@ class CPSFacebookAppController extends CPSController
 	const MAX_FRIENDS_TO_SHOW = 7;
 	const DEBUG = false;
 	const USE_CACHE = false;
-	const IS_CANVAS = true;
-	const IS_CONNECT = false;
+	const IS_CANVAS = false;
+	const IS_CONNECT = true;
 	const THUMB_CACHE = 'thumb_cache';
 	const FRIEND_CACHE = 'friend_cache';
 	const APP_FRIEND_CACHE = 'app_friend_cache';
@@ -67,7 +67,7 @@ class CPSFacebookAppController extends CPSController
 
 	/**
 	 * The Facebook API
-	 * @var Facebook
+	 * @var CPSFacebook
 	 */
 	protected $_facebookApi;
 	public function getFacebookApi() { return $this->_facebookApi; }
@@ -138,7 +138,7 @@ class CPSFacebookAppController extends CPSController
 	protected $_autoLoadPictures = true;
 	public function getAutoLoadPictures() { return $this->_autoLoadPictures; }
 	public function setAutoLoadPictures( $value ) { $this->_autoLoadPictures = $value; return $this; }
-	
+
 	/**
 	 * @var boolean True if user has authorized the app
 	 */
@@ -169,7 +169,7 @@ class CPSFacebookAppController extends CPSController
 	{
 		//	See if this is a deauth...
 		$this->_isDeauthRequest = ( false !== strpos( $_SERVER['REQUEST_URI'], 'app/deauthorize' ) );
-		
+
 		parent::init();
 
 		//	Set proper ini settings for FBC
@@ -182,15 +182,13 @@ class CPSFacebookAppController extends CPSController
             echo $this->_getRssFeed();
             die();
         }
-		
+
 		//	No facebook?
 		if ( PS::_gs( 'standalone' ) || PS::o( $_REQUEST, 'standalone' ) )
 			PS::_ss( 'standalone', true );
 
 		//	Set up events...
 		$this->onFacebookLogin = array( $this, 'facebookLogin' );
-		
-		return true;
 
 		//	Ignore ajax requests...
 		if ( ! Yii::app()->getRequest()->getIsAjaxRequest() )
@@ -231,7 +229,7 @@ class CPSFacebookAppController extends CPSController
             ),
         );
     }
-	
+
 	//********************************************************************************
 	//* Public Actions
 	//********************************************************************************
@@ -259,7 +257,7 @@ class CPSFacebookAppController extends CPSController
 	public function actionInviteComplete()
 	{
 		CPSLog::trace( __METHOD__, 'Invite complete: ' . print_r( $_REQUEST, true ) );
-		
+
 		//	$_POST['ids'] is an array of invited friends...
 		$this->_user->invite_count_nbr += count( PS::o( $_REQUEST, 'ids', array() ) );
 		$this->_user->update( array( 'invite_count_nbr' ) );
@@ -273,7 +271,7 @@ class CPSFacebookAppController extends CPSController
 	public function actionDeauthorize()
 	{
 		CPSLog::trace( __METHOD__, 'Deauth request: ' . print_r( $_REQUEST, true ) );
-		
+
 		$this->layout = false;
 
 		//	Reset!
@@ -308,7 +306,7 @@ class CPSFacebookAppController extends CPSController
 	    		echo $error['message'];
 				return;
 			}
-			
+
         	$this->render( 'error', $error );
 	    }
 	}
@@ -363,7 +361,7 @@ class CPSFacebookAppController extends CPSController
 			error_log( 'Get all friends failed: ' . $_ex->getMessage() );
 			$this->_forceLogin();
 		}
-		
+
 		return $this->_friendList;
 	}
 
@@ -374,7 +372,7 @@ class CPSFacebookAppController extends CPSController
 	protected function _getAppFriends()
 	{
 		CPSLog::trace( __METHOD__, 'Getting app friends...' );
-		
+
 		$this->_appFriendList = null; //PS::_gs( self::APP_FRIEND_CACHE . $this->_fbUserId );
 
 		try
@@ -383,7 +381,7 @@ class CPSFacebookAppController extends CPSController
 			{
 				$_fql = "select uid from user where is_app_user = '1' and uid in ( select uid2 from friend where uid1 = '{$this->_fbUserId}' ) order by name";
 				$_list = $this->_facebookApi->api( array( 'method' => 'fql.query', 'query' => $_fql ) );
-				
+
 				CPSLog::trace( __METHOD__, '  - App Friend List Retrieved: ' . print_r( $_list, true ) );
 
 				//	Make into a list of uids...
@@ -402,7 +400,7 @@ class CPSFacebookAppController extends CPSController
 			error_log( 'Get APP friends failed: ' . $_ex->getMessage() );
 			$this->_forceLogin();
 		}
-		
+
 		CPSLog::trace( __METHOD__, '  - App Friend List: ' . print_r( $this->_appFriendList, true ) );
 		return $this->_appFriendList;
 	}
@@ -422,7 +420,7 @@ class CPSFacebookAppController extends CPSController
 		{
 			throw $_ex;
 		}
-		
+
 		//	Get the login url
 		$this->_loginUrl = $this->_facebookApi->getLoginUrl(
 			array(
@@ -431,15 +429,15 @@ class CPSFacebookAppController extends CPSController
 				'req_perms' => $this->_facebookApi->getAppPermissions(),
 			)
 		);
-		
+
 		$this->_session = $this->_facebookApi->getSession();
-		
+
 		if ( ! $this->_session )
 		{
 			error_log( 'No session' );
 			$this->_forceLogin();
 		}
-		
+
 		try
 		{
 			//	Get our info...
@@ -447,14 +445,13 @@ class CPSFacebookAppController extends CPSController
 
 			if ( ! $this->_me )
 				throw new Exception( 'Not really logged in...' );
-			
-			if ( PS::_ig() && ! CPSFacebookUser::authenticateUser( $this ) )
+
+			if ( PS::_ig() && ! CPSFacebookUser::authenticateUser( $this->_facebookApi ) )
 				throw new Exception( 'Invalid session' );
 
 			//	Log into system...
 			$this->_fbUserId = $this->_session['uid'];
 			$this->_accessToken = $this->_session['access_token'];
-
 			$this->_firstName = PS::o( $this->_me, 'first_name' );
 			$this->_loadUser();
 
@@ -480,7 +477,7 @@ class CPSFacebookAppController extends CPSController
 
 	/**
 	 * Loads the user from the database. If the user is not found, a new row is added.
-	 * @return boolean 
+	 * @return boolean
 	 */
 	protected function _loadUser()
 	{
@@ -556,13 +553,13 @@ class CPSFacebookAppController extends CPSController
 	}
 
 	/**
-	 * Returns an RSS feed 
+	 * Returns an RSS feed
 	 * @param integer items to return
 	 */
 	protected function _getRssFeed( $items = 5 )
 	{
 	}
-	
+
 	/**
 	 * Forces a redirect to the Facebook login url...
 	 */
@@ -573,10 +570,10 @@ class CPSFacebookAppController extends CPSController
 		{
 			if ( $this->_loadUser() )
 				$this->actionDeauthorize();
-			
+
 			die();
 		}
-		
+
 		error_log( 'Force logging out user, no session found.' );
 		CPSLog::info( __METHOD__, 'Force logging out user, no session found.' );
 

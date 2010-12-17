@@ -76,13 +76,13 @@ class CPSFacebookUser extends CWebUser
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
-	
+
 	/**
 	 * Authenticate a facebook user
-	 * @param CPSFacebookAppController $fbApi
-	 * @return boolean 
+	 * @param CPSFacebook
+	 * @return boolean
 	 */
-	public static function authenticateUser( CPSFacebookAppController $fbApi )
+	public static function authenticateUser( CPSFacebook $fbApi )
 	{
 		$_result = false;
 		$_identity = new CPSFacebookUserIdentity( $fbApi );
@@ -93,7 +93,7 @@ class CPSFacebookUser extends CWebUser
 			$_result = true;
 		}
 
-		return $_result;		
+		return $_result;
 	}
 
 	/**
@@ -106,7 +106,7 @@ class CPSFacebookUser extends CWebUser
 		//	Set the current user value...
 		if ( null === ( $this->_user = PS::_gs( 'currentUser' ) ) )
 		{
-			if ( $this->_user = User::model()->findByPk( PS::_gu()->getId() ) )
+			if ( null !== ( $this->_user = User::model()->find( 'pform_user_id_text = :pform_user_id_text', array( ':pform_user_id_text' => $this->getFBUserIdId() ) ) ) )
 			{
 				PS::_ss( 'currentUser', $this->_user );
 				PS::_ss( 'currentMe', $this->_me );
