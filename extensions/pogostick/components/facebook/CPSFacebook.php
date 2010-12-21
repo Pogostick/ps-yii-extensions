@@ -42,7 +42,7 @@ class CPSFacebook extends CPSApiComponent
 	 * Cache constants
 	 */
 	const	PHOTO_CACHE = '_photoListCache';
-	
+
 	//********************************************************************************
 	//* Statics
 	//********************************************************************************
@@ -140,7 +140,7 @@ class CPSFacebook extends CPSApiComponent
 		'users.isverified' => 1,
 		'video.getuploadlimits' => 1,
 	);
-	
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -287,7 +287,7 @@ class CPSFacebook extends CPSApiComponent
 		$this->_baseDomain = PS::o( $config, 'domain', '' );
 		$this->_fileUploadSupport = PS::o( $config, 'fileUploadSupport', false );
 	}
-	
+
 	/**
 	 * Initialize
 	 */
@@ -296,7 +296,7 @@ class CPSFacebook extends CPSApiComponent
 		parent::init();
 		self::$_photoList = PS::_gs( self::PHOTO_CACHE );
 	}
-	
+
 	/**
 	 * Put it in the cache..
 	 */
@@ -337,7 +337,7 @@ class CPSFacebook extends CPSApiComponent
 
 			//	Try loading session from signed_request in $_REQUEST
 			if ( $_signedRequest = $this->getSignedRequest() )
-				$_session = $this->createSessionFromSignedRequest( $_signedRequest );
+				$_session = $this->_createSessionFromSignedRequest( $_signedRequest );
 
 			//	Try loading session from $_REQUEST
 			if ( ! $_session && $_session = PS::o( $_REQUEST, 'session' ) )
@@ -494,121 +494,7 @@ class CPSFacebook extends CPSApiComponent
 
 		return call_user_func_array( array( &$this, '_graph' ), $_args );
 	}
-	
-	/**
-	 * Fills the album cache 
-	 * @param string The album ID to return, null for all
-	 */
-	public function getAlbums( $id = null )
-	{
-		static $_inProgress = false;
 
-		if ( null !== ( $_user = User::model()->find( ':pform_user_id_text = pform_user_id_text', array( ':pform_user_id_text' => $this->_session['uid'] ) ) ) )
-		{
-			CPSLog::trace( __METHOD__, 'Getting photos from user table cache...' );
-			self::$_photoList = json_decode( $_user->photo_cache_text, true );
-		}
-
-		if ( $_inProgress ) return self::$_photoList;
-		
-		if ( empty( self::$_photoList ) )
-		{		
-			CPSLog::trace( __METHOD__, 'Reloading photo cache...' );
-			$_inProgress = true;
-			self::$_photoList = array();
-			
-			try
-			{
-				$_result = $this->api( '/me/albums' );
-				if ( null != ( self::$_photoList = PS::o( $_result, 'data' ) ) )
-				{
-					$_result = array();
-
-					foreach ( self::$_photoList as $_key => $_album )
-					{
-						self::$_photoList[$_key]['photos'] = $this->getPhotos( $_album['id'] );
-						
-						if ( ! empty( self::$_photoList[$_key]['photos'] ) )
-						{
-							foreach ( self::$_photoList[$_key]['photos'] as $_photo )
-							{
-								if ( isset( $_photo['picture'] ) )
-								{
-									self::$_photoList[$_key]['picture'] = $_photo['picture'];
-									break;
-								}
-							}
-						}
-					}
-					
-					CPSLog::trace( __METHOD__, 'Saving photos to user table cache...' );
-					$_user->photo_cache_text = json_encode( self::$_photoList );
-					$_user->update( array( 'photo_cache_text' ) );
-				}
-			}
-			catch ( Exception $_ex )
-			{
-				CPSLog::error( __METHOD__, 'Exception: ' . $_ex->getMessage() );
-			}
-		}
-
-		$_inProgress = false;
-		return self::$_photoList;
-	}
-	
-	/**
-	 * Retrieves photos or a photo
-	 * @param string The album ID
-	 * @param string The photo ID or null for all photos in the album
-	 */
-	public function getPhotos( $aid, $id = null, $limit = null )
-	{
-		static $_recursed = false;
-		
-		if ( null == $aid )
-			return null;
-		
-		if ( null == self::$_photoList )
-			$this->getAlbums();
-			
-		if ( isset( self::$_photoList, self::$_photoList[$aid], self::$_photoList[$aid]['photos'] ) )
-		{
-			$_photoList = self::$_photoList[$aid]['photos'];
-			if ( ! empty( $id ) ) return PS::o( $_photoList, $id );
-		}
-
-		//	Not there, grab photos and cache...
-		$_parameterList = array();
-		if ( null != $limit ) $_parameterList['limit'] = $limit;
-
-		$_url = '/' . $aid . '/photos';
-		$_resultList = array();
-
-		while ( true )
-		{
-			try
-			{
-				$_tempList = $this->api( $_url, $_parameterList );
-			}
-			catch ( Exception $_ex )
-			{
-				break;
-			}
-
-			if ( $_tempList )
-			{
-				$_resultList = array_merge( $_resultList, PS::o( $_tempList, 'data', array() ) );
-					
-				if ( null != $limit || null === ( $_url = PS::oo( $_tempList, 'paging', 'next' ) ) )
-					break;
-			}
-			else
-				break;
-		}
-
-		return $_resultList;
-	}
-	
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
@@ -666,12 +552,12 @@ class CPSFacebook extends CPSApiComponent
 
 		$_result = $this->_oauthRequest( $this->_getUrl( 'graph', $path ), $paramList );
 		$_result = json_decode( $_result, true );
-		
+
 		//	Results are returned, errors are thrown
 		if ( PS::o( $_result, 'error' ) )
 		{
 			$_ex = new CPSFacebookApiException( $_result );
-			
+
 			switch ( $_ex->getType() )
 			{
 				case 'OAuthException':			//	OAuth 2.0 Draft 00 style
@@ -679,9 +565,9 @@ class CPSFacebook extends CPSApiComponent
 					$this->setSession( null );
 					break;
 			}
-			
+
 			throw $_ex;
-		}		
+		}
 
 		return $_result;
 	}
@@ -919,7 +805,7 @@ class CPSFacebook extends CPSApiComponent
 		$_expectedSignature = hash_hmac( 'sha256', $_payload, $this->_apiSecretKey, true );
 
 		CPSLog::trace( __METHOD__, 'Sig:[' . $_signature . '] expect:[' . $_expectedSignature . ']' );
-		
+
 		if ( $_signature !== $_expectedSignature )
 		{
 			//	Disable error log if we are running in a CLI environment
@@ -963,9 +849,9 @@ class CPSFacebook extends CPSApiComponent
 
 		if ( null != $path )
 		{
-			if ( $path[0] == '/' ) 
+			if ( $path[0] == '/' )
 				$path = substr( $path, 1 );
-			
+
 			$_url .= $path;
 		}
 
@@ -1089,7 +975,7 @@ class CPSFacebookApiException extends CPSException
 	{
 		$this->_result = $result;
 		$_code = PS::o( $_result, 'error_code', 0 );
-		
+
 		if ( isset( $result['error_description'] ) )
 		{
 			//	OAuth 2.0 Draft 10 style
@@ -1109,7 +995,7 @@ class CPSFacebookApiException extends CPSException
 		{
 			$_message = 'Unknown Error. Check getResult()';
 		}
-		
+
 		parent::__construct( $_message, $_code );
 	}
 
@@ -1118,12 +1004,12 @@ class CPSFacebookApiException extends CPSException
 	 * 'Exception' when a type is not available.
 	 * @return string
 	 */
-	public function getType() 
-	{	
+	public function getType()
+	{
 		if ( isset( $this->_result['error'] ) )
 		{
 			$_error = $this->_result['error'];
-			if ( is_string( $_error ) ) 
+			if ( is_string( $_error ) )
 			{
 				// OAuth 2.0 Draft 10 style
 				return $_error;
@@ -1137,8 +1023,8 @@ class CPSFacebookApiException extends CPSException
 				}
 			}
 		}
-		
-		return 'Exception';	
+
+		return 'Exception';
 	}
 
 	/**
@@ -1149,5 +1035,5 @@ class CPSFacebookApiException extends CPSException
 	{
 		$_temp = $this->getType() . ': ' . ( $this->code != 0 ? $this->code . ': ' : '' ) . $this->message;
 	}
-	
+
 }

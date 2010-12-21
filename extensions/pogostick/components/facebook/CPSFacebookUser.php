@@ -26,6 +26,8 @@
  */
 
 //	Include Files
+Yii::import( 'pogostick.helpers.PS.php' );
+
 //	Constants
 //	Global Settings
 
@@ -62,56 +64,66 @@ class CPSFacebookUser extends CWebUser
 	public function getUser() { return $this->_user; }
 
 	/**
-	* @var array A copy of the user session
+	* @var string A copy of the facebook user Id
 	*/
-	protected $_fbSession = null;
-	public function getFBSession() { return $this->_fbSession; }
+	protected $_fbUserId = null;
+	public function getFBUserId() { return PS::o( $this->_me, 'id' ); }
+	public function setFBUserId( $value ) { $this->_fbUserId = $value; }
 
 	/**
 	* @var array A copy of the user session
 	*/
-	protected $_fbApi = null;
-	public function getFBApi() { return $this->_fbApi; }
+	protected $_facebookApi = null;
+	public function getfacebookApi() { return $this->_facebookApi; }
 
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 
 	/**
+	 * Initialize user and pull anything out of the session that's there...
+	 */
+	public function init()
+	{
+		parent::init();
+
+		$this->_user = CPSHelperBase::_gs( 'currentUser' );
+		$this->_me = CPSHelperBase::_gs( 'currentMe' );
+	}
+
+	/**
 	 * Authenticate a facebook user
 	 * @param CPSFacebook
+	 * @param CPSFacebookUserIdentity You may optionally pass in an identiy object
 	 * @return boolean
 	 */
-	public static function authenticateUser( CPSFacebook $fbApi )
+	public static function authenticateUser( CPSFacebook $facebookApi, CPSFacebookUserIdentity $identity = null )
 	{
 		$_result = false;
-		$_identity = new CPSFacebookUserIdentity( $fbApi );
+		$_identity = ( null === $identity ? new CPSFacebookUserIdentity( $facebookApi, null ) : $identity );
+
 		if ( $_identity->authenticate() && CUserIdentity::ERROR_NONE == $_identity->errorCode )
 		{
-			Yii::app()->user->allowAutoLogin = false;
-			Yii::app()->user->login( $_identity, 0 );
+			PS::_gu()->allowAutoLogin = false;
+			PS::_gu()->login( $_identity, 0 );
+
+			//	Set the current user value...
+			if ( null === ( $_user = PS::_gs( 'currentUser' ) ) )
+			{
+				$_me = $_identity->getMe();
+				PS::_gu()->setFBUserId( $_me['id'] );
+
+				if ( null !== ( $_user = User::model()->find( 'pform_user_id_text = :pform_user_id_text', array( ':pform_user_id_text' => $_me['id'] ) ) ) )
+				{
+					PS::_ss( 'currentUser', $_user );
+					PS::_ss( 'currentMe', $_me );
+				}
+			}
+
 			$_result = true;
 		}
 
 		return $_result;
-	}
-
-	/**
-	 * After a user has logged in, we cache the user row...
-	 */
-	protected function afterLogin( $fromCookie )
-	{
-		parent::afterLogin( $fromCookie );
-
-		//	Set the current user value...
-		if ( null === ( $this->_user = PS::_gs( 'currentUser' ) ) )
-		{
-			if ( null !== ( $this->_user = User::model()->find( 'pform_user_id_text = :pform_user_id_text', array( ':pform_user_id_text' => $this->getFBUserIdId() ) ) ) )
-			{
-				PS::_ss( 'currentUser', $this->_user );
-				PS::_ss( 'currentMe', $this->_me );
-			}
-		}
 	}
 
 	/**
@@ -120,7 +132,11 @@ class CPSFacebookUser extends CWebUser
 	protected function afterLogout()
 	{
 		if ( parent::afterLogout() )
-			$this->_me = $this->_session = null;
+		{
+			$this->_me = null;
+			PS::_ss( 'currentUser', $this->_user );
+			PS::_ss( 'currentMe', null );
+		}
 	}
 
 }

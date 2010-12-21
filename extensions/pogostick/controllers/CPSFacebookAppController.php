@@ -52,7 +52,7 @@ class CPSFacebookAppController extends CPSController
 	const MAX_FRIENDS_TO_SHOW = 7;
 	const DEBUG = false;
 	const USE_CACHE = false;
-	const IS_CANVAS = false;
+	const IS_CANVAS = true;
 	const IS_CONNECT = true;
 	const THUMB_CACHE = 'thumb_cache';
 	const FRIEND_CACHE = 'friend_cache';
@@ -73,40 +73,10 @@ class CPSFacebookAppController extends CPSController
 	public function getFacebookApi() { return $this->_facebookApi; }
 
 	/**
-	 * @var array The Facebook session data
-	 */
-	protected $_session;
-	public function getSession() { return $this->_session; }
-
-	/**
 	 * @var string User's access token
 	 */
 	protected $_accessToken;
 	public function getAccessToken() { return $this->_accessToken; }
-
-	/**
-	 * @var string The user's Facebook ID
-	 */
-	protected $_fbUserId;
-	public function getFBUserId() { return $this->_fbUserId; }
-
-	/**
-	 * @var array The user's Facebook info
-	 */
-	protected $_me;
-	public function getMe() { return $this->_me; }
-
-	/**
-	 * @var string Login Url
-	 */
-	protected $_firstName;
-	public function getFirstName() { return $this->_firstName; }
-
-	/**
-	 * @var string Login Url
-	 */
-	protected $_loginUrl = '';
-	public function getLoginUrl() { return $this->_loginUrl; }
 
 	/**
 	 * @var string Logout Url
@@ -115,48 +85,22 @@ class CPSFacebookAppController extends CPSController
 	public function getLogoutUrl() { return $this->_logoutUrl; }
 
 	/**
-	 * @var User The current user
+	 * @var string Login Url
 	 */
-	protected $_user = null;
-	public function getUser() { return $this->_user; }
+	protected $_loginUrl = '';
+	public function getLoginUrl() { return $this->_loginUrl; }
 
 	/**
-	 * @var array The users' list of friends
+	 * @var array The Facebook session data
 	 */
-	protected $_friendList = null;
-	public function getFriendList() { return $this->_friendList; }
-
-	/**
-	 * @var array The users' list of friends who also use this app
-	 */
-	protected $_appFriendList = null;
-	public function getAppFriendList() { return $this->_appFriendList; }
-
-	/**
-	 * @var boolean If true, user's albums and pictures are loaded and cached
-	 */
-	protected $_autoLoadPictures = true;
-	public function getAutoLoadPictures() { return $this->_autoLoadPictures; }
-	public function setAutoLoadPictures( $value ) { $this->_autoLoadPictures = $value; return $this; }
-
-	/**
-	 * @var boolean True if user has authorized the app
-	 */
-	protected $_isConnected = false;
-	public function getIsConnected() { return $this->_isConnected; }
+	protected $_session;
+	public function getSession() { return $this->_session; }
 
 	/**
 	 * @var boolean True if this is a deauthorization request
 	 */
 	protected $_isDeauthRequest = false;
 	public function getIsDeauthRequest() { return $this->_isDeauthRequest; }
-
-	/**
-	 * @var boolean If true, user is redirected to invite friends page after allowing application
-	 */
-	protected $_inviteAfterInstall = true;
-	public function getInviteAfterInstall() { return $this->_inviteAfterInstall; }
-	public function setInviteAfterInstall( $value ) { $this->_inviteAfterInstall = $value; }
 
 	//********************************************************************************
 	//* Public Methods
@@ -193,9 +137,8 @@ class CPSFacebookAppController extends CPSController
 		//	Ignore ajax requests...
 		if ( ! Yii::app()->getRequest()->getIsAjaxRequest() )
 		{
-			//	Set up the session for the page
-			if ( ! PS::_gs( 'standalone' ) )
-				$this->_initializeFacebook();
+			//	Set up the Facebook API
+			$this->_initializeFacebook();
 		}
 	}
 
@@ -206,11 +149,11 @@ class CPSFacebookAppController extends CPSController
 	*/
 	public function filters()
 	{
-		if ( $_SERVER['HTTP_HOST'] == 'localhost' ) return array();
+		if ( PS::isCLI() ) return array();
 
 		//	Perform access control for CRUD operations
 		return array(
-//			'accessControl',
+			'accessControl',
 		);
 	}
 
@@ -339,87 +282,13 @@ class CPSFacebookAppController extends CPSController
 	//********************************************************************************
 
 	/**
-	 * Get all friend data
-	 * @return array
-	 */
-	protected function _getAllFriends()
-	{
-		$this->_friendList = PS::_gs( self::FRIEND_CACHE );
-
-		try
-		{
-			if ( empty( $this->_friendList ) )
-			{
-				$_fql = "SELECT uid, name, first_name, pic_big, pic_square FROM user WHERE uid IN ( SELECT uid2 FROM friend where uid1 = '{$this->_fbUserId}' ) order by name";
-				$this->_friendList = $this->_facebookApi->api( array( 'method' => 'fql.query', 'query' => $_fql ) );
-				PS::_ss( self::FRIEND_CACHE, $this->_friendList );
-			}
-		}
-		catch ( Exception $_ex )
-		{
-			CPSLog::error( __METHOD__, 'Exception: ' . $_ex->getMessage() );
-			error_log( 'Get all friends failed: ' . $_ex->getMessage() );
-			$this->_forceLogin();
-		}
-
-		return $this->_friendList;
-	}
-
-	/**
-	 * Get friend data who have this app
-	 * @return array
-	 */
-	protected function _getAppFriends()
-	{
-		CPSLog::trace( __METHOD__, 'Getting app friends...' );
-
-		$this->_appFriendList = null; //PS::_gs( self::APP_FRIEND_CACHE . $this->_fbUserId );
-
-		try
-		{
-			if ( empty( $this->_appFriendList ) )
-			{
-				$_fql = "select uid from user where is_app_user = '1' and uid in ( select uid2 from friend where uid1 = '{$this->_fbUserId}' ) order by name";
-				$_list = $this->_facebookApi->api( array( 'method' => 'fql.query', 'query' => $_fql ) );
-
-				CPSLog::trace( __METHOD__, '  - App Friend List Retrieved: ' . print_r( $_list, true ) );
-
-				//	Make into a list of uids...
-				foreach ( $_list as $_friend )
-				{
-					if ( ! empty( $_friend['uid'] ) )
-						$this->_appFriendList[] = '\'' . $_friend['uid'] . '\'';
-				}
-
-				PS::_ss( self::APP_FRIEND_CACHE . $this->_fbUserId, $this->_appFriendList );
-			}
-		}
-		catch ( Exception $_ex )
-		{
-			CPSLog::error( __METHOD__, 'Exception: ' . $_ex->getMessage() );
-			error_log( 'Get APP friends failed: ' . $_ex->getMessage() );
-			$this->_forceLogin();
-		}
-
-		CPSLog::trace( __METHOD__, '  - App Friend List: ' . print_r( $this->_appFriendList, true ) );
-		return $this->_appFriendList;
-	}
-
-	/**
 	 * Initialize the Facebook stuff
 	 * @return boolean
 	 */
 	protected function _initializeFacebook()
 	{
 		//	Create the api object
-		try
-		{
-			$this->_facebookApi = Yii::app()->getComponent( 'facebook' );
-		}
-		catch ( Exception $_ex )
-		{
-			throw $_ex;
-		}
+		$this->_facebookApi = PS::_gco( 'facebook' );
 
 		//	Get the login url
 		$this->_loginUrl = $this->_facebookApi->getLoginUrl(
@@ -430,126 +299,7 @@ class CPSFacebookAppController extends CPSController
 			)
 		);
 
-		$this->_session = $this->_facebookApi->getSession();
-
-		if ( ! $this->_session )
-		{
-			error_log( 'No session' );
-			$this->_forceLogin();
-		}
-
-		try
-		{
-			//	Get our info...
-			$this->_me = $this->_facebookApi->api( '/me' );
-
-			if ( ! $this->_me )
-				throw new Exception( 'Not really logged in...' );
-
-			if ( PS::_ig() && ! CPSFacebookUser::authenticateUser( $this->_facebookApi ) )
-				throw new Exception( 'Invalid session' );
-
-			//	Log into system...
-			$this->_fbUserId = $this->_session['uid'];
-			$this->_accessToken = $this->_session['access_token'];
-			$this->_firstName = PS::o( $this->_me, 'first_name' );
-			$this->_loadUser();
-
-			if ( $this->_autoLoadPictures )
-			{
-				$_photoList = $this->getFacebookApi()->getAlbums();
-
-				if ( empty( $_photoList ) )
-					PS::_rs( '_psAutoLoadPictures', '$(function(){$.get("/app/photos",function(){});});' );
-			}
-
-			return $this->_isConnected = true;
-		}
-		catch ( Exception $_ex )
-		{
-			CPSLog::error( __METHOD__, 'FB Exception: ' . $_ex->getMessage() );
-			error_log( 'init exception: ' . $_ex->getMessage() );
-			$this->_forceLogin();
-		}
-
-		return false;
-	}
-
-	/**
-	 * Loads the user from the database. If the user is not found, a new row is added.
-	 * @return boolean
-	 */
-	protected function _loadUser()
-	{
-		$_user = null;
-
-		//	NO user id? Bail!
-		if ( empty( $this->_fbUserId ) )
-		{
-			CPSLog::error(__METHOD__,'FBUID EMPTY!' . $this->_fbUserId );
-			return false;
-		}
-
-		//	Is this a new app user?
-		$_user = User::model()->find( array(
-			'condition' => 'pform_user_id_text = :pform_user_id_text and pform_type_code = :pform_type_code',
-			'params' => array(
-				':pform_user_id_text' => $this->_fbUserId,
-				':pform_type_code' => 1000,
-			)
-		));
-
-		//	Not found, assume new...
-		if ( ! $_user )
-		{
-			//	New user...
-			$_user = new User();
-			$_user->pform_user_id_text = $this->_fbUserId;
-			$_user->pform_type_code = 1000;
-			$_user->app_add_date = date( 'Y-m-d h:i:s' );
-			$_user->app_del_date = null;
-		}
-
-		//	Set new stuff
-		$_user->session_key_text = $this->_accessToken;
-		$_user->last_visit_date = date( 'Y-m-d h:i:s' );
-
-		//	User installed app this time?
-		if ( '1' == PS::o( $_REQUEST, 'installed' ) )
-		{
-			$_user->app_add_date = date( 'Y-m-d h:i:s' );
-			$_user->app_del_date = null;
-			$_user->app_add_count_nbr += 1;
-
-			//	Invite friends?
-			if ( $this->_inviteAfterInstall )
-			{
-				$this->redirect( 'inviteFriends', true, 301 );
-				return false;
-			}
-		}
-
-		if ( $this->_me )
-		{
-			$_user->first_name_text = $this->_firstName;
-			$_user->last_name_text = PS::o( $this->_me, 'last_name' );
-			$_user->email_addr_text = PS::o( $this->_me, 'email' );
-			$_user->full_name_text = $this->_firstName . ' ' . strtoupper( substr( PS::o( $this->_me, 'last_name' ), 0, 1 ) . '.' );
-		}
-
-		//	Load app friends
-		$this->_getAppFriends();
-
-		//	Save info...
-		$_user->save();
-
-		//	Set our current user...
-		PS::_ss( 'currentUser', $this->_user = $_user );
-
-		//	Raise the facebook login event
-		$this->onFacebookLogin( new CEvent( $_user ) );
-
-		return true;
+		$_identity = new CPSFacebookUserIdentity( $this->_facebookApi, $this->_loginUrl );
 	}
 
 	/**
@@ -559,32 +309,4 @@ class CPSFacebookAppController extends CPSController
 	protected function _getRssFeed( $items = 5 )
 	{
 	}
-
-	/**
-	 * Forces a redirect to the Facebook login url...
-	 */
-	protected function _forceLogin()
-	{
-		//	If this is a deauth, clean up the database...
-		if ( $this->_isDeauthRequest )
-		{
-			if ( $this->_loadUser() )
-				$this->actionDeauthorize();
-
-			die();
-		}
-
-		error_log( 'Force logging out user, no session found.' );
-		CPSLog::info( __METHOD__, 'Force logging out user, no session found.' );
-
-		//	Logout user...
-		Yii::app()->user->logout();
-
-		CPSLog::trace( __METHOD__, 'Facebook login redirect: ' . $this->_loginUrl );
-
-		echo '<script type="text/javascript">window.top.location.href = "' . $this->_loginUrl . '";</script>';
-		flush();
-		exit;
-	}
-
 }

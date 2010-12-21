@@ -1098,7 +1098,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _gs( $stateName, $defaultValue = null )
 	{
-		return self::_unserialize( self::_gu()->getState( $stateName, self::_serialize( $defaultValue ) ) );
+		$_user = self::_gu();
+		return ( null !== $_user ? self::_unserialize( $_user->getState( $stateName, self::_serialize( $defaultValue ) ) ) : null );
 	}
 
 	/**
@@ -1132,7 +1133,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _ss( $stateName, $stateValue, $defaultValue = null )
 	{
-		return self::_gu()->setState( $stateName, self::_serialize( $stateValue ), self::_serialize( $defaultValue ) );
+		$_user = self::_gu();
+		return ( null !== $_user ? $_user->setState( $stateName, self::_serialize( $stateValue ), self::_serialize( $defaultValue ) ) : false );
 	}
 
 	/**
@@ -1283,16 +1285,32 @@ class CPSHelperBase extends CHtml implements IPSBase
 	{
 		try
 		{
-			if ( $value instanceof SimpleXMLElement || $value instanceof Util_SpXmlElement )
-				return simplexml_load_string( $value );
+			if ( self::_isSerialized( $value ) )
+			{
+				if ( $value instanceof SimpleXMLElement || $value instanceof Util_SpXmlElement )
+					return simplexml_load_string( $value );
 
-			return unserialize( $value );
+				return unserialize( $value );
+			}
 		}
 		catch ( Exception $_ex )
 		{
-			return $value;
 		}
+
+		return $value;
 	}
+
+	/**
+	 * Tests if a value needs unserialization
+	 * @param mixed $value
+	 * @return boolean
+	 */
+	protected static function _isSerialized( $value )
+	{
+		$_result = @unserialize( $value );
+		return !( false === $_result && $value != serialize( false ) );
+	}
+
 }
 
 /**

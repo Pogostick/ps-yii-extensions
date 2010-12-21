@@ -253,7 +253,7 @@ abstract class CPSController extends CController implements IPSBase
 	protected $_cleanTrail;
 	protected function getCleanTrail() { return $this->_cleanTrail; }
 	protected function setCleanTrail( $value ) { $this->_cleanTrail = $value; }
-	
+
 	/**
 	 * @var array Any values in this array will be extracted into each view before it's rendered. The value "currentUser" is added automatically.
 	 */
@@ -267,7 +267,7 @@ abstract class CPSController extends CController implements IPSBase
 	protected $_extraViewDataPrefix = '_';
 	protected function getExtraViewDataPrefix() { return $this->_extraViewDataPrefix; }
 	protected function setExtraViewDataPrefix( $value ) { $this->_extraViewDataPrefix = $value; }
-	
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -293,11 +293,11 @@ abstract class CPSController extends CController implements IPSBase
 		//	Ensure conformity
 		if ( ! is_array( $this->_extraViewDataList ) )
 			$this->_extraViewDataList = array();
-		
+
 		//	Add "currentUser" value to extra view data
 		if ( null === PS::o( $this->_extraViewDataList, $this->_extraViewDataPrefix . 'currentUser' ) )
 			$this->_extraViewDataList[ $this->_extraViewDataPrefix . 'currentUser' ] = PS::_gcu();
-		
+
 		//	And some defaults...
 		$this->_cleanTrail = $this->_displayName;
 		$this->defaultAction = 'index';
@@ -402,7 +402,7 @@ abstract class CPSController extends CController implements IPSBase
 				return;
 			}
 		}
-		
+
 		parent::missingAction( $sActionId );
 	}
 
@@ -470,9 +470,9 @@ abstract class CPSController extends CController implements IPSBase
 	{
 		//	make sure we're all on the same page...
 		$this->_pageLayout = $this->layout;
-		
+
 		$_output = $this->renderPartial( $viewName, $viewData, true );
-		
+
 		if ( $this->_pageLayout && false !== ( $_layoutFile = $this->getLayoutFile( $this->_pageLayout ) ) )
 		{
 			//	Process content layout if required
@@ -485,7 +485,7 @@ abstract class CPSController extends CController implements IPSBase
 
 		if ( $returnString )
 			return $_output;
-		
+
 		echo $_output;
 	}
 
@@ -552,8 +552,8 @@ abstract class CPSController extends CController implements IPSBase
 		if ( is_string( $optionList ) )
 		{
 			$_title = $optionList;
-			
-			$optionList = array( 
+
+			$optionList = array(
 				'title' => PS::_gan() . ' :: ' . $_title,
 				'breadcrumbs' => array( $_title ),
 			);
@@ -564,7 +564,7 @@ abstract class CPSController extends CController implements IPSBase
 
 		CPSjqUIWrapper::loadScripts();
 		PS::setFormFieldContainerClass( 'row' );
-		
+
 		$_formOptions = array(
 			'id' => PS::o( $optionList, 'id', 'ps-edit-form' ),
 			'showDates' => PS::o( $optionList, 'showDates', false ),
@@ -580,7 +580,7 @@ abstract class CPSController extends CController implements IPSBase
 
 			'validate' => PS::o( $optionList, 'validate', true ),
 
-			'validateOptions' => PS::o( $optionList, 'validateOptions', 
+			'validateOptions' => PS::o( $optionList, 'validateOptions',
 				array(
 					'ignoreTitle' => true,
 					'errorClass' => 'ps-validate-error',
@@ -800,6 +800,26 @@ CPSLog::trace(__METHOD__,print_r($oModel->getErrors(),true)	);
 		Yii::app()->user->clearState( $this->m_sSearchStateId );
 
 		return null;
+	}
+
+	/**
+	 * Turns off the layout, echos the JSON encoded version of data and returns. Optionally encoding HTML characters.
+	 * @param array $payload The response data
+	 * @param boolean $encode If true, response is run through htmlspecialchars()
+	 * @param integer $encodeOptions Options for htmlspecialchars. Defaults to ENT_NOQUOTES
+	 */
+	protected function _ajaxReturn( $payload = false, $encode = false, $encodeOptions = ENT_NOQUOTES )
+	{
+		$this->layout = false;
+
+		if ( false === $payload || true === $payload )
+			$payload = ( $payload ? '1' : '0' );
+
+		$_result = json_encode( $payload );
+		if ( $encode ) $_result = htmlspecialchars( $_result, $encodeOptions );
+
+		echo $_result;
+		return;
 	}
 
 }
