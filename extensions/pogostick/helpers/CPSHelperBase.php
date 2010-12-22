@@ -1268,12 +1268,14 @@ class CPSHelperBase extends CHtml implements IPSBase
 			if ( $value instanceof SimpleXMLElement || $value instanceof Util_SpXmlElement )
 				return $value->asXML();
 
-			return serialize( $value );
+			if ( is_object( $value ) )
+				return serialize( $value );
 		}
 		catch ( Exception $_ex )
 		{
-			return $value;
 		}
+
+		return $value;
 	}
 
 	/**

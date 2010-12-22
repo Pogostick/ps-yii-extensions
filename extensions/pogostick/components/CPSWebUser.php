@@ -49,6 +49,13 @@ class CPSWebUser extends CWebUser
 	public function setHashKeys( $value ) { return $this->_hashKeys = $value; }
 
 	/**
+	 * @var boolean If true, all data will be serialized for storage
+	 */
+	protected $_serializeData = true;
+	public function getSerializeData() { return $this->_serializeData; }
+	public function setSerializeData( $value ) { return $this->_serializeData = $value; }
+
+	/**
 	 * @var string The current key prefix
 	 */
 	protected $_keyPrefix = null;
@@ -94,7 +101,7 @@ class CPSWebUser extends CWebUser
 	public function getRawState( $key, $defaultValue = null )
 	{
 		if ( isset( $_SESSION[$key] ) )
-			return $_SESSION[$key];
+			return $this->_unserialize( $_SESSION[$key] );
 
 		return $_SESSION[$key] = $defaultValue;
 	}
@@ -129,7 +136,7 @@ class CPSWebUser extends CWebUser
 		if ( $value === $defaultValue )
 			unset( $_SESSION[$key] );
 		else
-			$_SESSION[$key] = $value;
+			$_SESSION[$key] = $this->_serialize( $value );
 	}
 
 	/**
@@ -247,5 +254,66 @@ class CPSWebUser extends CWebUser
 		$_key = md5( $this->_keyPrefix . ( $isFlashKey ? '.' . self::BASE_FLASH_KEY_PREFIX : null ) );
 		if ( ! empty( $key ) ) $_key .= '.' . ( $this->_hashKeys ? md5( $key ) : $key );
 		return $_key;
+	}
+
+	//********************************************************************************
+	//* Private Methods
+	//********************************************************************************
+
+	/**
+	 * Serializer that can handle SimpleXmlElement objects
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	protected function _serialize( $value )
+	{
+		try
+		{
+			if ( $value instanceof SimpleXMLElement )
+				return $value->asXML();
+
+			if ( is_object( $value ) )
+				return serialize( $value );
+		}
+		catch ( Exception $_ex )
+		{
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Unserializer that can handle SimpleXmlElement objects
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	protected function _unserialize( $value )
+	{
+		try
+		{
+			if ( $this->_isSerialized( $value ) )
+			{
+				if ( $value instanceof SimpleXMLElement || $value instanceof Util_SpXmlElement )
+					return simplexml_load_string( $value );
+
+				return unserialize( $value );
+			}
+		}
+		catch ( Exception $_ex )
+		{
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Tests if a value needs unserialization
+	 * @param mixed $value
+	 * @return boolean
+	 */
+	protected function _isSerialized( $value )
+	{
+		$_result = @unserialize( $value );
+		return !( false === $_result && $value != serialize( false ) );
 	}
 }
