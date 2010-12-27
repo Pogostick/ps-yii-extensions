@@ -68,7 +68,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	public function getFirstName() { return $this->_firstName; }
 
 	/**
-	 * @var User The current user
+	 * @var QuizUser The current user
 	 */
 	protected $_user = null;
 	public function getUser() { return $this->_user; }
@@ -262,7 +262,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 		}
 
 		//	Is this a new app user?
-		$_user = User::model()->find( array(
+		$_user = QuizUser::model()->find( array(
 			'condition' => 'pform_user_id_text = :pform_user_id_text and pform_type_code = :pform_type_code',
 			'params' => array(
 				':pform_user_id_text' => $this->_fbUserId,
@@ -274,7 +274,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 		if ( ! $_user )
 		{
 			//	New user...
-			$_user = new User();
+			$_user = new QuizUser();
 			$_user->pform_user_id_text = $this->_fbUserId;
 			$_user->pform_type_code = 1000;
 			$_user->app_add_date = date( 'Y-m-d h:i:s' );
@@ -399,7 +399,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	{
 		static $_inProgress = false;
 
-		if ( null !== ( $_user = User::model()->find( ':pform_user_id_text = pform_user_id_text', array( ':pform_user_id_text' => $this->_fbUserId ) ) ) )
+		if ( null !== ( $_user = QuizUser::model()->find( ':pform_user_id_text = pform_user_id_text', array( ':pform_user_id_text' => $this->_fbUserId ) ) ) )
 		{
 			CPSLog::trace( __METHOD__, 'Getting photos from user table cache...' );
 			CPSFacebook::$_photoList = json_decode( $_user->photo_cache_text, true );
