@@ -212,134 +212,135 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	* Similar to {@link PS::o} except it will pull a value from a nested array.
 	*
-	* @param array $arOptions
-	* @param integer|string $sKey
-	* @param integer|string $sSubKey
-	* @param mixed $oDefault
-	* @param boolean $bUnset
+	* @param array $optionList
+	* @param integer|string $key
+	* @param integer|string $subKey
+	* @param mixed $defaultValue
+	* @param boolean $unsetValue
 	* @return mixed
 	*/
-	public static function oo( &$arOptions = array(), $sKey, $sSubKey, $oDefault = null, $bUnset = false )
+	public static function oo( &$optionList = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
 	{
-		return PS::o( PS::o( $arOptions, $sKey, array() ), $sSubKey, $oDefault, $bUnset );
+		return PS::o( PS::o( $optionList, $key, array() ), $subKey, $defaultValue, $unsetValue );
 	}
 
 	/**
 	* Alias for {@link CPSHelperBase::getOption)
 	*
-	* @param array $arOptions
-	* @param integer|string $sKey
-	* @param integer|string $sSubKey
-	* @param mixed $oDefault
-	* @param boolean $bUnset
+	* @param array $optionList
+	* @param integer|string $key
+	* @param integer|string $subKey
+	* @param mixed $defaultValue
+	* @param boolean $unsetValue
 	* @return mixed
 	* @access public
 	* @static
 	* @see CPSHelperBase::getOption
 	*/
-	public static function o( &$arOptions = array(), $sKey, $oDefault = null, $bUnset = false )
+	public static function o( &$optionList = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
-		$_oValue = $oDefault;
+		$_newValue = $defaultValue;
 
-		if ( is_array( $arOptions ) )
+		if ( is_array( $optionList ) )
 		{
-			if ( ! array_key_exists( $sKey, $arOptions ) )
+			if ( ! array_key_exists( $key, $optionList ) )
 			{
 				//	Ignore case and look...
-			    $_sNewKey = strtolower( $sKey );
-			    foreach ( $arOptions as $_sKey => $_sValue )
+			    $_newKey = strtolower( $key );
+
+			    foreach ( $optionList as $_key => $_value )
 			    {
-		    		if ( strtolower( $_sKey ) == $_sNewKey )
+		    		if ( strtolower( $_key ) == $_newKey )
 		    		{
 		    			//	Set correct key and break
-		    			$sKey = $_sKey;
+		    			$key = $_key;
 		    			break;
 					}
 				}
 	        }
 
-			if ( isset( $arOptions[ $sKey ] ) )
+			if ( isset( $optionList[$key] ) )
 			{
-				$_oValue = $arOptions[ $sKey ];
-				if ( $bUnset ) unset( $arOptions[ $sKey ] );
+				$_newValue = $optionList[$key];
+				if ( $unsetValue ) unset( $optionList[$key] );
 			}
 
 			//	Set it in the array if not an unsetter...
-			if ( ! $bUnset ) $arOptions[ $sKey ] = $_oValue;
+			if ( ! $unsetValue ) $optionList[$key] = $_newValue;
 		}
 
 		//	Return...
-		return $_oValue;
+		return $_newValue;
 	}
 
 	/**
 	* Retrieves an option from the given array.
-	* $oDefault is set and returned if $sKey is not 'set'. Optionally will unset option in array.
+	* $defaultValue is set and returned if $key is not 'set'. Optionally will unset option in array.
 	*
-	* @param array $arOptions
-	* @param string $sKey
-	* @param mixed $oDefault
-	* @param boolean $bUnset
+	* @param array $optionList
+	* @param string $key
+	* @param mixed $defaultValue
+	* @param boolean $unsetValue
 	* @returns mixed
 	* @access public
 	* @static
 	*/
-	public static function getOption( &$arOptions = array(), $sKey, $oDefault = null, $bUnset = false )
+	public static function getOption( &$optionList = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
-		return self::o( $arOptions, $sKey, $oDefault, $bUnset );
+		return self::o( $optionList, $key, $defaultValue, $unsetValue );
 	}
 
 	/**
 	* Sets an option in the given array. Alias of {@link CPSHelperBase::setOption}
-	* @param array $arOptions
-	* @param string $sKey
-	* @param mixed $oValue
+	* @param array $optionList
+	* @param string $key
+	* @param mixed $value
 	* @returns mixed The new value of the key
 	* @static
 	*/
-	public static function so( array &$arOptions, $sKey, $oValue = null )
+	public static function so( array &$optionList, $key, $value = null )
 	{
-		return $arOptions[ $sKey ] = $oValue;
+		return $optionList[$key] = $value;
 	}
 
 	/**
 	* Sets an option in the given array
 	*
-	* @param array $arOptions
-	* @param string $sKey
-	* @param mixed $oValue
+	* @param array $optionList
+	* @param string $key
+	* @param mixed $value
 	* @returns mixed The new value of the key
 	* @static
 	*/
-	public static function setOption( array &$arOptions, $sKey, $oValue = null )
+	public static function setOption( array &$optionList, $key, $value = null )
 	{
-		return self::so( $arOptions, $sKey, $oValue );
+		return self::so( $optionList, $key, $value );
 	}
 
 	/**
 	* Unsets an option in the given array. Alias of {@link CPSHelperBase::unsetOption}
 	*
-	* @param array $arOptions
-	* @param string $sKey
+	* @param array $optionList
+	* @param string $key
 	* @returns mixed The last value of the key
 	* @static
 	*/
-	public static function uo( array &$arOptions, $sKey )
+	public static function uo( array &$optionList, $key )
 	{
-		return self::o( $arOptions, $sKey, null, true );
+		return self::o( $optionList, $key, null, true );
 	}
 
 	/**
 	* Unsets an option in the given array
 	*
-	* @param array $arOptions
-	* @param string $sKey
+	* @param array $optionList
+	* @param string $key
 	* @returns mixed The last value of the key
 	* @static
 	*/
-	public static function unsetOption( array &$arOptions, $sKey )
+	public static function unsetOption( array &$optionList, $key )
 	{
-		return self::uo( $arOptions, $sKey );
+		return self::uo( $optionList, $key );
 	}
 
 	/**
@@ -354,10 +355,10 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 		for ( $_i = 0; $_i < $_iCount; $_i++ )
 		{
-			foreach ( func_get_arg( $_i ) as $_sKey => $_oValue )
+			foreach ( func_get_arg( $_i ) as $_key => $_newValue )
 			{
-				if ( isset( $_arResult[ $_sKey ] ) ) $_oValue = $_arResult[ $_sKey ] . ' ' . $_oValue;
-				$_arResult[ $_sKey ] = $_oValue;
+				if ( isset( $_arResult[ $_key ] ) ) $_newValue = $_arResult[ $_key ] . ' ' . $_newValue;
+				$_arResult[ $_key ] = $_newValue;
 			}
 		}
 
@@ -525,26 +526,26 @@ class CPSHelperBase extends CHtml implements IPSBase
 			$sXml = simplexml_load_string( "<?xml version='1.0' encoding='utf-8'?><{$sRootNodeName} />" );
 
 		// loop through the data passed in.
-		foreach ( $arData as $_sKey => $_oValue )
+		foreach ( $arData as $_key => $_newValue )
 		{
 			// no numeric keys in our xml please!
-			if ( is_numeric($_sKey ) )
-				$_sKey = "unknownNode_". ( string )$_sKey;
+			if ( is_numeric($_key ) )
+				$_key = "unknownNode_". ( string )$_key;
 
 			// replace anything not alpha numeric
-			$_sKey = preg_replace( '/[^a-z]/i', '', $_sKey );
+			$_key = preg_replace( '/[^a-z]/i', '', $_key );
 
 			// if there is another array found recrusively call this function
-			if ( is_array( $_oValue ) )
+			if ( is_array( $_newValue ) )
 			{
-				$_oNode = $sXml->addChild( $_sKey );
-				self::arrayToXml( $_oValue, $sRootNodeName, $_oNode );
+				$_oNode = $sXml->addChild( $_key );
+				self::arrayToXml( $_newValue, $sRootNodeName, $_oNode );
 			}
 			else
 			{
 				// add single node.
-				$_oValue = htmlentities( $_oValue );
-				$sXml->addChild( $_sKey, $_oValue );
+				$_newValue = htmlentities( $_newValue );
+				$sXml->addChild( $_key, $_newValue );
 			}
 		}
 
@@ -601,8 +602,8 @@ class CPSHelperBase extends CHtml implements IPSBase
     				$_arOut[] = $_oArg;
     			else
     			{
-    				foreach ( $_oArg as $_sValue )
-    					$_arOut[] = $_sValue;
+    				foreach ( $_oArg as $_value )
+    					$_arOut[] = $_value;
 				}
 			}
 		}
@@ -638,11 +639,11 @@ class CPSHelperBase extends CHtml implements IPSBase
 			$_iCount = count( $arHaystack );
 			$_i = 0;
 
-			foreach ( $arHaystack as $_sKey => $_oStraw )
+			foreach ( $arHaystack as $_key => $_oStraw )
 			{
 				$_bNext = ( ++$_i == $_iCount ) ? false : true;
-				if ( is_array( $_oStraw ) ) $arPath[ $_sKey ] = $_sKey;
-				self::array_search( $_oStraw, $arNeedle, $arResult, $arPath, $_sKey );
+				if ( is_array( $_oStraw ) ) $arPath[ $_key ] = $_key;
+				self::array_search( $_oStraw, $arNeedle, $arResult, $arPath, $_key );
 				if (!$_bNext) unset( $arPath[ $currentKey ] );
 			}
 		}
@@ -935,9 +936,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	* @access public
 	* @static
 	*/
-	public static function registerMetaTag( $sContent, $sName = null, $sHttpEquiv = null, $arOptions = array() )
+	public static function registerMetaTag( $sContent, $sName = null, $sHttpEquiv = null, $optionList = array() )
 	{
-		return self::_rmt( $sContent, $sName, $sHttpEquiv, $arOptions );
+		return self::_rmt( $sContent, $sName, $sHttpEquiv, $optionList );
 	}
 
 	/**
@@ -950,9 +951,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	* @access public
 	* @static
 	*/
-	public static function _rmt( $sContent, $sName = null, $sHttpEquiv = null, $arOptions = array() )
+	public static function _rmt( $sContent, $sName = null, $sHttpEquiv = null, $optionList = array() )
 	{
-		self::$_clientScript->registerMetaTag( $sContent, $sName, $sHttpEquiv, $arOptions );
+		self::$_clientScript->registerMetaTag( $sContent, $sName, $sHttpEquiv, $optionList );
 	}
 
 	/**
