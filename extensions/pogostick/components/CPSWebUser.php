@@ -21,44 +21,15 @@
 class CPSWebUser extends CWebUser
 {
 	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-
-	/**
-	 * The base prefix for all state keys
-	 */
-	const BASE_KEY_PREFIX = 'com.pogostick.psYiiExtensions.components.webUser';
-	/**
-	 * The base prefix for all flash keys
-	 */
-	const BASE_FLASH_KEY_PREFIX = 'flashMessage';
-	/**
-	 * The key for the cache of states
-	 */
-	const STATES_CACHE = 'com.pogostick.psYiiExtensions.components.webUser.stateList';
-
-	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
 
 	/**
-	 * @var boolean If true, all keys are hashed before session storage
+	 * @var CPSStateManager Our state manager
 	 */
-	protected $_hashKeys = true;
-	public function getHashKeys() { return $this->_hashKeys; }
-	public function setHashKeys( $value ) { return $this->_hashKeys = $value; }
-
-	/**
-	 * @var boolean If true, all data will be serialized for storage
-	 */
-	protected $_serializeData = true;
-	public function getSerializeData() { return $this->_serializeData; }
-	public function setSerializeData( $value ) { return $this->_serializeData = $value; }
-
-	/**
-	 * @var string The current key prefix
-	 */
-	protected $_keyPrefix = null;
+	protected $_stateManager = null;
+	public function getStateManager() { return $this->_stateManager; }
+	public function setStateManager( $value ) { $this->_stateManager = $value; }
 
 	//********************************************************************************
 	//* Public Methods
@@ -71,7 +42,7 @@ class CPSWebUser extends CWebUser
 	public function __construct( $keyPrefix = null )
 	{
 		//	Initialize the state key prefix
-		$this->_keyPrefix = ( null === $keyPrefix ? self::BASE_KEY_PREFIX . '.' . get_class( $this ) . '.' . Yii::app()->getId() : $keyPrefix );
+		$this->_stateManager = new CPSStateManager( $keyPrefix );
 	}
 
 	/**
@@ -89,21 +60,7 @@ class CPSWebUser extends CWebUser
 	 */
 	public function getState( $key, $defaultValue = null, $isFlash = false )
 	{
-		return $this->getRawState( $this->getInternalKey( $key, $isFlash ), $defaultValue );
-	}
-
-	/**
-	 * Retrieves the raw state
-	 * @param string $key
-	 * @param mixed $defaultValue
-	 * @return mixed
-	 */
-	public function getRawState( $key, $defaultValue = null )
-	{
-		if ( isset( $_SESSION[$key] ) )
-			return $this->_unserialize( $_SESSION[$key] );
-
-		return $_SESSION[$key] = $defaultValue;
+		return $this->_stateManager->getState( $key, $defaultValue, $isFlash );
 	}
 
 	/**
@@ -122,21 +79,7 @@ class CPSWebUser extends CWebUser
 	 */
 	public function setState( $key, $value, $defaultValue = null, $isFlash = false )
 	{
-		$this->setRawState( $this->getInternalKey( $key, $isFlash ), $value, $defaultValue );
-	}
-
-	/**
-	 * Sets a session state
-	 * @param string $key
-	 * @param mixed $value
-	 * @param mixed $defaultValue
-	 */
-	public function setRawState( $key, $value, $defaultValue = null )
-	{
-		if ( $value === $defaultValue )
-			unset( $_SESSION[$key] );
-		else
-			$_SESSION[$key] = $this->_serialize( $value );
+		$this->_stateManager->setState( $key, $value, $defaultValue, $isFlash );
 	}
 
 	/**
@@ -147,8 +90,7 @@ class CPSWebUser extends CWebUser
 	 */
 	public function hasState( $key )
 	{
-		$_key = $this->getInternalKey( $key );
-		return isset( $_SESSION[$_key] );
+		return $this->_stateManager->hasState( $key );
 	}
 
 	/**
@@ -157,14 +99,7 @@ class CPSWebUser extends CWebUser
 	 */
 	public function clearStates()
 	{
-		$_baseKey = $this->getInternalKey();
-		$_length = strlen( $_baseKey );
-
-		foreach ( array_keys( $_SESSION ) as $_key )
-		{
-			if ( ! strncmp( $_key, $_baseKey, $_length ) )
-				unset( $_SESSION[$_key] );
-		}
+		$this->_stateManager->clearStates();
 	}
 
 	/**
@@ -176,24 +111,7 @@ class CPSWebUser extends CWebUser
 	 */
 	public function getFlashes( $delete = true )
 	{
-		$_flashList = array();
-		$_baseKey = $this->getInternalKey( null, true );
-		$_length = strlen( $_baseKey );
-
-		$_keyList = array_keys( $_SESSION );
-
-		foreach ( $_keyList as $_key )
-		{
-			if ( ! strncmp( $_key, $_baseKey, $_length ) )
-			{
-				$_flashList[substr( $_key, $_length )] = $_SESSION[$_key];
-				if ( $delete ) unset( $_SESSION[$_key] );
-			}
-		}
-
-		if ( $delete ) $this->setRawState( $this->getInternalKey( self::FLASH_COUNTERS, true ), array() );
-
-		return $_flashList;
+		return $this->_stateManager->getFlashes( $delete );
 	}
 
 	/**
@@ -207,9 +125,7 @@ class CPSWebUser extends CWebUser
 	 */
 	public function getFlash( $key, $defaultValue = null, $delete = true )
 	{
-		$_value = $this->getState( $key, $defaultValue, true );
-		if ( $delete ) $this->setFlash( $key, null );
-		return $_value;
+		return $this->_stateManager->getFlash( $key, $defaultValue, $delete );
 	}
 
 	/**
@@ -222,15 +138,7 @@ class CPSWebUser extends CWebUser
 	 */
 	public function setFlash( $key, $value, $defaultValue = null )
 	{
-		$this->setState( $key, $value, $defaultValue, true );
-		$_counterList = $this->getState( self::FLASH_COUNTERS, array() );
-
-		if ( $value === $defaultValue )
-			unset( $_counterList[$key] );
-		else
-			$_counterList[$key] = 0;
-
-		$this->setState( self::FLASH_COUNTERS, $_counterList, array() );
+		$this->_stateManager->setFlash( $key, $value, $defaultValue );
 	}
 
 	/**
@@ -239,81 +147,6 @@ class CPSWebUser extends CWebUser
 	 */
 	public function hasFlash( $key )
 	{
-		return ( null !== $this->getFlash( $key, null, false ) );
-	}
-
-	/**
-	 * Constructs an "internal" key built from the key you're looking for and the key prefix. Optionally hashes the key.
-	 * @param string $key If null, the hashed prefix is returned
-	 * @param boolean $isFlashKey If true, the base flash key prefix is appeneded to the key before hashing.
-	 * @return string
-	 */
-	public function getInternalKey( $key = null, $isFlashKey = false )
-	{
-		//	Construct the key
-		$_key = md5( $this->_keyPrefix . ( $isFlashKey ? '.' . self::BASE_FLASH_KEY_PREFIX : null ) );
-		if ( ! empty( $key ) ) $_key .= '.' . ( $this->_hashKeys ? md5( $key ) : $key );
-		return $_key;
-	}
-
-	//********************************************************************************
-	//* Private Methods
-	//********************************************************************************
-
-	/**
-	 * Serializer that can handle SimpleXmlElement objects
-	 * @param mixed $value
-	 * @return mixed
-	 */
-	protected function _serialize( $value )
-	{
-		try
-		{
-			if ( $value instanceof SimpleXMLElement )
-				return $value->asXML();
-
-			if ( is_object( $value ) )
-				return serialize( $value );
-		}
-		catch ( Exception $_ex )
-		{
-		}
-
-		return $value;
-	}
-
-	/**
-	 * Unserializer that can handle SimpleXmlElement objects
-	 * @param mixed $value
-	 * @return mixed
-	 */
-	protected function _unserialize( $value )
-	{
-		try
-		{
-			if ( $this->_isSerialized( $value ) )
-			{
-				if ( $value instanceof SimpleXMLElement || $value instanceof Util_SpXmlElement )
-					return simplexml_load_string( $value );
-
-				return unserialize( $value );
-			}
-		}
-		catch ( Exception $_ex )
-		{
-		}
-
-		return $value;
-	}
-
-	/**
-	 * Tests if a value needs unserialization
-	 * @param mixed $value
-	 * @return boolean
-	 */
-	protected function _isSerialized( $value )
-	{
-		$_result = @unserialize( $value );
-		return !( false === $_result && $value != serialize( false ) );
+		return $this->_stateManager->hasFlash( $key );
 	}
 }

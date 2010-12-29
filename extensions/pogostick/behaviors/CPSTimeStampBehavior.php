@@ -116,7 +116,7 @@ class CPSTimeStampBehavior extends CPSBaseActiveRecordBehavior
     */
     public function showDates()
     {
-    	if ( ! $this->owner->isNewRecord ) return PS::showDates( $this->owner, $this->m_sCreatedColumn, $this->m_sLModColumn, 'D M j, Y' );
+    	if ( ! $this->owner->isNewRecord ) return CPSHelperBase::showDates( $this->owner, $this->m_sCreatedColumn, $this->m_sLModColumn, 'D M j, Y' );
 	}
 	
  	/**
@@ -136,7 +136,7 @@ class CPSTimeStampBehavior extends CPSBaseActiveRecordBehavior
     	//	Any other columns to touch?
     	if ( null !== $additionalColumns )
     	{
-    		foreach ( PS::makeArray( $additionalColumns ) as $_attribute )
+    		foreach ( CPSHelperBase::makeArray( $additionalColumns ) as $_attribute )
     		{
     			if ( $this->owner->hasAttribute( $_attribute ) )
     			{

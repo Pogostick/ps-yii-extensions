@@ -1100,7 +1100,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _gs( $stateName, $defaultValue = null )
 	{
 		$_user = self::_gu();
-		return ( null !== $_user ? self::_unserialize( $_user->getState( $stateName, self::_serialize( $defaultValue ) ) ) : null );
+		return ( null !== $_user ? $_user->getState( $stateName, $defaultValue ) : null );
 	}
 
 	/**
@@ -1135,7 +1135,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _ss( $stateName, $stateValue, $defaultValue = null )
 	{
 		$_user = self::_gu();
-		return ( null !== $_user ? $_user->setState( $stateName, self::_serialize( $stateValue ), self::_serialize( $defaultValue ) ) : false );
+		return ( null !== $_user ? $_user->setState( $stateName, $stateValue, $defaultValue ) : false );
 	}
 
 	/**

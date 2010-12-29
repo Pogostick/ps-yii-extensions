@@ -70,7 +70,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	public function preinit()
 	{
 		//	Create our internal name
-		PS::createInternalName( $this );
+		CPSHelperBase::createInternalName( $this );
 
 		//	Create our option collection
 		$this->_optionList = new CPSOptionCollection();
@@ -79,7 +79,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 		$this->addOptions( self::getBaseOptions() );
 
 		//	Set the external library pathn
-		if ( ! PS::isCLI() )
+		if ( ! CPSHelperBase::isCLI() )
 			$this->extLibUrl = Yii::app()->getAssetManager()->publish( Yii::getPathOfAlias( 'pogostick.external' ), true );
 	}
 
@@ -135,7 +135,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	 * @param boolean $bNoCheck
 	 * @return mixed
 	 */
-	public function makeOptions( $bPublicOnly = true, $iFormat = PS::OF_JSON, $bNoCheck = false )
+	public function makeOptions( $bPublicOnly = true, $iFormat = CPSHelperBase::OF_JSON, $bNoCheck = false )
 	{
 		return CPSOptionHelper::makeOptions( $this, $bPublicOnly, $iFormat, $bNoCheck );
 	}
@@ -147,7 +147,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	 * @param boolean $bNoCheck
 	 * @return mixed
 	 */
-	public function makePublicOptions( $iFormat = PS::OF_JSON, $bNoCheck = false )
+	public function makePublicOptions( $iFormat = CPSHelperBase::OF_JSON, $bNoCheck = false )
 	{
 		return CPSOptionHelper::makeOptions( $this, true, $iFormat, $bNoCheck );
 	}

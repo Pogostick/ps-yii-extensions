@@ -132,7 +132,7 @@ abstract class CPSJobProcess extends CPSComponent
 	*/
 	public function getProcessingTime( $bRaw = false )
 	{
-		$_fSpan = PS::nvl( $this->m_fEnd, PS::currentTimeMillis() ) - $this->m_fStart;
+		$_fSpan = CPSHelperBase::nvl( $this->m_fEnd, CPSHelperBase::currentTimeMillis() ) - $this->m_fStart;
 		return $bRaw ? $_fSpan : number_format( $_fSpan, 2 ) . 's';
 	}
 	
@@ -142,7 +142,7 @@ abstract class CPSJobProcess extends CPSComponent
 	*/
 	public function stopTimer()
 	{
-		$this->m_fEnd = PS::currentTimeMillis();
+		$this->m_fEnd = CPSHelperBase::currentTimeMillis();
 	}
 	
 	/**
@@ -151,7 +151,7 @@ abstract class CPSJobProcess extends CPSComponent
 	*/
 	public function startTimer()
 	{
-		$this->m_fStart = PS::currentTimeMillis();
+		$this->m_fStart = CPSHelperBase::currentTimeMillis();
 		$this->m_fEnd = null;
 	}
 
@@ -176,6 +176,6 @@ abstract class CPSJobProcess extends CPSComponent
 	{
 		//	Auto set status 
 		if ( ! $bNoStatus && $sLevel == 'error' ) $this->setStatus( $sMessage );
-		Yii::log( $sMessage, $sLevel, PS::nvl( $sCategory, __CLASS__ ) );
+		Yii::log( $sMessage, $sLevel, CPSHelperBase::nvl( $sCategory, __CLASS__ ) );
 	}
 }

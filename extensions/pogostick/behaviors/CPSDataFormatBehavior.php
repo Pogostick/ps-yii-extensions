@@ -72,7 +72,7 @@ class CPSDataFormatBehavior extends CPSBaseActiveRecordBehavior
 	 */
 	public function getFormat( $sWhich = 'afterFind', $sType = 'date' )
 	{
-		return PS::nvl( $this->m_arFormat[ $sWhich ][ $sType ], 'm/d/Y' );
+		return CPSHelperBase::nvl( $this->m_arFormat[ $sWhich ][ $sType ], 'm/d/Y' );
 	}
 
 	/**

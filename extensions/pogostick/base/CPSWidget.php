@@ -81,7 +81,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	public function preinit()
 	{
 		//	Create our internal name
-		PS::createInternalName( $this );
+		CPSHelperBase::createInternalName( $this );
 
 		//	Attach our default Behavior
 		$this->attachBehavior( 'psWidget', 'pogostick.behaviors.CPSWidgetBehavior' );
@@ -145,19 +145,19 @@ class CPSWidget extends CInputWidget implements IPSComponent
 		//	Load css files and unset from array...
 		foreach ( $this->m_arCssFiles as $_sKey => $_arFile )
 		{
-			PS::_rcf( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
+			CPSHelperBase::_rcf( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
 			unset( $this->m_arCssFiles[ $_sKey ] );
 		}
 
 		//	Load script files and unset from array...
 		foreach ( $this->m_arScriptFiles as $_sKey => $_arFile )
 		{
-			PS::_rsf( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
+			CPSHelperBase::_rsf( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
 			unset( $this->m_arScriptFiles[ $_sKey ] );
 		}
 
 		//	Send upstream for convenience
-		return PS::_cs();
+		return CPSHelperBase::_cs();
 	}
 
 	/**
@@ -169,7 +169,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	public function registerWidgetScript( $sScript = null, $iWhere = CClientScript::POS_READY )
 	{
 		if ( null === $sScript ) $sScript = $this->generateJavascript();
-		if ( $sScript ) PS::_rs( $this->getUniqueId( $this->id ), $sScript, $iWhere );
+		if ( $sScript ) CPSHelperBase::_rs( $this->getUniqueId( $this->id ), $sScript, $iWhere );
 	}
 
 	/**
@@ -209,7 +209,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	*/
 	public function getUniqueId( $sId = null )
 	{
-		return 'ps.' . CPSHash::hash( PS::nvl( $sId, __CLASS__ ) . time() . CPSWidgetHelper::getNextIdCount() );
+		return 'ps.' . CPSHash::hash( CPSHelperBase::nvl( $sId, __CLASS__ ) . time() . CPSWidgetHelper::getNextIdCount() );
 	}
 
 	//********************************************************************************
@@ -370,19 +370,19 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	public static function create( $sName = null, array $arOptions = array() )
 	{
 		//	Instantiate...
-		$_sName = PS::nvl( $sName, ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $sName );
-		$_sClass = PS::o( $arOptions, 'class', ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $_sName, true );
+		$_sName = CPSHelperBase::nvl( $sName, ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $sName );
+		$_sClass = CPSHelperBase::o( $arOptions, 'class', ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $_sName, true );
 		$_oWidget = new $_sClass();
 		$_oWidget->widgetName = $_sName;
-		$_oWidget->id = $_oWidget->name = PS::o( $arOptions, 'id', $_sName );
-		$_oWidget->name = PS::o( $arOptions, 'name', $_oWidget->id );
+		$_oWidget->id = $_oWidget->name = CPSHelperBase::o( $arOptions, 'id', $_sName );
+		$_oWidget->name = CPSHelperBase::o( $arOptions, 'name', $_oWidget->id );
 
 		//	Push any optional scripts
-		foreach ( PS::o( $arOptions, '_scripts', array(), true ) as $_sScript )
+		foreach ( CPSHelperBase::o( $arOptions, '_scripts', array(), true ) as $_sScript )
 			$_oWidget->pushScriptFile( $_oWidget->baseUrl . $_sScript );
 
 		//	And CSS
-		foreach ( PS::o( $arOptions, '_cssFiles', array(), true ) as $_sCss )
+		foreach ( CPSHelperBase::o( $arOptions, '_cssFiles', array(), true ) as $_sCss )
 			$_oWidget->pushCssFile( $_oWidget->baseUrl . $_sCss);
 
 		//	Now process the rest of the options...

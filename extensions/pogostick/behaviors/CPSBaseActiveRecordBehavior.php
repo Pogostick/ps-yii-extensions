@@ -52,7 +52,7 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 	 */
 	public function preinit()
 	{
-		PS::createInternalName( $this );
+		CPSHelperBase::createInternalName( $this );
 	}
 
 	/**

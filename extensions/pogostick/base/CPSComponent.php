@@ -86,7 +86,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	public function preinit()
 	{
 		//	Create our internal name
-		PS::createInternalName( $this );
+		CPSHelperBase::createInternalName( $this );
 
 		//	Attach our default Behavior
 		$this->attachBehavior( 'psComponent', 'pogostick.behaviors.CPSComponentBehavior' );
@@ -152,7 +152,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	{
 		parent::canGetProperty( $name ) || $this->hasProperty( $name );
 	}
-	
+
 	/**
 	 * Determines whether a property can be set.
 	 * A property can be written if the class has a setter method
@@ -185,7 +185,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 			if ( ( $_behavior = $this->asa( $_behaviorName ) ) instanceof IPSOptionContainer && $_behavior->contains( $name ) && $_behavior->getEnabled() )
 				return true;
 		}
-		
+
 		return false;
 	}
 

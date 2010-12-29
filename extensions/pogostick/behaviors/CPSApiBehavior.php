@@ -1,7 +1,7 @@
 <?php
 /*
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -9,14 +9,14 @@
 
 /**
  * CPSApiBehavior provides a behavior to classes for making API calls
- * 
+ *
  * @package 	psYiiExtensions
  * @subpackage 	behaviors
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id: CPSApiBehavior.php 376 2010-03-22 21:34:12Z jerryablan@gmail.com $
  * @since 		v1.0.5
- * 
+ *
  * @filesource
  */
 class CPSApiBehavior extends CPSComponentBehavior
@@ -29,7 +29,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 	* 'GET' Http method
 	*/
 	const HTTP_GET = 'GET';
-	
+
 	/**
 	* 'PUT' Http method
 	*/
@@ -49,7 +49,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 
 		//	Add ours...
 		$this->addOptions( self::getBaseOptions() );
-		
+
 		//	Attach our events...
 		$this->attachEventHandler( 'onBeforeApiCall', array( $this, 'beforeApiCall' ) );
 		$this->attachEventHandler( 'onAfterApiCall', array( $this, 'afterApiCall' ) );
@@ -174,7 +174,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 		//	Make sure sub API name is set...
 		if ( null === $_sLastAction && null == $sSubApiName )
 			$sSubApiName = '/';
-			
+
 		if (  null !== $sSubApiName && $sSubApiName != $_sLastAction )
 			$_sLastAction = $sSubApiName;
 
@@ -192,7 +192,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 		//	Add mapping...
 		if ( ! $_arMap = $this->getValue( 'requestMap' ) )
 			$_arMap = array();
-			
+
 		$_arMap[$_sLastApiName][$_sLastAction][$sLabel] = $_arTemp;
 		$this->setValue( 'requestMap', $_arMap );
 
@@ -256,26 +256,26 @@ class CPSApiBehavior extends CPSComponentBehavior
 		{
 			$_arRequestMap = $this->requestMap[ $this->apiToUse ][ $sSubType ];
 			$_arDone = array();
-			
+
 			//	Add any extra requestData parameters unchecked to the query string...
 			foreach ( $_arRequestData as $_sKey => $_sValue )
 			{
-				if ( ! array_key_exists( $_sKey, $_arRequestMap ) ) 
+				if ( ! array_key_exists( $_sKey, $_arRequestMap ) )
 				{
 					$_sQuery .= '&' . $_sKey . '=' . urlencode( $_sValue );
 					unset( $_arRequestData[ $_sKey ] );
 				}
 			}
-				
+
 			//	Now build the url...
 			foreach ( $_arRequestMap as $_sKey => $_arInfo )
 			{
 				//	Tag as done...
 				$_arDone[] = $_sKey;
-				
+
 				//	Is there a default value?
 				if ( isset( $_arInfo[ 'default' ] ) && ! isset( $_arRequestData[ $_sKey ] ) ) $_arRequestData[ $_sKey ] = $_arInfo[ 'default' ];
-				
+
 				if ( isset( $_arInfo[ 'required' ] ) && $_arInfo[ 'required' ] && ! array_key_exists( $_sKey, $_arRequestData ) )
 				{
 					throw new CException(
@@ -311,7 +311,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 		CPSLog::trace( __METHOD__, 'Making request: ' . $_sQuery );
 
 		//	Ok, we've build our request, now let's get the results...
-		$_sResults = PS::makeHttpRequest( $_sUrl, $_sQuery, $sMethod, $this->userAgent );
+		$_sResults = CPSHelperBase::makeHttpRequest( $_sUrl, $_sQuery, $sMethod, $this->userAgent );
 
 		CPSLog::trace( __METHOD__, 'Call complete: ' . var_export( $_sResults, true ) );
 
@@ -329,7 +329,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 			case 'array':
 				$_sResults = json_decode( $_sResults, true );
 				break;
-				
+
 			default:	//	Naked
 				break;
 		}
@@ -355,7 +355,7 @@ class CPSApiBehavior extends CPSComponentBehavior
 	{
 		$this->raiseEvent( 'onBeforeApiCall', $event);
 	}
-	
+
 	public function beforeApiCall( CPSApiEvent $event )
 	{
 		return true;

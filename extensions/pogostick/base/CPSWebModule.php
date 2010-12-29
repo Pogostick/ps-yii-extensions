@@ -72,7 +72,7 @@ class CPSWebModule extends CWebModule implements IPSBase
 		$this->_setAssetPaths();
 
 		//	Who doesn't need this???
-		PS::_cs()->registerCoreScript( 'jquery' );
+		CPSHelperBase::_cs()->registerCoreScript( 'jquery' );
 	}
 
 	//********************************************************************************
@@ -84,7 +84,7 @@ class CPSWebModule extends CWebModule implements IPSBase
 	 */
 	protected function _setAssetPaths()
 	{
-		$_assetManager = PS::_a()->getAssetManager();
+		$_assetManager = CPSHelperBase::_a()->getAssetManager();
 		if ( ! $this->_assetPath ) $this->_assetPath = $_assetManager->getBasePath() . DIRECTORY_SEPARATOR . $this->getId();
 		if ( ! is_dir( $this->_assetPath ) ) @mkdir( $this->_assetPath );
 		$this->_assetUrl = $_assetManager->publish( $this->_assetPath, true, -1 );

@@ -102,7 +102,7 @@ class CPSOption implements IPSBase
 		'object',
 		'mixed',
 	);
-	public function isValidType( $sType = null ) { return in_array( PS::nvl( $sType, $this->getRule( self::RPT_TYPE ) ), $this->arValidTypes ); }
+	public function isValidType( $sType = null ) { return in_array( CPSHelperBase::nvl( $sType, $this->getRule( self::RPT_TYPE ) ), $this->arValidTypes ); }
 
 	//********************************************************************************
 	//* Member Variables
@@ -147,7 +147,7 @@ class CPSOption implements IPSBase
 		
 		//	Set values
 		$this->m_sName = $_sCleanName;
-		$this->m_oValue = PS::nvl( $oValue, $this->getDefaultValue() );
+		$this->m_oValue = CPSHelperBase::nvl( $oValue, $this->getDefaultValue() );
 	}
 	
 	//********************************************************************************
@@ -165,7 +165,7 @@ class CPSOption implements IPSBase
 	 * @param mixed
 	 */
 	 
-	public function getValue( $bDefaultIfNull = false ) { return $bDefaultIfNull ? PS::nvl( $this->m_oValue, $this->getDefaultValue() ) : $this->m_oValue; }
+	public function getValue( $bDefaultIfNull = false ) { return $bDefaultIfNull ? CPSHelperBase::nvl( $this->m_oValue, $this->getDefaultValue() ) : $this->m_oValue; }
 	
 	/**
 	 * Set the option value
@@ -178,7 +178,7 @@ class CPSOption implements IPSBase
 	 * @param string The rule
 	 * @return mixed
 	 */
-	public function getRule( $eWhich, $oDefault = null ) { return PS::o( $this->m_arRules, $eWhich, $oDefault ); }
+	public function getRule( $eWhich, $oDefault = null ) { return CPSHelperBase::o( $this->m_arRules, $eWhich, $oDefault ); }
 	
 	/**
 	 * Retrieves all rules
@@ -191,7 +191,7 @@ class CPSOption implements IPSBase
 	 * @param string The rule to set
 	 * @param mixed The rule pattern value
 	 */
-	public function setRule( $eWhich, $oValue ) { PS::so( $this->m_arRules, $eWhich, $oValue ); }
+	public function setRule( $eWhich, $oValue ) { CPSHelperBase::so( $this->m_arRules, $eWhich, $oValue ); }
 	
 	/**
 	 * Sets rules from a pattern

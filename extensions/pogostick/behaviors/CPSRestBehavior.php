@@ -81,8 +81,8 @@ class CPSRestBehavior extends CPSComponentBehavior
 	 */
 	public function hasAction( $actionName, $method = 'GET' )
 	{
-		if ( $_action = PS::o( $this->_restActions, $actionName ) )
-			return ( PS::o( $this->_restActions[$actionName], 'method' ) == $method );
+		if ( $_action = CPSHelperBase::o( $this->_restActions, $actionName ) )
+			return ( CPSHelperBase::o( $this->_restActions[$actionName], 'method' ) == $method );
 
 		return false;
 	}

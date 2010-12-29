@@ -195,7 +195,7 @@ class CPSOptionCollection extends CAttributeCollection implements IPSOptionConta
 	 */
 	public function getOption( $sKey, $oDefault = null, $bUnset = false ) 
 	{ 
-		$_oValue = PS::nvl( $this->itemAt( $sKey ), $oDefault );
+		$_oValue = CPSHelperBase::nvl( $this->itemAt( $sKey ), $oDefault );
 		if ( $bUnset ) $this->unsetOption( $sKey );
 		return $_oValue;
 	}

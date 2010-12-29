@@ -34,7 +34,7 @@ class CPSDeltaChangeBehavior extends CPSBaseActiveRecordBehavior
 	*/
 	protected $m_arLastAttributes = array();
 	public function getLastAttributes() { return $this->m_arLastAttributes; }
-	public function getLastAttribute( $oWhich ) { return PS::o( $this->m_arLastAttributes, $oWhich ); }
+	public function getLastAttribute( $oWhich ) { return CPSHelperBase::o( $this->m_arLastAttributes, $oWhich ); }
 	
 	/**
 	* If true, comparisons will be done in a case-insensitive manner. Defaults to true.
@@ -170,8 +170,8 @@ class CPSDeltaChangeBehavior extends CPSBaseActiveRecordBehavior
 		$_arSchema = ( $this->owner instanceof CPSModel ) ? $this->owner->getSchema() : $this->owner->getMetaData()->columns;
 
 		//	Get old and new values
-		$_oNewValue = PS::nvl( $this->owner->getAttribute( $sAttribute ), 'NULL' );
-		$_oOldValue = PS::nvl( $this->getLastAttribute( $sAttribute ), 'NULL' );
+		$_oNewValue = CPSHelperBase::nvl( $this->owner->getAttribute( $sAttribute ), 'NULL' );
+		$_oOldValue = CPSHelperBase::nvl( $this->getLastAttribute( $sAttribute ), 'NULL' );
 
 		//	Make dates look the same for string comparison
 		if ( isset( $_arSchema[ $sAttribute ] ) && ( $_arSchema[ $sAttribute ]->dbType == 'date' || $_arSchema[ $sAttribute ]->dbType == 'datetime' ) )

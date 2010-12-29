@@ -1,23 +1,23 @@
 <?php
 /*
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2010 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
- 
+
 //	Our requirements
 require_once( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'PS.php' );
- 
+
 /**
- * @package 	psYiiExtensions 
+ * @package 	psYiiExtensions
  * @subpackage 	helpers
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN $Id: CPSOptionHelper.php 368 2010-01-18 01:55:44Z jerryablan@gmail.com $
  * @since 		v1.0.6
- * 
+ *
  * @filesource
  */
 class CPSOptionHelper implements IPSBase
@@ -25,39 +25,39 @@ class CPSOptionHelper implements IPSBase
 	//********************************************************************************
 	//* Constants
 	//********************************************************************************
-	
+
 	/**
 	 * A key for use when mapping callbacks
 	 */
 	const	CB_KEY	= '__pscb_';
-	
+
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
 
 	/**
-	* Check to see if the value follows a callback function pattern. 
+	* Check to see if the value follows a callback function pattern.
 	* Basically we want to check for values that should *NOT* be quoted.
-	* 
+	*
 	* @param string $sValue
 	* @returns boolean
 	*/
 	public static function isScriptCallback( $sValue )
 	{
-		return is_string( $sValue ) && 
-			( 
+		return is_string( $sValue ) &&
+			(
 				$sValue === 'true' ||
 				$sValue === 'false' ||
-				0 == strncasecmp( $sValue, 'function(', 9 ) || 
-				0 == strncasecmp( $sValue, 'new Date(', 9 ) || 
-				0 == strncasecmp( $sValue, 'jQuery(', 7 ) || 
-				0 == strncasecmp( $sValue, '$(', 2 ) 
+				0 == strncasecmp( $sValue, 'function(', 9 ) ||
+				0 == strncasecmp( $sValue, 'new Date(', 9 ) ||
+				0 == strncasecmp( $sValue, 'jQuery(', 7 ) ||
+				0 == strncasecmp( $sValue, '$(', 2 )
 			);
 	}
-	
+
 	/**
 	* Parses a rule pattern string
-	* 
+	*
 	* @param string $sKey The key
 	* @param mixed $oPattern The pattern string or array
 	* @param boolean $bPrivate Forces this option to be private
@@ -68,15 +68,15 @@ class CPSOptionHelper implements IPSBase
 	{
 		//	Seed our rules array...
 		$_arRules = self::defaultRuleSet( $bPrivate );
-		
+
 		if ( null !== $oPattern )
 		{
 			//	Split up pattern (type{:defaultValue{:externalName{:isRequired{:allowedValue(s)}}}})
 			$_arPattern = ( ! is_array( $oPattern ) ) ? explode( ':', $oPattern ) : $oPattern;
-			
+
 			//	Type is required, but we can default to string.
-			$_arRules[ CPSOption::RPT_TYPE ] = PS::o( $_arPattern, 0, PS::o( $_arRules, CPSOption::RPT_TYPE, 'string' ) );
-			
+			$_arRules[ CPSOption::RPT_TYPE ] = CPSHelperBase::o( $_arPattern, 0, CPSHelperBase::o( $_arRules, CPSOption::RPT_TYPE, 'string' ) );
+
 			//	Fix up types...
 			switch ( $_arRules[ CPSOption::RPT_TYPE ] )
 			{
@@ -90,7 +90,7 @@ class CPSOptionHelper implements IPSBase
 			}
 
 			//	Default value (default default value is null)
-			if ( $_arRules[ CPSOption::RPT_DEFAULT ] = PS::o( $_arPattern, 1, PS::o( $_arRules, CPSOption::RPT_DEFAULT ) ) )
+			if ( $_arRules[ CPSOption::RPT_DEFAULT ] = CPSHelperBase::o( $_arPattern, 1, CPSHelperBase::o( $_arRules, CPSOption::RPT_DEFAULT ) ) )
 			{
 				//	Evalute default if we have one...
 				if ( $_arRules[ CPSOption::RPT_TYPE ] !== 'string' && ! empty( $_arRules[ CPSOption::RPT_DEFAULT ] ) )
@@ -98,18 +98,18 @@ class CPSOptionHelper implements IPSBase
 			}
 
 			//	Different name for external use?
-			$_arRules[ CPSOption::RPT_EXTERNAL_NAME ] = PS::o( $_arPattern, 2, PS::o( $_arRules, CPSOption::RPT_EXTERNAL_NAME ) );
-			
-			//	Required value? Must eval to bool(true)
-			$_arRules[ CPSOption::RPT_REQUIRED ] = ( bool )( eval( 'return ' . PS::o( $_arPattern, 3, PS::o( $_arRules, CPSOption::RPT_REQUIRED, false ) ) . ';' ) === true );
-			
-			//	And finally the allowed values. If string contains '|', will be transformed to an array
-			$_arRules[ CPSOption::RPT_ALLOWED ] = ( is_string( $_oAllowed = PS::o( $_arPattern, 4, PS::o( $_arRules, CPSOption::RPT_ALLOWED ) ) ) && false !== strpos( $_oAllowed, '|' ) ) ? explode( '|', $_oAllowed ) : $_oAllowed;
+			$_arRules[ CPSOption::RPT_EXTERNAL_NAME ] = CPSHelperBase::o( $_arPattern, 2, CPSHelperBase::o( $_arRules, CPSOption::RPT_EXTERNAL_NAME ) );
 
-			//	Clean rules 
+			//	Required value? Must eval to bool(true)
+			$_arRules[ CPSOption::RPT_REQUIRED ] = ( bool )( eval( 'return ' . CPSHelperBase::o( $_arPattern, 3, CPSHelperBase::o( $_arRules, CPSOption::RPT_REQUIRED, false ) ) . ';' ) === true );
+
+			//	And finally the allowed values. If string contains '|', will be transformed to an array
+			$_arRules[ CPSOption::RPT_ALLOWED ] = ( is_string( $_oAllowed = CPSHelperBase::o( $_arPattern, 4, CPSHelperBase::o( $_arRules, CPSOption::RPT_ALLOWED ) ) ) && false !== strpos( $_oAllowed, '|' ) ) ? explode( '|', $_oAllowed ) : $_oAllowed;
+
+			//	Clean rules
 			foreach ( $_arRules as $_sKey => $_oValue ) if ( null === $_arRules[ $_sKey ] ) unset( $_arRules[ $_sKey ] );
 		}
-		
+
 		//	and return...
 		return $_arRules;
 	}
@@ -128,7 +128,7 @@ class CPSOptionHelper implements IPSBase
 			CPSOption::RPT_PRIVATE => $bPrivate,
 		);
 	}
-	
+
 	/***
 	 * Validates all options in a collection
 	 * @param ICPSOptionContainer $oContainer
@@ -139,7 +139,7 @@ class CPSOptionHelper implements IPSBase
 		foreach ( $oContainer as $_oOption )
 			self::validateOption( $_oOption );
 	}
-	
+
 	/**
 	 * Validates an option value against its rules. If $oValue is null, stored value is used.
 	 * @param CPSOption $oOption
@@ -150,14 +150,14 @@ class CPSOptionHelper implements IPSBase
 	{
 		//	We all start innocent
 		$_bPassed = true;
-		
-		//	Get the value to test 
-		$_oValue = PS::nvl( $oValue, $oOption->getValue( true ) );
-		
+
+		//	Get the value to test
+		$_oValue = CPSHelperBase::nvl( $oValue, $oOption->getValue( true ) );
+
 		//	Check required values...
 		if ( ! $_bPassed = ( $oOption->getIsRequired() && null === $_oValue ) )
 			throw new CPSOptionException( "Option \"{$oOption->getName()}\" is required." );
-		
+
 		//	Fix up types...
 		$_arType = $oOption->getOptionType();
 		if ( ! is_array( $_arType ) ) $_arType = array( $_arType );
@@ -173,33 +173,33 @@ class CPSOptionHelper implements IPSBase
 					$_bPassed = is_bool( $_oValue );
 					$_sType = 'boolean';
 					break;
-					
+
 				case 'int':
 				case 'integer':
 					$_bPassed = is_int( $_oValue );
 					$_sType = 'integer';
 					break;
-					
+
 				case 'float':
 					$_bPassed = is_float( $_oValue );
 					break;
-					
+
 				case 'double':
 					$_bPassed = is_double( $_oValue );
 					break;
-					
+
 				case 'array':
 					$_bPassed = is_array( $_oValue );
 					break;
-					
+
 				case 'object':
 					$_bPassed = is_object( $_oValue ) || $_oValue === null;
 					break;
-					
+
 				case 'string':
 					$_bPassed = is_string( $_oValue ) || $_oValue === null;
 					break;
-					
+
 				default:
 					//	If we get here, we have unknown or user-defined type. If not null, test it.
 					if ( null !== $_sType && 'NULL' !== $_sType ) $_bPassed = ( $_oValue instanceof $_sType );
@@ -208,36 +208,36 @@ class CPSOptionHelper implements IPSBase
 
 			if ( ! $oOption->isValidType( $_sType ) )
 				throw new CPSOptionException( Yii::t( __CLASS__, 'Invalid type "{y}" specified for "{x}"', array( '{y}' => $_sType, '{x}' => $_sKey ) ), 1  );
-			
+
 			if ( ! $_bPassed )
 			{
 				$_sValType = gettype( $_oValue );
 				throw new CPSOptionException( "Option \"{$oOption->getName()}\" expects values to be of type \"{$_sType}\". \"{$_sValType}\" given." );
 			}
-			
+
 			$oOption->setRule( CPSOption::RPT_TYPE, $_sType );
 		}
 	}
 
 	/***
 	 * Makes an array of key=>value pairs in an array.
-	 * 
+	 *
 	 * @param array $arOptions The options to use as a source
 	 * @param integer $iFormat
 	 * @param boolean $bNoCheck
 	 * @return mixed
 	 */
-	public static function makeOptions( IPSOptionContainer $oContainer, $bPublicOnly = true, $iFormat = PS::OF_JSON, $bNoCheck = false )
+	public static function makeOptions( IPSOptionContainer $oContainer, $bPublicOnly = true, $iFormat = CPSHelperBase::OF_JSON, $bNoCheck = false )
 	{
 		//	Check them first...
 		if ( ! $bNoCheck ) self::validateOptions( $oContainer );
 
 		//	Get our public callbacks...
 		$_arCallbacks = $oContainer->getValue( 'callbacks', array() );
-		
+
 		//	Remove it
 		$oContainer->unsetOption( 'callbacks' );
-		
+
 		//	Our output array
 		$_arOut = array();
 		$_sEncodedOptions = null;
@@ -251,12 +251,12 @@ class CPSOptionHelper implements IPSBase
 
 		//	Now build our final array...
 		$_arRaw = $oContainer->getRawOptions( true );
-		
+
 		foreach( $_arRaw as $_sKey => $_oOption )
 		{
 			//	Skip nulls...
 			$_oValue = $_oOption->getValue();
-			
+
 			if ( ! empty( $_oValue ) || '0' === $_oValue )
 			{
 				$_sExtName = $_oOption->getExternalName();
@@ -290,27 +290,27 @@ class CPSOptionHelper implements IPSBase
 				}
 			}
 		}
-		
+
 		if ( count( $_arOut ) )
 		{
 			switch ( $iFormat )
 			{
-				case PS::OF_JSON:
+				case CPSHelperBase::OF_JSON:
 					$_sEncodedOptions = CJSON::encode( $_arOut );
 					break;
-					
-				case PS::OF_HTTP:
+
+				case CPSHelperBase::OF_HTTP:
 					foreach ( $_arOut as $_sKey => $_sValue )
 					{
-						if ( ! empty( $_sValue ) ) 
+						if ( ! empty( $_sValue ) )
 							$_sEncodedOptions .= '&' . $_sKey . '=' . urlencode( $_sValue );
 					}
 					break;
-					
-				case PS::OF_ASSOC_ARRAY:
-//					if ( ! empty( $_arCallbacks ) ) 
+
+				case CPSHelperBase::OF_ASSOC_ARRAY:
+//					if ( ! empty( $_arCallbacks ) )
 //						throw new CPSOptionException( 'Cannot use type "ASSOC_ARRAY" when callbacks are present.' );
-						
+
 					$_sEncodedOptions = $_arOut;
 					break;
 			}
@@ -328,9 +328,9 @@ class CPSOptionHelper implements IPSBase
 	*
 	* @param string $sKey
 	* @param mixed $oValue
-	* @throws CException           
+	* @throws CException
 	* @returns bool
-	*/                         
+	*/
 	public static function checkOption( CPSOption $oOption )
 	{
 		//	Required and missing? Bail
@@ -389,7 +389,7 @@ class CPSOptionHelper implements IPSBase
 		//	Clean...
 		return true;
 	}
-	
+
 	/**
 	 * Fix up the callbacks
 	 * @param mixed $oValue
@@ -398,7 +398,7 @@ class CPSOptionHelper implements IPSBase
 	protected static function fixCallbacks( $sOutput, $arCallbacks )
 	{
 		$_sOut = $sOutput;
-		
+
 		foreach ( $arCallbacks as $_sKey => $_oValue )
 		{
 			$_sQuote = '"';
@@ -411,7 +411,7 @@ class CPSOptionHelper implements IPSBase
 			}
 
 			$_sSearch = '"' . self::CB_KEY . $_sKey . '":"' . $_sKey . '"';
-			
+
 			if ( self::isScriptCallback( $_oValue ) )
 				$_sReplace = $_sQuote . $_sKey . $_sQuote . ' : ' . $_oValue;
 			else
@@ -419,7 +419,7 @@ class CPSOptionHelper implements IPSBase
 
 			$_sOut = str_replace( $_sSearch, $_sReplace, $_sOut );
 		}
-		
+
 		return $_sOut;
 	}
 
