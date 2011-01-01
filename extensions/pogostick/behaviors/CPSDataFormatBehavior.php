@@ -92,7 +92,7 @@ class CPSDataFormatBehavior extends CPSBaseActiveRecordBehavior
 
 	/**
 	* Returns the default sort
-	* @returns string
+	* @return string
 	* @see setDefaultSort
 	*/
 	public function getDefaultSort() { return $this->m_sDefaultSort; }
@@ -115,7 +115,7 @@ class CPSDataFormatBehavior extends CPSBaseActiveRecordBehavior
 	* @param CDbColumnSchema $oColumn
 	* @param mixed $oValue
 	* @param string $sWhich
-	* @returns mixed
+	* @return mixed
 	*/
 	protected function applyFormat( $oColumn, $oValue, $sWhich = 'view' )
 	{

@@ -40,7 +40,7 @@ class CPSOptionHelper implements IPSBase
 	* Basically we want to check for values that should *NOT* be quoted.
 	*
 	* @param string $sValue
-	* @returns boolean
+	* @return boolean
 	*/
 	public static function isScriptCallback( $sValue )
 	{
@@ -61,7 +61,7 @@ class CPSOptionHelper implements IPSBase
 	* @param string $sKey The key
 	* @param mixed $oPattern The pattern string or array
 	* @param boolean $bPrivate Forces this option to be private
-	* @returns array
+	* @return array
 	* @static
 	*/
 	public static function parseRulePattern( $oPattern, $bPrivate = false )
@@ -329,7 +329,7 @@ class CPSOptionHelper implements IPSBase
 	* @param string $sKey
 	* @param mixed $oValue
 	* @throws CException
-	* @returns bool
+	* @return bool
 	*/
 	public static function checkOption( CPSOption $oOption )
 	{
@@ -353,7 +353,7 @@ class CPSOptionHelper implements IPSBase
 	*
 	* @param array $arOptions
 	* @throws CException
-	* @returns bool
+	* @return bool
 	*/
 	public static function checkOptions( IPSOptionContainer $oContainer )
 	{
@@ -369,7 +369,7 @@ class CPSOptionHelper implements IPSBase
     * Checks the callback array to see if they're valid.
     *
     * @throws CException
-    * @returns true If all is good.
+    * @return true If all is good.
 
     */
 	public static function checkCallbacks( IPSComponent $oComponent )

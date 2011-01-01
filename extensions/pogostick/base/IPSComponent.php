@@ -36,7 +36,7 @@ interface IPSComponent extends IPSBase
 	
 	/**
 	* Get the internal name of our component
-	* @returns string
+	* @return string
 	*/
 	function getInternalName();
 	

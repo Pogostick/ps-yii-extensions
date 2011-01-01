@@ -238,7 +238,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 			//	Didn't work. Try our behavior cache...
 			foreach ( $this->_behaviorList as $_behaviorName )
 			{
-				if ( ( $_behavior = $this->asa( $_behaviorName ) ) instanceof IPSOptionContainer && $_behavior->contains( $name ) )
+				if ( ( $_behavior = $this->asa( $_behaviorName ) ) instanceof IPSOptionContainer )
 					return $_behavior->setValue( $name, $value );
 			}
 
@@ -317,7 +317,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	/**
 	 * Checks if a component has an attached behavior
 	 * @param string $class
-	 * @returns boolean
+	 * @return boolean
 	 */
 	public function hasBehavior( $class )
 	{

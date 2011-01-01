@@ -70,7 +70,7 @@ class CPSCodeTableModel extends CPSModel
 	*
 	* @param CDbConnection $dbConnection Defaults to PS::_a()->db
 	* @param string $name The code table name. Defaults to 'code_t'
-	* @returns boolean
+	* @return boolean
 	*/
 	public static function install( $dbConnection = null, $name = self::DDL_TABLE_NAME )
 	{
@@ -345,7 +345,7 @@ class CPSCodeTableModel extends CPSModel
 
 	/**
 	 * Only return active code records as designated by the active_ind
-	 * @returns CPSCodeTableModel
+	 * @return CPSCodeTableModel
 	 */
 	public function active( $activeOnly = true )
 	{

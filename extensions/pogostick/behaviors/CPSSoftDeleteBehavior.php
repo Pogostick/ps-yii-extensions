@@ -47,7 +47,7 @@ class CPSSoftDeleteBehavior extends CPSBaseActiveRecordBehavior
 	
 	/**
 	* Returns the soft-delete column for this model
-	* @returns string
+	* @return string
 	*/
 	public function getSoftDeleteColumn() { return $this->m_sSoftDeleteColumn; }
 	
@@ -59,7 +59,7 @@ class CPSSoftDeleteBehavior extends CPSBaseActiveRecordBehavior
 
 	/**
 	* Returns the soft-delete values for this model [false,true]
-	* @returns array
+	* @return array
 	*/
 	public function getSoftDeleteValue() { return $this->m_arSoftDeleteValue; }
 	
@@ -76,7 +76,7 @@ class CPSSoftDeleteBehavior extends CPSBaseActiveRecordBehavior
 	/**
 	* Soft deletes models that have that feature
 	* @params CEvent $oEvent
-	* @returns boolean
+	* @return boolean
 	*/
 	public function beforeDelete( $oEvent )
 	{
@@ -131,7 +131,7 @@ class CPSSoftDeleteBehavior extends CPSBaseActiveRecordBehavior
 	/**
 	* Undeletes a soft-deleted model
 	* 
-	* @returns boolean
+	* @return boolean
 	*/
 	public function undelete()
 	{

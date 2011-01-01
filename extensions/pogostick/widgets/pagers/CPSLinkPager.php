@@ -76,7 +76,7 @@ class CPSLinkPager extends CLinkPager implements IPSBase
 	/**
 	* Retrieves the entire icon mapping array
 	* 
-	* @returns array
+	* @return array
 	*/
 	public function getIconMap() { return $this->m_arIcons; }
 

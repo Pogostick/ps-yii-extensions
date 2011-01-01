@@ -126,7 +126,7 @@ class CPSTimeStampBehavior extends CPSBaseActiveRecordBehavior
  	* Only the columns that have been touched are updated. If no columns are updated, no database action is performed.
  	* 
  	* @param mixed $additionalColumns The single column name or array of columns to touch in addition to configured lmod column
- 	* @returns boolean
+ 	* @return boolean
  	*/
     public function touch( $additionalColumns = null )
     {

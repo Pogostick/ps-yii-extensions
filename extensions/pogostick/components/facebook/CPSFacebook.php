@@ -1029,7 +1029,7 @@ class CPSFacebookApiException extends CPSException
 
 	/**
 	 * A string representation of this exception
-	 * @returns string
+	 * @return string
 	 */
 	public function __toString()
 	{

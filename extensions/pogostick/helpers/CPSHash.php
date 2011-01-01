@@ -71,7 +71,7 @@ class CPSHash implements IPSBase
 	* Generates a unique hash code
 	* 
 	* @param int $iLength
-	* @returns string
+	* @return string
 	*/
 	public static function generate( $iLength = 20, $eType = self::ALL )
 	{
@@ -91,7 +91,7 @@ class CPSHash implements IPSBase
 	* @param integer $eHashType
 	* @param integer $iLength
 	* @param boolean $bRawOutput
-	* @returns string
+	* @return string
 	*/
 	public static function hash( $sValueToHash = null, $eHashType = self::SHA1, $iLength = 32, $bRawOutput = false )
 	{

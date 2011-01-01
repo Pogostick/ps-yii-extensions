@@ -411,7 +411,7 @@ class CPSWidgetHelper extends CPSHelperBase
 					$_labelOptions['label'] = false;
 				else
 					$_labelOptions['label'] = PS::nvl( $_label, PS::nvl( $model->getAttributeLabel( $attributeName ), $attributeName ) ) . $_suffixToUse;
-				
+
 				$_output = ( $inputFieldType == PS::TEXT_DISPLAY ? self::activeLabel( $model, $attributeName, $_labelOptions ) : self::activeLabelEx( $model, $attributeName, $_labelOptions ) );
 			}
 
@@ -445,7 +445,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	* @param string $sLabel The real name of the attribute if different
 	* @param array $arLabelOptions The htmlOptions for the label
 	* @param array $listData Any data necessary for the field (i.e. drop down data)
-	* @returns string
+	* @return string
 	* @deprecated
 	*/
 	public static function simpleActiveBlock( $inputFieldType, $model, $attributeName, $arOptions = array(), $sLabel = null, $arLabelOptions = array(), $listData = null, $widgetOptions = array() )
@@ -477,7 +477,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	* @param array $htmlOptions The htmlOptions for the field
 	* @param array $widgetOptions The widget options for the field
 	* @param array $listData Any data necessary for the field (i.e. drop down data)
-	* @returns string
+	* @return string
 	*/
 	public static function activeField( $inputFieldType, $model, $attributeName, $htmlOptions = array(), $widgetOptions = array(), $listData = null )
 	{
@@ -503,9 +503,9 @@ class CPSWidgetHelper extends CPSHelperBase
 			//	Get any additional params for validation
 			$_sClass = PS::o( $htmlOptions, '_validate', null, true );
 			$_isRequired = ( false !== stripos( PS::o( $htmlOptions, 'class' ), 'required' ) );
-			
+
 			if ( ! $_isRequired && $model->isAttributeRequired( $attributeName ) ) PS::addClass( $_sClass, 'required' );
-			
+
 			if ( ! $_isRequired && $model->isAttributeRequired( $attributeName ) )
 			{
 				PS::addClass( $_sClass, 'required' );
@@ -667,7 +667,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	* @param array $htmlOptions The htmlOptions for the field
 	* @param array $widgetOptions The widget options for the field
 	* @param array $listData Any data necessary for the field (i.e. drop down data)
-	* @returns string
+	* @return string
 	*/
 	public static function inactiveField( $inputFieldType, $attributeName, $htmlOptions = array(), $widgetOptions = array(), $listData = null )
 	{
@@ -1274,13 +1274,13 @@ CSS;
 	*
 	* @param string $sLable The button label
 	* @param array $htmlOptions HTML options for the submit button.
-	* @returns string The generated button tag
+	* @return string The generated button tag
 	* @see clientChange
 	*/
 	public static function submitButtonBar( $sLabel = 'Submit', $htmlOptions = array() )
 	{
 		$_sLegend = null;
-		
+
 		//	Make sure current form id is set if we have it...
 		$htmlOptions['formId'] = PS::o( $htmlOptions, 'formId', self::$m_sCurrentFormId );
 		if ( self::$_showRequiredLabel && trim( self::$afterRequiredLabel ) ) $_sLegend = '<span class="ps-form-legend"><span class="required">' . self::getRequiredLabel() . '</span> denotes required fields</span>';
@@ -1552,7 +1552,7 @@ HTML;
 	/**
 	* Closes an open fieldset
 	*
-	* @returns string
+	* @return string
 	*/
 	public static function endFieldset()
 	{
@@ -1599,7 +1599,7 @@ HTML;
 	/**
 	* Returns a styled menu separator.
 	* @param string $sInner
-	* @returns string
+	* @return string
 	*/
 	public static function pipe( $sInner = '|' )
 	{
@@ -1650,7 +1650,7 @@ HTML;
 
 		if ( $_content !== null )
 		{
-			if ( ! $_iconClass ) 
+			if ( ! $_iconClass )
 				$_sIcon = ( ! $_bNoIcon ) ? '<span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>' : null;
 			else
 				$_sIcon = '<span class="' . $_iconClass . '" style="float: left; margin-right: .3em;"></span>';
@@ -1720,7 +1720,7 @@ HTML;
 	* Gets the options for pre-fab select boxes
 	*
 	* @param mixed $inputFieldType
-	* @returns boolean
+	* @return boolean
 	*/
 	protected static function setDropDownValues( &$inputFieldType, &$htmlOptions = array(), &$listData = null, $oSelected = null )
 	{
@@ -1750,7 +1750,7 @@ HTML;
 	* Gets the options for pre-fab select boxes
 	*
 	* @param mixed $inputFieldType
-	* @returns boolean
+	* @return boolean
 	*/
 	protected static function getGenericDropDownValues( $eType, &$htmlOptions = array(), &$listData = null )
 	{
@@ -1878,9 +1878,68 @@ HTML;
 	{
 		$realAttribute = $attribute;
 		self::resolveName( $model, $attribute ); // strip off square brackets if any
-		
+
 		if ( null === PS::o( $htmlOptions, 'required' ) ) $htmlOptions['required'] = $model->isAttributeRequired( $attribute );
 		return self::activeLabel( $model, $realAttribute, $htmlOptions );
 	}
 
+	/**
+	 * Outputs a nicely formatted JSON object
+	 * @param mixed $data A JSON encoded string or an object
+	 * @return string
+	 */
+	public static function jsonFormat( $data = null )
+	{
+		$_indent = '  ';
+		$_result = null;
+		$_indentLevel = 0;
+		$_inString = false;
+
+		//	Is it valid?
+		if ( ! is_string( $data ) ) $data = json_decode( $data );
+
+		if ( empty( $data ) )
+			return false;
+
+		for ( $_i = 0, $_count = strlen( $data ); $_i < $_count; $_i++ )
+		{
+			switch ( $data[$_i] )
+			{
+				case '{':
+				case '[':
+					$_result .= $data[$_i] . ( $_inString ? PHP_EOL . str_repeat( $_indent, ++$_indentLevel ) : null );
+					break;
+
+				case '}':
+				case ']':
+					$_result .= ( ! $_inString ? PHP_EOL . str_repeat( $_indent, $_indentLevel ) : null ) . $data[$_i];
+					if ( --$_indentLevel < 0 ) $_indentLevel = 0;
+					break;
+
+				case ',':
+					if ( ! $_inString )
+						$_result .= ',' . PHP_EOL . str_repeat( $_indent, $_indentLevel );
+					else
+						$_result .= $data[$_i];
+					break;
+
+				case ':':
+					if ( ! $_inString )
+						$_result .= ': ';
+					else
+						$_result .= $data[$_i];
+					break;
+
+				case '"':
+					if ( 0 < $_i && '\\' != $data[$_i - 1] )
+						$_inString = ! $_inString;
+
+				default:
+					$_result .= $data[$_i];
+					break;
+			}
+		}
+
+		return $_result;
+	}
 }

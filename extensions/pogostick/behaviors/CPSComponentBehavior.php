@@ -6,7 +6,6 @@
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
-
 /**
  * Provides a base for the pYe behaviors
  *
@@ -36,16 +35,19 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	//********************************************************************************
 
 	/**
-	 * Our options
-	 * @var CPSOptionCollection
+	 * @var CPSOptionCollection $_optionList Our options
 	 */
 	protected $_optionList;
 
 	/**
-	 * Tracks if we have been initialized yet.
-	 * @var boolean
+	 * @var boolean $initialized Tracks if we have been initialized yet.
 	 */
 	protected $_initialized = false;
+
+	/**
+	 * @var boolean $addIfMissing If option is not found, it is added
+	 */
+	protected $_addIfMissing = true;
 
 	//********************************************************************************
 	//* Yii Overrides
@@ -54,11 +56,8 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	/**
 	* Constructs a component.
 	*/
-	public function __construct( $arConfig = array() )
+	public function __construct( $options = array() )
 	{
-		//	Log it and check for issues...
-//		Yii::trace( 'pogostick.behaviors', '{class} constructed', array( "{class}" => get_class( $this ) ) );
-
 		//	Preinitialize
 		$this->preinit();
 	}
@@ -88,16 +87,12 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	*/
 	public function init()
 	{
-		if ( ! $this->_initialized )
-		{
-			//	We are now...
-			$this->_initialized = true;
-		}
+		$this->_initialized = true;
 	}
 
 	/**
 	* Returns only the public options
-	* @returns array A copy of the public options stored...
+	* @return array A copy of the public options stored...
 	* @see getOptions
 	*/
 	public function getPublicOptions()
@@ -107,56 +102,56 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 
 	/**
 	 * Gets an options value
-	 * @param string $sKey
-	 * @param mixed $oDefault
-	 * @returns mixed
+	 * @param string $key
+	 * @param mixed $defaultValue
+	 * @return mixed
 	 */
-	public function getValue( $sKey, $oDefault = null )
+	public function getValue( $key, $defaultValue = null )
 	{
-		return $this->_optionList->getValue( $sKey, $oDefault );
+		return $this->_optionList->getValue( $key, $defaultValue );
 	}
 
 	/**
 	 * Sets an options value
-	 * @param string $sKey
+	 * @param string $key
 	 * @param mixed $value
-	 * @param boolean $bAddIfMissing If option is not found, it is added
+	 * @param boolean $addIfMissing If option is not found, it is added
 	 */
-	public function setValue( $sKey, $value = null, $bAddIfMissing = true )
+	public function setValue( $key, $value = null, $addIfMissing = true )
 	{
-		$this->_optionList->setValue( $sKey, $value, $bAddIfMissing );
+		$this->_optionList->setValue( $key, $value, $this->_addIfMissing = $addIfMissing );
 	}
 
 	/**
 	 * Makes a set of options
 	 *
-	 * @param boolean $bPublicOnly
-	 * @param integer $iFormat
-	 * @param boolean $bNoCheck
+	 * @param boolean $publicOnly
+	 * @param integer $outputFormat
+	 * @param boolean $noCheck
 	 * @return mixed
 	 */
-	public function makeOptions( $bPublicOnly = true, $iFormat = CPSHelperBase::OF_JSON, $bNoCheck = false )
+	public function makeOptions( $publicOnly = true, $outputFormat = CPSHelperBase::OF_JSON, $noCheck = false )
 	{
-		return CPSOptionHelper::makeOptions( $this, $bPublicOnly, $iFormat, $bNoCheck );
+		return CPSOptionHelper::makeOptions( $this, $publicOnly, $outputFormat, $noCheck );
 	}
 
 	/**
 	 * Makes a set of public options
 	 *
-	 * @param integer $iFormat
-	 * @param boolean $bNoCheck
+	 * @param integer $outputFormat
+	 * @param boolean $noCheck
 	 * @return mixed
 	 */
-	public function makePublicOptions( $iFormat = CPSHelperBase::OF_JSON, $bNoCheck = false )
+	public function makePublicOptions( $outputFormat = CPSHelperBase::OF_JSON, $noCheck = false )
 	{
-		return CPSOptionHelper::makeOptions( $this, true, $iFormat, $bNoCheck );
+		return CPSOptionHelper::makeOptions( $this, true, $outputFormat, $noCheck );
 	}
 
 	/**
 	 * Merges an array of options into the component options.
 	 * You can pass in an array of (key=>value) pairs or an array of {@link CPSOption}s
 	 * @param array $optionList
-	 * @returns mixed
+	 * @return mixed
 	 */
 	public function mergeOptions( $optionList = array() )
 	{
@@ -180,24 +175,24 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 
 	/**
 	 * Get our internal name
-	 * @returns string
+	 * @return string
 	 */
 	public function getInternalName() { return $this->_internalName; }
 
 	/**
 	 * Set our internal name
-	 * @param string $sName
+	 * @param string $name
 	 */
 	public function setInternalName( $sValue ) { $this->_internalName = $sValue; }
 
 	/**
 	* Adds an option to the collection.
-	* @param string $sKey
+	* @param string $key
 	* @param array $arValue
 	* @param bool $bNoSort If set to false, the option array will not be sorted after the addition
 	* @see unsetOption
 	*/
-	public function addOption( $sKey, $value = null, $oPattern = null ) { $this->_optionList->addOption( $sKey, $value, $oPattern ); }
+	public function addOption( $key, $value = null, $definition = null ) { $this->_optionList->addOption( $key, $value, $definition ); }
 
 	/**
 	* Add options in bulk
@@ -205,53 +200,53 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	* @see setOptions
 	* @see getOptions
 	*/
-	public function addOptions( array $optionList ) { $this->_optionList->addOptions( $optionList ); }
+	public function addOptions( $options = array() ) { $this->_optionList->addOptions( $options ); }
 
 	/**
 	* Retrieves an option value
-	* @param string $sKey
+	* @param string $key
 	* @return mixed
 	* @see getOptions
 	*/
-	public function getOption( $sKey, $oDefault = null, $bUnset = false ) { return $this->_optionList->getOption( $sKey, $oDefault, $bUnset ); }
+	public function getOption( $key, $defaultValue = null, $unsetAfter = false ) { return $this->_optionList->getOption( $key, $defaultValue, $unsetAfter ); }
 
 	/**
 	 * Returns an array of options
-	 * @param boolean $bPublicOnly
-	 * @param array $arOnlyThese
+	 * @param boolean $publicOnly
+	 * @param array $optionFilter
 	 * @return array
 	 */
-	public function getOptions( $bPublicOnly = false, $arOnlyThese = array() ) { return $this->_optionList->getOptions( $bPublicOnly, $arOnlyThese ); }
-	public function getRawOptions( $bPublicOnly = false, $arOnlyThese = array() ) { return $this->_optionList->toArray( $bPublicOnly, $arOnlyThese ); }
+	public function getOptions( $publicOnly = false, $optionFilter = array() ) { return $this->_optionList->getOptions( $publicOnly, $optionFilter ); }
+	public function getRawOptions( $publicOnly = false, $optionFilter = array() ) { return $this->_optionList->toArray( $publicOnly, $optionFilter ); }
 	public function &getOptionsObject() { return $this->_optionList; }
 
 	/**
 	* Sets an option
 	*
-	* @param string $sKey
+	* @param string $key
 	* @param mixed $value
 	* @see getOption
 	*/
-	public function setOption( $sKey, $value ) { $this->_optionList->setValue( $sKey, $value ); }
+	public function setOption( $key, $value ) { $this->_optionList->setValue( $key, $value ); }
 
 	/**
 	* Set options in bulk
 	*
 	* @param array $optionList An array containing option_key => value pairs
-	* @param boolean If true, empties array before setting options.
+	* @param boolean $clearFirst If true, empties array before setting options.
 	* @see getOptions
 	*/
-	public function setOptions( array $optionList, $bClearFirst = false ) { $this->_optionList->setOptions( $optionList, $bClearFirst ); }
+	public function setOptions( $options = array(), $clearFirst = false ) { $this->_optionList->setOptions( $options, $clearFirst ); }
 
 	/**
 	* Unsets a single option
 	*
-	* @param string $sKey
+	* @param string $key
 	* @param mixed $value
 	* @see setOption
 	* @see getOption
 	*/
-	public function unsetOption( $sKey ) { $this->_optionList->unsetOption( $sKey ); }
+	public function unsetOption( $key ) { $this->_optionList->unsetOption( $key ); }
 
 	/**
 	* Resets the collection to empty
@@ -261,13 +256,13 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	/**
 	* Checks if an option exists in the options array...
 	*
-	* @param string $sKey
+	* @param string $key
 	* @return bool
 	* @see setOption
 	* @see setOptions
 	*/
-	public function contains( $sKey ) { return $this->_optionList->contains( $sKey ); }
-	public function hasOption( $sKey ) { return $this->contains( $sKey ); }
+	public function contains( $key ) { return $this->_optionList->contains( $key ); }
+	public function hasOption( $key ) { return $this->contains( $key ); }
 
 	/**
 	 * Determines whether a property can be read.
@@ -301,63 +296,63 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 
 	/**
 	 * Gets an option from the collection or passes through to parent.
-	 * @param string $sName the option, property or event name
+	 * @param string $name the option, property or event name
 	 * @return mixed
 	 * @throws CException if the property or event is not defined
 	 * @see __set
 	 */
-	public function __get( $sName )
+	public function __get( $name )
 	{
 		//	Check my options first...
-		if ( $this->_optionList->contains( $sName ) )
-			return $this->_optionList->getValue( $sName );
+		if ( $this->_optionList->contains( $name ) )
+			return $this->_optionList->getValue( $name );
 
 		//	Try daddy...
-		return parent::__get( $sName );
+		return parent::__get( $name );
 	}
 
 	/**
 	 * Sets value of a component option or property.
-	 * @param string $sName the property, option or event name
+	 * @param string $name the property, option or event name
 	 * @param mixed $value the property value or callback
 	 * @throws CException if the property/event is not defined or the property is read only.
 	 * @see __get
 	 */
-	public function __set( $sName, $value )
+	public function __set( $name, $value )
 	{
 		//	Check my options first...
-		if ( $this->_optionList->contains( $sName ) )
-			return $this->_optionList->setValue( $sName, $value );
+		if ( $this->_optionList->contains( $name ) )
+			return $this->_optionList->setValue( $name, $value );
 
 		//	Let parent take a stab. He'll check getter/setters and Behavior methods
-		return parent::__set( $sName, $value );
+		return parent::__set( $name, $value );
 	}
 
 	/**
 	 * Test to see if an option is set.
-	 * @param string $sName
+	 * @param string $name
 	 */
-	public function __isset( $sName )
+	public function __isset( $name )
 	{
 		//	Mine first...
-		if ( $this->_optionList->contains( $sName ) )
-			return null !== $this->_optionList->getValue( $sName );
+		if ( $this->_optionList->contains( $name ) )
+			return null !== $this->_optionList->getValue( $name );
 
-		return parent::__isset( $sName );
+		return parent::__isset( $name );
 	}
 
 	/**
 	 * Unset an option
-	 * @param string $sName
+	 * @param string $name
 	 */
-	public function __unset( $sName )
+	public function __unset( $name )
 	{
 		//	Check my options first...
-		if ( $this->_optionList->contains( $sName ) )
-			$this->_optionList->setValue( $sName );
+		if ( $this->_optionList->contains( $name ) )
+			$this->_optionList->setValue( $name );
 		else
 			//	Try dad
-			parent::__unset( $sName );
+			parent::__unset( $name );
 	}
 
 	//********************************************************************************
@@ -370,53 +365,53 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	* This doesn't actually raise an event. What it does is calls the
 	* owner's event raiser method. That method will then raise the event.
 	*
-	* @param string $sName The event name
-	* @param CPSApiEvent $oEvent The event
+	* @param string $name The event name
+	* @param CPSApiEvent $event The event
 	*/
-	public function raiseEvent( $sName, $oEvent )
+	public function raiseEvent( $name, $event )
 	{
 		//	Save called name...
-		$_sOrigName = $sName;
+		$_originalName = $name;
 
 		//	Handler exists? Call it
-		if ( method_exists( $this->getOwner(), $sName ) )
-			return call_user_func_array( array( $this->getOwner(), $sName ), array( $oEvent ) );
+		if ( method_exists( $this->getOwner(), $name ) )
+			return call_user_func_array( array( $this->getOwner(), $name ), array( $event ) );
 
 		//	See if pre-handler exists...
-		if ( 0 == strncasecmp( 'on', $sName, 2 ) )
-			$sName = substr( $sName, 2 );
+		if ( 0 == strncasecmp( 'on', $name, 2 ) )
+			$name = substr( $name, 2 );
 
-		$sName = lcfirst( $sName );
+		$name = lcfirst( $name );
 
-		if ( method_exists( $this->getOwner(), $sName ) )
-			return call_user_func_array( array( $this->getOwner(), $sName ), array( $oEvent ) );
+		if ( method_exists( $this->getOwner(), $name ) )
+			return call_user_func_array( array( $this->getOwner(), $name ), array( $event ) );
 
 		//	Not there? Throw error...
-		return parent::raiseEvent( $_sOrigName, $oEvent );
+		return parent::raiseEvent( $_originalName, $event );
 	}
 
 	/**
 	* Logs a message to the application log
 	*
-	* @param string $sMessage The log message
-	* @param string $sCategory The category for this log entry. Defaults to __METHOD__
-	* @param string $sLevel The level of this log. Defaults to 'trace'
+	* @param string $message The log message
+	* @param string $category The category for this log entry. Defaults to __METHOD__
+	* @param string $level The level of this log. Defaults to 'trace'
 	*/
-	protected function log( $sMessage, $sCategory = __METHOD__, $sLevel = 'trace' )
+	protected function log( $message, $category = __METHOD__, $level = 'trace' )
 	{
-		return Yii::log( $sMessage, $sLevel, $sCategory );
+		return Yii::log( $message, $level, $category );
 	}
 
 	/**
 	* Log helpers
 	*
-	* @param string $sMessage The log message
-	* @param string $sCategory The category for this log entry. Defaults to __METHOD__
+	* @param string $message The log message
+	* @param string $category The category for this log entry. Defaults to __METHOD__
 	*/
-	protected function logInfo( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'info' ); }
-	protected function logError( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'error' ); }
-	protected function logWarning( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'warning' ); }
-	protected function logTrace( $sMessage, $sCategory = __METHOD__ ) { $this->log( $sMessage, $sCategory, 'trace' ); }
+	protected function logInfo( $message, $category = __METHOD__ ) { $this->log( $message, $category, 'info' ); }
+	protected function logError( $message, $category = __METHOD__ ) { $this->log( $message, $category, 'error' ); }
+	protected function logWarning( $message, $category = __METHOD__ ) { $this->log( $message, $category, 'warning' ); }
+	protected function logTrace( $message, $category = __METHOD__ ) { $this->log( $message, $category, 'trace' ); }
 
 	//********************************************************************************
 	//* Private Methods

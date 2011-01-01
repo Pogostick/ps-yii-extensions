@@ -58,7 +58,7 @@ class CPSThemeRoller extends CPSPortlet
 	/**
 	* Renders the content of this portlet.
 	* If object is set to auto-render, the view with the same name as this portlet will be rendered when called
-	* @returns string
+	* @return string
 	*/
 	protected function renderContent()
 	{
@@ -67,7 +67,7 @@ class CPSThemeRoller extends CPSPortlet
 	
 	/**
 	 * User has requested a new theme
-	 * @returns bool
+	 * @return bool
 	 */
 	public function handleThemeChangeRequest()
 	{

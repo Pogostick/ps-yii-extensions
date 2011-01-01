@@ -92,7 +92,7 @@ class CPSDeltaChangeBehavior extends CPSBaseActiveRecordBehavior
 	
 	/**
 	* Reverts a model back to its state before changes were made.
-	* @returns boolean True if reverted.
+	* @return boolean True if reverted.
 	*/
 	public function revert()
 	{
@@ -101,7 +101,7 @@ class CPSDeltaChangeBehavior extends CPSBaseActiveRecordBehavior
 
 	/**
 	* Returns an array of changed attributes since last save.
-	* @returns array The changed set of attributes or an empty array.
+	* @return array The changed set of attributes or an empty array.
 	* @see didChange
 	*/
 	public function getChangedSet( $arAttributes = array(), $bReturnChanges = false )
@@ -129,7 +129,7 @@ class CPSDeltaChangeBehavior extends CPSBaseActiveRecordBehavior
 	* Returns true if the attribute(s) changed since save
 	* 
 	* @param string|array $oAttributes You may pass in a single attribute or an array of attributes to check
-	* @returns boolean
+	* @return boolean
 	* @see getChangedSet
 	*/
 	public function didChange( $oAttributes )
@@ -161,7 +161,7 @@ class CPSDeltaChangeBehavior extends CPSBaseActiveRecordBehavior
 	* If attribute has changed, returns array of old/new values.
 	* 
 	* @param string $sAttribute
-	* @returns array
+	* @return array
 	*/
 	protected function checkAttributeChange( $sAttribute, $bReturnChanges = false, $bQuickCheck = false )
 	{

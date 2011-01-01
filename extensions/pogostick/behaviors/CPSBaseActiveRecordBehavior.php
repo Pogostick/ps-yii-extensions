@@ -64,7 +64,7 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 
 	/**
 	* Get the internal name of our component
-	* @returns string
+	* @return string
 	*/
 	public function getInternalName() { return $this->_internalName; }
 

@@ -70,7 +70,7 @@ class CPSImage implements IPSBase
 	* @param string $sThumbName
 	* @param int $iThumbWidth
 	* @param int $iThumbHeight
-	* @returns boolean 
+	* @return boolean 
 	* @static
 	*/
 	public static function createThumbnail( $sFileName, $sThumbName = null, $iThumbWidth = null, $iThumbHeight = null )

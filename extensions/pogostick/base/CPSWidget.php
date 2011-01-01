@@ -11,12 +11,12 @@
  * CPSWidget is the base class for all Pogostick widgets for Yii. This object
  * is pretty much identical to CPSComponent but offers a little bit of extra functionality.
  *
- * @package 	psYiiExtensions
+ * @package		psYiiExtensions
  * @subpackage 	base
  *
  * @author 		Jerry Ablan <jablan@pogostick.com>
- * @version 	SVN: $Id: CPSWidget.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
- * @since 		v1.0.0
+ * @version		SVN: $Id: CPSWidget.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
+ * @since			v1.0.0
  *
  * @filesource
  */
@@ -36,25 +36,25 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	 * Tracks if we have been initialized yet.
 	 * @var boolean
 	 */
-	protected $m_bInitialized = false;
+	protected $_initialized = false;
 
 	/**
 	 * Our behaviors. Cached for speed here...
 	 * @var array
 	 */
-	protected $m_arBehaviorCache = array();
+	protected $_behaviorCache = array();
 
 	/**
 	* Our CSS files
 	* @var array
 	*/
-	protected $m_arCssFiles = array();
+	protected $_cssFiles = array();
 
 	/**
 	* Our JS files
 	* @var array
 	*/
-	protected $m_arScriptFiles = array();
+	protected $_scriptFiles = array();
 
 	//********************************************************************************
 	//* Yii Overrides
@@ -63,12 +63,9 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	/**
 	* Constructs a widget
 	*/
-	public function __construct( $oOwner = null )
+	public function __construct( $owner = null )
 	{
-		parent::__construct( $oOwner );
-
-		//	Log it and check for issues...
-//		CPSLog::trace( 'pogostick.base', '{class} constructed', array( "{class}" => get_class( $this ) ) );
+		parent::__construct( $owner );
 
 		//	Preinitialize
 		$this->preinit();
@@ -92,7 +89,7 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	*/
 	public function init()
 	{
-		if ( ! $this->m_bInitialized )
+		if ( ! $this->_initialized )
 		{
 			//	Now call parent's init...
 			parent::init();
@@ -100,42 +97,42 @@ class CPSWidget extends CInputWidget implements IPSComponent
 			if ( empty( $this->name ) ) $this->name = $this->_internalName;
 
 			//	Call our behaviors init() method if they exist
-			foreach ( $this->m_arBehaviorCache as $_sName )
-				$this->asa( $_sName )->init();
+			foreach ( $this->_behaviorCache as $_name )
+				$this->asa( $_name )->init();
 
 			//	Get the id/name of this widget
 			list( $this->name, $this->id ) = $this->resolveNameID();
 
 			//	We are now...
-			$this->m_bInitialized = true;
+			$this->_initialized = true;
 		}
 	}
 
 	/**
 	* Pushes a css file onto the page load stack.
-	* @param string $sPath Path of css relative to doc_root
-	* @param string $sId
+	* @param string $path Path of css relative to doc_root
+	* @param string $id
 	*/
-	public function pushCssFile( $sPath, $sMedia = 'screen' )
+	public function pushCssFile( $path, $media = 'screen' )
 	{
-		return $this->m_arCssFiles[] = array( $sPath, $sMedia );
+		return $this->_cssFiles[] = array( $path, $media );
 	}
 
 	/**
 	* Pushes a script onto the page load stack.
 	*
-	* @param string $sPath Path of script relative to doc_root
-	* @param integer $iPosition
-	* @param string $sId
+	* @param string $path Path of script relative to doc_root
+	* @param integer $position
+	* @param string $id
 	*/
-	public function pushScriptFile( $sPath, $iPosition = CClientScript::POS_HEAD )
+	public function pushScriptFile( $path, $position = CClientScript::POS_HEAD )
 	{
-		$this->m_arScriptFiles[] = array( $sPath, $iPosition );
+		$this->_scriptFiles[] = array( $path, $position );
 	}
 
 	/***
 	* Handles registration of scripts & css files...
-	* @returns CClientScript Returns the current applications CClientScript object {@link CWebApplication::getClientScript}
+	* @return CClientScript Returns the current applications CClientScript object {@link CWebApplication::getClientScript}
 	*/
 	public function registerClientScripts()
 	{
@@ -143,17 +140,17 @@ class CPSWidget extends CInputWidget implements IPSComponent
 		if ( $this->cssFile ) $this->pushCssFile( $this->cssFile );
 
 		//	Load css files and unset from array...
-		foreach ( $this->m_arCssFiles as $_sKey => $_arFile )
+		foreach ( $this->_cssFiles as $_key => $_fileList )
 		{
-			CPSHelperBase::_rcf( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
-			unset( $this->m_arCssFiles[ $_sKey ] );
+			CPSHelperBase::_rcf( CPSHelperBase::_gbu() . $_fileList[0], $_fileList[1] );
+			unset( $this->_cssFiles[ $_key ] );
 		}
 
 		//	Load script files and unset from array...
-		foreach ( $this->m_arScriptFiles as $_sKey => $_arFile )
+		foreach ( $this->_scriptFiles as $_key => $_fileList )
 		{
-			CPSHelperBase::_rsf( Yii::app()->baseUrl . $_arFile[0], $_arFile[1] );
-			unset( $this->m_arScriptFiles[ $_sKey ] );
+			CPSHelperBase::_rsf( PS::_gbu() . $_fileList[0], $_fileList[1] );
+			unset( $this->_scriptFiles[ $_key ] );
 		}
 
 		//	Send upstream for convenience
@@ -163,13 +160,13 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	/**
 	 * Registers a widget script.
 	 * If no script is provided, the object's generateJavascript() method is called to get the sript.
-	 * @param string $sScript
+	 * @param string $script
 	 * @param integer Where to load the script. See {@link CClientScript} for values.
 	 */
-	public function registerWidgetScript( $sScript = null, $iWhere = CClientScript::POS_READY )
+	public function registerWidgetScript( $script = null, $position = CClientScript::POS_READY )
 	{
-		if ( null === $sScript ) $sScript = $this->generateJavascript();
-		if ( $sScript ) CPSHelperBase::_rs( $this->getUniqueId( $this->id ), $sScript, $iWhere );
+		if ( null === $script ) $script = $this->generateJavascript();
+		if ( $script ) CPSHelperBase::_rs( $this->getUniqueId( $this->id ), $script, $position );
 	}
 
 	/**
@@ -179,37 +176,37 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	 * @param mixed the Behavior configuration. This is passed as the first parameter to {@link YiiBase::createComponent} to create the Behavior object.
 	 * @return IPSBehavior the Behavior object
 	 */
-	public function attachBehavior( $sName, $oBehavior )
+	public function attachBehavior( $name, $behavior )
 	{
 		//	Attach the Behavior at the parent and add options here...
-		if ( $_oObject = parent::attachBehavior( $sName, $oBehavior ) )
+		if ( $_behavior = parent::attachBehavior( $name, $behavior ) )
 		{
 			//	Add to our cache...
-			$this->m_arBehaviorCache[] = $sName;
+			$this->_behaviorCache[] = $name;
 		}
 
-		return $_oObject;
+		return $_behavior;
 	}
 
 	/**
 	 * Alias for setOptions
-	 * @param array $arConfig
+	 * @param array $options
 	 * @see setOptions
 	 */
-	public function configure( $arConfig = array() )
+	public function configure( $options = array() )
 	{
-		$this->setOptions( $arConfig );
+		$this->setOptions( $options );
 	}
 
 	/**
 	* Given an ID, a unique name is built and returned
 	*
-	* @param string $sId
-	* @returns string
+	* @param string $id
+	* @return string
 	*/
-	public function getUniqueId( $sId = null )
+	public function getUniqueId( $id = null )
 	{
-		return 'ps.' . CPSHash::hash( CPSHelperBase::nvl( $sId, __CLASS__ ) . time() . CPSWidgetHelper::getNextIdCount() );
+		return 'ps.' . CPSHash::hash( CPSHelperBase::nvl( $id, __CLASS__ ) . time() . CPSWidgetHelper::getNextIdCount() );
 	}
 
 	//********************************************************************************
@@ -238,15 +235,15 @@ class CPSWidget extends CInputWidget implements IPSComponent
 
 	/**
 	 * Get our internal name
-	 * @returns string
+	 * @return string
 	 */
 	public function getInternalName() { return $this->_internalName; }
 
 	/**
 	 * Set our internal name
-	 * @param string $sName
+	 * @param string $name
 	 */
-	public function setInternalName( $sValue ) { $this->_internalName = $sValue; }
+	public function setInternalName( $value ) { $this->_internalName = $value; }
 
 	//********************************************************************************
 	//* Magic Methods
@@ -254,103 +251,103 @@ class CPSWidget extends CInputWidget implements IPSComponent
 
 	/**
 	 * Gets an option from the collection or passes through to parent.
-	 * @param string $sName the option, property or event name
+	 * @param string $name the option, property or event name
 	 * @return mixed
 	 * @throws CException if the property or event is not defined
 	 * @see __set
 	 */
-	public function __get( $sName )
+	public function __get( $name )
 	{
 		//	Then behaviors
-		foreach ( $this->m_arBehaviorCache as $_sBehavior )
+		foreach ( $this->_behaviorCache as $_behaviorName )
 		{
-			if ( ( $_oBehave = $this->asa( $_sBehavior ) ) instanceof IPSOptionContainer && $_oBehave->contains( $sName ) )
-				return $_oBehave->getValue( $sName );
+			if ( ( $_behavior = $this->asa( $_behaviorName ) ) instanceof IPSOptionContainer && $_behavior->contains( $name ) )
+				return $_behavior->getValue( $name );
 		}
 
 		//	Try daddy...
-		return parent::__get( $sName );
+		return parent::__get( $name );
 	}
 
 	/**
 	 * Sets value of a component option or property.
-	 * @param string $sName the property, option or event name
-	 * @param mixed $oValue the property value or callback
+	 * @param string $name the property, option or event name
+	 * @param mixed $value the property value or callback
 	 * @throws CException if the property/event is not defined or the property is read only.
 	 * @see __get
 	 */
-	public function __set( $sName, $oValue )
+	public function __set( $name, $value )
 	{
 		//	Then behaviors
-		foreach ( $this->m_arBehaviorCache as $_sBehavior )
+		foreach ( $this->_behaviorCache as $_behaviorName )
 		{
-			if ( ( $_oBehave = $this->asa( $_sBehavior ) ) instanceof IPSOptionContainer && $_oBehave->contains( $sName ) )
-				return $_oBehave->setValue( $sName, $oValue );
+			if ( ( $_behavior = $this->asa( $_behaviorName ) ) instanceof IPSOptionContainer && $_behavior->contains( $name ) )
+				return $_behavior->setValue( $name, $value );
 		}
 
 		//	Let parent take a stab. He'll check getter/setters and Behavior methods
-		return parent::__set( $sName, $oValue );
+		return parent::__set( $name, $value );
 	}
 
 	/**
 	 * Test to see if an option is set.
-	 * @param string $sName
+	 * @param string $name
 	 */
-	public function __isset( $sName )
+	public function __isset( $name )
 	{
 		//	Then behaviors
-		foreach ( $this->m_arBehaviorCache as $_sBehavior )
+		foreach ( $this->_behaviorCache as $_behaviorName )
 		{
-			if ( ( $_oBehave = $this->asa( $_sBehavior ) ) instanceof IPSOptionContainer && $_oBehave->contains( $sName ) )
-				return $_oBehave->getValue( $sName ) !== null;
+			if ( ( $_behavior = $this->asa( $_behaviorName ) ) instanceof IPSOptionContainer && $_behavior->contains( $name ) )
+				return $_behavior->getValue( $name ) !== null;
 		}
 
-		return parent::__isset( $sName );
+		return parent::__isset( $name );
 	}
 
 	/**
 	 * Unset an option
-	 * @param string $sName
+	 * @param string $name
 	 */
-	public function __unset( $sName )
+	public function __unset( $name )
 	{
 		//	Check my options first...
-		if ( ! $this->m_oOptions->contains( $sName ) )
-			$this->unsetOption( $sName );
+		if ( ! $this->m_oOptions->contains( $name ) )
+			$this->unsetOption( $name );
 		else
 			//	Try dad
-			parent::__unset( $sName );
+			parent::__unset( $name );
 	}
 
 	/**
 	 * Calls the named method which is not a class method.
 	 * Do not call this method. This is a PHP magic method that we override
-	 * @param string $sName The method name
-	 * @param array $arParams The method parameters
+	 * @param string $name The method name
+	 * @param array $parameters The method parameters
 	 * @throws CPSOptionException if the property/event is not defined or the property is read only.
 	 * @see __call
 	 * @return mixed The method return value
 	 */
-	public function __call( $sName, $arParams )
+	public function __call( $name, $parameters )
 	{
-		$_oEvent = null;
+		$_event = null;
 
 		try
 		{
 			//	Look for behavior methods
-			foreach ( $this->m_arBehaviorCache as $_sBehavior )
+			foreach ( $this->_behaviorCache as $_behaviorName )
 			{
-				if ( $_oBehave = $this->asa( $_sBehavior ) )
+				if ( $_behavior = $this->asa( $_behaviorName ) )
 				{
-					if ( method_exists( $_oBehave, $sName ) )
-						return call_user_func_array( array( $_oBehave, $sName ), $arParams );
+					if ( method_exists( $_behavior, $name ) )
+						return call_user_func_array( array( $_behavior, $name ), $parameters );
 				}
 			}
 		}
 		catch ( CPSOptionException $_ex ) { /* Ignore and pass through */ }
 
 		//	Pass on to dad
-		return parent::__call( $sName, $arParams );
+		return parent::__call( $name, $parameters );
 	}
 
 	//********************************************************************************
@@ -363,40 +360,47 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	* The options passed in are dynamically added to the options array and will be accessible
 	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
 	*
-	* @param string $sName The type of widget to create
-	* @param array $arOptions The options for the widget
+	* @param string $name The type of widget to create
+	* @param array $options The options for the widget
 	* @return CPSWidget
 	*/
-	public static function create( $sName = null, array $arOptions = array() )
+	public static function create( $name = null, array $options = array() )
 	{
+		//	Allow shifted arguments...
+		if ( is_array( $name ) && array() === $options )
+		{
+			$options = $name;
+			$name = null;
+		}
+
 		//	Instantiate...
-		$_sName = CPSHelperBase::nvl( $sName, ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $sName );
-		$_sClass = CPSHelperBase::o( $arOptions, 'class', ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $_sName, true );
-		$_oWidget = new $_sClass();
-		$_oWidget->widgetName = $_sName;
-		$_oWidget->id = $_oWidget->name = CPSHelperBase::o( $arOptions, 'id', $_sName );
-		$_oWidget->name = CPSHelperBase::o( $arOptions, 'name', $_oWidget->id );
+		$_name = CPSHelperBase::nvl( $name, ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $name );
+		$_class = CPSHelperBase::o( $options, 'class', ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $_name, true );
+		$_widget = new $_class;
+		$_widget->widgetName = $_name;
+		$_widget->id = $_widget->name = CPSHelperBase::o( $options, 'id', $_name );
+		$_widget->name = CPSHelperBase::o( $options, 'name', $_widget->id );
 
 		//	Push any optional scripts
-		foreach ( CPSHelperBase::o( $arOptions, '_scripts', array(), true ) as $_sScript )
-			$_oWidget->pushScriptFile( $_oWidget->baseUrl . $_sScript );
+		foreach ( CPSHelperBase::o( $options, '_scripts', array(), true ) as $_script )
+			$_widget->pushScriptFile( $_widget->baseUrl . $_script );
 
 		//	And CSS
-		foreach ( CPSHelperBase::o( $arOptions, '_cssFiles', array(), true ) as $_sCss )
-			$_oWidget->pushCssFile( $_oWidget->baseUrl . $_sCss);
+		foreach ( CPSHelperBase::o( $options, '_cssFiles', array(), true ) as $_css )
+			$_widget->pushCssFile( $_widget->baseUrl . $_css );
 
 		//	Now process the rest of the options...
-		$_oWidget->addOptions( $arOptions );
+		$_widget->addOptions( $options );
 
 		//	Initialize our widget
-		$_oWidget->init();
+		$_widget->init();
 
 		//	And run it...
-		if ( $_oWidget->autoRun )
-			$_oWidget->run();
+		if ( $_widget->autoRun )
+			$_widget->run();
 
 		//	And return...
-		return $_oWidget;
+		return $_widget;
 	}
 
 }

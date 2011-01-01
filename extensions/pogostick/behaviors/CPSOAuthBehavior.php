@@ -48,13 +48,13 @@ class CPSOAuthBehavior extends CPSApiBehavior
 
 	/**
 	* Retrieves the current token
-	* @returns array
+	* @return array
 	*/
 	public function getToken() { return $this->m_arCurToken; }
 
 	/**
 	* Retrieves the OAuth object
-	* @returns oauth
+	* @return oauth
 	*/
 	public function getOAuthObject() { return $this->m_oOAuth; }
 	

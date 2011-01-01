@@ -77,7 +77,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 
 	/**
 	* Returns all attribute latbels and populates cache
-	* @returns array
+	* @return array
 	* @see CPSModel::attributeLabels
 	*/
 	public function getAttributeLabels() { return $this->m_arAttributeLabels ? $this->m_arAttributeLabels : $this->m_arAttributeLabels = $this->attributeLabels(); }
@@ -102,7 +102,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	protected $m_sModelName = null;
 	/**
 	* Get this model's name.
-	* @returns string
+	* @return string
 	*/
 	public function getModelName() { return $this->m_sModelName; }
 	/**
@@ -130,7 +130,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	/**
 	 * Checks if a component has an attached behavior
 	 * @param string $sClass
-	 * @returns boolean
+	 * @return boolean
 	 */
 	public function hasBehavior( $sClass )
 	{
@@ -152,7 +152,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	/***
 	* Sets our default behaviors. 
 	* All CPSModel's have the DataFormat and Utility behaviors added by default.
-	* @returns array
+	* @return array
 	* @see CModel::behaviors
 	*/
 	public function behaviors()
@@ -208,7 +208,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	/***
 	* Returns the errors on this model in a single string suitable for logging.
 	* @param string $sAttribute Attribute name. Use null to retrieve errors for all attributes.
-	* @returns string
+	* @return string
 	*/
 	public function getErrorsForLogging( $sAttribute = null )
 	{
@@ -270,7 +270,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	/**
 	 * PHP sleep magic method.
 	 * Take opportunity to flush schema cache...
-	 * @returns array
+	 * @return array
 	 */
 	public function __sleep()
 	{
@@ -301,7 +301,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 
 	/**
 	 * Convenience method to get a database connection to a model's database
-	 * @returns CDbConnection
+	 * @return CDbConnection
 	 */
 	public static function getDb()
 	{
@@ -327,7 +327,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 
 	/**
 	 * Convenience method to get a database command model's database
-	 * @returns CDbCommand
+	 * @return CDbCommand
 	 */
 	public static function createCommand( $sSQL )
 	{

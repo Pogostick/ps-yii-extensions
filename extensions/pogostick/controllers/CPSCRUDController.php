@@ -78,7 +78,7 @@ abstract class CPSCRUDController extends CPSController
 	/**
 	* The filters for this controller
 	*
-	* @returns array Action filters
+	* @return array Action filters
 	*/
 	public function filters()
 	{
@@ -93,7 +93,7 @@ abstract class CPSCRUDController extends CPSController
 	/**
 	* The base access rules for our CRUD controller
 	*
-	* @returns array Access control rules
+	* @return array Access control rules
 	*/
 	public function accessRules()
 	{

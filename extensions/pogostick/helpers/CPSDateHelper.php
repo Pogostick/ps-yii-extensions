@@ -30,7 +30,7 @@ class CPSDateHelper implements IPSBase
 	* 
 	* @param string $dtStart
 	* @param string $dtEnd
-	* @returns DateInterval
+	* @return DateInterval
 	*/
 	public static function dateDiff( $dtStart, $dtEnd = null, $bAbsolute = false )
 	{

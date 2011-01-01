@@ -46,21 +46,21 @@ class CPSMenuHelper extends CPSHelperBase
 
 	/**
 	 * Retrieves the class that marks a menu item as current. Defaults to ps-menu-current.
-	 * @returns string
+	 * @return string
 	 * @static
 	 */
 	public static function getCurrentClass() { return self::$m_sCurrentClass; }
 
 	/**
 	 * Sets the class that marks a menu item as current.
-	 * @returns string
+	 * @return string
 	 * @static
 	 */
 	public static function setCurrentClass( $sValue ) { self::$m_sCurrentClass = $sValue; }
 
 	/**
 	 * Retrieves the current index into the menu
-	 * @returns integer
+	 * @return integer
 	 */
 	public static function getCurrentSection() { return self::$m_iCurrentSection; }
 
@@ -75,7 +75,7 @@ class CPSMenuHelper extends CPSHelperBase
 	 *
 	 * @param string $sTitle
 	 * @param array $arItems
-	 * @returns string
+	 * @return string
 	 */
 	public static function buildMenuBlock( $sTitle, $arOptions = array() )
 	{
@@ -118,7 +118,7 @@ class CPSMenuHelper extends CPSHelperBase
 	 *
 	 * @param string $sTitle
 	 * @param array $arItems
-	 * @returns string
+	 * @return string
 	 */
 	public static function buildMenuFromArray( $sIndex, $arMenu = array() )
 	{

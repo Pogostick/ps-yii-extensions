@@ -77,7 +77,7 @@ abstract class CPSPortlet extends CPSWidget
 	
 	/**
 	* Generate our widget's html
-	* @returns string
+	* @return string
 	*/
 	protected function generateHtml()
 	{
@@ -98,7 +98,7 @@ abstract class CPSPortlet extends CPSWidget
 	/**
 	* Renders the content of this portlet.
 	* If object is set to auto-render, the view with the same name as this portlet will be rendered when called
-	* @returns string
+	* @return string
 	*/
 	protected function renderContent()
 	{
@@ -109,7 +109,7 @@ abstract class CPSPortlet extends CPSWidget
 	
 	/**
 	* Our options
-	* @returns array
+	* @return array
 	*/
 	private function getBaseOptions()
 	{

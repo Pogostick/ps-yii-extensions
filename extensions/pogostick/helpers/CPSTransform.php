@@ -70,7 +70,7 @@ class CPSTransform implements IPSBase
 	* Gets the value of a column
 	* @param string $sType
 	* @param mixed $oValue
-	* @returns mixed
+	* @return mixed
 	*/
 	public static function valueOf( $sType, $oValue )
 	{
@@ -122,7 +122,7 @@ class CPSTransform implements IPSBase
 	* Splits apart a complex column name into its components and constructs a 
 	* column chain (i.e. game.long_name becomes game->long_name)
 	* @param string $sColumn
-	* @returns string
+	* @return string
 	*/
 	protected static function columnChain( $sColumn )
 	{
@@ -146,7 +146,7 @@ class CPSTransform implements IPSBase
 	* @param string $sLinkView
 	* @param string $sWrapTag
 	* @param array $arWrapOptions
-	* @returns string
+	* @return string
 	*/
 	public static function column( CModel $oModel, $arColumns = array(), $sLinkView = 'update', $sWrapTag = 'td', $arWrapOptions = array() )
 	{
@@ -671,7 +671,7 @@ class CPSTransform implements IPSBase
 	* @param array $arData
 	* @param string $sKeyColumn
 	* @param string $sValueColumn
-	* @returns array
+	* @return array
 	* @static
 	* @access public
 	*/

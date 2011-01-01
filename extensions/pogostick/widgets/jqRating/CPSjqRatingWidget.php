@@ -211,7 +211,7 @@ class CPSjqRatingWidget extends CPSWidget
 	* focus				function	The Javascript function executed when stars are focused
 	*
 	* @param array $arOptions
-	* @returns CPSjqRatingWidget
+	* @return CPSjqRatingWidget
 	*/
 	public static function createRating( $arOptions )
 	{

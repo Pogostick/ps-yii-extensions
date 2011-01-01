@@ -65,44 +65,44 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	* Cache the current app for speed
-	* @static CWebApplication
+	* @static CWebApplication $thisApp
 	*/
 	protected static $_thisApp = null;
 
 	/**
 	 * Cache the current request
-	 * @var CHttpRequest
+	 * @var CHttpRequest $thisRequest
 	 */
 	protected static $_thisRequest = null;
 
 	/**
 	* Cache the client script object for speed
-	* @static CClientScript
+	* @static CClientScript $clientScript
 	*/
 	protected static $_clientScript = null;
 
 	/**
 	* Cache the user object for speed
-	* @static CWebUser
+	* @static CWebUser $thisUser
 	*/
 	protected static $_thisUser = null;
 
 	/**
 	* Cache the current controller for speed
-	* @static CController
+	* @static CController $thisController
 	*/
 	protected static $_thisController = null;
 
 	/**
 	* Cache the application parameters for speed
-	* @static CAttributeCollection
+	* @static CAttributeCollection $appParameters
 	*/
 	protected static $_appParameters = null;
 	public static function getParams() { self::$_appParameters; }
 
 	/**
 	 * An array of class names to search in for missing methods
-	 * @static array
+	 * @static array $classPath
 	 */
 	protected static $_classPath = array();
 	public static function getClassPath() { return self::$_classPath; }
@@ -131,7 +131,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	* Creates the internal name of a component/widget. Use (@link setInternalName) to change.
 	* @param IPSBase $component
-	* @returns IPSComponent
+	* @return IPSComponent
 	*/
 	public static function createInternalName( IPSComponent $component )
 	{
@@ -154,7 +154,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	* Since PHP evaluates the arguments before calling a function, this is NOT a short-circuit method.
 	*
 	* @param mixed
-	* @returns mixed
+	* @return mixed
 	*/
 	public static function nvl()
 	{
@@ -201,7 +201,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	* Returns an analog to Java System.currentTimeMillis()
 	*
-	* @returns integer
+	* @return integer
 	*/
 	public static function currentTimeMillis()
 	{
@@ -281,7 +281,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	* @param string $key
 	* @param mixed $defaultValue
 	* @param boolean $unsetValue
-	* @returns mixed
+	* @return mixed
 	* @access public
 	* @static
 	*/
@@ -295,7 +295,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	* @param array $optionList
 	* @param string $key
 	* @param mixed $value
-	* @returns mixed The new value of the key
+	* @return mixed The new value of the key
 	* @static
 	*/
 	public static function so( array &$optionList, $key, $value = null )
@@ -309,7 +309,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	* @param array $optionList
 	* @param string $key
 	* @param mixed $value
-	* @returns mixed The new value of the key
+	* @return mixed The new value of the key
 	* @static
 	*/
 	public static function setOption( array &$optionList, $key, $value = null )
@@ -322,7 +322,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	*
 	* @param array $optionList
 	* @param string $key
-	* @returns mixed The last value of the key
+	* @return mixed The last value of the key
 	* @static
 	*/
 	public static function uo( array &$optionList, $key )
@@ -335,7 +335,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	*
 	* @param array $optionList
 	* @param string $key
-	* @returns mixed The last value of the key
+	* @return mixed The last value of the key
 	* @static
 	*/
 	public static function unsetOption( array &$optionList, $key )
@@ -346,7 +346,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	* Merges an array without overwriting. Accepts multiple array arguments
 	* If an index exists in the target array, it is appended to the value.
-	* @returns array
+	* @return array
 	*/
 	public static function smart_array_merge()
 	{
@@ -554,7 +554,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	* Returns the Url of the currently loaded page.
-	* @returns string
+	* @return string
 	*/
 	public static function getCurrentPageUrl()
 	{
@@ -586,7 +586,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	* Takes parameters and returns an array of the values.
 	*
 	* @param string|array $oData,... One or more values to read and put into the return array.
-	* @returns array
+	* @return array
 	*/
 	public static function makeArray( $oData )
 	{
@@ -615,7 +615,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * Takes the arguments and makes a file path out of them.
 	 * @param mixed File path parts
-	 * @returns string
+	 * @return string
 	 */
 	public static function makePath()
 	{
@@ -680,7 +680,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * Convenience method returns the current app name
 	 * @see CWebApplication::name
 	 * @see CHtml::encode
-	 * @returns string
+	 * @return string
 	 */
 	public static function getAppName( $notEncoded = false ) { return self::_gan( $notEncoded ); }
 	public static function _gan( $notEncoded = false )
@@ -692,7 +692,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * Convienice method returns the current page title
 	 * @see CController::pageTitle
 	 * @see CHtml::encode
-	 * @returns string
+	 * @return string
 	 */
 	public static function getPageTitle( $notEncoded = false ) { return self::_gpt( $notEncoded ); }
 	public static function _gpt( $notEncoded = false )
@@ -704,7 +704,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * Convienice methond Returns the base url of the current app
 	 * @see CWebApplication::getBaseUrl
 	 * @see CHttpRequest::getBaseUrl
-	 * @returns string
+	 * @return string
 	 */
 	public static function getBaseUrl( $absolute = false ) { return self::$_thisApp->getBaseUrl( $absolute ); }
 	public static function _gbu( $absolute = false ) { return self::$_thisApp->getBaseUrl( $absolute ); }
@@ -713,14 +713,14 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * Convienice methond Returns the base path of the current app
 	 * @see CWebApplication::getBasePath
 	 * @see CHttpRequest::getBasePath
-	 * @returns string
+	 * @return string
 	 */
 	public static function getBasePath() { return self::$_thisApp->getBasePath(); }
 	public static function _gbp() { return self::$_thisApp->getBaseUrl(); }
 
 	/***
 	 * Retrieves and caches the Yii ClientScript object
-	 * @returns CClientScript
+	 * @return CClientScript
  	 * @access public
 	 * @static
 	 */
@@ -731,13 +731,26 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	* Returns the current clientScript object. Caches for subsequent calls...
-	* @returns CClientScript
+	* @return CClientScript
 	* @access public
 	* @static
 	*/
 	public static function _cs()
 	{
 		return self::$_clientScript;
+	}
+
+	/**
+	 * Terminates the application.
+	 * This method replaces PHP's exit() function by calling {@link onEndRequest} before exiting.
+	 * @param integer $status exit status (value 0 means normal exit while other values mean abnormal exit).
+	 * @param boolean $exit whether to exit the current request. This parameter has been available since version 1.1.5. It defaults to true, meaning the PHP's exit() function will be called at the end of this method.
+	 * @access public
+	 * @static
+	 */
+	public static function _end( $status = 0, $exit = true )
+	{
+		self::$_thisApp->end( $status, $exit );
 	}
 
 	/**
@@ -770,14 +783,14 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	* Registers a javascript file.
 	*
-	* @param array|string Urls of scripts to load. If URL starts with '!', asset library will be prepended. If first character is not a '/', the asset library directory is prepended.
-	* @param integer the position of the JavaScript code. Valid values include the following:
+	* @param array|string $urlList Urls of scripts to load. If URL starts with '!', asset library will be prepended. If first character is not a '/', the asset library directory is prepended.
+	* @param integer $pagePosition the position of the JavaScript code. Valid values include the following:
 	* <ul>
 	* <li>CClientScript::POS_HEAD : the script is inserted in the head section right before the title element.</li>
 	* <li>CClientScript::POS_BEGIN : the script is inserted at the beginning of the body section.</li>
 	* <li>CClientScript::POS_END : the script is inserted at the end of the body section.</li>
 	* </ul>
-	* @param boolean If true, asset library directory is prepended to url
+	* @param boolean $fromPublished If true, asset library directory is prepended to url
 	* @access public
 	* @static
 	*/
@@ -974,6 +987,11 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return CHttpRequest
 	 */
 	public static function getRequest() { return self::_gr(); }
+	/**
+	 * Returns the current request. Equivalent of {@link CApplication::getRequest}
+	 * @see CApplication::getRequest
+	 * @return CHttpRequest
+	 */
 	public static function _gr()
 	{
 		return self::$_thisRequest;

@@ -148,7 +148,7 @@ class CPSUserIdentity extends CUserIdentity
 	 * @param CFormModel $oForm The data to validate
 	 * @param string $sUser
 	 * @param string $sPassword
-	 * @returns bool
+	 * @return bool
 	 */
 	public static function authenticatePassword( $arOptions = array(), $sClassName = __CLASS__ )
 	{

@@ -110,19 +110,19 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	* Convenience access to isPostRequest
-	* @returns boolean
+	* @return boolean
 	*/
 	public function getIsPostRequest() { return Yii::app()->getRequest()->isPostRequest; }
 
 	/**
 	* Convenience access to isAjaxRequest
-	* @returns boolean
+	* @return boolean
 	*/
 	public function getIsAjaxRequest() { return Yii::app()->getRequest()->isAjaxRequest; }
 
 	/**
 	 * Returns the base url of the current app
-	 * @returns string
+	 * @return string
 	 */
 	public function getAppBaseUrl() { return Yii::app()->getBaseUrl(); }
 
@@ -599,7 +599,7 @@ abstract class CPSController extends CController implements IPSBase
 	* Executes any commands
 	* Maps to {@link CPSController::commandMap} and calls the appropriate method.
 	*
-	* @returns mixed
+	* @return mixed
 	*/
 	protected function processCommand( $arData = array(), $sIndexName = self::COMMAND_FIELD_NAME )
 	{
@@ -638,7 +638,7 @@ abstract class CPSController extends CController implements IPSBase
 	* @param string $sModelName Optional model name
 	* @param string $sSuccessMessage Flash message to set if successful
 	* @param boolean $bNoCommit If true, transaction will not be committed
-	* @returns boolean
+	* @return boolean
 	*/
 	protected function saveModel( &$oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false, $bSafeOnly = false )
 	{
@@ -685,7 +685,7 @@ CPSLog::trace(__METHOD__,print_r($oModel->getErrors(),true)	);
 	* Loads a page of models
 	* @param boolean Whether or not to apply a sort. Defaults to false
 	*
-	* @returns array Element 0 is the results of the find. Element 1 is the pagination object
+	* @return array Element 0 is the results of the find. Element 1 is the pagination object
 	*/
 	protected function loadPaged( $bSort = false, $oCriteria = null )
 	{
@@ -716,7 +716,7 @@ CPSLog::trace(__METHOD__,print_r($oModel->getErrors(),true)	);
 	* @param CDbCriteria The criteria for the lookup
 	* @param array Scopes to apply to this request
 	* @param array Options for the data load
-	* @returns CActiveRecord|array
+	* @return CActiveRecord|array
 	*/
 	protected function genericModelLoad( $sMethod, &$oCrit = null, $arScope = array(), $arOptions = array() )
 	{
@@ -728,7 +728,7 @@ CPSLog::trace(__METHOD__,print_r($oModel->getErrors(),true)	);
 	* This method reads the data from the database and returns the row.
 	* Must override in subclasses.
 	* @var integer $iId The primary key to look up
-	* @returns CActiveRecord
+	* @return CActiveRecord
 	*/
 	protected function load( $iId = null )
 	{
@@ -762,7 +762,7 @@ CPSLog::trace(__METHOD__,print_r($oModel->getErrors(),true)	);
 	* Builds a string suitable for {@link eval}. The verb is intentionally not appeneded.
 	*
 	* @param array $arScope
-	* @returns string
+	* @return string
 	* @todo Will be deprecated after upgrade to PHP v5.3
 	*/
 	protected function getModelLoadString( $arScope = array(), $arOptions = array() )
@@ -792,7 +792,7 @@ CPSLog::trace(__METHOD__,print_r($oModel->getErrors(),true)	);
 
 	/**
 	* Clears the current search criteria
-	* @returns null
+	* @return null
 	*/
 	protected function clearSearchCriteria()
 	{

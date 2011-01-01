@@ -38,7 +38,7 @@ class CSFBaseApplication extends CPSApiComponent
 	
 	/**
 	 * Get our base options
-	 * @returns array
+	 * @return array
 	 */
 	private function getBaseOptions()
 	{

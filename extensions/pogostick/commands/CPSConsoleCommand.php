@@ -150,7 +150,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 	* <li>params: optional, the parameters to be passed to the callback</li>
 	* </ul>
 	* @see buildFileList
-	* @returns array
+	* @return array
 	*/
 	public function copyFiles( $arFileList = array() )
 	{
@@ -572,7 +572,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 	
 	/**
 	* Get options to display
-	* @returns string
+	* @return string
 	*/
 	protected function getDisplayOptions()
 	{

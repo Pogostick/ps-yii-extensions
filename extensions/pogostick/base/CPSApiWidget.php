@@ -52,7 +52,7 @@ abstract class CPSApiWidget extends CPSWidget
 	*
 	* @param array $arMap The map of items to insert into the array. Format is the same as {@link makeMapItem}
 	* @param bool $bSetRequestMap If false, will NOT insert constructed array into {@link requestMap}
-	* @returns array Returns the constructed array item ready to insert into your requestMap
+	* @return array Returns the constructed array item ready to insert into your requestMap
 	* @see makeMapItem
 	*/
 	protected function makeMapArray( $sApiName, $sSubApiName = null, array $arMap, $bSetRequestMap = true )
@@ -87,7 +87,7 @@ abstract class CPSApiWidget extends CPSWidget
 	* @param bool $bRequired Set to true if the parameter is required
 	* @param array $arOptions If supplied, will merge with generated options
 	* @param array $arTargetArray If supplied, will insert into array
-	* @returns array Returns the constructed array item ready to insert into your requestMap
+	* @return array Returns the constructed array item ready to insert into your requestMap
 	*/
 	protected function makeMapItem( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, array $arTargetArray = null )
 	{

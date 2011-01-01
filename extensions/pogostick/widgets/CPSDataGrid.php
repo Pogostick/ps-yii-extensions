@@ -91,7 +91,7 @@ class CPSDataGrid implements IPSBase
     * 
     * @param array $arModel Array of models
     * @param array $arOptions Grid options
-    * @returns string
+    * @return string
     */
 	public static function createEx( $arModel, $arOptions = array() )
 	{
@@ -219,7 +219,7 @@ class CPSDataGrid implements IPSBase
 	* If a column name is prefixed with an '@', it will be stripped and the column will be a link to the 'update' view
 	* If a column name is prefixed with an '?', it will be stripped and the column will be treated as a boolean
 	* 
-	* @returns string
+	* @return string
 	*/
 	protected static function getDataGridRows()
 	{

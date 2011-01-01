@@ -72,7 +72,7 @@ class CPSParamHelper implements IPSBase
 	* @param array $arSource
 	* @param array $arColumns
 	* 
-	* @returns string
+	* @return string
 	*/
 	public static function buildParameterSet( $arSource = array(), $arColumns = array() )
 	{
@@ -157,7 +157,7 @@ class CPSParamHelper implements IPSBase
 	* @param string $sTemplate The template for the condition (i.e. '%{column}%' for 'like' operators)
 	* @param string $bOr If true, condition will be "OR" instead of "AND"
 	* 
-	* @returns string The amended condition string
+	* @return string The amended condition string
 	*/
 	public static function findParam( $arSource = array(), $sColumn, $sCondition = null, $sOperator = '=', $sTemplate = '{column}', $bOr = false )
 	{
@@ -183,7 +183,7 @@ class CPSParamHelper implements IPSBase
 	* @param string $sTemplate The template for the condition (i.e. '%{column}%' for 'like' operators)
 	* @param string $bOr If true, condition will be "OR" instead of "AND"
 	* 
-	* @returns string The amended condition string
+	* @return string The amended condition string
 	*/
 	public static function makeParam( $sColumn, $oValue, $sCondition = null, $sOperator = '=', $sTemplate = '{column}', $bOr = false )
 	{

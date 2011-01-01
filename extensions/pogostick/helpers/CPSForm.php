@@ -203,7 +203,7 @@ class CPSForm implements IPSBase
 	* @param array $arMenuItems
 	* @param string $sDivClass
 	* @param boolean $bShowFlashDiv If true, will output a standard ps-flash-display div
-	* @returns string
+	* @return string
 	* 
 	*/
 	public static function formHeaderEx( $sTitle, $arOptions = array() )
@@ -317,7 +317,7 @@ HTML;
 	/**
 	 * Send in an array of standard actions and they will be converted to spiffy action buttons.
 	 * @param array $arWhich
-	 * @returns array
+	 * @return array
 	 */
 	public static function createMenuButtons( $sItemName, $arWhich = array(), $sAdminName = null, $sAdminAction = null )
 	{

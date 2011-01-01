@@ -115,7 +115,7 @@ abstract class CPSJobProcess extends CPSComponent
 	
 	/**
 	* Runs the job process with timing
-	* @returns boolean
+	* @return boolean
 	*/
 	public function run()
 	{
@@ -128,7 +128,7 @@ abstract class CPSJobProcess extends CPSComponent
 	
 	/**
 	* Returns the amount of time since the timer was started
-	* @returns float
+	* @return float
 	*/
 	public function getProcessingTime( $bRaw = false )
 	{

@@ -50,7 +50,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	public function getSession() { return $this->_session; }
 
 	/**
-	 * @var string The user's Facebook ID
+	 * @var string $fbUserId The user's Facebook ID
 	 */
 	protected $_fbUserId;
 	public function getFBUserId() { return $this->_fbUserId; }
@@ -193,8 +193,8 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	 */
 	public function _initialize()
 	{
-		//	Ignore second call
-		if ( $this->_inForceLogin )
+		//	Ignore second call and standalone...
+		if ( PS::_gs( 'standalone', false ) || $this->_inForceLogin )
 			return;
 
 		$this->_session = $this->_facebookApi->getSession();

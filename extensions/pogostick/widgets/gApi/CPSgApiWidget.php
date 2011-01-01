@@ -55,7 +55,7 @@ class CPSgApiWidget extends CPSApiWidget
 
 	/**
 	* Generates the needed javascript
-	* @returns string
+	* @return string
 	*/
 	protected function generateJavascript()
 	{

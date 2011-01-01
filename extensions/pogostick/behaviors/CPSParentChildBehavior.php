@@ -29,7 +29,7 @@ class CPSParentChildBehavior extends CPSBaseActiveRecordBehavior
 	* Returns whether or not this model has children
 	* Override as necessary
 	* 
-	* @returns boolean
+	* @return boolean
 	*/
 	public function hasChildren()
 	{
