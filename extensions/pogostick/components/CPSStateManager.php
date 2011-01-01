@@ -70,14 +70,10 @@ class CPSStateManager extends CPSComponent
 	public function __construct( $keyPrefix = null )
 	{
 		//	Call pop
-		parent::__construct( array( 'debugMode' => true ) );
-
-		CPSLog::trace( __METHOD__, 'BEFORE: Key Prefix = ' . $keyPrefix . ' (Defaults=[' . self::BASE_KEY_PREFIX . '.' . session_id() . ']' );
+		parent::__construct();
 
 		//	Initialize the state key prefix
-		$this->_keyPrefix = ( null === $keyPrefix ? md5( self::BASE_KEY_PREFIX . '.' . session_id() ) : $keyPrefix );
-
-		CPSLog::trace( __METHOD__, 'AFTER: Key Prefix = ' . $this->_keyPrefix );
+		$this->_keyPrefix = ( null === $keyPrefix ? md5( self::BASE_KEY_PREFIX ) : $keyPrefix );
 	}
 
 	/**
