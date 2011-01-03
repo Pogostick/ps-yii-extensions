@@ -591,6 +591,17 @@ abstract class CPSController extends CController implements IPSBase
 		return $_formOptions;
 	}
 
+	/**
+	 * Sets the content type for this page to the specified MIME type
+	 * @param <type> $contentType The MIME type to set
+	 * @param boolean $noLayout If true, the layout for this page is set to false
+	 */
+	public function setContentType( $contentType, $noLayout = true )
+	{
+		if ( $noLayout ) $this->layout = false;
+		header( 'Content-Type: ' . $contentType );
+	}
+
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************

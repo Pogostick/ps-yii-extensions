@@ -1213,7 +1213,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _sqlAll( $sql, $parameterList = null, $dbToUse = null )
 	{
 		if ( null !== ( $_db = PS::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
-			return $_db->createCommand( $sql )->queryAll( $parameterList );
+			return $_db->createCommand( $sql )->queryAll( true, $parameterList );
 
 		return null;
 	}
@@ -1231,7 +1231,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 		if ( null !== ( $_db = PS::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
 		{
-			if ( null !== ( $_rowList = $_db->createCommand( $sql )->queryAll( $parameterList ) ) )
+			if ( null !== ( $_rowList = $_db->createCommand( $sql )->queryAll( true, $parameterList ) ) )
 			{
 				$_resultList = array();
 
@@ -1250,6 +1250,35 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function isCLI()
 	{
 		return ( 'cli' == php_sapi_name() && empty( $_SERVER['REMOTE_ADDR'] ) );
+	}
+
+	/**
+	 * Create a path alias.
+	 * Note, this method neither checks the existence of the path nor normalizes the path.
+	 * @param string $alias alias to the path
+	 * @param string $path the path corresponding to the alias. If this is null, the corresponding
+	 * path alias will be removed.
+	 */
+	public static function _spoa( $alias, $path )
+	{
+		Yii::setPathOfAlias( $alias, $path );
+	}
+
+	/**
+	 * Translates an alias into a file path.
+	 * Note, this method does not ensure the existence of the resulting file path.
+	 * It only checks if the root alias is valid or not.
+	 * @param string $alias alias (e.g. system.web.CController)
+	 * @param string $url Additional url combine with alias
+	 * @return mixed file path corresponding to the alias, false if the alias is invalid.
+	 */
+	public static function _gpoa( $alias, $url = null )
+	{
+		$_path = Yii::getPathOfAlias( $alias );
+		if ( false !== $_path && null !== $url )
+			$_path = str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_path ) . $url;
+
+		return $_path;
 	}
 
 	//********************************************************************************
