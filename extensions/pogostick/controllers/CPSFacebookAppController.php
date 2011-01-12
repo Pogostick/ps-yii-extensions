@@ -66,6 +66,13 @@ class CPSFacebookAppController extends CPSController
 	//********************************************************************************
 
 	/**
+	* @var string The user model class
+	*/
+	protected $_userModelClass = 'User';
+	public function getUserModelClass() { return $this->_userModelClass; }
+	public function setUserModelClass( $value ) { $this->_userModelClass = $value; }
+
+	/**
 	 * The Facebook API
 	 * @var CPSFacebook
 	 */
@@ -299,7 +306,7 @@ class CPSFacebookAppController extends CPSController
 			)
 		);
 
-		$_identity = new CPSFacebookUserIdentity( $this->_facebookApi, $this->_loginUrl );
+		$_identity = new CPSFacebookUserIdentity( $this->_facebookApi, $this->_loginUrl, $this->_userModelClass );
 	}
 
 	/**

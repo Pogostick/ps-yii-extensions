@@ -113,7 +113,7 @@ class CPSFacebookUser extends CWebUser
 				$_me = $_identity->getMe();
 				PS::_gu()->setFBUserId( $_me['id'] );
 
-				if ( null !== ( $_user = QuizUser::model()->find( 'pform_user_id_text = :pform_user_id_text', array( ':pform_user_id_text' => $_me['id'] ) ) ) )
+				if ( null !== ( $_user = User::model()->find( 'pform_user_id_text = :pform_user_id_text', array( ':pform_user_id_text' => $_me['id'] ) ) ) )
 				{
 					PS::_ss( 'currentUser', $_user );
 					PS::_ss( 'currentMe', $_me );
