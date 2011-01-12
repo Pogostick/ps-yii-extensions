@@ -1275,6 +1275,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _gpoa( $alias, $url = null )
 	{
 		$_path = Yii::getPathOfAlias( $alias );
+
 		if ( false !== $_path && null !== $url )
 			$_path = str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_path ) . $url;
 
