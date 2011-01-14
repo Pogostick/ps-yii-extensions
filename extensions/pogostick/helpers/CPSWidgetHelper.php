@@ -639,7 +639,7 @@ class CPSWidgetHelper extends CPSHelperBase
 
 		try
 		{
-			CPSLog::trace( __METHOD__, 'Rendering field "' . $attributeName . '" of type "' . $inputFieldType . '"' );
+//			CPSLog::trace( __METHOD__, 'Rendering field "' . $attributeName . '" of type "' . $inputFieldType . '"' );
 
 			if ( method_exists( 'CPSWidgetHelper', $inputFieldType ) )
 				$_fieldOutput = self::$inputFieldType( $model, $attributeName, $htmlOptions );
