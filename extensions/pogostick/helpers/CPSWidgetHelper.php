@@ -365,7 +365,9 @@ class CPSWidgetHelper extends CPSHelperBase
 			//	Get our operating parameters
 			$_label = PS::o( $arOptions, 'label', null, true );
 			$_labelOptions = PS::o( $arOptions, 'labelOptions', array(), true );
-			if ( $inputFieldType == PS::TEXTAREA ) $_labelOptions['style'] .= 'vertical-align:top;';
+
+			if ( $inputFieldType == PS::TEXTAREA ) $_labelOptions['style'] = PS::o( $_labelOptions, 'style' ) . 'vertical-align:top;';
+
 			$_suffixToUse = PS::o( $_labelOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
 			$_widgetOptions = PS::o( $arOptions, 'widgetOptions', array(), true );
 			$_arData = PS::o( $arOptions, 'data', array(), true );

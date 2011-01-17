@@ -559,6 +559,51 @@ abstract class CPSController extends CController implements IPSBase
 			);
 		}
 
+		//	Abbreviated arguments?
+		if ( is_array( $model ) && array() === $optionList )
+		{
+			$optionList = $model;
+			$model = PS::o( $optionList, 'model' );
+		}
+
+		//	Let side menu be set from here as well...
+		if ( null !== ( $_menuItems = PS::o( $optionList, 'menu' ) ) )
+		{
+			//	Rebuild menu items if not in standard format
+			$_finalMenu = array();
+
+			foreach ( $_menuItems as $_itemKey => $_itemValue )
+			{
+				$_label = PS::o( $_itemValue, 'label', $_itemKey );
+				$_url = PS::o( $_itemValue, 'url', $_itemValue );
+
+				$_finalMenu[] = array(
+					'label' => $_label,
+					'url' => $_url,
+				);
+			}
+
+			$this->setMenu( $_finalMenu );
+		}
+
+		$_formId = PS::o( $optionList, 'id', 'ps-edit-form' );
+			
+		if ( false !== ( $_enableSearch = PS::o( $optionList, 'enableSearch', false ) ) )
+		{
+			PS::_rs( 'search', "
+$('.search-button').click(function(){
+	$('.search-form').slideToggle();
+	return false;
+});
+$('.search-form form').submit(function(){
+	$.fn.yiiGridView.update('{$_formId}', {
+		data: $(this).serialize()
+	});
+	return false;
+});
+");
+		}
+
 		$this->setPageTitle( PS::o( $optionList, 'pageTitle', PS::_gan() ) );
 		$this->_breadcrumbs = PS::o( $optionList, 'breadcrumbs' );
 
@@ -570,7 +615,7 @@ abstract class CPSController extends CController implements IPSBase
 			'showDates' => PS::o( $optionList, 'showDates', false ),
 			'method' => PS::o( $optionList, 'method', 'POST' ),
 
-			'uiStyle' => PS::o( $optionList, 'uiStyle', PS::JQUI ),
+			'uiStyle' => PS::o( $optionList, 'uiStyle', PS::UI_JQUERY ),
 			'formClass' => PS::o( $optionList, 'formClass', 'form' ),
 			'formModel' => $model,
 			'errorCss' => PS::o( $optionList, 'errorCss', 'error' ),
