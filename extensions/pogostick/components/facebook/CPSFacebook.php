@@ -250,7 +250,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	public static $_photoList = null;
 	public static function getPhotoList() { return self::$_photoList; }
-	public static function setPhotoList( $value ) { self::$_photoList = $value; }
+	public static function setPhotoList( $_value ) { self::$_photoList = $_value; }
 
 	/**
 	 * @var array The active user session, if one is available.
@@ -343,6 +343,13 @@ class CPSFacebook extends CPSApiComponent
 			if ( ! $_session && $_session = PS::o( $_REQUEST, 'session' ) )
 			{
 				$_session = json_decode( get_magic_quotes_gpc() ? stripslashes( $_session ) : $_session, true );
+				$_session = $this->_validateSessionObject( $_session );
+			}
+
+			//	Try getting unsigned fb_sig request...
+			if ( ! $_session )
+			{
+				$_session = $this->_getUnsignedSession();
 				$_session = $this->_validateSessionObject( $_session );
 			}
 
@@ -899,10 +906,10 @@ class CPSFacebook extends CPSApiComponent
 	 * Generate a signature for the given params and secret.
 	 *
 	 * @param array $paramList the parameters to sign
-	 * @param string $secret the secret to sign with
+	 * @param string $_secretKey the secret to sign with
 	 * @return string the generated signature
 	 */
-	protected static function _generateSignature( $paramList, $secret )
+	protected static function _generateSignature( $paramList, $_secretKey )
 	{
 		//	Work with sorted data
 		ksort( $paramList );
@@ -913,7 +920,7 @@ class CPSFacebook extends CPSApiComponent
 		foreach ( $paramList as $_key => $_value )
 			$_baseString .= $_key . '=' . $_value;
 
-		$_baseString .= $secret;
+		$_baseString .= $_secretKey;
 
 		return md5( $_baseString );
 	}
@@ -929,6 +936,40 @@ class CPSFacebook extends CPSApiComponent
 	protected static function _base64UrlDecode( $source )
 	{
 		return base64_decode( strtr( $source, '-_', '+/' ) );
+	}
+
+	/**
+	 * Looks in request for session signatures
+	 * @return array
+	 */
+	protected static function _getUnsignedSession()
+	{
+		if ( isset( $_REQUEST['fb_sig_user'] ) )
+		{
+			$_session = array();
+
+			$_session['uid'] = PS::o( $_REQUEST, 'fb_sig_user' );
+			$_session['access_token'] = $this->_appId . '|' . PS::o( $_REQUEST, 'fb_sig_session_key' );
+			$_session['expires'] = PS::o( $_REQUEST, 'fb_sig_expires' );
+			$_session['base_domain'] = PS::o( $_REQUEST, 'fb_sig_base_domain' );
+			$_session['secret'] = PS::o( $_REQUEST, 'fb_sig_ss' );
+
+			if ( null !== ( $_session['session_key'] = PS::o( $_REQUEST, 'fb_sig_session_key' ) ) )
+			{
+				ksort( $_session );
+
+				// generate the base string
+				$_baseString = '';
+
+				foreach ( $_session as $_key => $_value )
+					$_baseString .= $_key . '=' . $_value;
+
+				$_baseString .= $this->_apiSecretKey;
+				$_session['sig'] = md5( $_baseString );
+			}
+
+			return $_session;
+		}
 	}
 
 }

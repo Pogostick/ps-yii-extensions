@@ -369,7 +369,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	{
 		CPSLog::trace( __METHOD__, 'Getting app friends...' );
 
-		$this->_appFriendList = null; //PS::_gs( CPSFacebookAppController::APP_FRIEND_CACHE . $this->_fbUserId );
+		$this->_appFriendList = PS::_gs( CPSFacebookAppController::APP_FRIEND_CACHE );
 
 		try
 		{
@@ -387,7 +387,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 						$this->_appFriendList[] = '\'' . $_friend['uid'] . '\'';
 				}
 
-				PS::_ss( CPSFacebookAppController::APP_FRIEND_CACHE . $this->_fbUserId, $this->_appFriendList );
+				PS::_ss( CPSFacebookAppController::APP_FRIEND_CACHE, $this->_appFriendList );
 			}
 		}
 		catch ( Exception $_ex )
