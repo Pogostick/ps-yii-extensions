@@ -49,6 +49,11 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	const COMMAND_FIELD_NAME = '__psCommand';
 
+	/**
+	 * Standard search text for rendering
+	 */
+	const SEARCH_HELP_TEXT = 'You may optionally enter a comparison operator (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b>or <b>=</b>) at the beginning of each search value to specify how the comparison should be done.';
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -566,52 +571,19 @@ abstract class CPSController extends CController implements IPSBase
 			$model = PS::o( $optionList, 'model' );
 		}
 
-		//	Let side menu be set from here as well...
-		if ( null !== ( $_menuItems = PS::o( $optionList, 'menu' ) ) )
-		{
-			//	Rebuild menu items if not in standard format
-			$_finalMenu = array();
-
-			foreach ( $_menuItems as $_itemKey => $_itemValue )
-			{
-				$_label = PS::o( $_itemValue, 'label', $_itemKey );
-				$_url = PS::o( $_itemValue, 'url', $_itemValue );
-
-				$_finalMenu[] = array(
-					'label' => $_label,
-					'url' => $_url,
-				);
-			}
-
-			$this->setMenu( $_finalMenu );
-		}
+		//	Set the standard nav options
+		$this->setViewNavigationOptions( $optionList );
 
 		$_formId = PS::o( $optionList, 'id', 'ps-edit-form' );
-			
-		if ( false !== ( $_enableSearch = PS::o( $optionList, 'enableSearch', false ) ) )
-		{
-			PS::_rs( 'search', "
-$('.search-button').click(function(){
-	$('.search-form').slideToggle();
-	return false;
-});
-$('.search-form form').submit(function(){
-	$.fn.yiiGridView.update('{$_formId}', {
-		data: $(this).serialize()
-	});
-	return false;
-});
-");
-		}
 
-		$this->setPageTitle( PS::o( $optionList, 'pageTitle', PS::_gan() ) );
-		$this->_breadcrumbs = PS::o( $optionList, 'breadcrumbs' );
+		if ( PS::UI_JQUERY == ( $_uiStyle = PS::o( $optionList, 'uiStyle', PS::UI_JQUERY ) ) )
+			CPSjqUIWrapper::loadScripts();
 
-		CPSjqUIWrapper::loadScripts();
-		PS::setFormFieldContainerClass( 'row' );
+		PS::setFormFieldContainerClass( PS::o( $optionList, 'rowClass', 'row' ) );
 
 		$_formOptions = array(
-			'id' => PS::o( $optionList, 'id', 'ps-edit-form' ),
+			'id' => $_formId,
+			'showLegend' => PS::o( $optionList, 'showLegend', true ),
 			'showDates' => PS::o( $optionList, 'showDates', false ),
 			'method' => PS::o( $optionList, 'method', 'POST' ),
 
@@ -633,6 +605,22 @@ $('.search-form form').submit(function(){
 			),
 		);
 
+		//	Do some auto-page-setup...
+		if ( null !== ( $_header = PS::o( $optionList, 'header' ) ) )
+			echo PS::tag( 'h1', array(), $_header );
+
+		if ( false !== PS::o( $optionList, 'renderSearch', false ) )
+		{
+			echo PS::tag( 'p', array(), self::SEARCH_HELP_TEXT );
+			echo PS::link( 'Advanced Search', '#', array( 'class' => 'search-button' ) );
+
+			echo PS::tag( 
+				'div', 
+				array( 'class' => 'search-form' ), 
+				$this->renderPartial( '_search', array( 'model' => $model ), true )
+			);
+		}
+
 		return $_formOptions;
 	}
 
@@ -645,6 +633,76 @@ $('.search-form form').submit(function(){
 	{
 		if ( $noLayout ) $this->layout = false;
 		header( 'Content-Type: ' . $contentType );
+	}
+
+	/**
+	 * Sets the standard page navigation options (title, crumbs, menu, etc.)
+	 * @param array $options
+	 */
+	public function setViewNavigationOptions( &$options = array() )
+	{
+		//	Page title
+		$_title = PS::o( $options, 'title', null, true );
+		$_subtitle = PS::o( $options, 'subtitle', null, true );
+
+		if ( $_subtitle )
+			$_title = PS::_gan() . ' :: ' . $_subtitle;
+
+		if ( ! $_title )
+			$_title =  PS::_gan();
+
+		$this->setPageTitle( $options['title'] = $_title );
+
+		//	Set crumbs
+		$this->_breadcrumbs = PS::o( $options, 'breadcrumbs' );
+
+		//	Let side menu be set from here as well...
+		if ( null !== ( $_menuItems = PS::o( $options, 'menu', null ) ) )
+		{
+			//	Rebuild menu items if not in standard format
+			$_finalMenu = array();
+
+			foreach ( $_menuItems as $_itemKey => $_itemValue )
+			{
+				$_finalMenu[] = array(
+					'label' => PS::o( $_itemValue, 'label', $_itemKey ),
+					'url' => PS::o( $_itemValue, 'url', $_itemValue ),
+				);
+			}
+
+			$this->setMenu( $options['menu'] = $_finalMenu );
+		}
+
+		$_enableSearch = ( PS::o( $options, 'enableSearch', false ) || PS::o( $options, 'renderSearch', false ) );
+
+		//	Drop the search script on the page if enabled...
+		if ( false !== $_enableSearch )
+		{
+			$_searchSelector = PS::o( $options, 'searchSelector', '.search-button' );
+			$_toggleSpeed = PS::o( $options, 'toggleSpeed', 'fast' );
+			$_searchForm = PS::o( $options, 'searchForm', '.search-form' );
+			$_targetFormId = PS::o( $options, 'id', 'ps-edit-form' );
+
+			$_searchScript =<<<JS
+$(function(){
+	$('{$_searchSelector}').click(function(){
+		$('{$_searchForm}').slideToggle('{$_toggleSpeed}');
+		return false;
+	});
+
+	$('{$_searchForm} form').submit(function(){
+		$.fn.yiiGridView.update('{$_targetFormId}', {
+			data: $(this).serialize()
+		});
+		return false;
+	});
+});
+JS;
+			PS::_rs( 'search', $_searchScript );
+		}
+
+		//	Return reconstructed options for standard form use
+		return $options;
 	}
 
 	//********************************************************************************
