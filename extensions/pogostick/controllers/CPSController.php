@@ -576,9 +576,6 @@ abstract class CPSController extends CController implements IPSBase
 
 		$_formId = PS::o( $optionList, 'id', 'ps-edit-form' );
 
-		if ( PS::UI_JQUERY == ( $_uiStyle = PS::o( $optionList, 'uiStyle', PS::UI_JQUERY ) ) )
-			CPSjqUIWrapper::loadScripts();
-
 		PS::setFormFieldContainerClass( PS::o( $optionList, 'rowClass', 'row' ) );
 
 		$_formOptions = array(
@@ -606,7 +603,7 @@ abstract class CPSController extends CController implements IPSBase
 		);
 
 		//	Do some auto-page-setup...
-		if ( null !== ( $_header = PS::o( $optionList, 'header' ) ) )
+		if ( null !== ( $_header = PS::o( $optionList, 'header', PS::o( $optionList, 'title' ) ) ) )
 			echo PS::tag( 'h1', array(), $_header );
 
 		if ( false !== PS::o( $optionList, 'renderSearch', false ) )
@@ -619,7 +616,14 @@ abstract class CPSController extends CController implements IPSBase
 				array( 'class' => 'search-form' ), 
 				$this->renderPartial( '_search', array( 'model' => $model ), true )
 			);
+			
+			//	Register the search script, if any
+			if ( null !== ( $_searchScript = PS::o( $optionList, '__searchScript' ) ) )
+				PS::_rs( 'search', $_searchScript );
 		}
+
+		if ( PS::UI_JQUERY == ( $_uiStyle = PS::o( $optionList, 'uiStyle', PS::UI_JQUERY ) ) )
+			CPSjqUIWrapper::loadScripts();
 
 		return $_formOptions;
 	}
@@ -662,15 +666,21 @@ abstract class CPSController extends CController implements IPSBase
 			//	Rebuild menu items if not in standard format
 			$_finalMenu = array();
 
-			foreach ( $_menuItems as $_itemKey => $_itemValue )
+			foreach ( $_menuItems as $_itemLabel => $_itemLink )
 			{
+				if ( null === ( $_label = PS::o( $_itemLink, 'label', null, true ) ) )
+					$_label = $_itemLabel;
+				
+				if ( null === ( $_link = PS::o( $_itemLink, 'link', null, true ) ) )
+					$_link = $_itemLink;
+				
 				$_finalMenu[] = array(
-					'label' => PS::o( $_itemValue, 'label', $_itemKey ),
-					'url' => PS::o( $_itemValue, 'url', $_itemValue ),
+					'label' => $_label,
+					'url' => $_link,
 				);
 			}
 
-			$this->setMenu( $options['menu'] = $_finalMenu );
+			$options['menu'] = $this->_menu = $_finalMenu;
 		}
 
 		$_enableSearch = ( PS::o( $options, 'enableSearch', false ) || PS::o( $options, 'renderSearch', false ) );
@@ -698,7 +708,7 @@ $(function(){
 	});
 });
 JS;
-			PS::_rs( 'search', $_searchScript );
+			$options['__searchScript'] = $_searchScript;
 		}
 
 		//	Return reconstructed options for standard form use
