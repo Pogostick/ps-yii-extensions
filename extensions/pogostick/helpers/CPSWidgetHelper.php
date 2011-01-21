@@ -38,7 +38,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	 * A prefix for generated ids
 	 */
 	const ID_PREFIX = 'pye';
-	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget-content';
+	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget';
 	const STD_FORM_CONTAINER_CLASS = 'ps-edit-form';
 	const STD_FORM_CLASS = 'yiiForm';
 

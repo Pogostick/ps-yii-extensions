@@ -1,26 +1,26 @@
 <?php
 /*
  * Sonetrix.php
- * 
+ *
  * Copyright (c) 2010 Jerry Ablan <jablan@pogostick.com>.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
- * 
+ *
  * This file is part of Sonetrix by Pogostick, LLC.
- * 
+ *
  * We share the same open source ideals as does the jQuery team, and
  * we love them so much we like to quote their license statement:
- * 
+ *
  * You may use our open source libraries under the terms of either the MIT
  * License or the Gnu General Public License (GPL) Version 2.
- * 
+ *
  * The MIT License is recommended for most projects. It is simple and easy to
  * understand, and it places almost no restrictions on what you can do with
  * our code.
- * 
+ *
  * If the GPL suits your project better, you are also free to use our code
  * under that license.
- * 
+ *
  * You don’t have to do anything special to choose one license or the other,
  * and you don’t have to notify anyone which license you are using.
  */
@@ -51,7 +51,7 @@ class SonetrixClient extends CPSApiComponent
 	//********************************************************************************
 	//* Constants
 	//********************************************************************************
-	
+
 	/**
 	 * Statistic Types
 	 */
@@ -59,7 +59,7 @@ class SonetrixClient extends CPSApiComponent
 	const	STAT_GENDER = 1;
 	const	STAT_AGE = 2;
 	const	STAT_INVITES = 3;
-	
+
 	/**
 	 * Supported Platforms
 	 */
@@ -70,9 +70,7 @@ class SonetrixClient extends CPSApiComponent
 	const PF_Orkut = 1004;
 	const PF_OpenSocial = 1005;
 	const PF_Friendster = 1006;
-}
 
-	
 	protected $m_sUserAgent = "";
 	protected $m_sAppId = "";
 	protected $m_sAppProfileId = "";

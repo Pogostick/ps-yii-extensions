@@ -604,7 +604,16 @@ abstract class CPSController extends CController implements IPSBase
 
 		//	Do some auto-page-setup...
 		if ( null !== ( $_header = PS::o( $optionList, 'header', PS::o( $optionList, 'title' ) ) ) )
-			echo PS::tag( 'h1', array(), $_header );
+		{
+			if ( null !== ( $_headerIcon = PS::o( $optionList, 'headerIcon' ) ) )
+				$_header = PS::tag( 'span', array(), PS::image( $_headerIcon ) ) . $_header;
+
+			echo PS::tag( 'h1', array( 'class' => 'ui-generated-header' ), $_header );
+		}
+
+		//	Do some auto-page-setup...
+		if ( null !== ( $_subHeader = PS::o( $optionList, 'subHeader' ) ) )
+			echo PS::tag( 'div', array(), $_subHeader );
 
 		if ( false !== PS::o( $optionList, 'renderSearch', false ) )
 		{
@@ -648,6 +657,11 @@ abstract class CPSController extends CController implements IPSBase
 		//	Page title
 		$_title = PS::o( $options, 'title', null, true );
 		$_subtitle = PS::o( $options, 'subtitle', null, true );
+		$_header = PS::o( $options, 'header' );
+		
+		//	Generate subtitle from header...
+		if ( null === $_title && null === $_subtitle && null !== $_header )
+			$_subtitle = $_header;
 
 		if ( $_subtitle )
 			$_title = PS::_gan() . ' :: ' . $_subtitle;
