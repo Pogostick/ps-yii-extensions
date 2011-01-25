@@ -576,6 +576,30 @@ abstract class CPSController extends CController implements IPSBase
 
 		$_formId = PS::o( $optionList, 'id', 'ps-edit-form' );
 
+		//	Put a cool flash span on the page
+		if ( PS::o( $options, 'enableFlash', true, true ) )
+		{
+			$_flashClass = PS::o( $options, 'flashSuccessClass', 'operation-result-success' );
+			
+			if ( null === ( $_message = PS::_gf( 'success' ) ) )
+			{
+				if ( null !== ( $_message = PS::_gf( 'failure' ) ) )
+					$_flashClass = PS::o( $options, 'flashFailureClass', 'operation-result-failure' );
+			}
+
+			$_spanId = PS::o( $options, 'flashSpanId', 'operation-result', true );
+			PS::_ss( 'psForm-flash-html', PS::tag( 'span', array( 'id' => $_spanId, 'class' => $_flashClass ), $_message ) );
+			
+			//	Register a nice little fader...
+			$_fader =<<<SCRIPT
+$('#{$_spanId}').fadeIn('500',function(){
+	$(this).delay(3000).fadeOut(3500);
+});
+SCRIPT;
+				
+			PS::_rs( $_formId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
+		}
+		
 		PS::setFormFieldContainerClass( PS::o( $optionList, 'rowClass', 'row' ) );
 
 		$_formOptions = array(
@@ -724,7 +748,7 @@ $(function(){
 JS;
 			$options['__searchScript'] = $_searchScript;
 		}
-
+		
 		//	Return reconstructed options for standard form use
 		return $options;
 	}
