@@ -662,7 +662,6 @@ abstract class CPSController extends CController implements IPSBase
 
 			if ( $oModel->save() )
 			{
-CPSLog::trace(__METHOD__,print_r($oModel->getErrors(),true)	);
 				if ( ! $bNoCommit && $oModel instanceof CPSModel && $oModel->hasTransaction() ) $oModel->commitTransaction();
 
 				Yii::app()->user->setFlash( 'success', $_sMessage );
