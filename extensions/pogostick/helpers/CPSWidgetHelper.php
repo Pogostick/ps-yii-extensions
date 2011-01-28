@@ -38,7 +38,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	 * A prefix for generated ids
 	 */
 	const ID_PREFIX = 'pye';
-	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget-content';
+	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget';
 	const STD_FORM_CONTAINER_CLASS = 'ps-edit-form';
 	const STD_FORM_CLASS = 'yiiForm';
 
@@ -365,7 +365,9 @@ class CPSWidgetHelper extends CPSHelperBase
 			//	Get our operating parameters
 			$_label = PS::o( $arOptions, 'label', null, true );
 			$_labelOptions = PS::o( $arOptions, 'labelOptions', array(), true );
-			if ( $inputFieldType == PS::TEXTAREA ) $_labelOptions['style'] .= 'vertical-align:top;';
+
+			if ( $inputFieldType == PS::TEXTAREA ) $_labelOptions['style'] = PS::o( $_labelOptions, 'style' ) . 'vertical-align:top;';
+
 			$_suffixToUse = PS::o( $_labelOptions, 'noSuffix', false, true ) ? '' : self::$m_sLabelSuffix;
 			$_widgetOptions = PS::o( $arOptions, 'widgetOptions', array(), true );
 			$_arData = PS::o( $arOptions, 'data', array(), true );

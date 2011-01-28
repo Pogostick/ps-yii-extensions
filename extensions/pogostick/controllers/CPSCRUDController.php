@@ -50,6 +50,17 @@ abstract class CPSCRUDController extends CPSController
 	public function getMenu() { return $this->_menu; }
 	public function setMenu( $value ) { $this->_menu = $value; }
 
+	/***
+	 * @var boolean 
+	 */
+	
+	/**
+	 * @var boolean $singleViewMode If true, only the 'update' view is called for create and update.
+	 */
+	protected $_singleViewMode = false;
+	public function getSingleViewMode() { return $this->_singleViewMode; }
+	public function setSingleViewMode( $value ) { $this->_singleViewMode = $value; }
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -212,23 +223,23 @@ abstract class CPSCRUDController extends CPSController
 	*/
 	public function actionCreate( $options = array() )
 	{
-		$_model = new $this->m_sModelName;
-		if ( Yii::app()->request->isPostRequest ) $this->saveModel( $_model, $_POST, 'update' );
-		$this->genericAction( 'create', $_model, $options );
+		$this->actionUpdate( $options, true );
 	}
 
 	/**
 	* Update the model
 	*
 	*/
-	public function actionUpdate( $options = array() )
+	public function actionUpdate( $options = array(), $fromCreate = false )
 	{
-		$_model = $this->loadModel();
-		if ( Yii::app()->request->isPostRequest )
-		{
-			$this->saveModel( $_model, $_POST, 'update' );
-		}
-		$this->genericAction( 'update', $_model, $options );
+		//	Handle singleViewMode...
+		$_model = ( $fromCreate ? new $this->m_sModelName : $this->loadModel()  );
+		$_viewName = ( $fromCreate ? ( $this->_singleViewMode ? 'update' : 'create' ) : 'update' );
+		
+		if ( $this->isPostRequest ) $this->saveModel( $_model, $_POST, 'update' );
+		
+		$options['update'] = ( ! $fromCreate );
+		$this->genericAction( $_viewName, $_model, $options );
 	}
 
 	/**

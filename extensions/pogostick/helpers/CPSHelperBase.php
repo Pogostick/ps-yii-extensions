@@ -1136,6 +1136,22 @@ class CPSHelperBase extends CHtml implements IPSBase
 	}
 
 	/**
+	 * Returns a flash message.
+	 * A flash message is available only in the current and the next requests.
+	 * @param string $key key identifying the flash message
+	 * @param mixed $defaultValue value to be returned if the flash message is not available.
+	 * @param boolean $delete whether to delete this flash message after accessing it.
+	 * Defaults to true. This parameter has been available since version 1.0.2.
+	 * @return mixed the message message
+	 * @see _sf
+	 */
+	public function _gf( $key, $defaultValue = null, $delete = true )
+	{
+		$_user = self::_gu();
+		return ( null !== $_user ? $_user->getFlash( $key, $defaultValue, $delete ) : null );
+	}
+
+	/**
 	 * Stores a variable from the user session
 	 *
 	 * This function is designed to be used by CWebUser descendant classes
@@ -1168,6 +1184,20 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _shs( $stateKeyParts, $stateValue, $defaultValue = null )
 	{
 		return self::_ss( CPSHash::hash( implode( '.', $stateKeyParts ) ), $stateValue, $defaultValue );
+	}
+
+	/**
+	 * Stores a flash message.
+	 * A flash message is available only in the current and the next requests.
+	 * @param string $key key identifying the flash message
+	 * @param mixed $value flash message
+	 * @param mixed $defaultValue if this value is the same as the flash message, the flash message
+	 * will be removed. (Therefore, you can use setFlash('key',null) to remove a flash message.)
+	 * @see {@link CPSHelperBase#_gf}
+	 */
+	public static function _sf( $key, $value, $defaultValue = null )
+	{
+		if ( null !== ( $_user = self::_gu() ) ) $_user->setFlash( $key, $value, $defaultValue );
 	}
 
 	/**

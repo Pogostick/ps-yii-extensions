@@ -66,14 +66,39 @@ class CPSForm implements IPSBase
 		$_errorSummaryHeader = PS::o( $_errorSummaryOptions, 'header', null, true );
 		$_sFormId = PS::o( $arOptions, 'id', 'ps-edit-form' );
 		$_eUIStyle = PS::o( $arOptions, 'uiStyle', PS::UI_DEFAULT );
+
 		if ( ! isset( $arOptions['name'] ) ) $arOptions['name'] = $_sFormId;
 
 		//	Our model?
 		$_oModel = PS::o( $arOptions, 'formModel', null, true );
 
+		//	Throw in a neato keano flash span
+		if ( null === PS::_gs( 'psForm-flash-html' ) && ! PS::o( $arOptions, 'noFlash', false, true ) )
+		{
+			$_flashClass = PS::o( $options, 'flashSuccessClass', 'operation-result-success' );
+			
+			if ( null === ( $_message = PS::_gf( 'success' ) ) )
+			{
+				if ( null !== ( $_message = PS::_gf( 'failure' ) ) )
+					$_flashClass = PS::o( $options, 'flashFailureClass', 'operation-result-failure' );
+			}
+			
+			$_spanId = PS::o( $options, 'flashSpanId', 'operation-result', true );
+			PS::_ss( 'psForm-flash-html', PS::tag( 'span', array( 'id' => $_spanId, 'class' => $_flashClass ), $_message ) );
+
+			//	Register a nice little fader...
+			$_fader =<<<SCRIPT
+$('#{$_spanId}').fadeIn('500',function(){
+	$(this).delay(3000).fadeOut(3500);
+});
+SCRIPT;
+
+			PS::_rs( $_sFormId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
+		}
+
 		//	Let's begin...
 		$_sOut = PS::beginFormEx( $arOptions );
-
+		
 		//	Error summary wanted?
 		if ( $_oModel && $_bErrorSummary )
 			$_sOut .= PS::errorSummary( $_oModel, $_errorSummaryHeader, null, $_errorSummaryOptions );
@@ -169,7 +194,7 @@ class CPSForm implements IPSBase
 
 		//	Ok, done building form...
 		$_sOut .= PS::endForm();
-
+		
 		//	Does user want data returned?
 		if ( $_bReturnString ) return $_sOut;
 

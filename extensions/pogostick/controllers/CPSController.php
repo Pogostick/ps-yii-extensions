@@ -49,6 +49,11 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	const COMMAND_FIELD_NAME = '__psCommand';
 
+	/**
+	 * Standard search text for rendering
+	 */
+	const SEARCH_HELP_TEXT = 'You may optionally enter a comparison operator (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b>or <b>=</b>) at the beginning of each search value to specify how the comparison should be done.';
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -559,18 +564,51 @@ abstract class CPSController extends CController implements IPSBase
 			);
 		}
 
-		$this->setPageTitle( PS::o( $optionList, 'pageTitle', PS::_gan() ) );
-		$this->_breadcrumbs = PS::o( $optionList, 'breadcrumbs' );
+		//	Abbreviated arguments?
+		if ( is_array( $model ) && array() === $optionList )
+		{
+			$optionList = $model;
+			$model = PS::o( $optionList, 'model' );
+		}
 
-		CPSjqUIWrapper::loadScripts();
-		PS::setFormFieldContainerClass( 'row' );
+		//	Set the standard nav options
+		$this->setViewNavigationOptions( $optionList );
+
+		$_formId = PS::o( $optionList, 'id', 'ps-edit-form' );
+
+		//	Put a cool flash span on the page
+		if ( PS::o( $options, 'enableFlash', true, true ) )
+		{
+			$_flashClass = PS::o( $options, 'flashSuccessClass', 'operation-result-success' );
+			
+			if ( null === ( $_message = PS::_gf( 'success' ) ) )
+			{
+				if ( null !== ( $_message = PS::_gf( 'failure' ) ) )
+					$_flashClass = PS::o( $options, 'flashFailureClass', 'operation-result-failure' );
+			}
+
+			$_spanId = PS::o( $options, 'flashSpanId', 'operation-result', true );
+			PS::_ss( 'psForm-flash-html', PS::tag( 'span', array( 'id' => $_spanId, 'class' => $_flashClass ), $_message ) );
+			
+			//	Register a nice little fader...
+			$_fader =<<<SCRIPT
+$('#{$_spanId}').fadeIn('500',function(){
+	$(this).delay(3000).fadeOut(3500);
+});
+SCRIPT;
+				
+			PS::_rs( $_formId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
+		}
+		
+		PS::setFormFieldContainerClass( PS::o( $optionList, 'rowClass', 'row' ) );
 
 		$_formOptions = array(
-			'id' => PS::o( $optionList, 'id', 'ps-edit-form' ),
+			'id' => $_formId,
+			'showLegend' => PS::o( $optionList, 'showLegend', true ),
 			'showDates' => PS::o( $optionList, 'showDates', false ),
 			'method' => PS::o( $optionList, 'method', 'POST' ),
 
-			'uiStyle' => PS::o( $optionList, 'uiStyle', PS::JQUI ),
+			'uiStyle' => PS::o( $optionList, 'uiStyle', PS::UI_JQUERY ),
 			'formClass' => PS::o( $optionList, 'formClass', 'form' ),
 			'formModel' => $model,
 			'errorCss' => PS::o( $optionList, 'errorCss', 'error' ),
@@ -588,6 +626,38 @@ abstract class CPSController extends CController implements IPSBase
 			),
 		);
 
+		//	Do some auto-page-setup...
+		if ( null !== ( $_header = PS::o( $optionList, 'header', PS::o( $optionList, 'title' ) ) ) )
+		{
+			if ( null !== ( $_headerIcon = PS::o( $optionList, 'headerIcon' ) ) )
+				$_header = PS::tag( 'span', array(), PS::image( $_headerIcon ) ) . $_header;
+
+			echo PS::tag( 'h1', array( 'class' => 'ui-generated-header' ), $_header );
+		}
+
+		//	Do some auto-page-setup...
+		if ( null !== ( $_subHeader = PS::o( $optionList, 'subHeader' ) ) )
+			echo PS::tag( 'div', array(), $_subHeader );
+
+		if ( false !== PS::o( $optionList, 'renderSearch', false ) )
+		{
+			echo PS::tag( 'p', array(), self::SEARCH_HELP_TEXT );
+			echo PS::link( 'Advanced Search', '#', array( 'class' => 'search-button' ) );
+
+			echo PS::tag( 
+				'div', 
+				array( 'class' => 'search-form' ), 
+				$this->renderPartial( '_search', array( 'model' => $model ), true )
+			);
+			
+			//	Register the search script, if any
+			if ( null !== ( $_searchScript = PS::o( $optionList, '__searchScript' ) ) )
+				PS::_rs( 'search', $_searchScript );
+		}
+
+		if ( PS::UI_JQUERY == ( $_uiStyle = PS::o( $optionList, 'uiStyle', PS::UI_JQUERY ) ) )
+			CPSjqUIWrapper::loadScripts();
+
 		return $_formOptions;
 	}
 
@@ -600,6 +670,87 @@ abstract class CPSController extends CController implements IPSBase
 	{
 		if ( $noLayout ) $this->layout = false;
 		header( 'Content-Type: ' . $contentType );
+	}
+
+	/**
+	 * Sets the standard page navigation options (title, crumbs, menu, etc.)
+	 * @param array $options
+	 */
+	public function setViewNavigationOptions( &$options = array() )
+	{
+		//	Page title
+		$_title = PS::o( $options, 'title', null, true );
+		$_subtitle = PS::o( $options, 'subtitle', null, true );
+		$_header = PS::o( $options, 'header' );
+		
+		//	Generate subtitle from header...
+		if ( null === $_title && null === $_subtitle && null !== $_header )
+			$_subtitle = $_header;
+
+		if ( $_subtitle )
+			$_title = PS::_gan() . ' :: ' . $_subtitle;
+
+		if ( ! $_title )
+			$_title =  PS::_gan();
+
+		$this->setPageTitle( $options['title'] = $_title );
+
+		//	Set crumbs
+		$this->_breadcrumbs = PS::o( $options, 'breadcrumbs' );
+
+		//	Let side menu be set from here as well...
+		if ( null !== ( $_menuItems = PS::o( $options, 'menu', null ) ) )
+		{
+			//	Rebuild menu items if not in standard format
+			$_finalMenu = array();
+
+			foreach ( $_menuItems as $_itemLabel => $_itemLink )
+			{
+				if ( null === ( $_label = PS::o( $_itemLink, 'label', null, true ) ) )
+					$_label = $_itemLabel;
+				
+				if ( null === ( $_link = PS::o( $_itemLink, 'link', null, true ) ) )
+					$_link = $_itemLink;
+				
+				$_finalMenu[] = array(
+					'label' => $_label,
+					'url' => $_link,
+				);
+			}
+
+			$options['menu'] = $this->_menu = $_finalMenu;
+		}
+
+		$_enableSearch = ( PS::o( $options, 'enableSearch', false ) || PS::o( $options, 'renderSearch', false ) );
+
+		//	Drop the search script on the page if enabled...
+		if ( false !== $_enableSearch )
+		{
+			$_searchSelector = PS::o( $options, 'searchSelector', '.search-button' );
+			$_toggleSpeed = PS::o( $options, 'toggleSpeed', 'fast' );
+			$_searchForm = PS::o( $options, 'searchForm', '.search-form' );
+			$_targetFormId = PS::o( $options, 'id', 'ps-edit-form' );
+
+			$_searchScript =<<<JS
+$(function(){
+	$('{$_searchSelector}').click(function(){
+		$('{$_searchForm}').slideToggle('{$_toggleSpeed}');
+		return false;
+	});
+
+	$('{$_searchForm} form').submit(function(){
+		$.fn.yiiGridView.update('{$_targetFormId}', {
+			data: $(this).serialize()
+		});
+		return false;
+	});
+});
+JS;
+			$options['__searchScript'] = $_searchScript;
+		}
+		
+		//	Return reconstructed options for standard form use
+		return $options;
 	}
 
 	//********************************************************************************
