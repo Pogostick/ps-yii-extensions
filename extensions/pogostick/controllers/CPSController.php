@@ -258,6 +258,13 @@ abstract class CPSController extends CController implements IPSBase
 	protected $_cleanTrail;
 	protected function getCleanTrail() { return $this->_cleanTrail; }
 	protected function setCleanTrail( $value ) { $this->_cleanTrail = $value; }
+	
+	/**
+	 * @var array $viewData The array of data passed to views
+	 */
+	protected $_viewData = array();
+	protected function getViewData() { return $this->_viewData; }
+	protected function setViewData( $value ) { $this->_viewData = $value; }
 
 	/**
 	 * @var array Any values in this array will be extracted into each view before it's rendered. The value "currentUser" is added automatically.
@@ -533,8 +540,19 @@ abstract class CPSController extends CController implements IPSBase
 				)
 			);
 		}
+		
+		if ( null === $data )
+			$data = array();
 
-		$_output = $this->renderFile( $_viewFile, array_merge( is_array( $data ) ? $data : array(), $this->_extraViewDataList ), true );
+		$_output = $this->renderFile( 
+			$_viewFile, 
+			array_merge( 
+				$this->_extraViewDataList, 
+				$this->_viewData, 
+				$data 
+			), 
+			true 
+		);
 
 		if ( $processOutput )
 			$_output = $this->processOutput( $_output );
@@ -949,6 +967,17 @@ JS;
 	protected function popAction()
 	{
 		return array_pop( $this->m_arActionQueue );
+	}
+
+	/**
+	* Pushes a variable onto the view data stack
+	*
+	* @param string $variableName
+	* @param mixed $variableData
+	*/
+	protected function addViewData( $variableName, $variableData = null )
+	{
+		$this->_viewData[$variableName] = $variableData;
 	}
 
 	/**

@@ -156,7 +156,6 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	{
 		$_arguments = func_get_args();
 		return call_user_func_array( array( $this->_facebookApi, 'api' ), $_arguments );
-
 	}
 
 	/**

@@ -80,6 +80,12 @@ class CPSFacebookAppController extends CPSController
 	public function getFacebookApi() { return $this->_facebookApi; }
 
 	/**
+	 * @var CPSFacebookUserIdentity The current user
+	 */
+	protected $_identity = null;
+	public function getIdentity() { return $this->_identity; }
+
+	/**
 	 * @var string User's access token
 	 */
 	protected $_accessToken;
@@ -126,6 +132,9 @@ class CPSFacebookAppController extends CPSController
 		//	Set proper ini settings for FBC
         ini_set( 'zend.ze1_compatibility_mode', 0 );
 
+		//	Get our identity
+		$this->_identity = PS::_gs( 'currentIdentity' );
+		
         //	Handle an rss feed
         if ( isset( $_REQUEST[ 'rss' ] ) )
         {
@@ -283,7 +292,26 @@ class CPSFacebookAppController extends CPSController
 	{
 		return true;
 	}
+	
+	public function getFbUserName( $fbUserId )
+	{
+		try
+		{
+			if ( $this->_identity && $this->_identity->getFBUserId() == $fbUserId )
+				return 'You';
 
+			$_user = json_decode( file_get_contents( 'https://graph.facebook.com/' . $fbUserId ) );
+			
+			if ( $_user )
+				return trim( $_user->first_name . ' ' . $_user->last_name );
+		}
+		catch ( Exception $_ex )
+		{
+		}
+
+		return 'Facebook User';
+	}
+	
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
