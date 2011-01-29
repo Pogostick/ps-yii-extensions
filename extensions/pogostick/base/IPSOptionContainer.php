@@ -51,7 +51,7 @@ interface IPSOptionContainer extends IPSBase
 	* @param string $key
 	* @param mixed $value
 	*/
-	function setOption( $key, $value );
+	function setOption( $key, $value = null );
 
 	/**
 	* Set options in a bulk manner. $arOptions should be array of key => value pairs.

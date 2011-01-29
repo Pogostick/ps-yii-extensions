@@ -5,6 +5,7 @@
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
+ * @filesource
  */
 /**
  * Provides a base for the pYe behaviors
@@ -15,8 +16,6 @@
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id: CPSComponentBehavior.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
  * @since 		v1.0.1
- *
- * @filesource
  */
 class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSBehavior
 {
@@ -227,7 +226,7 @@ class CPSComponentBehavior extends CBehavior implements IPSOptionContainer, IPSB
 	* @param mixed $value
 	* @see getOption
 	*/
-	public function setOption( $key, $value ) { $this->_optionList->setValue( $key, $value ); }
+	public function setOption( $key, $value = null ) { $this->_optionList->setValue( $key, $value ); }
 
 	/**
 	* Set options in bulk
