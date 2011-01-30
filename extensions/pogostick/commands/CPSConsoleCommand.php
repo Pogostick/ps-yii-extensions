@@ -68,7 +68,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 	* Executes the command.
 	* @param array command line parameters for this command.
 	*/
-	public abstract function run( $argumentList );
+	public abstract function run( $argumentList = array() );
 
 	//********************************************************************************
 	//* Public Methods
@@ -89,9 +89,6 @@ abstract class CPSConsoleCommand extends CPSComponent
 		//	Note settings
 		$this->_name = $commandName;
 		$this->_commandRunner = $commandRunner;
-		
-		//	Initialize!
-		$this->init();
 	}
 	
 	/***

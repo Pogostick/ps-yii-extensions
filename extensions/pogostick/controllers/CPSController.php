@@ -823,7 +823,7 @@ JS;
 	protected function saveModel( &$oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false, $bSafeOnly = false )
 	{
 		$_sMessage = PS::nvl( $sSuccessMessage, 'Your changes have been saved.' );
-		$_sModelName = PS::nvl( $sModelName, PS::nvl( $oModel->modelName, $this->m_sModelName ) );
+		$_sModelName = PS::nvl( $sModelName, PS::nvl( $oModel->getModelClass(), $this->m_sModelName ) );
 
 		if ( isset( $arData, $arData[ $_sModelName ] ) )
 		{

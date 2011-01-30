@@ -537,7 +537,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		{
 			case self::TEXT_DISPLAY:
 				$htmlOptions['style'] = PS::o( $htmlOptions, 'style' ) . ' border:none; background-color: transparent;';
-				$htmlOptions['class'] = PS::addClass( $arOptions['class'], 'ps-text-display' );
+				$htmlOptions['class'] = PS::addClass( $htmlOptions['class'], 'ps-text-display' );
 				$htmlOptions['readonly'] = 'readonly';
 				$htmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', CPSTransform::valueOf( '*', $model->$attributeName ) ) );
 				$inputFieldType = self::TEXT;
@@ -615,7 +615,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				break;
 
 			case self::CAPTCHA:
-				$arOptions['hint'] = 'Please enter the letters as they are shown in the image above.<br />Letters are not case-sensitive.';
+				$htmlOptions['hint'] = 'Please enter the letters as they are shown in the image above.<br />Letters are not case-sensitive.';
 				ob_start();
 				echo PS::openTag( 'div', array( 'class' => 'ps-captcha-container' ) );
 				Yii::app()->getController()->widget( self::CAPTCHA, $widgetOptions );

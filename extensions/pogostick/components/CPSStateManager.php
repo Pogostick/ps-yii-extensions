@@ -194,7 +194,7 @@ class CPSStateManager extends CPSComponent
 			}
 		}
 
-		if ( $delete ) $this->setRawState( $this->getInternalKey( self::FLASH_COUNTERS, true ), array() );
+		if ( $delete ) $this->setRawState( $this->getInternalKey( self::BASE_FLASH_KEY_PREFIX . '.counters', true ), array() );
 
 		return $_flashList;
 	}
@@ -226,14 +226,14 @@ class CPSStateManager extends CPSComponent
 	public function setFlash( $key, $value, $defaultValue = null )
 	{
 		$this->setState( $key, $value, $defaultValue, true );
-		$_counterList = $this->getState( self::FLASH_COUNTERS, array() );
+		$_counterList = $this->getState( self::BASE_FLASH_KEY_PREFIX . '.counters', array() );
 
 		if ( $value === $defaultValue )
 			unset( $_counterList[$key] );
 		else
 			$_counterList[$key] = 0;
 
-		$this->setState( self::FLASH_COUNTERS, $_counterList, array() );
+		$this->setState( self::BASE_FLASH_KEY_PREFIX . '.counters', $_counterList, array() );
 	}
 
 	/**
