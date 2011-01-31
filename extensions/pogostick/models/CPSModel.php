@@ -67,12 +67,30 @@ class CPSModel extends CActiveRecord implements IPSBase
 	}
 
 	/**
+	 * Get this model's class name.
+	 * @return string
+	 */
+	public function getModelClass()
+	{
+		return $this->_modelClass;
+	}
+
+	/**
 	 * Set this model's name
 	 * @param string $sValue
 	 */
 	public function setModelName( $sValue )
 	{
 		$this->_modelClass = $sValue;
+	}
+
+	/**
+	 * Sets this model's name.
+	 * @param string $modelClass
+	 */
+	public function setModelClass( $modelClass )
+	{
+		$this->_modelClass = $modelClass;
 	}
 
 	/**
@@ -333,6 +351,15 @@ class CPSModel extends CActiveRecord implements IPSBase
 	//*******************************************************************************
 	//* Transaction Management
 	//*******************************************************************************
+	
+	/**
+	 * Checks to see if there are any transactions going...
+	 * @return boolean
+	 */
+	public function hasTransaction()
+	{
+		return ( 0 != count( self::$_transactionStack ) );
+	}
 
 	/**
 	 * Begins a database transaction (PHP 5.3+ only)

@@ -40,20 +40,21 @@ abstract class CPSConsoleCommand extends CPSComponent
 	//********************************************************************************
 	
 	/**
-	* This command's name
-	* 
-	* @var string
+	* @var string This command's name
 	*/
 	protected $_name;
 	public function getName() { return $this->_name; }
 	/**
-	* The command runner
-	* 
-	* @var CConsoleCommandRunner
+	* @var CConsoleCommandRunner The command runner
 	*/
 	protected $_commandRunner;
 	public function getCommandRunner() { return $this->_commandRunner; }
-
+	/**
+	 * @var string The default action
+	 */
+	protected $_defaultAction = 'index';
+	public function getDefaultAction() { return $this->_defaultAction; }
+	public function setDefaultAction( $value ) { $this->_defaultAction = $value; }
 	/**
 	 * @var array The specific options for this command
 	 */
@@ -89,6 +90,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 		//	Note settings
 		$this->_name = $commandName;
 		$this->_commandRunner = $commandRunner;
+		$this->_defaultAction = 'index';
 	}
 	
 	/***
