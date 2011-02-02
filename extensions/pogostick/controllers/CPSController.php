@@ -633,6 +633,9 @@ SCRIPT;
 
 			//	We want error summary...
 			'errorSummary' => PS::o( $optionList, 'errorSummary', true ),
+			'errorSummaryOptions' => array(
+				'header' => '<p>The following problems occurred:</p>',
+			),
 
 			'validate' => PS::o( $optionList, 'validate', true ),
 
