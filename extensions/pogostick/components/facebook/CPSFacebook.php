@@ -811,7 +811,8 @@ class CPSFacebook extends CPSApiComponent
 		//	Check signature
 		$_expectedSignature = hash_hmac( 'sha256', $_payload, $this->_apiSecretKey, true );
 
-		CPSLog::trace( __METHOD__, 'Sig:[' . $_signature . '] expect:[' . $_expectedSignature . ']' );
+		if ( PYE_TRACE_LEVEL > 3 )
+			CPSLog::trace( __METHOD__, 'Sig:[' . $_signature . '] expect:[' . $_expectedSignature . ']' );
 
 		if ( $_signature !== $_expectedSignature )
 		{

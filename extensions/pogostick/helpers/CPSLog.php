@@ -1,7 +1,7 @@
 <?php
 /*
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2010 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -9,14 +9,14 @@
 
 /**
  * Logging helper methods
- * 
+ *
  * @package 	psYiiExtensions
  * @subpackage 	helpers
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id: CPSLog.php 401 2010-08-31 21:04:18Z jerryablan@gmail.com $
  * @since 		v1.0.6
- *  
+ *
  * @filesource
  */
 class CPSLog implements IPSBase
@@ -29,12 +29,12 @@ class CPSLog implements IPSBase
 	 * @var boolean If true, all applicable log entries will be echoed to the screen
 	 */
 	public static $echoData = false;
-	
+
 	/**
 	 * @var string Prepended to each log entry before writing.
 	 */
 	public static $prefix = null;
-	
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -60,7 +60,7 @@ class CPSLog implements IPSBase
 
 		Yii::log( $_logEntry, $sLevel, $sCategory );
 	}
-	
+
 	/**
 	 * Creates an 'info' log entry
 	 * @param mixed $sCategory The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
@@ -73,7 +73,7 @@ class CPSLog implements IPSBase
 	{
 		self::log( $sCategory, $sMessage, 'info', $arParams, $sSource, $sLanguage );
 	}
-	
+
 	/**
 	 * Creates an 'error' log entry
 	 * @param mixed $sCategory The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
@@ -86,7 +86,7 @@ class CPSLog implements IPSBase
 	{
 		self::log( $sCategory, $sMessage, 'error', $arParams, $sSource, $sLanguage );
 	}
-	
+
 	/**
 	 * Creates an 'warning' log entry
 	 * @param mixed $sCategory The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
@@ -99,7 +99,7 @@ class CPSLog implements IPSBase
 	{
 		self::log( $sCategory, $sMessage, 'warning', $arParams, $sSource, $sLanguage );
 	}
-	
+
 	/**
 	 * Creates an 'trace' log entry
 	 * @param mixed $sCategory The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
@@ -110,7 +110,10 @@ class CPSLog implements IPSBase
 	 */
 	public static function trace( $sCategory, $sMessage, $arParams = array(), $sSource = null, $sLanguage = null )
 	{
+		if ( defined( 'PYE_TRACE_LEVEL' ) && 0 == PYE_TRACE_LEVEL )
+			return;
+
 		self::log( $sCategory, $sMessage, 'trace', $arParams, $sSource, $sLanguage );
 	}
-	
+
 }

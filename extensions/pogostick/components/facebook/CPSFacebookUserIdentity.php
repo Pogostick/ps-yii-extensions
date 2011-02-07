@@ -95,7 +95,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	/**
 	 * @var boolean If true, user's albums and pictures are loaded and cached
 	 */
-	protected $_autoLoadPictures = true;
+	protected $_autoLoadPictures = false;
 	public function getAutoLoadPictures() { return $this->_autoLoadPictures; }
 	public function setAutoLoadPictures( $value ) { $this->_autoLoadPictures = $value; return $this; }
 
@@ -208,7 +208,6 @@ class CPSFacebookUserIdentity extends CUserIdentity
 
 		if ( ! $this->_session )
 		{
-			error_log( 'No session' );
 			$this->_inForceLogin = true;
 			$this->_forceLogin();
 		}
@@ -228,6 +227,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 				throw new Exception( 'Invalid session' );
 
 			//	Log into system...
+			$this->_me = $this->_facebookApi->api( '/me' );
 			$this->_fbUserId = $this->_session['uid'];
 			$this->_accessToken = $this->_session['access_token'];
 			$this->_firstName = PS::o( $this->_me, 'first_name' );
@@ -238,7 +238,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 				CPSFacebook::$_photoList = $this->getAlbums();
 
 				if ( empty( CPSFacebook::$_photoList ) )
-					PS::_rs( '_psAutoLoadPictures', '$(function(){$.get("/app/photos",function(){});});' );
+					PS::_rs( '_psAutoLoadPictures', '$(function(){$.get("/app/photos",function(){});});', CClientScript::POS_END );
 			}
 
 			return $this->_isConnected = true;
@@ -283,7 +283,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 		if ( ! $_user )
 		{
 			//	New user...
-			$_user = new $this->_userModelClass();
+			$_user = get_class( $_model );
 			$_user->pform_user_id_text = $this->_fbUserId;
 			$_user->pform_type_code = 1000;
 			$_user->app_add_date = date( 'Y-m-d h:i:s' );
@@ -291,6 +291,8 @@ class CPSFacebookUserIdentity extends CUserIdentity
 		}
 
 		//	Set new stuff
+		$_freshness = ( $_user->session_key_text != $this->_accessToken );
+
 		$_user->session_key_text = $this->_accessToken;
 		$_user->last_visit_date = date( 'Y-m-d h:i:s' );
 
@@ -311,10 +313,21 @@ class CPSFacebookUserIdentity extends CUserIdentity
 
 		if ( $this->_me )
 		{
+			PS::_ss( CPSFacebookAppController::ME_CACHE, $this->_me );
 			$_user->first_name_text = $this->_firstName;
 			$_user->last_name_text = PS::o( $this->_me, 'last_name' );
 			$_user->email_addr_text = PS::o( $this->_me, 'email' );
 			$_user->full_name_text = $this->_firstName . ' ' . strtoupper( substr( PS::o( $this->_me, 'last_name' ), 0, 1 ) . '.' );
+		}
+
+		//	Clear all the caches
+		if ( $_freshness )
+		{
+			PS::_ss( CPSFacebookAppController::THUMB_CACHE, null );
+			PS::_ss( CPSFacebookAppController::FRIEND_CACHE, null );
+			PS::_ss( CPSFacebookAppController::APP_FRIEND_CACHE, null );
+			PS::_ss( CPSFacebookAppController::PROFILE_CACHE, null );
+			PS::_ss( CPSFacebookAppController::FL_CACHE, null );
 		}
 
 		//	Load app friends
@@ -328,7 +341,8 @@ class CPSFacebookUserIdentity extends CUserIdentity
 		PS::_ss( 'currentIdentity', $this );
 
 		//	Raise the facebook login event in our controller
-		PS::_gc()->onFacebookLogin( new CEvent( $_user ) );
+		if ( $_freshness )
+			PS::_gc()->onFacebookLogin( new CEvent( $_user ) );
 
 		return true;
 	}
@@ -366,8 +380,6 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	 */
 	protected function _getAppFriends()
 	{
-		CPSLog::trace( __METHOD__, 'Getting app friends...' );
-
 		$this->_appFriendList = PS::_gs( CPSFacebookAppController::APP_FRIEND_CACHE );
 
 		try
@@ -377,7 +389,8 @@ class CPSFacebookUserIdentity extends CUserIdentity
 				$_fql = "select uid from user where is_app_user = '1' and uid in ( select uid2 from friend where uid1 = '{$this->_fbUserId}' ) order by name";
 				$_list = $this->_facebookApi->api( array( 'method' => 'fql.query', 'query' => $_fql ) );
 
-				CPSLog::trace( __METHOD__, '  - App Friend List Retrieved: ' . print_r( $_list, true ) );
+				if ( PYE_TRACE_LEVEL > 3 )
+					CPSLog::trace( __METHOD__, '  - App Friend List Retrieved: ' . print_r( $_list, true ) );
 
 				//	Make into a list of uids...
 				foreach ( $_list as $_friend )
@@ -391,12 +404,11 @@ class CPSFacebookUserIdentity extends CUserIdentity
 		}
 		catch ( Exception $_ex )
 		{
-			CPSLog::error( __METHOD__, 'Exception: ' . $_ex->getMessage() );
 			error_log( 'Get APP friends failed: ' . $_ex->getMessage() );
+			CPSLog::error( __METHOD__, 'Exception: ' . $_ex->getMessage() );
 			$this->_forceLogin();
 		}
 
-		CPSLog::trace( __METHOD__, '  - App Friend List: ' . print_r( $this->_appFriendList, true ) );
 		return $this->_appFriendList;
 	}
 
@@ -411,10 +423,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 		$_model = call_user_func( array( $this->_userModelClass, 'model' ) );
 
 		if ( null !== ( $_user = $_model->find( ':pform_user_id_text = pform_user_id_text', array( ':pform_user_id_text' => $this->_fbUserId ) ) ) )
-		{
-			CPSLog::trace( __METHOD__, 'Getting photos from user table cache...' );
 			CPSFacebook::$_photoList = json_decode( $_user->photo_cache_text, true );
-		}
 
 		if ( $_inProgress ) return CPSFacebook::$_photoList;
 

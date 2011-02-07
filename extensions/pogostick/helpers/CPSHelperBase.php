@@ -1312,6 +1312,53 @@ class CPSHelperBase extends CHtml implements IPSBase
 		return $_path;
 	}
 
+	/**
+	 * @return boolean whether this is POST request.
+	 */
+	public static function isPostRequest()
+	{
+		return self::_gr()->getIsPostRequest();
+	}
+
+	/**
+	 * @return boolean True if this is an AJAX (xhr) request.
+	 */
+	public static function isAjaxRequest()
+	{
+		return self::_gr()->getIsAjaxRequest();
+	}
+
+	//********************************************************************************
+	//* Filter Helpers
+	//********************************************************************************
+
+	/**
+	 * Filters an int optionally returns null
+	 * @param mixed $value
+	 * @param boolean $nullIfZero
+	 * @param integer $min
+	 * @param integer $max
+	 * @return integer Filtered value or false on error
+	 */
+	public static function filterInt( $value, $nullIfZero = true, $min = null, $max = null )
+	{
+		$_value = false;
+
+		if ( false !== ( $_value = filter_var( $value, FILTER_SANITIZE_NUMBER_INT ) ) )
+		{
+			if ( null !== $min && $_value < $min )
+				return false;
+
+			if ( null !== $max && $_value > $max )
+				return false;
+
+			if ( $nullIfZero && 0 == $_value )
+				return null;
+		}
+
+		return $_value;
+	}
+
 	//********************************************************************************
 	//* Magic Methods
 	//********************************************************************************
