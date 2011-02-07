@@ -53,7 +53,7 @@ class CPSFacebookAppController extends CPSController
 	const DEBUG = false;
 	const USE_CACHE = false;
 	const IS_CANVAS = true;
-	const IS_CONNECT = true;
+	const IS_CONNECT = false;
 	const THUMB_CACHE = 'thumb_cache';
 	const FRIEND_CACHE = 'friend_cache';
 	const APP_FRIEND_CACHE = 'app_friend_cache';
@@ -129,12 +129,9 @@ class CPSFacebookAppController extends CPSController
 
 		parent::init();
 
-		//	Set proper ini settings for FBC
-        ini_set( 'zend.ze1_compatibility_mode', 0 );
-
 		//	Get our identity
 		$this->_identity = PS::_gs( 'currentIdentity' );
-		
+
         //	Handle an rss feed
         if ( isset( $_REQUEST[ 'rss' ] ) )
         {
@@ -215,7 +212,8 @@ class CPSFacebookAppController extends CPSController
 	 */
 	public function actionInviteComplete()
 	{
-		CPSLog::trace( __METHOD__, 'Invite complete: ' . print_r( $_REQUEST, true ) );
+		if ( PYE_TRACE_LEVEL > 3 )
+			CPSLog::trace( __METHOD__, 'Invite complete: ' . print_r( $_REQUEST, true ) );
 
 		//	$_POST['ids'] is an array of invited friends...
 		$this->_user->invite_count_nbr += count( PS::o( $_REQUEST, 'ids', array() ) );
@@ -229,7 +227,8 @@ class CPSFacebookAppController extends CPSController
 	 */
 	public function actionDeauthorize()
 	{
-		CPSLog::trace( __METHOD__, 'Deauth request: ' . print_r( $_REQUEST, true ) );
+		if ( PYE_TRACE_LEVEL > 3 )
+			CPSLog::trace( __METHOD__, 'Deauth request: ' . print_r( $_REQUEST, true ) );
 
 		$this->layout = false;
 
@@ -292,7 +291,7 @@ class CPSFacebookAppController extends CPSController
 	{
 		return true;
 	}
-	
+
 	public function getFbUserName( $fbUserId )
 	{
 		try
@@ -301,7 +300,7 @@ class CPSFacebookAppController extends CPSController
 				return 'You';
 
 			$_user = json_decode( file_get_contents( 'https://graph.facebook.com/' . $fbUserId ) );
-			
+
 			if ( $_user )
 				return trim( $_user->first_name . ' ' . $_user->last_name );
 		}
@@ -311,7 +310,7 @@ class CPSFacebookAppController extends CPSController
 
 		return 'Facebook User';
 	}
-	
+
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
@@ -334,7 +333,14 @@ class CPSFacebookAppController extends CPSController
 			)
 		);
 
-		$_identity = new CPSFacebookUserIdentity( $this->_facebookApi, $this->_loginUrl, $this->_userModelClass );
+		PS::_ss(
+			'_currentIdentity',
+			$this->_identity = new CPSFacebookUserIdentity(
+				$this->_facebookApi,
+				$this->_loginUrl,
+				$this->_userModelClass
+			)
+		);
 	}
 
 	/**

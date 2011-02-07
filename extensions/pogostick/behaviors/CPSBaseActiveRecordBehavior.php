@@ -37,7 +37,8 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 	public function __construct()
 	{
 		//	Log it and check for issues...
-//		CPSLog::trace( 'pogostick.behaviors', __CLASS__ . ' constructed' );
+		if ( PYE_TRACE_LEVEL > 4 )
+			CPSLog::trace( 'pogostick.behaviors', __CLASS__ . ' constructed' );
 
 		//	Preinitialize
 		$this->preinit();

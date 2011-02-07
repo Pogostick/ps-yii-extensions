@@ -301,18 +301,21 @@ class CPSApiBehavior extends CPSComponentBehavior
 			}
 		}
 
-		CPSLog::trace( __METHOD__, 'Calling onBeforeApiCall' );
+		if ( PYE_TRACE_LEVEL > 3 )
+			CPSLog::trace( __METHOD__, 'Calling onBeforeApiCall' );
 
 		//	Handle events...
 		$_oEvent = new CPSApiEvent( $_sUrl, $_sQuery, null, $this );
 		$this->onBeforeApiCall( $_oEvent );
 
-		CPSLog::trace( __METHOD__, 'Making request: ' . $_sQuery );
+		if ( PYE_TRACE_LEVEL > 3 )
+			CPSLog::trace( __METHOD__, 'Making request: ' . $_sQuery );
 
 		//	Ok, we've build our request, now let's get the results...
 		$_sResults = CPSHelperBase::makeHttpRequest( $_sUrl, $_sQuery, $sMethod, $this->userAgent );
 
-		CPSLog::trace( __METHOD__, 'Call complete: ' . var_export( $_sResults, true ) );
+		if ( PYE_TRACE_LEVEL > 3 )
+			CPSLog::trace( __METHOD__, 'Call complete: ' . var_export( $_sResults, true ) );
 
 		//	Handle events...
 		$_oEvent->urlResults = $_sResults;
