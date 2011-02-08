@@ -122,7 +122,7 @@ class CPSjqUIAlerts extends CPSjqUIWrapper
 			$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
 			
 			//	Register scripts necessary
-			PS::_rsf( "{$_oWidget->baseUrl}/jquery.alerts.js" );
+			PS::_rsf( "{$_oWidget->baseUrl}/jquery.alerts.js", CClientScript::POS_END );
 
 			//	Register css files...
 			PS::_rcf( "{$_oWidget->baseUrl}/jquery.alerts.css" );

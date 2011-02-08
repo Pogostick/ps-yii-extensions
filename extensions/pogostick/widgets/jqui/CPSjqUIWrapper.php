@@ -222,7 +222,7 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 			$this->unsetOption( 'regional' );
 
 			//	Not en? Let's load i18n file...
-			if ( ! empty( $_sRegion ) ) PS::_rsf( ( PS::o( $_SERVER, 'HTTPS' ) == 'on' ? 'https' : 'http' ) . "://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/i18n/jquery-ui-i18n.min.js" );
+			if ( ! empty( $_sRegion ) ) PS::_rsf( ( PS::o( $_SERVER, 'HTTPS' ) == 'on' ? 'https' : 'http' ) . "://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/i18n/jquery-ui-i18n.min.js", CClientScript::POS_END );
 			
 			//	Set defaults for datepicker if this is one...
 			$_sRegion = "$.datepicker.setDefaults($.extend({showMonthAfterYear: false},$.datepicker.regional['{$_sRegion}']));";
