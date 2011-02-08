@@ -72,19 +72,37 @@ class CPSLiveLogRoute extends CFileLogRoute
 			if ( @filesize( $_logFile ) > $this->getMaxFileSize() * 1024 )
 				$this->rotateFiles();
 
+			//	Write out the log entries
 			foreach ( $logs as $_log )
 			{
-				foreach ( $this->_excludeCategories as $_category )
+				$_exclude = false;
+				
+				//	Check out the exclusions
+				if ( ! empty( $this->_excludeCategories ) )
 				{
-					//	If found, we skip
-					if ( $_category == $_log[2] || 0 != preg_match( $_category, $_log[2] ) )
-						continue;
+					foreach ( $this->_excludeCategories as $_category )
+					{
+						//	If found, we skip
+						if ( trim( strtolower( $_category ) ) == trim( strtolower( $_log[2] ) ) )
+						{
+							$_exclude = true;
+							break;
+						}
+
+						//	Check for regex
+						if ( '/' == $_category[0] && 0 != @preg_match( $_category, $_log[2] ) )
+						{
+							$_exclude = true;
+							break;
+						}
+					}
 				}
 					
 				/**
 				 * 	Use {@link error_log} facility to write out log entry
 				 */
-				error_log( $this->formatLogMessage( $_log[0], $_log[1], $_log[2], $_log[3] ), 3, $_logFile );
+				if ( ! $_exclude )
+					error_log( $this->formatLogMessage( $_log[0], $_log[1], $_log[2], $_log[3] ), 3, $_logFile );
 			}
 		}
 		catch ( Exception $_ex )
