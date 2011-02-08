@@ -87,10 +87,20 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	public function getFriendList() { return $this->_friendList; }
 
 	/**
-	 * @var array The users' list of friends who also use this app
+	 * The users' list of friends who also use this app
+	 * @property-read array $appFriendList
+	 * @var array $_appFriendList
 	 */
 	protected $_appFriendList = null;
 	public function getAppFriendList() { return $this->_appFriendList; }
+
+	/**
+	 * @property boolean $cacheAppFriends
+	 * @var boolean $_cacheAppFriends
+	 */
+	protected $_cacheAppFriends = false;
+	public function getCacheAppFriends() { return $this->_cacheAppFriends; }
+	public function setCacheAppFriends( $value ) { $this->_cacheAppFriends = $value; }
 
 	/**
 	 * @var boolean If true, user's albums and pictures are loaded and cached
@@ -380,7 +390,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	 */
 	protected function _getAppFriends()
 	{
-		$this->_appFriendList = PS::_gs( CPSFacebookAppController::APP_FRIEND_CACHE );
+		$this->_appFriendList = ( $this->_cacheAppFriends ? PS::_gs( CPSFacebookAppController::APP_FRIEND_CACHE ) : null );
 
 		try
 		{
@@ -399,7 +409,8 @@ class CPSFacebookUserIdentity extends CUserIdentity
 						$this->_appFriendList[] = '\'' . $_friend['uid'] . '\'';
 				}
 
-				PS::_ss( CPSFacebookAppController::APP_FRIEND_CACHE, $this->_appFriendList );
+				if ( $this->_cacheAppFriends )
+					PS::_ss( CPSFacebookAppController::APP_FRIEND_CACHE, $this->_appFriendList );
 			}
 		}
 		catch ( Exception $_ex )

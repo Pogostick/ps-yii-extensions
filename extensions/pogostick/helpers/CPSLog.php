@@ -113,9 +113,9 @@ class CPSLog implements IPSBase
 		if ( defined( 'PYE_TRACE_LEVEL' ) && 0 == PYE_TRACE_LEVEL )
 			return;
 
-		self::log( $sCategory, $sMessage, 'trace', $arParams, $sSource, $sLanguage );
+		self::log( $category, $message, 'trace', $options, $source, $language );
 	}
-	
+
 	/**
 	 * Creates an 'api' log entry
 	 * @param string $apiCall The API call made
@@ -125,7 +125,7 @@ class CPSLog implements IPSBase
 	{
 		self::log( $apiCall, PHP_EOL . print_r( $response, true ) . PHP_EOL, 'api' );
 	}
-	
+
 	/**
 	 * Creates a 'debug' log entry
 	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
