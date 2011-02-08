@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -13,7 +13,7 @@
 
 /**
  * CPSLiveLogRoute utilizes PHP's {@link error_log} function to write logs in real time
- * 
+ *
  * @author Jerry Ablan <jablan@pogostick.com>
  * @since v1.1.0
  */
@@ -22,25 +22,25 @@ class CPSLiveLogRoute extends CFileLogRoute
 	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
-	
+
 	/**
 	 * @property array $excludeCategories An array of categories to exclude from logging. Regex pattern matching is supported via {@link preg_match}
 	 */
 	protected $_excludeCategories = array();
 	public function getExcludeCategories() { return $this->_excludeCategories; }
 	public function setExcludeCategories( $value ) { $this->_excludeCategories = $value; }
-		
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
-	
+
 	/**
 	 * Initialize component
 	 */
 	public function init()
 	{
 		parent::init();
-		
+
 		//	Write each line out to disk
 		Yii::getLogger()->autoFlush = 1;
 	}
@@ -54,7 +54,7 @@ class CPSLiveLogRoute extends CFileLogRoute
 	{
 		parent::collectLogs( $logger, true );
 	}
-	
+
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
@@ -76,7 +76,7 @@ class CPSLiveLogRoute extends CFileLogRoute
 			foreach ( $logs as $_log )
 			{
 				$_exclude = false;
-				
+
 				//	Check out the exclusions
 				if ( ! empty( $this->_excludeCategories ) )
 				{
@@ -97,13 +97,16 @@ class CPSLiveLogRoute extends CFileLogRoute
 						}
 					}
 				}
-					
+
 				/**
 				 * 	Use {@link error_log} facility to write out log entry
 				 */
 				if ( ! $_exclude )
 					error_log( $this->formatLogMessage( $_log[0], $_log[1], $_log[2], $_log[3] ), 3, $_logFile );
 			}
+
+			//	Processed, clear!
+			$this->logs = null;
 		}
 		catch ( Exception $_ex )
 		{
@@ -123,7 +126,7 @@ class CPSLiveLogRoute extends CFileLogRoute
 	{
 		if ( null === $time )
 			$time = time();
-		
+
 		$level = strtoupper( $level[0] );
 
 		return @date( 'M d H:i:s', $time ) . ' [' . sprintf( '%-30s', $category ) . '] ' . ': <' . $level . '> ' . $message . PHP_EOL;
