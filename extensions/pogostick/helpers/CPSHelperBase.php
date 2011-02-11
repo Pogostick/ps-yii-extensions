@@ -1240,7 +1240,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param CDbConnection $dbToUse
 	 * @return mixed
 	 */
-	public static function _sqlAll( $sql, $parameterList = null, $dbToUse = null )
+	public static function _sqlAll( $sql, $parameterList = array(), $dbToUse = null )
 	{
 		if ( null !== ( $_db = PS::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
 			return $_db->createCommand( $sql )->queryAll( true, $parameterList );
