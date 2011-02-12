@@ -127,6 +127,12 @@ class CPSFacebookAppController extends CPSController
 		//	See if this is a deauth...
 		$this->_isDeauthRequest = ( false !== strpos( $_SERVER['REQUEST_URI'], 'app/deauthorize' ) );
 
+		if ( isset( $_REQUEST['request_ids'] ) )
+		{
+			$this->actionInviteComplete( 'request_ids' );
+			$this->redirect( '/' );
+		}
+
 		parent::init();
 
 		//	Get our identity
@@ -204,20 +210,25 @@ class CPSFacebookAppController extends CPSController
 	public function actionAdmin()
 	{
 		$this->layout = 'admin';
-		$this->render( ( $this->_user && $this->_user->admin_level_nbr != 0 ) ? 'admin' : 'index' );
+		if ( null !== ( $_user = PS::_gs( 'currentUser' ) ) )
+			$this->render( ( $_user && $_user->admin_level_nbr != 0 ) ? 'admin' : 'index' );
 	}
 
 	/**
 	 * Called after invitations have been sent.
 	 */
-	public function actionInviteComplete()
+	public function actionInviteComplete( $queryParam = 'ids' )
 	{
 		if ( PYE_TRACE_LEVEL > 3 )
 			CPSLog::trace( __METHOD__, 'Invite complete: ' . print_r( $_REQUEST, true ) );
 
 		//	$_POST['ids'] is an array of invited friends...
-		$this->_user->invite_count_nbr += count( PS::o( $_REQUEST, 'ids', array() ) );
-		$this->_user->update( array( 'invite_count_nbr' ) );
+		if ( null !== ( $_user = PS::_gs( 'currentUser' ) ) )
+		{
+			$_user->invite_count_nbr += count( PS::o( $_REQUEST, $queryParam, array() ) );
+			$_user->update( array( 'invite_count_nbr' ) );
+		}
+
 		$this->redirect( PS::_gp( 'appUrl' ) );
 	}
 
@@ -233,13 +244,13 @@ class CPSFacebookAppController extends CPSController
 		$this->layout = false;
 
 		//	Reset!
-		if ( $this->_user )
+		if ( null !== ( $_user = PS::_gs( 'currentUser' ) ) )
 		{
-			$this->_user->app_del_date = date( 'Y-m-d H:i:s' );
-			$this->_user->app_del_count_nbr += 1;
-			$this->_user->access_token_text = null;
-			$this->_user->session_key_text = null;
-			$this->_user->update( array( 'app_del_date', 'app_del_count_nbr', 'access_token_text', 'session_key_text' ) );
+			$_user->app_del_date = date( 'Y-m-d H:i:s' );
+			$_user->app_del_count_nbr += 1;
+			$_user->access_token_text = null;
+			$_user->session_key_text = null;
+			$_user->update( array( 'app_del_date', 'app_del_count_nbr', 'access_token_text', 'session_key_text' ) );
 		}
 	}
 
@@ -248,7 +259,7 @@ class CPSFacebookAppController extends CPSController
 	 */
 	public function actionInviteFriends()
 	{
-		$this->render( 'inviteFriends' );
+		$this->render( 'index' );
 	}
 
 	/**
