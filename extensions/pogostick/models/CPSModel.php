@@ -1,7 +1,7 @@
 <?php
 /*
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -9,16 +9,16 @@
 
 /**
  * CPSModel provides base functionality for models
- * 
+ *
  * @package 	psYiiExtensions
  * @subpackage 	models
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id: CPSModel.php 401 2010-08-31 21:04:18Z jerryablan@gmail.com $
  * @since 		v1.0.6
- *  
+ *
  * @filesource
- * 
+ *
  * @property-read string $modelName The class name of the model
  */
 class CPSModel extends CActiveRecord implements IPSBase
@@ -159,21 +159,27 @@ class CPSModel extends CActiveRecord implements IPSBase
 	 * Override of CModel::setAttributes
 	 * Populates member variables as well.
 	 * Aware of Yii 1.1.0+
-	 * 
+	 *
 	 * @param array $attributes
 	 */
 	public function setAttributes( $attributes, $safeOnly = true )
 	{
 		if ( version_compare( Yii::getVersion(), '1.1.0', '>=' ) )
 		{
-			if ( !is_array( $attributes ) ) return;
+			if ( ! is_array( $attributes ) )
+				return;
 
 			$_attributes = array_flip( $safeOnly ? $this->getSafeAttributeNames() : $this->attributeNames()  );
 
 			foreach ( $attributes as $_column => $_value )
 			{
-				if ( isset( $_attributes[$_column] ) ) $this->setAttribute( $_column, $_value );
-				else if ( $this->hasProperty( $_column ) && $this->canSetProperty( $_column ) ) $this->{$_column} = $_value;
+				if ( isset( $_attributes[$_column] ) )
+					$this->setAttribute( $_column, $_value );
+				else
+				{
+					if ( $this->hasProperty( $_column ) && $this->canSetProperty( $_column ) )
+						$this->{$_column} = $_value;
+				}
 			}
 		}
 		else
@@ -198,7 +204,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 
 	/**
 	 * Builds a CPSModel and sets the model name
-	 * 
+	 *
 	 * @param string $_scenario
 	 * @return CPSModel
 	 */
@@ -222,7 +228,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 				$_class = Yii::import( $_class );
 
 			//	Check...
-			if ( $className == $_column || $className == $_class ) 
+			if ( $className == $_column || $className == $_class )
 				return true;
 		}
 
@@ -231,7 +237,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	}
 
 	/**
-	 * Sets our default behaviors. 
+	 * Sets our default behaviors.
 	 * All CPSModel's have the DataFormat and Utility behaviors added by default.
 	 * @return array
 	 * @see CModel::behaviors
@@ -239,7 +245,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	public function behaviors()
 	{
 		return array_merge(
-			parent::behaviors(), 
+			parent::behaviors(),
 			array(
 				//	Date/time formatter
 				'psDataFormat' => array(
@@ -260,7 +266,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 		$_i = 1;
 
 		$_errors = $this->getErrors( $attribute );
-		
+
 		if ( ! empty( $_errors ) )
 		{
 			foreach ( $_errors as $_attribute => $_error )
@@ -292,7 +298,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 
 		foreach ( $this->getTableSchema()->columns as $_column )
 		{
-			if ( 'string' == $_column->type ) 
+			if ( 'string' == $_column->type )
 				$_criteria->compare( $_column->name, $this->{$_column->name}, true );
 		}
 
@@ -351,7 +357,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	//*******************************************************************************
 	//* Transaction Management
 	//*******************************************************************************
-	
+
 	/**
 	 * Checks to see if there are any transactions going...
 	 * @return boolean
@@ -368,7 +374,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	 */
 	public static function beginTransaction()
 	{
-		if ( version_compare( PHP_VERSION, '5.3.0' ) > 0 ) 
+		if ( version_compare( PHP_VERSION, '5.3.0' ) > 0 )
 		{
 			$_modelClass = get_called_class();
 			$_model = new $_modelClass;
