@@ -641,7 +641,7 @@ class CPSWidgetHelper extends CPSHelperBase
 
 		try
 		{
-			if ( PYE_TRACE_LEVEL > 3 )
+			if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
 				CPSLog::trace( __METHOD__, 'Rendering field "' . $attributeName . '" of type "' . $inputFieldType . '"' );
 
 			if ( method_exists( 'CPSWidgetHelper', $inputFieldType ) )
@@ -1846,7 +1846,7 @@ HTML;
 	public static function getExternalLibraryUrl()
 	{
 		$_path = str_replace( PS::_gbu(), '', Yii::app()->getAssetManager()->getPublishedUrl( Yii::getPathOfAlias( 'pogostick.external' ), true ) );
-		if ( PYE_TRACE_LEVEL > 3 )
+		if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
 			CPSLog::trace( __METHOD__, 'External Library URL: ' . $_path );
 		return $_path;
 	}
@@ -1859,7 +1859,7 @@ HTML;
 	public static function getExternalLibraryPath()
 	{
 		$_path = str_replace( PS::_gbp(), '', Yii::app()->getAssetManager()->getPublishedPath( Yii::getPathOfAlias( 'pogostick.external' ), true ) );
-		if ( PYE_TRACE_LEVEL > 3 )
+		if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
 			CPSLog::trace( __METHOD__, 'External Library Path: ' . $_path );
 		return $_path;
 	}

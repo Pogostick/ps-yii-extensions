@@ -219,7 +219,7 @@ class CPSFacebookAppController extends CPSController
 	 */
 	public function actionInviteComplete( $queryParam = 'ids' )
 	{
-		if ( PYE_TRACE_LEVEL > 3 )
+		if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
 			CPSLog::trace( __METHOD__, 'Invite complete: ' . print_r( $_REQUEST, true ) );
 
 		//	$_POST['ids'] is an array of invited friends...
@@ -238,7 +238,7 @@ class CPSFacebookAppController extends CPSController
 	 */
 	public function actionDeauthorize()
 	{
-		if ( PYE_TRACE_LEVEL > 3 )
+		if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
 			CPSLog::trace( __METHOD__, 'Deauth request: ' . print_r( $_REQUEST, true ) );
 
 		$this->layout = false;

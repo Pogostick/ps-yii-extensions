@@ -399,7 +399,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 				$_fql = "select uid from user where is_app_user = '1' and uid in ( select uid2 from friend where uid1 = '{$this->_fbUserId}' ) order by name";
 				$_list = $this->_facebookApi->api( array( 'method' => 'fql.query', 'query' => $_fql ) );
 
-				if ( PYE_TRACE_LEVEL > 3 )
+				if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
 					CPSLog::trace( __METHOD__, '  - App Friend List Retrieved: ' . print_r( $_list, true ) );
 
 				//	Make into a list of uids...
