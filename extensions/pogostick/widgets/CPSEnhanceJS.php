@@ -82,7 +82,8 @@ class CPSEnhanceJS extends CPSjQueryWidget
 			$_oWidget->baseUrl = $_oWidget->extLibUrl . self::PS_EXTERNAL_PATH;
 
 			//	jQuery first...
-			PS::_cs()->registerCoreScript( 'jquery' );
+			if ( false !== ( PS::o( PS::_cs()->scriptMap, 'jquery.js' ) ) )
+				PS::_cs()->registerCoreScript( 'jquery' );
 
 			//	Register scripts necessary
 			PS::_rsf( $_oWidget->baseUrl . '/enhance.js' );

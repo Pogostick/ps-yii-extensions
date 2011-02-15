@@ -72,7 +72,8 @@ class CPSWebModule extends CWebModule implements IPSBase
 		$this->_setAssetPaths();
 
 		//	Who doesn't need this???
-		CPSHelperBase::_cs()->registerCoreScript( 'jquery' );
+		if ( false !== ( CPSHelperBase::o( CPSHelperBase::_cs()->scriptMap, 'jquery.js' ) ) )
+			CPSHelperBase::_cs()->registerCoreScript( 'jquery' );
 	}
 
 	//********************************************************************************
