@@ -30,6 +30,21 @@ class CPSLiveLogRoute extends CFileLogRoute
 	public function getExcludeCategories() { return $this->_excludeCategories; }
 	public function setExcludeCategories( $value ) { $this->_excludeCategories = $value; }
 
+	/**
+	 * @property integer $categoryWidth The minimum width of the category column in the log output
+	 */
+	protected $_categoryWidth = 40;
+	/**
+	 * Get the minimum width of the category column in the log output
+	 * @return integer 
+	 */
+	public function getCategoryWidth() { return $this->_categoryWidth; }
+	/**
+	 * Set the minimum width of the category column in the log output
+	 * @return integer 
+	 */
+	public function setCategoryWidth( $value ) { $this->_categoryWidth = $value; }
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -129,6 +144,6 @@ class CPSLiveLogRoute extends CFileLogRoute
 
 		$level = strtoupper( $level[0] );
 
-		return @date( 'M d H:i:s', $time ) . ' [' . sprintf( '%-30s', $category ) . '] ' . ': <' . $level . '> ' . $message . PHP_EOL;
+		return @date( 'M d H:i:s', $time ) . ' [' . sprintf( '%-' . $this->_categoryWidth . 's', $category ) . '] ' . ': <' . $level . '> ' . $message . PHP_EOL;
 	}
 }
