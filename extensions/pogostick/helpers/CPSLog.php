@@ -50,6 +50,9 @@ class CPSLog implements IPSBase
 	 */
 	protected static function log( $category, $message, $level = 'info', $options = array(), $source = null, $language = null )
 	{
+		if ( null === $category )
+			$category = self::_getCallingMethod();
+
 		$_logEntry = self::$prefix . Yii::t( $category, $message, $options, $source, $language );
 
 		if ( self::$echoData )
@@ -145,6 +148,31 @@ class CPSLog implements IPSBase
 	public static function write( $message, $level, $category = null )
 	{
 		self::log( $category, $message, $level );
+	}
+
+	/**
+	 * Returns the name of the method that made the call
+	 * @param integer $level The level of the call
+	 * @return string
+	 */
+	protected static function _getCallingMethod( $level = 2 )
+	{
+		$_trace = debug_backtrace();
+
+		while ( $level >= 0 )
+		{
+			if ( null !== ( $_caller = PS::o( $_trace, $level ) ) )
+			{
+				if ( null !== ( $_class = PS::o( $_caller, 'class' ) ) )
+					return $_class . '::' . PS::o( $_caller, 'function' );
+
+				return basename( PS::o( $_caller, 'file' ) ) . '::' . PS::o( $_caller, 'function' ) . ' (Line ' . PS::o( $_caller, 'line' ) . ')';
+			}
+
+			$level--;
+		}
+
+		return null;
 	}
 
 }
