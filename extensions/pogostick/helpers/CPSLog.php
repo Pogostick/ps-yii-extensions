@@ -136,4 +136,15 @@ class CPSLog implements IPSBase
 		self::log( $category, $message, 'debug' );
 	}
 
+	/**
+	 * Creates an user-defined log entry
+	 * @param mixed $message The message
+	 * @param string $level The message level
+	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
+	 */
+	public static function write( $message, $level, $category = null )
+	{
+		self::log( $category, $message, $level );
+	}
+
 }
