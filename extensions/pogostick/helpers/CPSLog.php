@@ -26,14 +26,33 @@ class CPSLog implements IPSBase
 	//********************************************************************************
 
 	/**
-	 * @var boolean If true, all applicable log entries will be echoed to the screen
+	 * @staticvar boolean If true, all applicable log entries will be echoed to the screen
 	 */
 	public static $echoData = false;
 
 	/**
-	 * @var string Prepended to each log entry before writing.
+	 * @staticvar string Prepended to each log entry before writing.
 	 */
 	public static $prefix = null;
+
+	/**
+	 * @staticvar integer The base level for getting source of log entry
+	 */
+	public static $baseLevel = 2;
+
+	/**
+	 * @staticvar integer The current indent level
+	 */
+	public static $currentIndent = 0;
+
+	protected static $_defaultLevelIndicator = '.';
+
+	protected static $_levelIndicators = array(
+		'info' => '*',
+		'notice' => '?',
+		'warning' => '-',
+		'error' => '!',
+	);
 
 	//********************************************************************************
 	//* Public Methods
@@ -53,15 +72,39 @@ class CPSLog implements IPSBase
 		if ( null === $category )
 			$category = self::_getCallingMethod();
 
-		$_logEntry = self::$prefix . Yii::t( $category, $message, $options, $source, $language );
+		//	Get the indent, if any
+		$_unindent = ( 0 > ( $_newIndent = self::_processMessage( $message ) ) );
 
-		if ( self::$echoData )
+		$_levelList = explode( '|', $level );
+
+		//	Handle writing to multiple levels at once.
+		foreach ( $_levelList as $_level )
 		{
-			echo date( 'Y.m.d h.i.s' ) . '[' . strtoupper( $level[0] ) . '] ' . '[' . sprintf( '%-40s', $category ) . '] ' . $_logEntry . '<br />';
-			flush();
+			$_indicator = PS::o( self::$_levelIndicators, $_level, self::$_defaultLevelIndicator );
+			$_logEntry = self::$prefix . Yii::t( $category, $message, $options, $source, $language );
+
+			if ( self::$echoData )
+			{
+				echo date( 'Y.m.d h.i.s' ) . '[' . strtoupper( $_level[0] ) . '] ' . '[' . sprintf( '%-40s', $category ) . '] ' . $_logEntry . '<br />';
+				flush();
+			}
+
+			//	Indent...
+			$_tempIndent = self::$currentIndent;
+
+			if ( $_unindent )
+				$_tempIndent--;
+
+			if ( $_tempIndent < 0 )
+				$_tempIndent = 0;
+
+			$_logEntry = str_repeat( '  ', $_tempIndent ) . $_indicator . ' ' . $message;
+
+			Yii::log( $_logEntry, $_level, $category );
 		}
 
-		Yii::log( $_logEntry, $level, $category );
+		//	Set indent level...
+		self::$currentIndent += $_newIndent;
 	}
 
 	/**
@@ -155,24 +198,88 @@ class CPSLog implements IPSBase
 	 * @param integer $level The level of the call
 	 * @return string
 	 */
-	protected static function _getCallingMethod( $level = 2 )
+	protected static function _getCallingMethod( $level = null )
 	{
-		$_trace = debug_backtrace();
+		$_className = get_class();
+		$level = ( null === $level ? self::$baseLevel : $level );
 
-		while ( $level >= 0 )
+		try
 		{
-			if ( null !== ( $_caller = PS::o( $_trace, $level ) ) )
+			$_trace = debug_backtrace();
+			$_count = count( $_trace );
+
+			while ( $level >= 0 && isset( $_trace[$level] ) )
 			{
+				if ( null === ( $_caller = PS::o( $_trace, $level ) ) )
+					break;
+
 				if ( null !== ( $_class = PS::o( $_caller, 'class' ) ) )
+				{
+					//	If we see ourself, then we must go again
+					if ( $_class == $_className )
+					{
+						//	One louder
+						$level++;
+						continue;
+					}
+
 					return $_class . '::' . PS::o( $_caller, 'function' );
+				}
+
+				//	If we see ourself, then we must go again
+				if ( $_className == basename( PS::o( $_caller, 'file' ) ) )
+				{
+					//	One louder
+					$level++;
+					continue;
+				}
 
 				return basename( PS::o( $_caller, 'file' ) ) . '::' . PS::o( $_caller, 'function' ) . ' (Line ' . PS::o( $_caller, 'line' ) . ')';
-			}
 
-			$level--;
+				$level--;
+			}
+		}
+		catch ( Exception $_ex )
+		{
+			//	Error logging shouldn't create more errors...
 		}
 
 		return null;
 	}
 
+	/**
+	 * Safely decrements the current indent level
+	 */
+	public static function decrementIndent( $howMuch = 1 )
+	{
+		self::$currentIndent -= $howMuch;
+
+		if ( self::$currentIndent < 0 )
+			self::$currentIndent = 0;
+	}
+
+	/**
+	 * Processes the indent level for the messages
+	 * @param string $message
+	 * @return integer The indent difference AFTER this message
+	 */
+	protected static function _processMessage( &$message )
+	{
+		$_newIndent = 0;
+
+		switch ( substr( $message, 0, 2 ) )
+		{
+			case '>>':
+				$_newIndent = 1;
+				$message = trim( substr( $message, 2 ) );
+				break;
+
+			case '<<':
+				$_newIndent = -1;
+				$message = trim( substr( $message, 2 ) );
+				break;
+		}
+
+		return $_newIndent;
+	}
 }
