@@ -67,7 +67,7 @@ class CPSLog implements IPSBase
 	 * @param string $source Which message source application component to use.
 	 * @param string $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
 	 */
-	protected static function log( $category, $message, $level = 'info', $options = array(), $source = null, $language = null )
+	public static function log( $category, $message, $level = 'info', $options = array(), $source = null, $language = null )
 	{
 		if ( null === $category )
 			$category = self::_getCallingMethod();
