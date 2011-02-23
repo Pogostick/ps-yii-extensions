@@ -78,7 +78,7 @@ class CPSLiveLogRoute extends CFileLogRoute
 	 * Writes log messages in files.
 	 * @param array $logs list of log messages
 	 */
-	protected function processLogs( $logs = array() )
+	protected function processLogs( $logs )
 	{
 		try
 		{
