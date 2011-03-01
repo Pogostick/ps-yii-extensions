@@ -102,13 +102,24 @@ CODE;
 	* The options passed in are dynamically added to the options array and will be accessible 
 	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
 	* 
-	* @param array $arOptions The options for the widget
+	* @param array $options The options for the widget
 	* @param string $sClass The class of the calling object if different
 	* @return CPSjqGridWidget
 	*/
-	public static function create( $sName = null, array $arOptions = array() )
+	public static function create( $name = null, array $options = array() )
 	{
-		return parent::create( PS::nvl( $sName, self::PS_WIDGET_NAME ), array_merge( $arOptions, array( 'class' => __CLASS__ ) ) );
+		return parent::create( 
+			PS::nvl( 
+				$name, 
+				self::PS_WIDGET_NAME 
+			), 
+			array_merge( 
+				$options, 
+				array( 
+					'class' => __CLASS__ 
+				) 
+			) 
+		);
 	}
 	
 	/**
