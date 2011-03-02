@@ -4,7 +4,7 @@
  *
  * @filesource
  * @author Jerry Ablan <jablan@pogostick.com>
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @package psYiiExtensions
  * @subpackage commands

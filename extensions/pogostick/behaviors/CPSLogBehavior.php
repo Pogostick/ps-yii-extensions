@@ -5,21 +5,19 @@
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
+ * @filesource
  */
 
 /**
  * A base class for AR behaviors
  *
- * @package 	psYiiExtensions
+ * @package		pyel
  * @subpackage 	behaviors
  *
  * @author 		Jerry Ablan <jablan@pogostick.com>
- * @version 	SVN: $Id: CPSBaseActiveRecordBehavior.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
- * @since 		v1.0.6
- *
- * @filesource
+ * @since 		v1.1.0
  */
-class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBehavior
+class CPSLogBehavior extends CBehavior implements IPSBehavior
 {
 	//********************************************************************************
 	//* Member Variables
@@ -30,9 +28,7 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 	 */
 	public function __construct()
 	{
-		//	Log it and check for issues...
-		if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 4 )
-			CPSLog::trace( 'pogostick.behaviors', __CLASS__ . ' constructed' );
+		parent::_construct( $options );
 
 		//	Preinitialize
 		$this->preinit();

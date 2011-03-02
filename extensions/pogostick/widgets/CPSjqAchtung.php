@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -57,7 +57,7 @@ class CPSjqAchtung extends CPSjQueryWidget
 		PS::_rcf( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.css", CClientScript::POS_HEAD );
 		
 		//	Register scripts necessary
-		PS::_rsf( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.js", CClientScript::POS_HEAD );
+		$this->pushScriptFile( $this->baseUrl . DIRECTORY_SEPARATOR . "ui.achtung-min.js", CClientScript::POS_HEAD );
 
 		//	Don't forget subclasses
 		return PS::_cs();

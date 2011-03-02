@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Sonetrix.php
  *
  * Copyright (c) 2010 Jerry Ablan <jablan@pogostick.com>.

@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -82,8 +82,8 @@ class CPSMarkItUpWidget extends CPSjqUIWrapper
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 
 		//	Register scripts necessary
-		PS::_rsf( "{$this->baseUrl}/jquery.markitup.pack.js" );
-		PS::_rsf( "{$this->baseUrl}/sets/{$this->setToUse}/set.js" );
+		$this->pushScriptFile( "{$this->baseUrl}/jquery.markitup.pack.js" );
+		$this->pushScriptFile( "{$this->baseUrl}/sets/{$this->setToUse}/set.js" );
 		PS::_rcf( "{$this->baseUrl}/skins/{$this->skinToUse}/style.css" );
 		PS::_rcf( "{$this->baseUrl}/sets/{$this->setToUse}/style.css" );
 	

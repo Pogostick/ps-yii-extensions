@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of the Pogostick Yii Extension library
  *
  * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
