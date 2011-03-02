@@ -2,7 +2,7 @@
 /*
  * This file is part of the psYiiExtensions package.
  *
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright &copy; 2009-2011 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -1326,6 +1326,57 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function isAjaxRequest()
 	{
 		return self::_gr()->getIsAjaxRequest();
+	}
+	
+	/**
+	 * Generic array sorter
+	 * 
+	 * To sort a column in descending order, assign 'desc' to the column's value in the defining array:
+	 * 
+	 * $_columnsToSort = array(
+	 *	'date' => 'desc',
+	 *	'lastName' => 'asc',
+	 *	'firstName' => 'asc',
+	 * );
+	 * 
+	 * @param array $arrayToSort
+	 * @param array $columnsToSort Array of columns in $arrayToSort to sort. 
+	 * @return boolean
+	 */
+	public static function arraySort( &$arrayToSort, $columnsToSort = array() )
+	{
+		//	Convert to an array
+		if ( ! empty( $columnsToSort ) && ! is_array( $columnsToSort ) )
+			$columnsToSort = array( $columnsToSort );
+		
+		//	Any fields?
+		if ( ! empty( $columnsToSort ) )
+		{
+			$_first = true;
+			$_evalCode = null;
+
+			foreach ( $columnsToSort as $_column => $_order )
+			{
+				if ( is_numeric( $_column ) && ! self::in( strtolower( $_order ), 'asc', 'desc' ) )
+				{
+					$_column = $_order;
+					$_order = null;
+				}
+				
+				if ( 'desc' == strtolower( $_order ) )
+					$_evalCode .= ( ! $_first ? 'if ( ! $_result ) ' : null ) . '$_result = strnatcmp( $b["' . $_column . '"], $a["' . $_column . '"]);' . PHP_EOL;
+				else
+					$_evalCode .= ( ! $_first ? 'if ( ! $_result ) ' : null ) . '$_result = strnatcmp( $a["' . $_column . '"], $b["' . $_column . '"]);' . PHP_EOL;
+				
+				$_first = false;
+			}
+
+			$_evalCode .= 'return $_result;';
+
+			return usort( $arrayToSort, create_function( '$a,$b', $_evalCode ) );
+		}
+		
+		return false;
 	}
 
 	//********************************************************************************
