@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * CPSOpenCalais.php
  * 
  * Copyright (c) 2009 Jerry Ablan <jablan@pogostick.com>.

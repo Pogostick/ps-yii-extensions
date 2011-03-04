@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  *
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -31,6 +31,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	const	OF_JSON 		= 0;
 	const	OF_HTTP 		= 1;
 	const	OF_ASSOC_ARRAY 	= 2;
+	const	OF_XML		 	= 3;
 
 	/**
 	* Pager locations

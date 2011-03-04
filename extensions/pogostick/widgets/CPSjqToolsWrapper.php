@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -112,13 +112,13 @@ class CPSjqToolsWrapper extends CPSjQueryWidget
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 		
 		//	Register scripts necessary
-		PS::_rsf( $this->baseUrl . '/jquery.tools.min.js' );
+		$this->pushScriptFile( $this->baseUrl . '/jquery.tools.min.js' );
 		
 //	Uncomment to use CDN		
-//		PS::_rsf( "http://cdn.jquerytools.org/1.1.2/tiny/jquery.tools.min.js" );
+//		$this->pushScriptFile( "http://cdn.jquerytools.org/1.1.2/tiny/jquery.tools.min.js" );
 
 		//	Add for flashembed if we need it...
-		if ( 'flashembed' == $this->widgetName ) PS::_rsf( "http://static.flowplayer.org/js/tools/tools.flashembed-1.0.4.min.js" );
+		if ( 'flashembed' == $this->widgetName ) $this->pushScriptFile( "http://static.flowplayer.org/js/tools/tools.flashembed-1.0.4.min.js" );
 		
 		//	Register any CSS files for this tool...
 		if ( isset( $this->m_arSupportFiles, $this->m_arSupportFiles[ $this->widgetName ], $this->m_arSupportFiles[ $this->widgetName ]['css'] ) )

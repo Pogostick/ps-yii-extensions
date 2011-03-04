@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of the SnowFrame package.
  * 
  * @copyright Copyright &copy; 2010 Pogostick, LLC

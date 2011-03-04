@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * 
+ */
 class ModelCode extends CCodeModel
 {
 	public $tablePrefix;

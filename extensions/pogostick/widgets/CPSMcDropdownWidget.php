@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -68,8 +68,8 @@ class CPSMcDropdownWidget extends CPSjqUIWrapper
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 	
-		PS::_rsf( "{$this->baseUrl}/lib/jquery.bgiframe.js" );
-		PS::_rsf( "{$this->baseUrl}/lib/jquery.mcdropdown.min.js" );
+		$this->pushScriptFile( "{$this->baseUrl}/lib/jquery.bgiframe.js" );
+		$this->pushScriptFile( "{$this->baseUrl}/lib/jquery.mcdropdown.min.js" );
 		PS::_rcf( "{$this->baseUrl}/css/jquery.mcdropdown.min.css" );
 		
 		//	And register ours...

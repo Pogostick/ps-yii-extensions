@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -38,8 +38,8 @@ class CPSjqGridWidget extends CPSjqUIWrapper
 		parent::registerClientScripts( $bLocateScript );
 		
 		//	Register scripts necessary
-		PS::_rsf( "{$this->extLibUrl}/jqGrid/js/i18n/grid.locale-en.js" );
-		PS::_rsf( "{$this->extLibUrl}/jqGrid/js/jquery.jqGrid.min.js" );
+		$this->pushScriptFile( "{$this->extLibUrl}/jqGrid/js/i18n/grid.locale-en.js" );
+		$this->pushScriptFile( "{$this->extLibUrl}/jqGrid/js/jquery.jqGrid.min.js" );
 
 		//	Register css files...
 		PS::_rcf( "{$this->extLibUrl}/jqGrid/css/ui.jqgrid.css", 'screen' );

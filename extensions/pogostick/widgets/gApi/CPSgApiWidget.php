@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -80,10 +80,10 @@ class CPSgApiWidget extends CPSApiWidget
 		$_sApiKey = $this->apiKey;
 
 		//	Register scripts necessary
-		PS::_rsf( "http://www.google.com/jsapi?key={$_sApiKey}", CClientScript::POS_HEAD );
-		PS::_rsf( "http://maps.google.com/maps?file=api&v=2&key={$_sApiKey}&sensor=false", CClientScript::POS_HEAD );
-		PS::_rsf( 'http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/1.1/src/markermanager.js', CClientScript::POS_HEAD );
-		PS::_rsf( 'http://gmaps-utility-library.googlecode.com/svn/trunk/extinfowindow/release/src/extinfowindow.js', CClientScript::POS_HEAD );
+		$this->pushScriptFile( "http://www.google.com/jsapi?key={$_sApiKey}", CClientScript::POS_HEAD );
+		$this->pushScriptFile( "http://maps.google.com/maps?file=api&v=2&key={$_sApiKey}&sensor=false", CClientScript::POS_HEAD );
+		$this->pushScriptFile( 'http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/1.1/src/markermanager.js', CClientScript::POS_HEAD );
+		$this->pushScriptFile( 'http://gmaps-utility-library.googlecode.com/svn/trunk/extinfowindow/release/src/extinfowindow.js', CClientScript::POS_HEAD );
 
 		PS::_rs( "Yii.{__CLASS__}.#.{$this->id}", $this->generateJavascript() );
 		PS::_rs( "Yii.{__CLASS__}.#.{$this->id}.onLoad", 'initialize();' );

@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -54,7 +54,7 @@ class CPSjqSelectMenu extends CPSjQueryWidget
 		
 		//	Register scripts necessary
 		PS::_rcs( $this->baseUrl . '/ui.selectmenu.css' );
-		PS::_rsf( $this->baseUrl . '/ui.selectmenu.js', CClientScript::POS_END );
+		$this->pushScriptFile( $this->baseUrl . '/ui.selectmenu.js', CClientScript::POS_END );
 
 		//	Don't forget subclasses
 		return PS::_cs();
