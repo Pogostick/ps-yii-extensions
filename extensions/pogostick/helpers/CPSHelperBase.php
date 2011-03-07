@@ -1469,7 +1469,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 				if ( $value instanceof SimpleXMLElement || $value instanceof Util_SpXmlElement )
 					return simplexml_load_string( $value );
 
-				return unserialize( $value );
+				return @unserialize( $value );
 			}
 		}
 		catch ( Exception $_ex )
@@ -1487,7 +1487,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	protected static function _isSerialized( $value )
 	{
 		$_result = @unserialize( $value );
-		return !( false === $_result && $value != serialize( false ) );
+		return !( false === $_result && $value != @serialize( false ) );
 	}
 
 }

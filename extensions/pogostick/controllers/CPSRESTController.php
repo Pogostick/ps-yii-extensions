@@ -182,8 +182,6 @@ class CPSRESTController extends CPSController
 			$_requestMethod = 'request' . $_actionId;
 		}
 
-		CPSLog::trace( __METHOD__, 'calling ' . $_requestMethod );
-
 		echo call_user_func_array( array( $this, $_requestMethod ), array_values( $_urlParameters ) );
 	}
 
