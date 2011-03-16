@@ -697,13 +697,13 @@ class CPSFacebook extends CPSApiComponent
 
 		$_result = curl_exec( $curl );
 
-		//	CURLE_SSL_CACERT
-		if ( 60 == curl_errno( $curl ) )
-		{
-			CPSLog::error( __METHOD__, 'Invalid or no certificate authority found, using bundled information' );
-			curl_setopt( $curl, CURLOPT_CAINFO, dirname( __FILE__ ) . '/fb_ca_chain_bundle.crt' );
-			$_result = curl_exec( $curl );
-		}
+//		//	CURLE_SSL_CACERT
+//		if ( 60 == curl_errno( $curl ) )
+//		{
+//			CPSLog::error( __METHOD__, 'Invalid or no certificate authority found, using bundled information' );
+//			curl_setopt( $curl, CURLOPT_CAINFO, dirname( __FILE__ ) . '/fb_ca_chain_bundle.crt' );
+//			$_result = curl_exec( $curl );
+//		}
 
 		if ( false === $_result )
 		{
