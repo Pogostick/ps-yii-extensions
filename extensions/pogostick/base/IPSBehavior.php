@@ -21,10 +21,4 @@
  */
 interface IPSBehavior extends IPSComponent, IBehavior
 {
-	/**
-	* My name
-	* @var string
-	*/
-	protected $_internalName;
-
 }

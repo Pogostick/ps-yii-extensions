@@ -25,7 +25,7 @@
  * @property boolean $debugMode Enable trace-level debugging
  * @property integer $debugLevel A user-defined debugging level
  */
-class CPSComponent extends CApplicationComponent implements IPSComponent
+class CPSComponent extends CApplicationComponent implements IPSComponent, IApplicationComponent
 {
 	//********************************************************************************
 	//* Properties

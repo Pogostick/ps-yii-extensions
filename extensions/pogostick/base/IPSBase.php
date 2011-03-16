@@ -9,8 +9,8 @@
  */
 
 //	All components require these
-Yii::import( 'pogostick.helpers.PS.php', true );
-Yii::import( 'pogostick.base.CPSException.php', true );
+Yii::import( 'pogostick.helpers.PS', true );
+Yii::import( 'pogostick.base.CPSException', true );
 
 /**
  * This interface does nothing other than indicate that an object is part of the Pogostick Yii Extensions library.

@@ -29,11 +29,6 @@ interface IPSComponent extends IPSBase
 	function preinit();
 
 	/**
-	 * Initialize the object
-	 */
-	function init();
-
-	/**
 	* Get the internal name of our component
 	* @return string
 	*/
