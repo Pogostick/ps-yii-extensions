@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -58,14 +58,14 @@ class CPSjqValidate extends CPSjQueryWidget
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 		
 		//	Meta data for goodness...
-		PS::_rsf( $this->extLibUrl . '/jquery-plugins/jquery.metadata.js', CClientScript::POS_HEAD );
+		$this->pushScriptFile( $this->extLibUrl . '/jquery-plugins/jquery.metadata.js', CClientScript::POS_HEAD );
 		
 		//	Register scripts necessary
-		PS::_rsf( ( $_SERVER['HTTPS'] == 'on' ? self::CDN_SSL_ROOT : self::CDN_ROOT ) . '/jquery.validate.min.js', CClientScript::POS_HEAD );
-//		PS::_rsf( $this->baseUrl . '/jquery.validate.min.js', CClientScript::POS_HEAD );
+		$this->pushScriptFile( ( $_SERVER['HTTPS'] == 'on' ? self::CDN_SSL_ROOT : self::CDN_ROOT ) . '/jquery.validate.min.js', CClientScript::POS_HEAD );
+//		$this->pushScriptFile( $this->baseUrl . '/jquery.validate.min.js', CClientScript::POS_HEAD );
 			
-		PS::_rsf( ( $_SERVER['HTTPS'] == 'on' ? self::CDN_SSL_ROOT : self::CDN_ROOT ) . '/additional-methods.js', CClientScript::POS_HEAD );
-//		PS::_rsf( $this->baseUrl . '/additional-methods.js', CClientScript::POS_HEAD );
+		$this->pushScriptFile( ( $_SERVER['HTTPS'] == 'on' ? self::CDN_SSL_ROOT : self::CDN_ROOT ) . '/additional-methods.js', CClientScript::POS_HEAD );
+//		$this->pushScriptFile( $this->baseUrl . '/additional-methods.js', CClientScript::POS_HEAD );
 
 		//	Don't forget subclasses
 		return PS::_cs();

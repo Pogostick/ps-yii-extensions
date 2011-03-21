@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of the Pogostick Yii Extension library
  *
  * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
@@ -345,6 +345,9 @@ class CPSFacebookUserIdentity extends CUserIdentity
 
 		//	Save info...
 		$_user->save();
+
+		//	Stow da ting mon
+		$this->_id = $_user->id;
 
 		//	Set our current user...
 		PS::_ss( 'currentUser', $this->_user = $_user );

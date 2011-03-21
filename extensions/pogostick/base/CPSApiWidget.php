@@ -1,29 +1,28 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
- * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ *
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
+ * @filesource
  */
 
 /**
  * The CPSApiWidget is the base class for all Pogostick API widgets for Yii
- * 
- * @package 	psYiiExtensions
- * @subpackage 	base
- * 
- * @author 		Jerry Ablan <jablan@pogostick.com>
- * @version 	SVN: $Id: CPSApiWidget.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
- * @since 		v1.0.3
- * 
- * @filesource
+ *
+ * @package		psYiiExtensions
+ * @subpackage 	base.components
+ *
+ * @author			Jerry Ablan <jablan@pogostick.com>
+ * @version		SVN: $Id: CPSApiWidget.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
+ * @since			v1.0.3
  * @abstract
  */
 abstract class CPSApiWidget extends CPSWidget
 {
 	//********************************************************************************
-	//* Yii Override Methods
+	//* Public Methods
 	//********************************************************************************
 
 	/**
@@ -35,8 +34,8 @@ abstract class CPSApiWidget extends CPSWidget
 		parent::preinit();
 
 		//	Attach our api behavior
-		$this->attachBehavior( $this->_internalName, 'pogostick.behaviors.CPSApiBehavior' );
-		
+		$this->attachBehavior( 'pye-api', 'pogostick.behaviors.CPSApiBehavior' );
+
 		//	Attach our events
 		$this->attachEventHandler( 'onBeforeApiCall', array( $this, 'beforeApiCall' ) );
 		$this->attachEventHandler( 'onAfterApiCall', array( $this, 'afterApiCall' ) );
@@ -50,60 +49,63 @@ abstract class CPSApiWidget extends CPSWidget
 	/**
 	* Creates an array for requestMap
 	*
-	* @param array $arMap The map of items to insert into the array. Format is the same as {@link makeMapItem}
-	* @param bool $bSetRequestMap If false, will NOT insert constructed array into {@link requestMap}
+	* @param array $apiMap The map of items to insert into the array. Format is the same as {@link makeMapItem}
+	* @param bool $setRequestMap If false, will NOT insert constructed array into {@link requestMap}
 	* @return array Returns the constructed array item ready to insert into your requestMap
 	* @see makeMapItem
 	*/
-	protected function makeMapArray( $sApiName, $sSubApiName = null, array $arMap, $bSetRequestMap = true )
+	protected function makeMapArray( $apiName, $subApiName = null, array $apiMap, $setRequestMap = true )
 	{
-		$_arFinal = array();
+		$_parameters = array();
 
-		foreach ( $arMap as $_sKey => $_oValue )
+		foreach ( $apiMap as $_key => $_value )
 		{
-			$_arTemp = $this->makeMapItem(
-				( in_array( 'label', $_oValue ) ) ? $_oValue[ 'name' ] : $_oValue[ 'label' ],
-				$_oValue[ 'name' ],
-				( in_array( 'required', $_oValue ) ) ? $_oValue[ 'required' ] : false,
-				( in_array( 'options', $_oValue ) ) ? $_oValue[ 'options' ] : null
+			$_mapItem = $this->makeMapItem(
+				( in_array( 'label', $_value ) ) ? $_value[ 'name' ] : $_value[ 'label' ],
+				$_value[ 'name' ],
+				( in_array( 'required', $_value ) ) ? $_value[ 'required' ] : false,
+				( in_array( 'options', $_value ) ) ? $_value[ 'options' ] : null
 			);
 
-			$_arTemp = ( $sSubApiName != null ) ? array( $sSubApiName => $_arTemp ) : array( $_sKey, $_arTemp );
+			$_mapItem = ( $subApiName != null ) ? array( $subApiName => $_mapItem ) : array( $_key, $_mapItem );
 
-			if ( $bSetRequestMap )
-				$this->requestMap[ $sApiName ] = $_arTemp;
+			if ( $setRequestMap )
+				$this->requestMap[ $apiName ] = $_mapItem;
 
-			array_merge( $_arFinal[ $sApiName ], $_arTemp );
+			array_merge( $_parameters[ $apiName ], $_mapItem );
 		}
 
-		return( $_arFinal );
+		return( $_parameters );
 	}
 
 	/**                                                   S
 	* Creates an entry for requestMap and inserts it into the array.
 	*
-	* @param string $sLabel The label or friendly name of this map item
-	* @param string $sParamName The actual parameter name to send to API. If not specified, will default to $sLabel
-	* @param bool $bRequired Set to true if the parameter is required
-	* @param array $arOptions If supplied, will merge with generated options
-	* @param array $arTargetArray If supplied, will insert into array
+	* @param string $itemLabel The label or friendly name of this map item
+	* @param string $parameterName The actual parameter name to send to API. If not specified, will default to $itemLabel
+	* @param bool $required Set to true if the parameter is required
+	* @param array $options If supplied, will merge with generated options
+	* @param array $target If supplied, will insert into array
 	* @return array Returns the constructed array item ready to insert into your requestMap
 	*/
-	protected function makeMapItem( $sLabel, $sParamName = null, $bRequired = false, array $arOptions = null, array $arTargetArray = null )
+	protected function makeMapItem( $itemLabel, $parameterName = null, $required = false, $options = array(), array &$target = null )
 	{
 		//	Build default settings
-		$_arMapOptions = array( 'name' => ( null != $sParamName ) ? $sParamName : $sLabel, 'required' => $bRequired );
+		$_mappingOptions = array(
+			'name' => ( null != $parameterName ) ? $parameterName : $itemLabel,
+			'required' => $required
+		);
 
 		//	Add on supplied options
-		if ( null != $arOptions )
-			$_arMapOptions = array_merge( $_arMapOptions, $arOptions );
+		if ( ! empty( $options ) )
+			$_mappingOptions = array_merge( $_mappingOptions, $options );
 
 		//	Insert for caller if requested
-		if ( null != $arTargetArray )
-			$arTargetArray[ $sLabel ] = $_arMapOptions;
+		if ( null != $target )
+			$target[ $itemLabel ] = $_mappingOptions;
 
 		//	Return our array
-		return( $_arMapOptions );
+		return( $_mappingOptions );
 	}
 
 	//********************************************************************************
@@ -112,49 +114,52 @@ abstract class CPSApiWidget extends CPSWidget
 
 	/**
 	* Raises the onBeforeApiCall event
-	* @param CPSApiEvent $oEvent
+	* @param CPSApiEvent $event
 	*/
-	public function onBeforeApiCall( $oEvent )
+	public function onBeforeApiCall( $event )
 	{
-		$this->raiseEvent( 'onBeforeApiCall', $oEvent );
+		$this->raiseEvent( 'onBeforeApiCall', $event );
 	}
 
 	/**
-	* @param CPSApiEvent $oEvent
-	*/
-	public function beforeApiCall( $oEvent )
-	{
-	}
-
-	/**
-	* Raises the onAfterApiCall event. $oEvent contains "raw" return data
-	* @param CPSApiEvent $oEvent
-	*/
-	public function onAfterApiCall( $oEvent )
-	{
-		$this->raiseEvent( 'onAfterApiCall', $oEvent );
-	}
-
-	/**
-	* @param CPSApiEvent $oEvent
-	*/
-	public function afterApiCall( $oEvent )
+	 * Base event handler
+	 * @param CPSApiEvent $event
+	 */
+	public function beforeApiCall( $event )
 	{
 	}
 
 	/**
-	* Raises the onRequestComplete event. $oEvent contains "processed" return data (if applicable)
-	* @param CPSApiEvent $oEvent
+	* Raises the onAfterApiCall event. $event contains "raw" return data
+	* @param CPSApiEvent $event
 	*/
-	public function onRequestComplete( $oEvent )
+	public function onAfterApiCall( $event )
 	{
-		$this->raiseEvent( 'onRequestComplete', $oEvent );
+		$this->raiseEvent( 'onAfterApiCall', $event );
 	}
 
 	/**
-	* @param CPSApiEvent $oEvent
+	 * Base event handler
+	 * @param CPSApiEvent $event
+	 */
+	public function afterApiCall( $event )
+	{
+	}
+
+	/**
+	* Raises the onRequestComplete event. $event contains "processed" return data (if applicable)
+	* @param CPSApiEvent $event
 	*/
-	public function requestComplete( $oEvent )
+	public function onRequestComplete( $event )
+	{
+		$this->raiseEvent( 'onRequestComplete', $event );
+	}
+
+	/**
+	 * Base event handler
+	 * @param CPSApiEvent $event
+	 */
+	public function requestComplete( $event )
 	{
 	}
 

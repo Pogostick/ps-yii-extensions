@@ -2,7 +2,7 @@
 /**
  * This file is part of the psYiiExtensions package.
  *
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  * @package psYiiExtensions
@@ -36,29 +36,18 @@ class CPSLiveLogRoute extends CFileLogRoute
 	protected $_categoryWidth = 40;
 	/**
 	 * Get the minimum width of the category column in the log output
-	 * @return integer 
+	 * @return integer
 	 */
 	public function getCategoryWidth() { return $this->_categoryWidth; }
 	/**
 	 * Set the minimum width of the category column in the log output
-	 * @return integer 
+	 * @return integer
 	 */
 	public function setCategoryWidth( $value ) { $this->_categoryWidth = $value; }
 
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
-
-	/**
-	 * Initialize component
-	 */
-	public function init()
-	{
-		parent::init();
-
-		//	Write each line out to disk
-		Yii::getLogger()->autoFlush = 1;
-	}
 
 	/**
 	 * Retrieves filtered log messages from logger for further processing.

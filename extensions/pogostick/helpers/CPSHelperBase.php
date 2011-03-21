@@ -1,8 +1,12 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  *
+<<<<<<< HEAD
  * @copyright Copyright &copy; 2009-2011 Pogostick, LLC
+=======
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
+>>>>>>> 93e55a4c29a0582d3f03de2ad001c9beda57e9bd
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -31,6 +35,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	const	OF_JSON 		= 0;
 	const	OF_HTTP 		= 1;
 	const	OF_ASSOC_ARRAY 	= 2;
+	const	OF_XML		 	= 3;
 
 	/**
 	* Pager locations
@@ -630,9 +635,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param <type> $arNeedle
 	 * @param <type> $arResult
 	 * @param <type> $arPath
-	 * @param <type> $sCurrentKey
+	 * @param <type> $currentKey
 	 */
-	public static function array_search( $arHaystack, $arNeedle, &$arResult, &$arPath = null, $sCurrentKey = '')
+	public static function array_search( $arHaystack, $arNeedle, &$arResult, &$arPath = null, $currentKey = '')
 	{
 		if ( is_array( $arHaystack ) )
 		{
@@ -654,9 +659,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 			if ( $_oStraw == $arNeedle )
 			{
 				if ( ! isset( $arPath ) )
-					$_sPath = "\$arResult[$sCurrentKey] = \$arNeedle;";
+					$_sPath = "\$arResult[$currentKey] = \$arNeedle;";
 				else
-					$_sPath = "\$arResult['".join("']['",$arPath)."'][$sCurrentKey] = \$arNeedle;";
+					$_sPath = "\$arResult['".join("']['",$arPath)."'][$currentKey] = \$arNeedle;";
 
 				eval( $_sPath );
 			}
@@ -1327,20 +1332,20 @@ class CPSHelperBase extends CHtml implements IPSBase
 	{
 		return self::_gr()->getIsAjaxRequest();
 	}
-	
+
 	/**
 	 * Generic array sorter
-	 * 
+	 *
 	 * To sort a column in descending order, assign 'desc' to the column's value in the defining array:
-	 * 
+	 *
 	 * $_columnsToSort = array(
 	 *	'date' => 'desc',
 	 *	'lastName' => 'asc',
 	 *	'firstName' => 'asc',
 	 * );
-	 * 
+	 *
 	 * @param array $arrayToSort
-	 * @param array $columnsToSort Array of columns in $arrayToSort to sort. 
+	 * @param array $columnsToSort Array of columns in $arrayToSort to sort.
 	 * @return boolean
 	 */
 	public static function arraySort( &$arrayToSort, $columnsToSort = array() )
@@ -1348,7 +1353,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 		//	Convert to an array
 		if ( ! empty( $columnsToSort ) && ! is_array( $columnsToSort ) )
 			$columnsToSort = array( $columnsToSort );
-		
+
 		//	Any fields?
 		if ( ! empty( $columnsToSort ) )
 		{
@@ -1362,12 +1367,12 @@ class CPSHelperBase extends CHtml implements IPSBase
 					$_column = $_order;
 					$_order = null;
 				}
-				
+
 				if ( 'desc' == strtolower( $_order ) )
 					$_evalCode .= ( ! $_first ? 'if ( ! $_result ) ' : null ) . '$_result = strnatcmp( $b["' . $_column . '"], $a["' . $_column . '"]);' . PHP_EOL;
 				else
 					$_evalCode .= ( ! $_first ? 'if ( ! $_result ) ' : null ) . '$_result = strnatcmp( $a["' . $_column . '"], $b["' . $_column . '"]);' . PHP_EOL;
-				
+
 				$_first = false;
 			}
 
@@ -1375,7 +1380,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 			return usort( $arrayToSort, create_function( '$a,$b', $_evalCode ) );
 		}
-		
+
 		return false;
 	}
 

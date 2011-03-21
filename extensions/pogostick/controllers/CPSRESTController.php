@@ -3,7 +3,7 @@
  * CPSRESTController class file.
  *
  * @filesource
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
  * @package psYiiExtensions
@@ -126,10 +126,10 @@ class CPSRESTController extends CPSController
 
 		//	If additional parameters are specified in the URL, convert to parameters...
 		$_uri = PS::_gr()->getRequestUri();
+		$_frag = '/' . $this->getId() . '/' . $_actionId;
 
-		if ( null != ( $_uri = trim( str_ireplace( '/' . $this->getId() . '/' . $_actionId, '', $_uri ) ) ) )
+		if ( null != ( $_uri = trim( substr( $_uri, stripos( $_uri, $_frag ) + strlen( $_frag ) ), ' /?' ) ) )
 		{
-			$_uri = trim( $_uri, '/?' );
 			$_options = ( ! empty( $_uri ) ? explode( '/', $_uri ) : array() );
 
 			foreach ( $_options as $_key => $_value )
@@ -148,11 +148,22 @@ class CPSRESTController extends CPSController
 
 		//	Any query string? (?x=y&...)
 		if ( null != ( $_queryString = parse_url( $_uri, PHP_URL_QUERY ) ) )
-			$_options = array_merge( explode( '=', $_queryString ), $_options );
+		{
+			$_queryOptions = array();
+			parse_str( $_queryString, $_queryOptions );
+			$_options = array_merge( $_queryOptions, $_options );
+
+			//	Remove route
+			if ( isset( $_options['r'] ) )
+				unset( $_options['r']);
+		}
 
 		//	load into url params
 		foreach ( $_options as $_key => $_value )
-			if ( ! isset( $_urlParameters[ $_key ] ) ) $_urlParameters[ $_key ] = $_value;
+		{
+			if ( ! isset( $_urlParameters[ $_key ] ) )
+				$_urlParameters[ $_key ] = $_value;
+		}
 
 		//	Is it a valid request?
 		$_requestType = strtolower( $this->getRequest()->getRequestType() );
@@ -182,6 +193,11 @@ class CPSRESTController extends CPSController
 			$_requestMethod = 'request' . $_actionId;
 		}
 
+<<<<<<< HEAD
+=======
+//		CPSLog::trace( __METHOD__, 'calling ' . $_requestMethod . ' with params: ' . PHP_EOL . print_r( $_urlParameters, true ) );
+
+>>>>>>> 93e55a4c29a0582d3f03de2ad001c9beda57e9bd
 		echo call_user_func_array( array( $this, $_requestMethod ), array_values( $_urlParameters ) );
 	}
 
