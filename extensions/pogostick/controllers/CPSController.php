@@ -80,7 +80,7 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	protected $m_sPageHeading;
 	public function getPageHeading() { return $this->m_sPageHeading; }
-	public function setPageHeading( $sValue ) { $this->m_sPageHeading = $sValue; }
+	public function setPageHeading( $value ) { $this->m_sPageHeading = $value; }
 
 	/***
 	* Allows you to change your action prefix
@@ -89,7 +89,7 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	protected $m_sMethodPrefix = 'action';
 	public function getMethodPrefix() { return $this->m_sMethodPrefix; }
-	public function setMethodPrefix( $sValue ) { $this->m_sMethodPrefix = $sValue; }
+	public function setMethodPrefix( $value ) { $this->m_sMethodPrefix = $value; }
 
 	/**
 	* @var CActiveRecord The currently loaded data model instance.
@@ -117,23 +117,23 @@ abstract class CPSController extends CController implements IPSBase
 	* Convenience access to isPostRequest
 	* @return boolean
 	*/
-	public function getIsPostRequest() { return Yii::app()->getRequest()->isPostRequest; }
+	public function getIsPostRequest() { return PS::_gr()->getIsPostRequest(); }
 
 	/**
 	* Convenience access to isAjaxRequest
 	* @return boolean
 	*/
-	public function getIsAjaxRequest() { return Yii::app()->getRequest()->isAjaxRequest; }
+	public function getIsAjaxRequest() { return PS::_gr()->getIsAjaxRequest(); }
 
 	/**
-	 * Returns the base url of the current app
+	 * Returns the base url of the current app. Optionally absolute
+	 * @param boolean
 	 * @return string
 	 */
-	public function getAppBaseUrl() { return Yii::app()->getBaseUrl(); }
+	public function getAppBaseUrl( $absolute = false ) { return PS::_gbu( $absolute ); }
 
 	/**
 	* The id in the state of our current filter/search criteria
-	*
 	* @var string
 	*/
 	protected $m_sSearchStateId = null;
@@ -148,7 +148,7 @@ abstract class CPSController extends CController implements IPSBase
 	public function setSearchCriteria( $arValue )
 	{
 		$this->m_arCurrentSearchCriteria = $arValue;
-		Yii::app()->user->setState( $this->m_sSearchStateId, $arValue );
+		PS::_ss( $this->m_sSearchStateId, $arValue );
 	}
 
 	/**
@@ -173,7 +173,7 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	protected $m_bAutoLayout = true;
 	public function getAutoLayout() { return $this->m_bAutoLayout; }
-	public function setAutoLayout( $bValue ) { $this->m_bAutoLayout = $bValue; }
+	public function setAutoLayout( $value ) { $this->m_bAutoLayout = $value; }
 
 	/**
 	* @var boolean Try to find missing action
@@ -181,7 +181,7 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	protected $m_bAutoMissing = true;
 	public function getAutoMissing() { return $this->m_bAutoMissing; }
-	public function setAutoMissing( $bValue ) { $this->m_bAutoMissing = $sValue; }
+	public function setAutoMissing( $value ) { $this->m_bAutoMissing = $value; }
 
 	/**
 	* @var array An associative array of POST commands and their applicable methods
@@ -190,7 +190,7 @@ abstract class CPSController extends CController implements IPSBase
 	protected $m_arCommandMap = array();
 	public function getCommandMap() { return $this->m_arCommandMap; }
 	public function setCommandMap( $oValue ) { $this->m_arCommandMap = $oValue; }
-	public function addCommandToMap( $sKey, $oValue = null, $eWhich = null ) { $this->m_arCommandMap[ $sKey ] = $oValue; if ( $eWhich ) $this->addUserActions( $eWhich, array( $sKey ) ); }
+	public function addCommandToMap( $sKey, $oValue = null, $grantee = null ) { $this->m_arCommandMap[ $sKey ] = $oValue; if ( $grantee ) $this->addUserActions( $grantee, array( $sKey ) ); }
 
 	/**
 	* Action queue for keeping track of where we are...
@@ -213,42 +213,42 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	protected $m_arUserActionList = array();
 	protected function resetUserActionList() { $this->m_arUserActionList = array(); $this->addUserAction( self::ACCESS_TO_ANY, 'error' ); }
-	protected function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = null; $this->addUserActions( $eWhich, $arValue ); }
-	public function getUserActionList( $eWhich ) { return PS::o( $this->m_arUserActionList, $eWhich ); }
-	public function addUserActionRole( $eWhich, $sRole, $sAction ) { $this->m_arUserActionList[ $eWhich ]['roles'][] = $arValue; }
+	protected function setUserActionList( $grantee, $arValue ) { $this->m_arUserActionList[ $grantee ] = null; $this->addUserActions( $grantee, $arValue ); }
+	public function getUserActionList( $grantee ) { return PS::o( $this->m_arUserActionList, $grantee ); }
+	public function addUserActionRole( $grantee, $roleName, $action ) { $this->m_arUserActionList[ $grantee ]['roles'][$roleName] = $action; }
 
-	public function removeUserAction( $eWhich, $sAction )
+	public function removeUserAction( $grantee, $action )
 	{
-		if ( ! isset( $this->m_arUserActionList[ $eWhich ] ) || ! is_array( $this->m_arUserActionList[ $eWhich ] ) )
+		if ( ! isset( $this->m_arUserActionList[ $grantee ] ) || ! is_array( $this->m_arUserActionList[ $grantee ] ) )
 			return;
 
-		if ( in_array( $sAction, $this->m_arUserActionList[ $eWhich ] ) )
-			unset( $this->m_arUserActionList[ $eWhich ][ $sAction ] );
+		if ( in_array( $action, $this->m_arUserActionList[ $grantee ] ) )
+			unset( $this->m_arUserActionList[ $grantee ][ $action ] );
 	}
 
-	public function addUserAction( $eWhich, $sAction )
+	public function addUserAction( $grantee, $action )
 	{
-		if ( ! isset( $this->m_arUserActionList[ $eWhich ] ) || ! is_array( $this->m_arUserActionList[ $eWhich ] ) )
-			$this->m_arUserActionList[ $eWhich ] = array();
+		if ( ! isset( $this->m_arUserActionList[ $grantee ] ) || ! is_array( $this->m_arUserActionList[ $grantee ] ) )
+			$this->m_arUserActionList[ $grantee ] = array();
 
-		if ( ! in_array( $sAction, $this->m_arUserActionList[ $eWhich ] ) )
-			$this->m_arUserActionList[ $eWhich ][] = $sAction;
+		if ( ! in_array( $action, $this->m_arUserActionList[ $grantee ] ) )
+			$this->m_arUserActionList[ $grantee ][] = $action;
 
 		//	Make sure we don't lose our error handler...
-		if ( $eWhich == self::ACCESS_TO_ANY )
+		if ( $grantee == self::ACCESS_TO_ANY )
 		{
-			if ( ! in_array( 'error', $this->m_arUserActionList[ $eWhich ] ) )
+			if ( ! in_array( 'error', $this->m_arUserActionList[ $grantee ] ) )
 				$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
 		}
 	}
 
-	public function addUserActions( $eWhich, $arActions = array() )
+	public function addUserActions( $grantee, $arActions = array() )
 	{
-		if ( ! is_array( PS::o( $this->m_arUserActionList, $eWhich ) ) )
-			$this->m_arUserActionList[ $eWhich ] = array();
+		if ( ! is_array( PS::o( $this->m_arUserActionList, $grantee ) ) )
+			$this->m_arUserActionList[ $grantee ] = array();
 
 		foreach ( $arActions as $_sAction )
-			$this->addUserAction( $eWhich, $_sAction );
+			$this->addUserAction( $grantee, $_sAction );
 	}
 
 	protected $_displayName;
@@ -300,7 +300,7 @@ abstract class CPSController extends CController implements IPSBase
 		$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
 
 		//	Pull any search criteria we've stored...
-		if ( $this->getModelName() ) $this->m_arCurrentSearchCriteria = Yii::app()->user->getState( $this->m_sSearchStateId );
+		if ( $this->getModelName() ) $this->m_arCurrentSearchCriteria = PS::_gs( $this->m_sSearchStateId );
 
 		//	Ensure conformity
 		if ( ! is_array( $this->_extraViewDataList ) )
@@ -365,10 +365,10 @@ abstract class CPSController extends CController implements IPSBase
 	* @param array Extra parameters to pass to the view
 	* @param string The name of the variable to pass to the view. Defaults to 'model'
 	*/
-	public function genericAction( $sActionId, $oModel = null, $arExtraParams = array(), $sModelVarName = 'model', $sFlashKey = null, $sFlashValue = null, $sFlashDefaultValue = null )
+	public function genericAction( $actionId, $model = null, $parameters = array(), $modelVariableName = 'model', $flashKey = null, $flashValue = null, $defaultValue = null )
 	{
-		if ( $sFlashKey ) Yii::app()->user->setFlash( $sFlashKey, $sFlashValue, $sFlashDefaultValue );
-		$this->render( $sActionId, array_merge( $arExtraParams, array( $sModelVarName => ( $oModel ) ? $oModel : $this->loadModel() ) ) );
+		if ( $flashKey ) PS::_sf( $flashKey, $flashValue, $defaultValue );
+		$this->render( $actionId, array_merge( $parameters, array( $modelVariableName => ( $model ) ? $model : $this->loadModel() ) ) );
 	}
 
 	/**
@@ -400,39 +400,38 @@ abstract class CPSController extends CController implements IPSBase
 	* Provide automatic missing action mapping...
 	* Also handles a theme change request from any portlets
 	*
-	* @param string $sActionId
+	* @param string $actionId
 	*/
-	public function missingAction( $sActionId = null )
+	public function missingAction( $actionId = null )
 	{
 		if ( $this->m_bAutoMissing )
 		{
-			if ( empty( $sActionId ) ) $sActionId = $this->defaultAction;
+			if ( empty( $actionId ) ) $actionId = $this->defaultAction;
 
-			if ( $this->getViewFile( $sActionId ) )
+			if ( $this->getViewFile( $actionId ) )
 			{
-				$this->render( $sActionId );
+				$this->render( $actionId );
 				return;
 			}
 		}
 
-		parent::missingAction( $sActionId );
+		parent::missingAction( $actionId );
 	}
 
 	/**
 	* Our error handler...
-	*
 	*/
 	public function actionError()
 	{
-		if ( ! $_arError = Yii::app()->errorHandler->error )
+		if ( null !== ( $_error = Yii::app()->getErrorHandler()->getError() ) )
 		{
-			if ( $this->isAjaxRequest )
-				echo $_arError['message'];
-			else
+			if ( ! $this->getIsAjaxRequest() )
 				throw new CHttpException( 404, 'Page not found.' );
+
+			echo $_error['message'];
 		}
 
-		$this->render( 'error', array( 'error' => $_arError ) );
+		$this->render( 'error', array( 'error' => $_error ) );
 	}
 
 	/**
@@ -610,11 +609,13 @@ abstract class CPSController extends CController implements IPSBase
 			
 			//	Register a nice little fader...
 			$_fader =<<<SCRIPT
-$('#{$_spanId}').fadeIn('500',function(){
-	$(this).delay(3000).fadeOut(3500);
-});
+if ($('#{$_spanId}').length){
+	$('#{$_spanId}').fadeIn('500',function(){
+		$(this).delay(3000).fadeOut(3500);
+	});
+}
 SCRIPT;
-				
+
 			PS::_rs( $_formId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
 		}
 		
@@ -676,8 +677,8 @@ SCRIPT;
 				PS::_rs( 'search', $_searchScript );
 		}
 
-		if ( PS::UI_JQUERY == ( $_uiStyle = PS::o( $optionList, 'uiStyle', PS::UI_JQUERY ) ) )
-			CPSjqUIWrapper::loadScripts();
+		if ( PS::UI_JQUERY == PS::o( $optionList, 'uiStyle', PS::UI_JQUERY ) )
+			CPSjqUIWrapper::loadScripts( null, PS::_gp( 'jquiTheme' ) );
 
 		return $_formOptions;
 	}
@@ -813,33 +814,33 @@ JS;
 
 	/**
 	* Saves the data in the model
-	*
-	* @param CModel $oModel The model to save
-	* @param array $arData The array of data to merge with the model
-	* @param string $sRedirectAction Where to redirect after a successful save
-	* @param boolean $bAttributesSet If true, attributes will not be set from $arData
-	* @param string $sModelName Optional model name
-	* @param string $sSuccessMessage Flash message to set if successful
-	* @param boolean $bNoCommit If true, transaction will not be committed
-	* @return boolean
-	*/
-	protected function saveModel( &$oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false, $bSafeOnly = false )
+	 * @param CPSModel $model
+	 * @param array $arData
+	 * @param string $sRedirectAction
+	 * @param bool $bAttributesSet
+	 * @param null $sModelName
+	 * @param null $sSuccessMessage
+	 * @param bool $bNoCommit
+	 * @param bool $bSafeOnly
+	 * @return bool
+	 */
+	protected function saveModel( &$model, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false, $bSafeOnly = false )
 	{
 		$_sMessage = PS::nvl( $sSuccessMessage, 'Your changes have been saved.' );
-		$_sModelName = PS::nvl( $sModelName, PS::nvl( $oModel->getModelClass(), $this->m_sModelName ) );
+		$_sModelName = PS::nvl( $sModelName, PS::nvl( $model->getModelClass(), $this->m_sModelName ) );
 
 		if ( isset( $arData, $arData[ $_sModelName ] ) )
 		{
-			if ( ! $bAttributesSet ) $oModel->setAttributes( $arData[ $_sModelName ], $bSafeOnly );
+			if ( ! $bAttributesSet ) $model->setAttributes( $arData[ $_sModelName ], $bSafeOnly );
 
-			if ( $oModel->save() )
+			if ( $model->save() )
 			{
-				if ( ! $bNoCommit && $oModel instanceof CPSModel && $oModel->hasTransaction() ) $oModel->commitTransaction();
+				if ( ! $bNoCommit && $model instanceof CPSModel && $model->hasTransaction() ) $model->commitTransaction();
 
-				Yii::app()->user->setFlash( 'success', $_sMessage );
+				PS::_sf( 'success', $_sMessage );
 
 				if ( $sRedirectAction )
-					$this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
+					$this->redirect( array( $sRedirectAction, 'id' => $model->id ) );
 
 				return true;
 			}
@@ -851,16 +852,16 @@ JS;
 	/***
 	* Just like saveModel, but doesn't commit, and never redirects.
 	*
-	* @param CPSModel $oModel
+	* @param CPSModel $model
 	* @param array $arData
 	* @param boolean $bAttributesSet
 	* @param string $sSuccessMessage
 	* @return boolean
 	* @see saveModel
 	*/
-	protected function saveTransactionModel( &$oModel, $arData = array(), $bAttributesSet = false, $sSuccessMessage = null )
+	protected function saveTransactionModel( &$model, $arData = array(), $bAttributesSet = false, $sSuccessMessage = null )
 	{
-		return $this->saveModel( $oModel, $arData, false, $bAttributesSet, null, $sSuccessMessage, true );
+		return $this->saveModel( $model, $arData, false, $bAttributesSet, null, $sSuccessMessage, true );
 	}
 
 	/**

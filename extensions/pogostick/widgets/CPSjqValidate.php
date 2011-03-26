@@ -35,10 +35,10 @@ class CPSjqValidate extends CPSjQueryWidget
 	* Currently, a CDN is in use and no local files are required...
 	*/
 	const PS_EXTERNAL_PATH = '/jquery-plugins/validate';
-	const CDN_ROOT = 'http://ajax.microsoft.com/ajax/jquery.validate/1.7';
-	const CDN_SSL_ROOT = 'https://ajax.microsoft.com/ajax/jquery.validate/1.7';
-	const CDN_PATH = 'http://ajax.microsoft.com/ajax/jquery.validate/1.7/jquery.validate.min.js';
-	const CDN_SSL_PATH = 'https://ajax.microsoft.com/ajax/jquery.validate/1.7/jquery.validate.min.js';
+	const CDN_ROOT = 'http://ajax.microsoft.com/ajax/jquery.validate/1.8';
+	const CDN_SSL_ROOT = 'https://ajax.microsoft.com/ajax/jquery.validate/1.8';
+	const CDN_PATH = 'http://ajax.microsoft.com/ajax/jquery.validate/1.8/jquery.validate.min.js';
+	const CDN_SSL_PATH = 'https://ajax.microsoft.com/ajax/jquery.validate/1.8/jquery.validate.min.js';
 
 	//********************************************************************************
 	//* Public Methods

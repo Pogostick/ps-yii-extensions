@@ -1146,7 +1146,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return mixed the message message
 	 * @see _sf
 	 */
-	public function _gf( $key, $defaultValue = null, $delete = true )
+	public static function _gf( $key, $defaultValue = null, $delete = true )
 	{
 		$_user = self::_gu();
 		return ( null !== $_user ? $_user->getFlash( $key, $defaultValue, $delete ) : null );

@@ -23,6 +23,12 @@
 class CPSRESTController extends CPSController
 {
 	//********************************************************************************
+	//* Private Members
+	//********************************************************************************
+
+	protected $_dataFormat = PS::OF_JSON;
+
+	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 
@@ -41,7 +47,7 @@ class CPSRESTController extends CPSController
 
 		if ( $this->beforeAction( $action ) )
 		{
-			$this->dispatchRequest( $action );
+			$this->_dispatchRequest( $action );
 			$this->afterAction( $action );
 		}
 
@@ -117,7 +123,7 @@ class CPSRESTController extends CPSController
 	 * @see runAction
 	 * @access protected
 	 */
-	protected function dispatchRequest( CAction $action )
+	protected function _dispatchRequest( CAction $action )
 	{
 		$_actionId = $action->getId();
 		$_parameters = $_REQUEST;
@@ -194,6 +200,9 @@ class CPSRESTController extends CPSController
 		}
 
 //		CPSLog::trace( __METHOD__, 'calling ' . $_requestMethod . ' with params: ' . PHP_EOL . print_r( $_urlParameters, true ) );
+
+		if ( PS::OF_JSON == $this->_dataFormat )
+			header( 'Content-type: application/json' );
 
 		echo call_user_func_array( array( $this, $_requestMethod ), array_values( $_urlParameters ) );
 	}
