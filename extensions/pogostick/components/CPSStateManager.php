@@ -303,7 +303,7 @@ class CPSStateManager extends CPSComponent
 				if ( $value instanceof SimpleXMLElement || $value instanceof Util_SpXmlElement )
 					return simplexml_load_string( $value );
 
-				return unserialize( $value );
+				return @unserialize( $value );
 			}
 		}
 		catch ( Exception $_ex )
@@ -321,7 +321,7 @@ class CPSStateManager extends CPSComponent
 	protected function _isSerialized( $value )
 	{
 		$_result = @unserialize( $value );
-		return !( false === $_result && $value != serialize( false ) );
+		return !( false === $_result && $value != @serialize( false ) );
 	}
 
 }
