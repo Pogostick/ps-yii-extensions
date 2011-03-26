@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="DBNavigator.Module.ConnectionManager">
+    <connections />
+  </component>
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/extensions/examples" />
+      <excludeFolder url="file://$MODULE_DIR$/nbproject" />
+      <excludeFolder url="file://$MODULE_DIR$/orig" />
+    </content>
+    <content url="file://$MODULE_DIR$/../yii">
+      <excludeFolder url="file://$MODULE_DIR$/../yii/demos" />
+      <excludeFolder url="file://$MODULE_DIR$/../yii/requirements" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
+

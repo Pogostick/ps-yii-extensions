@@ -122,19 +122,19 @@ abstract class CPSController extends CController implements IPSBase
 	* Convenience access to isPostRequest
 	* @return boolean
 	*/
-	public function getIsPostRequest() { return Yii::app()->getRequest()->isPostRequest; }
+	public function getIsPostRequest() { return PS::_gr()->getIsPostRequest(); }
 
 	/**
 	* Convenience access to isAjaxRequest
 	* @return boolean
 	*/
-	public function getIsAjaxRequest() { return Yii::app()->getRequest()->isAjaxRequest; }
+	public function getIsAjaxRequest() { return PS::_gr()->getIsAjaxRequest(); }
 
 	/**
 	 * Returns the base url of the current app
 	 * @return string
 	 */
-	public function getAppBaseUrl() { return Yii::app()->getBaseUrl(); }
+	public function getAppBaseUrl() { return PS::_gbu(); }
 
 	/**
 	* The id in the state of our current filter/search criteria
@@ -153,7 +153,7 @@ abstract class CPSController extends CController implements IPSBase
 	public function setSearchCriteria( $arValue )
 	{
 		$this->m_arCurrentSearchCriteria = $arValue;
-		Yii::app()->user->setState( $this->m_sSearchStateId, $arValue );
+		PS::_ss( $this->m_sSearchStateId, $arValue );
 		return $this;
 	}
 
@@ -221,9 +221,9 @@ abstract class CPSController extends CController implements IPSBase
 	protected function resetUserActionList() { $this->m_arUserActionList = array(); $this->addUserAction( self::ACCESS_TO_ANY, 'error' ); return $this; }
 	protected function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = null; $this->addUserActions( $eWhich, $arValue ); return $this; }
 	public function getUserActionList( $eWhich ) { return PS::o( $this->m_arUserActionList, $eWhich ); }
-	public function addUserActionRole( $eWhich, $sRole, $action )
+	public function addUserActionRole( $eWhich, $roleName, $action )
 	{
-		$this->m_arUserActionList[ $eWhich ]['roles'][]= $action;
+		$this->m_arUserActionList[ $eWhich ]['roles'][$roleName] = $action;
 		return $this;
 	}
 
@@ -386,7 +386,7 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	public function genericAction( $sActionId, $oModel = null, $arExtraParams = array(), $sModelVarName = 'model', $sFlashKey = null, $sFlashValue = null, $sFlashDefaultValue = null )
 	{
-		if ( $sFlashKey ) Yii::app()->user->setFlash( $sFlashKey, $sFlashValue, $sFlashDefaultValue );
+		if ( $sFlashKey ) PS::_sf( $sFlashKey, $sFlashValue, $sFlashDefaultValue );
 		$this->render( $sActionId, array_merge( $arExtraParams, array( $sModelVarName => ( $oModel ) ? $oModel : $this->loadModel() ) ) );
 	}
 
@@ -443,15 +443,15 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	public function actionError()
 	{
-		if ( ! $_arError = Yii::app()->errorHandler->error )
+		if ( null !== ( $_error = PS::_ge() ) )
 		{
-			if ( $this->isAjaxRequest )
-				echo $_arError['message'];
+			if ( $this->getIsAjaxRequest() )
+				echo $_error['message'];
 			else
 				throw new CHttpException( 404, 'Page not found.' );
 		}
 
-		$this->render( 'error', array( 'error' => $_arError ) );
+		$this->render( 'error', array( 'error' => $_error ) );
 	}
 
 	/**
@@ -698,6 +698,9 @@ SCRIPT;
 		if ( PS::UI_JQUERY == ( $_uiStyle = PS::o( $options, 'uiStyle', PS::UI_JQUERY ) ) )
 			CPSjqUIWrapper::loadScripts();
 
+		if ( PS::o( $options, 'validate', true ) )
+			CPSjqValidate::loadScripts();
+
 		return $_formOptions;
 	}
 
@@ -855,7 +858,7 @@ JS;
 			{
 				if ( ! $bNoCommit && $oModel instanceof CPSModel && $oModel->hasTransaction() ) $oModel->commitTransaction();
 
-				Yii::app()->user->setFlash( 'success', $_sMessage );
+				PS::_sf( 'success', $_sMessage );
 
 				if ( $sRedirectAction )
 					$this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
