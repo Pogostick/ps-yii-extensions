@@ -120,7 +120,13 @@ class CPSWidgetHelper extends CPSHelperBase
 
 	protected static $_showRequiredLabel = true;
 	public static function getShowRequiredLabel() { return self::$_showRequiredLabel; }
-	public static function setShowRequiredLabel( $value ) { self::$_showRequiredLabel = $value; }
+	/**
+	 * Turns on/off the required decoration on form labels
+	 * @static
+	 * @param boolean $value
+	 * @return bool The previous value
+	 */
+	public static function setShowRequiredLabel( $value ) { $_oldValue = self::$_showRequiredLabel; self::$_showRequiredLabel = $value; return $_oldValue; }
 	public static function getRequiredLabel() { return self::$_showRequiredLabel ? self::$afterRequiredLabel : null; }
 
 	/**
@@ -1002,10 +1008,10 @@ CODE;
 
 		if ( ! empty( $_sFieldImageUrl ) )
 		{
-			$_sTempCss =<<<CSS
-	background-image: url('{$_sFieldImageUrl}');
-	background-repeat: {$_sFieldImageRepeat};
-	background-position: {$_sFieldImagePosition};
+			$_sTempCss = <<<CSS
+	background-image: url({$sFieldImageUrl});
+	background-repeat: {$sFieldImageRepeat};
+	background-position {$sFieldImagePosition};
 CSS;
 		}
 
