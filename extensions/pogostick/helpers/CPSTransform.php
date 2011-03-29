@@ -110,7 +110,7 @@ class CPSTransform implements IPSBase
 	* @param string $sFormatColumn
 	* @return mixed
 	*/
-	protected static function getValue( $oModel, $sColumn, $sFormatColumn = null )
+	public static function getValue( $oModel, $sColumn, $sFormatColumn = null )
 	{
 		if ( ! $oModel instanceof CModel ) 
 			return $oModel[ self::columnChain( PS::nvl( $sFormatColumn, $sColumn ) ) ];

@@ -26,6 +26,15 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 	//********************************************************************************
 
 	/**
+	* @var string The internal name of the component.
+	*/
+	protected $_internalName;
+
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
+
+	/**
 	 * Constructor
 	 */
 	public function __construct()

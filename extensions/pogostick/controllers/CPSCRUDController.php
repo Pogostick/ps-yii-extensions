@@ -26,6 +26,15 @@ abstract class CPSCRUDController extends CPSController
 	//********************************************************************************
 
 	/**
+	 * If true, the admin system will not process commands, but render the admin page 
+	 * in a manner suitable for use with {@link CGridView}
+	 * @var string
+	 */
+	protected $_enableAdminDashboard = false;
+	public function getEnableAdminDashboard() { return $this->_enableAdminDashboard; }
+	public function setEnableAdminDashboard( $value ) { $this->_enableAdminDashboard = $value; }
+
+	/**
 	* The name of the Login Form class. Defaults to 'LoginForm'
 	*
 	* @var string
@@ -285,8 +294,46 @@ abstract class CPSCRUDController extends CPSController
 	*/
 	public function actionAdmin( $options = array(), $oCriteria = null )
 	{
-		if ( $this->m_sModelName ) @list( $_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadPaged( true, $oCriteria );
+		if ( $this->_enableAdminDashboard )
+		{
+			$this->actionAdminDashboard( $options );
+			return;
+		}
+
+		//	Regular old admin page...
+		if ( $this->m_sModelName )
+			@list( $_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadPaged( true, $oCriteria );
+
 		$this->render( 'admin', array_merge( $options, array( 'models' => $_arModels, 'pages' => $_oPage, 'sort' => $_oSort ) ) );
+	}
+
+	/**
+	 * Admin page for use with a {@link CGridView}
+	 * @param array $options
+	 * @return void
+	 */
+	public function actionAdminDashboard( $options = array() )
+	{
+		if ( null !== $this->_modelName )
+		{
+			$_model = new $this->_modelName( 'search' );
+			$_model->unsetAttributes();
+
+			if ( isset( $_REQUEST[$this->_modelName] ) )
+				$_model->attributes = $_REQUEST[$this->_modelName];
+
+			$this->render(
+				'admin',
+				array_merge(
+					$options,
+					array(
+						'model' => $_model,
+					)
+				)
+			);
+		}
+
+		throw new Exception( 'No model name/class set, unable to render "adminDashboard" page.' );
 	}
 
 	//********************************************************************************

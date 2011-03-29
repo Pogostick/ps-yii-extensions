@@ -6,7 +6,6 @@
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
-
 /**
  * CPSController provides filtered access to resources
  *
@@ -72,7 +71,7 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	protected $_breadcrumbs = array();
 	public function getBreadcrumbs() { return $this->_breadcrumbs; }
-	public function setBreadcrumbs( $value ) { $this->_breadcrumbs = $value; }
+	public function setBreadcrumbs( $value ) { $this->_breadcrumbs = $value; return $this; }
 
 	/**
 	 * An optional, additional page heading
@@ -80,7 +79,7 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	protected $m_sPageHeading;
 	public function getPageHeading() { return $this->m_sPageHeading; }
-	public function setPageHeading( $value ) { $this->m_sPageHeading = $value; }
+	public function setPageHeading( $sValue ) { $this->m_sPageHeading = $sValue; return $this; }
 
 	/***
 	* Allows you to change your action prefix
@@ -89,7 +88,7 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	protected $m_sMethodPrefix = 'action';
 	public function getMethodPrefix() { return $this->m_sMethodPrefix; }
-	public function setMethodPrefix( $value ) { $this->m_sMethodPrefix = $value; }
+	public function setMethodPrefix( $sValue ) { $this->m_sMethodPrefix = $sValue; return $this; }
 
 	/**
 	* @var CActiveRecord The currently loaded data model instance.
@@ -97,7 +96,7 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	protected $m_oModel = null;
 	public function getModel() { return $this->m_oModel; }
-	protected function setModel( $oValue ) { $this->m_oModel = $oValue; }
+	protected function setModel( $oValue ) { $this->m_oModel = $oValue; return $this; }
 
 	/**
 	* @var string The name of the model for this controller
@@ -111,6 +110,7 @@ abstract class CPSController extends CController implements IPSBase
 		$this->_modelName = $this->m_sModelName = $value;
 		$this->m_sSearchStateId = 'PS_' . strtoupper( $value ) . '_SEARCH_CRIT';
 		$this->m_arCurrentSearchCriteria = PS::_gs( $this->m_sSearchStateId );
+		return $this;
 	}
 
 	/**
@@ -130,7 +130,7 @@ abstract class CPSController extends CController implements IPSBase
 	 * @param boolean
 	 * @return string
 	 */
-	public function getAppBaseUrl( $absolute = false ) { return PS::_gbu( $absolute ); }
+	public function getAppBaseUrl() { return PS::_gbu(); }
 
 	/**
 	* The id in the state of our current filter/search criteria
@@ -149,6 +149,7 @@ abstract class CPSController extends CController implements IPSBase
 	{
 		$this->m_arCurrentSearchCriteria = $arValue;
 		PS::_ss( $this->m_sSearchStateId, $arValue );
+		return $this;
 	}
 
 	/**
@@ -157,7 +158,7 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	public $_pageLayout = 'main';
 	public function getPageLayout() { return $this->_pageLayout = $this->layout; }
-	public function setPageLayout( $value ) { $this->_pageLayout = $this->layout = $value; }
+	public function setPageLayout( $value ) { $this->_pageLayout = $this->layout = $value; return $this; }
 
 	/**
 	 * @var string the layout of the content portion of this controller. If specified,
@@ -165,7 +166,7 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	protected $_contentLayout = null;
 	public function getContentLayout() { return $this->_contentLayout; }
-	public function setContentLayout( $value ) { $this->_contentLayout = $value; }
+	public function setContentLayout( $value ) { $this->_contentLayout = $value; return $this; }
 
 	/**
 	* @var boolean Try to find proper layout to use
@@ -173,7 +174,7 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	protected $m_bAutoLayout = true;
 	public function getAutoLayout() { return $this->m_bAutoLayout; }
-	public function setAutoLayout( $value ) { $this->m_bAutoLayout = $value; }
+	public function setAutoLayout( $bValue ) { $this->m_bAutoLayout = $bValue; return $this; }
 
 	/**
 	* @var boolean Try to find missing action
@@ -181,7 +182,7 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	protected $m_bAutoMissing = true;
 	public function getAutoMissing() { return $this->m_bAutoMissing; }
-	public function setAutoMissing( $value ) { $this->m_bAutoMissing = $value; }
+	public function setAutoMissing( $value ) { $this->m_bAutoMissing = $value; return $this; }
 
 	/**
 	* @var array An associative array of POST commands and their applicable methods
@@ -189,8 +190,8 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	protected $m_arCommandMap = array();
 	public function getCommandMap() { return $this->m_arCommandMap; }
-	public function setCommandMap( $oValue ) { $this->m_arCommandMap = $oValue; }
-	public function addCommandToMap( $sKey, $oValue = null, $grantee = null ) { $this->m_arCommandMap[ $sKey ] = $oValue; if ( $grantee ) $this->addUserActions( $grantee, array( $sKey ) ); }
+	public function setCommandMap( $oValue ) { $this->m_arCommandMap = $oValue; return $this; }
+	public function addCommandToMap( $sKey, $oValue = null, $eWhich = null ) { $this->m_arCommandMap[ $sKey ] = $oValue; if ( $eWhich ) $this->addUserActions( $eWhich, array( $sKey ) ); return $this; }
 
 	/**
 	* Action queue for keeping track of where we are...
@@ -204,32 +205,38 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	protected $m_arPortletActions = array();
 	public function getPortletActions() { return $this->m_arPortletActions; }
-	public function setPortletActions( $arValue ) { $this->m_arPortletActions = $arValue; }
-	public function addPortletAction( $sName, $arCallback ) { $this->m_arPortletActions[ $sName ] = $arCallback; }
+	public function setPortletActions( $arValue ) { $this->m_arPortletActions = $arValue; return $this; }
+	public function addPortletAction( $sName, $arCallback ) { $this->m_arPortletActions[ $sName ] = $arCallback; return $this; }
 
 	/**
 	* @var array An array of actions permitted by any user
 	* @access protected
 	*/
 	protected $m_arUserActionList = array();
-	protected function resetUserActionList() { $this->m_arUserActionList = array(); $this->addUserAction( self::ACCESS_TO_ANY, 'error' ); }
-	protected function setUserActionList( $grantee, $arValue ) { $this->m_arUserActionList[ $grantee ] = null; $this->addUserActions( $grantee, $arValue ); }
-	public function getUserActionList( $grantee ) { return PS::o( $this->m_arUserActionList, $grantee ); }
-	public function addUserActionRole( $grantee, $roleName, $action ) { $this->m_arUserActionList[ $grantee ]['roles'][$roleName] = $action; }
-
-	public function removeUserAction( $grantee, $action )
+	protected function resetUserActionList() { $this->m_arUserActionList = array(); $this->addUserAction( self::ACCESS_TO_ANY, 'error' ); return $this; }
+	protected function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = null; $this->addUserActions( $eWhich, $arValue ); return $this; }
+	public function getUserActionList( $eWhich ) { return PS::o( $this->m_arUserActionList, $eWhich ); }
+	public function addUserActionRole( $eWhich, $roleName, $action )
 	{
-		if ( ! isset( $this->m_arUserActionList[ $grantee ] ) || ! is_array( $this->m_arUserActionList[ $grantee ] ) )
-			return;
-
-		if ( in_array( $action, $this->m_arUserActionList[ $grantee ] ) )
-			unset( $this->m_arUserActionList[ $grantee ][ $action ] );
+		$this->m_arUserActionList[ $eWhich ]['roles'][$roleName] = $action;
+		return $this;
 	}
 
-	public function addUserAction( $grantee, $action )
+	public function removeUserAction( $eWhich, $sAction )
 	{
-		if ( ! isset( $this->m_arUserActionList[ $grantee ] ) || ! is_array( $this->m_arUserActionList[ $grantee ] ) )
-			$this->m_arUserActionList[ $grantee ] = array();
+		if ( ! isset( $this->m_arUserActionList[ $eWhich ] ) || ! is_array( $this->m_arUserActionList[ $eWhich ] ) )
+			return;
+
+		if ( in_array( $sAction, $this->m_arUserActionList[ $eWhich ] ) )
+			unset( $this->m_arUserActionList[ $eWhich ][ $sAction ] );
+
+		return $this;
+	}
+
+	public function addUserAction( $eWhich, $sAction )
+	{
+		if ( ! isset( $this->m_arUserActionList[ $eWhich ] ) || ! is_array( $this->m_arUserActionList[ $eWhich ] ) )
+			$this->m_arUserActionList[ $eWhich ] = array();
 
 		if ( ! in_array( $action, $this->m_arUserActionList[ $grantee ] ) )
 			$this->m_arUserActionList[ $grantee ][] = $action;
@@ -240,6 +247,8 @@ abstract class CPSController extends CController implements IPSBase
 			if ( ! in_array( 'error', $this->m_arUserActionList[ $grantee ] ) )
 				$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
 		}
+
+		return $this;
 	}
 
 	public function addUserActions( $grantee, $arActions = array() )
@@ -248,37 +257,39 @@ abstract class CPSController extends CController implements IPSBase
 			$this->m_arUserActionList[ $grantee ] = array();
 
 		foreach ( $arActions as $_sAction )
-			$this->addUserAction( $grantee, $_sAction );
+			$this->addUserAction( $eWhich, $_sAction );
+
+		return $this;
 	}
 
 	protected $_displayName;
-	protected function setDisplayName( $value ) { $this->_displayName = $value; }
+	protected function setDisplayName( $value ) { $this->_displayName = $value; return $this; }
 	protected function getDisplayName() { return $this->_displayName; }
 
 	protected $_cleanTrail;
 	protected function getCleanTrail() { return $this->_cleanTrail; }
-	protected function setCleanTrail( $value ) { $this->_cleanTrail = $value; }
+	protected function setCleanTrail( $value ) { $this->_cleanTrail = $value; return $this; }
 	
 	/**
 	 * @var array $viewData The array of data passed to views
 	 */
 	protected $_viewData = array();
 	protected function getViewData() { return $this->_viewData; }
-	protected function setViewData( $value ) { $this->_viewData = $value; }
+	protected function setViewData( $value ) { $this->_viewData = $value; return $this; }
 
 	/**
 	 * @var array Any values in this array will be extracted into each view before it's rendered. The value "currentUser" is added automatically.
 	 */
 	protected $_extraViewDataList;
 	protected function getExtraViewDataList() { return $this->_extraViewDataList; }
-	protected function setExtraViewDataList( $value ) { $this->_extraViewDataList = $value; }
+	protected function setExtraViewDataList( $value ) { $this->_extraViewDataList = $value; return $this; }
 
 	/**
 	 * @var string The prefix to prepend to variables extracted into the view from {@link $_extraViewDataList}. Defaults to '_' (single underscore).
 	 */
 	protected $_extraViewDataPrefix = '_';
 	protected function getExtraViewDataPrefix() { return $this->_extraViewDataPrefix; }
-	protected function setExtraViewDataPrefix( $value ) { $this->_extraViewDataPrefix = $value; }
+	protected function setExtraViewDataPrefix( $value ) { $this->_extraViewDataPrefix = $value; return $this; }
 
 	//********************************************************************************
 	//* Public Methods
@@ -294,13 +305,16 @@ abstract class CPSController extends CController implements IPSBase
 		parent::init();
 
 		//	Find layout...
-		if ( PHP_SAPI != 'cli' && $this->m_bAutoLayout && ! Yii::app() instanceof CConsoleApplication ) if ( file_exists( Yii::app()->getBasePath() . '/views/layouts/' . $this->getId() . '.php' ) ) $this->_pageLayout = $this->getId();
+		if ( PHP_SAPI != 'cli' && $this->m_bAutoLayout && ! Yii::app() instanceof CConsoleApplication )
+			if ( file_exists( Yii::app()->getBasePath() . '/views/layouts/' . $this->getId() . '.php' ) )
+				$this->_pageLayout = $this->getId();
 
 		//	Allow errors
 		$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
 
 		//	Pull any search criteria we've stored...
-		if ( $this->getModelName() ) $this->m_arCurrentSearchCriteria = PS::_gs( $this->m_sSearchStateId );
+		if ( $this->getModelName() )
+			$this->m_arCurrentSearchCriteria = PS::_gs( $this->m_sSearchStateId );
 
 		//	Ensure conformity
 		if ( ! is_array( $this->_extraViewDataList ) )
@@ -367,8 +381,8 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	public function genericAction( $actionId, $model = null, $parameters = array(), $modelVariableName = 'model', $flashKey = null, $flashValue = null, $defaultValue = null )
 	{
-		if ( $flashKey ) PS::_sf( $flashKey, $flashValue, $defaultValue );
-		$this->render( $actionId, array_merge( $parameters, array( $modelVariableName => ( $model ) ? $model : $this->loadModel() ) ) );
+		if ( $sFlashKey ) PS::_sf( $sFlashKey, $sFlashValue, $sFlashDefaultValue );
+		$this->render( $sActionId, array_merge( $arExtraParams, array( $sModelVarName => ( $oModel ) ? $oModel : $this->loadModel() ) ) );
 	}
 
 	/**
@@ -568,30 +582,30 @@ abstract class CPSController extends CController implements IPSBase
 	 * @param string|array If a string is passed in, it is used as the title.
 	 * @return array
 	 */
-	public function setStandardFormOptions( $model, $optionList = array() )
+	public function setStandardFormOptions( $model, $options = array() )
 	{
 		//	Shortcut... only passed in the title...
-		if ( is_string( $optionList ) )
+		if ( is_string( $options ) )
 		{
-			$_title = $optionList;
+			$_title = $options;
 
-			$optionList = array(
+			$options = array(
 				'title' => PS::_gan() . ' :: ' . $_title,
 				'breadcrumbs' => array( $_title ),
 			);
 		}
 
 		//	Abbreviated arguments?
-		if ( is_array( $model ) && array() === $optionList )
+		if ( is_array( $model ) && array() === $options )
 		{
-			$optionList = $model;
-			$model = PS::o( $optionList, 'model' );
+			$options = $model;
+			$model = PS::o( $options, 'model' );
 		}
 
 		//	Set the standard nav options
-		$this->setViewNavigationOptions( $optionList );
+		$this->setViewNavigationOptions( $options );
 
-		$_formId = PS::o( $optionList, 'id', 'ps-edit-form' );
+		$_formId = PS::o( $options, 'id', 'ps-edit-form' );
 
 		//	Put a cool flash span on the page
 		if ( PS::o( $options, 'enableFlash', true, true ) )
@@ -609,38 +623,36 @@ abstract class CPSController extends CController implements IPSBase
 			
 			//	Register a nice little fader...
 			$_fader =<<<SCRIPT
-if ($('#{$_spanId}').length){
-	$('#{$_spanId}').fadeIn('500',function(){
-		$(this).delay(3000).fadeOut(3500);
-	});
-}
+$('#{$_spanId}').fadeIn('500',function(){
+	$(this).delay(3000).fadeOut(3500);
+});
 SCRIPT;
-
+				
 			PS::_rs( $_formId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
 		}
 		
-		PS::setFormFieldContainerClass( PS::o( $optionList, 'rowClass', 'row' ) );
+		PS::setFormFieldContainerClass( PS::o( $options, 'rowClass', 'row' ) );
 
 		$_formOptions = array(
 			'id' => $_formId,
-			'showLegend' => PS::o( $optionList, 'showLegend', true ),
-			'showDates' => PS::o( $optionList, 'showDates', false ),
-			'method' => PS::o( $optionList, 'method', 'POST' ),
+			'showLegend' => PS::o( $options, 'showLegend', true ),
+			'showDates' => PS::o( $options, 'showDates', false ),
+			'method' => PS::o( $options, 'method', 'POST' ),
 
-			'uiStyle' => PS::o( $optionList, 'uiStyle', PS::UI_JQUERY ),
-			'formClass' => PS::o( $optionList, 'formClass', 'form' ),
+			'uiStyle' => PS::o( $options, 'uiStyle', PS::UI_JQUERY ),
+			'formClass' => PS::o( $options, 'formClass', 'form' ),
 			'formModel' => $model,
-			'errorCss' => PS::o( $optionList, 'errorCss', 'error' ),
+			'errorCss' => PS::o( $options, 'errorCss', 'error' ),
 
 			//	We want error summary...
-			'errorSummary' => PS::o( $optionList, 'errorSummary', true ),
+			'errorSummary' => PS::o( $options, 'errorSummary', true ),
 			'errorSummaryOptions' => array(
 				'header' => '<p>The following problems occurred:</p>',
 			),
 
-			'validate' => PS::o( $optionList, 'validate', true ),
+			'validate' => PS::o( $options, 'validate', true ),
 
-			'validateOptions' => PS::o( $optionList, 'validateOptions',
+			'validateOptions' => PS::o( $options, 'validateOptions',
 				array(
 					'ignoreTitle' => true,
 					'errorClass' => 'ps-validate-error',
@@ -649,19 +661,19 @@ SCRIPT;
 		);
 
 		//	Do some auto-page-setup...
-		if ( null !== ( $_header = PS::o( $optionList, 'header', PS::o( $optionList, 'title' ) ) ) )
+		if ( null !== ( $_header = PS::o( $options, 'header', PS::o( $options, 'title' ) ) ) )
 		{
-			if ( null !== ( $_headerIcon = PS::o( $optionList, 'headerIcon' ) ) )
+			if ( null !== ( $_headerIcon = PS::o( $options, 'headerIcon' ) ) )
 				$_header = PS::tag( 'span', array(), PS::image( $_headerIcon ) ) . $_header;
 
 			echo PS::tag( 'h1', array( 'class' => 'ui-generated-header' ), $_header );
 		}
 
 		//	Do some auto-page-setup...
-		if ( null !== ( $_subHeader = PS::o( $optionList, 'subHeader' ) ) )
+		if ( null !== ( $_subHeader = PS::o( $options, 'subHeader' ) ) )
 			echo PS::tag( 'div', array(), $_subHeader );
 
-		if ( false !== PS::o( $optionList, 'renderSearch', false ) )
+		if ( false !== PS::o( $options, 'renderSearch', false ) )
 		{
 			echo PS::tag( 'p', array(), self::SEARCH_HELP_TEXT );
 			echo PS::link( 'Advanced Search', '#', array( 'class' => 'search-button' ) );
@@ -673,12 +685,15 @@ SCRIPT;
 			);
 			
 			//	Register the search script, if any
-			if ( null !== ( $_searchScript = PS::o( $optionList, '__searchScript' ) ) )
+			if ( null !== ( $_searchScript = PS::o( $options, '__searchScript' ) ) )
 				PS::_rs( 'search', $_searchScript );
 		}
 
-		if ( PS::UI_JQUERY == PS::o( $optionList, 'uiStyle', PS::UI_JQUERY ) )
-			CPSjqUIWrapper::loadScripts( null, PS::_gp( 'jquiTheme' ) );
+		if ( PS::UI_JQUERY == ( $_uiStyle = PS::o( $options, 'uiStyle', PS::UI_JQUERY ) ) )
+			CPSjqUIWrapper::loadScripts();
+
+		if ( PS::o( $options, 'validate', true ) )
+			CPSjqValidate::loadScripts();
 
 		return $_formOptions;
 	}

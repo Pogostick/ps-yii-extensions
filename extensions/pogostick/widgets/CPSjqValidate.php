@@ -35,10 +35,10 @@ class CPSjqValidate extends CPSjQueryWidget
 	* Currently, a CDN is in use and no local files are required...
 	*/
 	const PS_EXTERNAL_PATH = '/jquery-plugins/validate';
-	const CDN_ROOT = 'http://ajax.microsoft.com/ajax/jquery.validate/1.8';
-	const CDN_SSL_ROOT = 'https://ajax.microsoft.com/ajax/jquery.validate/1.8';
-	const CDN_PATH = 'http://ajax.microsoft.com/ajax/jquery.validate/1.8/jquery.validate.min.js';
-	const CDN_SSL_PATH = 'https://ajax.microsoft.com/ajax/jquery.validate/1.8/jquery.validate.min.js';
+	const CDN_ROOT = 'http://ajax.aspnetcdn.com/ajax/jquery.validate/1.8';
+	const CDN_SSL_ROOT = 'https://ajax.aspnetcdn.com/ajax/jquery.validate/1.8';
+	const CDN_PATH = 'http://ajax.aspnetcdn.com/ajax/jquery.validate/1.8/jquery.validate.min.js';
+	const CDN_SSL_PATH = 'https://ajax.aspnetcdn.com/ajax/jquery.validate/1.8/jquery.validate.min.js';
 
 	//********************************************************************************
 	//* Public Methods
@@ -56,17 +56,9 @@ class CPSjqValidate extends CPSjQueryWidget
 		
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
-		
-		//	Meta data for goodness...
-		$this->pushScriptFile( $this->extLibUrl . '/jquery-plugins/jquery.metadata.js', CClientScript::POS_HEAD );
-		
-		//	Register scripts necessary
-		$this->pushScriptFile( ( $_SERVER['HTTPS'] == 'on' ? self::CDN_SSL_ROOT : self::CDN_ROOT ) . '/jquery.validate.min.js', CClientScript::POS_HEAD );
-//		$this->pushScriptFile( $this->baseUrl . '/jquery.validate.min.js', CClientScript::POS_HEAD );
-			
-		$this->pushScriptFile( ( $_SERVER['HTTPS'] == 'on' ? self::CDN_SSL_ROOT : self::CDN_ROOT ) . '/additional-methods.js', CClientScript::POS_HEAD );
-//		$this->pushScriptFile( $this->baseUrl . '/additional-methods.js', CClientScript::POS_HEAD );
 
+		self::loadScripts();
+		
 		//	Don't forget subclasses
 		return PS::_cs();
 	}
@@ -131,5 +123,13 @@ CODE;
 
 		return $this->script;
 	}
-	
+
+	public static function loadScripts( $widget = null, $widgetTheme = null )
+	{
+		$_base = PS::_a()->getAssetManager()->publish( PS::_gpoa( 'pogostick.external' ), true );
+		PS::_rsf( $_base . '/jquery-plugins/jquery.metadata.js', CClientScript::POS_HEAD );
+		PS::_rsf( self::CDN_SSL_PATH, CClientScript::POS_HEAD );
+		PS::_rsf( self::CDN_SSL_ROOT . '/additional-methods.js', CClientScript::POS_HEAD );
+	}
+
 }

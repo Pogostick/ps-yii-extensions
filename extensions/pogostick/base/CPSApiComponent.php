@@ -5,13 +5,11 @@
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
+ * @author Jerry Ablan <jablan@pogostick.com>
+ * @package psYiiExtensions
+ * @subpackage base.components
+ * @since v1.0.0
  * @filesource
- *
- * @package		psYiiExtensions
- * @subpackage 	base.components
- * @since			v1.0.0
- *
- * @author			Jerry Ablan <jablan@pogostick.com>
  */
 
 /**
@@ -253,8 +251,8 @@ class CPSApiComponent extends CPSComponent
 		//	Build the url...
 		$_url = rtrim( $this->_apiBaseUrl, '/' ) . '/';
 
-		if ( isset( $this->_apiSubUrls[ $this->_apiToUse ] ) && '/' != $this->_apiSubUrls[ $this->_apiToUse ] )
-			$_url .= $this->_apiSubUrls[ $this->_apiToUse ];
+		if ( isset( $this->apiSubUrls[ $this->_apiToUse ] ) && '/' != $this->apiSubUrls[ $this->_apiToUse ] )
+			$_url .= $this->apiSubUrls[ $this->_apiToUse ];
 
 		//	Add the API key...
 		if ( $this->_requireApiQueryName )
@@ -423,7 +421,7 @@ class CPSApiComponent extends CPSComponent
 	}
 
 	//********************************************************************************
-	//* Property Accessors
+	//* Accessors
 	//********************************************************************************
 
 	public function getAltApiKey()
@@ -433,7 +431,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setAltApiKey( $altApiKey )
 	{
-		$this->_altApiKey = $altApiKey;
+		$this->_altApiKey = $_altApiKey;
 	}
 
 	public function getAppendFormat()
@@ -443,7 +441,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setAppendFormat( $appendFormat )
 	{
-		$this->_appendFormat = $appendFormat;
+		$this->_appendFormat = $_appendFormat;
 	}
 
 	public function getApiBaseUrl()
@@ -453,7 +451,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setApiBaseUrl( $apiBaseUrl )
 	{
-		$this->_apiBaseUrl = $apiBaseUrl;
+		$this->_apiBaseUrl = $_apiBaseUrl;
 	}
 
 	public function getApiKey()
@@ -463,7 +461,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setApiKey( $apiKey )
 	{
-		$this->_apiKey = $apiKey;
+		$this->_apiKey = $_apiKey;
 	}
 
 	public function getApiQueryName()
@@ -473,7 +471,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setApiQueryName( $apiQueryName )
 	{
-		$this->_apiQueryName = $apiQueryName;
+		$this->_apiQueryName = $_apiQueryName;
 	}
 
 	public function getApiToUseprotected()
@@ -483,7 +481,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setApiToUseprotected( $apiToUseprotected )
 	{
-		$this->_apiToUseprotected = $apiToUseprotected;
+		$this->_apiToUseprotected = $_apiToUseprotected;
 	}
 
 	public function getApiSubUrls()
@@ -493,7 +491,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setApiSubUrls( $apiSubUrls )
 	{
-		$this->_apiSubUrls = $apiSubUrls;
+		$this->_apiSubUrls = $_apiSubUrls;
 	}
 
 	public function getHttpMethod()
@@ -503,7 +501,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setHttpMethod( $httpMethod )
 	{
-		$this->_httpMethod = $httpMethod;
+		$this->_httpMethod = $_httpMethod;
 	}
 
 	public function getReturnFormat()
@@ -513,7 +511,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setReturnFormat( $returnFormat )
 	{
-		$this->_returnFormat = $returnFormat;
+		$this->_returnFormat = $_returnFormat;
 	}
 
 	public function getRequestData()
@@ -523,7 +521,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setRequestData( $requestData )
 	{
-		$this->_requestData = $payload;
+		$this->_requestData = $_payload;
 	}
 
 	public function getRequestMap()
@@ -533,7 +531,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setRequestMap( $requestMap )
 	{
-		$this->_requestMap = $requestMap;
+		$this->_requestMap = $_requestMap;
 	}
 
 	public function getRequireApiQueryName()
@@ -543,7 +541,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setRequireApiQueryName( $requireApiQueryName )
 	{
-		$this->_requireApiQueryName = $requireApiQueryName;
+		$this->_requireApiQueryName = $_requireApiQueryName;
 	}
 
 	public function getTestApiKey()
@@ -553,7 +551,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setTestApiKey( $testApiKey )
 	{
-		$this->_testApiKey = $testApiKey;
+		$this->_testApiKey = $_testApiKey;
 	}
 
 	public function getTestAltApiKey()
@@ -563,7 +561,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setTestAltApiKey( $testAltApiKey )
 	{
-		$this->_testAltApiKey = $testAltApiKey;
+		$this->_testAltApiKey = $_testAltApiKey;
 	}
 
 	public function getUserAgent()
@@ -573,7 +571,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setUserAgent( $userAgent )
 	{
-		$this->_userAgent = $userAgent;
+		$this->_userAgent = $_userAgent;
 	}
 
 	public function getLastErrorMessage()
@@ -583,7 +581,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setLastErrorMessage( $lastErrorMessage )
 	{
-		$this->_lastErrorMessage = $lastErrorMessage;
+		$this->_lastErrorMessage = $_lastErrorMessage;
 	}
 
 	public function getLastErrorMessageExtra()
@@ -593,7 +591,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setLastErrorMessageExtra( $lastErrorMessageExtra )
 	{
-		$this->_lastErrorMessageExtra = $lastErrorMessageExtra;
+		$this->_lastErrorMessageExtra = $_lastErrorMessageExtra;
 	}
 
 	public function getLastErrorCode()
@@ -603,76 +601,7 @@ class CPSApiComponent extends CPSComponent
 
 	public function setLastErrorCode( $lastErrorCode )
 	{
-		$this->_lastErrorCode = $lastErrorCode;
+		$this->_lastErrorCode = $_lastErrorCode;
 	}
 
-	public function getBaseUrl()
-	{
-		return $this->_baseUrl;
-	}
-
-	public function setBaseUrl( $baseUrl )
-	{
-		$this->_baseUrl = $baseUrl;
-	}
-
-	public function getValidateOptions()
-	{
-		return $this->_validateOptions;
-	}
-
-	public function setValidateOptions( $validateOptions )
-	{
-		$this->_validateOptions = $validateOptions;
-	}
-
-	public function getValidOptions()
-	{
-		return $this->_validOptions;
-	}
-
-	public function setValidOptions( $validOptions )
-	{
-		$this->_validOptions = $validOptions;
-	}
-
-	public function getValidateCallbacks()
-	{
-		return $this->_validateCallbacks;
-	}
-
-	public function setValidateCallbacks( $validateCallbacks )
-	{
-		$this->_validateCallbacks = $validateCallbacks;
-	}
-
-	public function getValidCallbacks()
-	{
-		return $this->_validCallbacks;
-	}
-
-	public function setValidCallbacks( $validCallbacks )
-	{
-		$this->_validCallbacks = $validCallbacks;
-	}
-
-	public function getCallbacks()
-	{
-		return $this->_callbacks;
-	}
-
-	public function setCallbacks( $callbacks )
-	{
-		$this->_callbacks = $callbacks;
-	}
-
-	public function getExternalLibraryUrl()
-	{
-		return $this->_externalLibraryUrl;
-	}
-
-	public function setExternalLibraryUrl( $externalLibraryUrl )
-	{
-		$this->_externalLibraryUrl = $externalLibraryUrl;
-	}
 }

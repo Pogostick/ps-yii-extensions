@@ -1,30 +1,29 @@
 <?php
 /**
- * This file is part of the YiiXL package.
+ * This file is part of the psYiiExtensions package.
  *
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
- * @filesource
- */
-
-/**
- * CPSComponent class
- * This is the base class for all Pogostick Yii Extension library objects.
- * It extends the base functionality of the Yii Framework without replacing
- * and core code.
- *
  * @package		psYiiExtensions
  * @subpackage 	base.components
- *
  * @author			Jerry Ablan <jablan@pogostick.com>
  * @version		SVN $Id: CPSComponent.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
  * @since			v1.0.0
+ * @filesource
+ */
+/**
+ * CPSComponent
+ * This is the base class for all Pogostick Yii Extension library objects.
+ * It extends the base functionality of the Yii Framework without replacing
+ * and core code.
  *
  * @property string $internalName The internal name of the component.
  * @property boolean $debugMode Enable trace-level debugging
  * @property integer $debugLevel A user-defined debugging level
  */
+ 
+ 
 class CPSComponent extends CApplicationComponent implements IPSComponent, IApplicationComponent
 {
 	//********************************************************************************
