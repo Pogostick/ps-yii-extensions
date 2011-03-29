@@ -1,3 +1,4 @@
+/** @noinspection PhpUnimplementedMethodsInspection */
 <?php
 /**
  * This file is part of the psYiiExtensions package.

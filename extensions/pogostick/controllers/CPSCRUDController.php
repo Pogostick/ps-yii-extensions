@@ -26,7 +26,7 @@ abstract class CPSCRUDController extends CPSController
 	//********************************************************************************
 
 	/**
-	 * If true, the admin system will not process commands, but render the admin page 
+	 * If true, the admin system will not process commands, but render the admin page
 	 * in a manner suitable for use with {@link CGridView}
 	 * @var string
 	 */
@@ -60,9 +60,9 @@ abstract class CPSCRUDController extends CPSController
 	public function setMenu( $value ) { $this->_menu = $value; }
 
 	/***
-	 * @var boolean 
+	 * @var boolean
 	 */
-	
+
 	/**
 	 * @var boolean $singleViewMode If true, only the 'update' view is called for create and update.
 	 */
@@ -244,9 +244,9 @@ abstract class CPSCRUDController extends CPSController
 		//	Handle singleViewMode...
 		$_model = ( $fromCreate ? new $this->m_sModelName : $this->loadModel()  );
 		$_viewName = ( $fromCreate ? ( $this->_singleViewMode ? 'update' : 'create' ) : 'update' );
-		
+
 		if ( $this->isPostRequest ) $this->saveModel( $_model, $_POST, 'update' );
-		
+
 		$options['update'] = ( ! $fromCreate );
 		$this->genericAction( $_viewName, $_model, $options );
 	}
@@ -331,6 +331,8 @@ abstract class CPSCRUDController extends CPSController
 					)
 				)
 			);
+
+			return;
 		}
 
 		throw new Exception( 'No model name/class set, unable to render "adminDashboard" page.' );

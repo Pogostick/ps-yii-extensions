@@ -127,8 +127,8 @@
         <content-type name="PHP" enabled="true" />
         <content-type name="JSP" enabled="true" />
         <content-type name="JSPx" enabled="true" />
+        <content-type name="ASP" enabled="true" />
         <content-type name="YAML" enabled="true" />
-        <content-type name="Bash" enabled="true" />
       </lob-content-types>
     </dataset-editor-settings>
     <code-completion-settings>

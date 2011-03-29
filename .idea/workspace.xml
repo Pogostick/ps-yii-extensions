@@ -2,89 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b8e8de94-c440-44a8-a089-1a03836d304d" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/projectCodeStyle.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/psYiiExtensions.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/jablan.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.explode.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-uk.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-sl.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-ru.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-da.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.droppable.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-pt-BR.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-nl.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-pl.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.core.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jquery-plugins/validate/jquery.validate.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-fi.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-is.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-hu.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.pulsate.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.fold.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-ja.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-no.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-he.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-sq.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-hy.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-lv.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-id.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-ms.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jquery-plugins/validate/jquery.validate.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-ca.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-es.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/jquery-ui-i18n.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.shake.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-zh-CN.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-th.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-tr.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-ko.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.scale.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.tabs.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.sortable.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-lt.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.selectable.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jquery-plugins/validate/additional-methods.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-fr.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.resizable.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.accordion.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.blind.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.slide.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-sr.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.datepicker.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.draggable.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.dialog.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-bg.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-it.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-fa.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-sr-SR.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.bounce.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.drop.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-de.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-el.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-cs.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.clip.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-ro.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jquery-plugins/validate/jquery.validate.pack.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-ar.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.progressbar.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.core.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-hr.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-zh-TW.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-sv.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.highlight.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/ui.slider.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-sk.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/i18n/ui.datepicker-eo.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/jquery-ui.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jqui/jquery-ui-1.7.2/ui/minified/effects.transfer.min.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/widgets/CPSjqValidate.php" afterPath="$PROJECT_DIR$/extensions/pogostick/widgets/CPSjqValidate.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/external/jquery-plugins/jquery.metadata.js" afterPath="$PROJECT_DIR$/extensions/pogostick/external/jquery-plugins/jquery.metadata.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/helpers/CPSHelperBase.php" afterPath="$PROJECT_DIR$/extensions/pogostick/helpers/CPSHelperBase.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/controllers/CPSController.php" afterPath="$PROJECT_DIR$/extensions/pogostick/controllers/CPSController.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/controllers/CPSCRUDController.php" afterPath="$PROJECT_DIR$/extensions/pogostick/controllers/CPSCRUDController.php" />
     </list>
     <ignored path="psYiiExtensions.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -106,7 +27,17 @@
     <favorites_list name="psYiiExtensions" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file leaf-file-name="CPSCRUDController.php" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/extensions/pogostick/controllers/CPSCRUDController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="249" column="47" selection-start="6465" selection-end="6465" vertical-scroll-proportion="0.45543584">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -123,6 +54,7 @@
         <option value="$PROJECT_DIR$/extensions/pogostick/helpers/CPSHelperBase.php" />
         <option value="$PROJECT_DIR$/extensions/pogostick/controllers/CPSController.php" />
         <option value="$PROJECT_DIR$/extensions/pogostick/widgets/CPSjqValidate.php" />
+        <option value="$PROJECT_DIR$/extensions/pogostick/controllers/CPSCRUDController.php" />
       </list>
     </option>
   </component>
@@ -152,6 +84,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -160,39 +93,88 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="psYiiExtensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="psYiiExtensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="psYiiExtensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="psYiiExtensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="extensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="psYiiExtensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="psYiiExtensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="extensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pogostick" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="psYiiExtensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="psYiiExtensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="extensions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pogostick" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="controllers" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="Favorites" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="options.lastSelected" value="reference.settings.deploy.options" />
+    <property name="options.lastSelected" value="web.server" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
   </component>
-  <component name="PublishConfig" serverName="CIS Apps" serverId="94e52d9d-234a-470c-b7a1-2bd963fcf068" overwriteAll="false" traceLevel="DETAILS">
+  <component name="PublishConfig" serverName="vcisdev11.atlis1" serverId="38d33f0f-f8b6-45b5-9310-14ad151c7d61" overwriteAll="false" traceLevel="DETAILS">
     <servers>
-      <server id="625a4f1f-3bbf-41fb-9240-e7a15e6a81d8">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </server>
-      <server id="94e52d9d-234a-470c-b7a1-2bd963fcf068">
+      <server id="38d33f0f-f8b6-45b5-9310-14ad151c7d61">
         <serverdata>
           <mappings>
             <mapping deploy="/var/inc/psYiiExtensions" local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </server>
-      <server id="b45e5d27-e58b-4b9c-8619-9fe158da5695">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </server>
@@ -248,30 +230,32 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1600" height="870" extended-state="0" />
-    <editor active="false" />
+    <frame x="0" y="0" width="1600" height="1173" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.3292011" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287483" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="CSS-X-Fire" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287483" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.19689119" sideWeight="0.2352132" order="1" side_tool="true" content_ui="tabs" x="332" y="352" width="620" height="472" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18081659" sideWeight="0.0" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1860013" sideWeight="0.0" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3981358" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287483" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287483" sideWeight="0.0" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.32888466" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32966322" sideWeight="0.6011004" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" x="100" y="100" width="1400" height="973" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3292011" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3278237" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="CSS-X-Fire" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="DB Execution Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32908913" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsManagerConfiguration">
@@ -314,19 +298,9 @@
         <state line="1149" column="5" selection-start="36069" selection-end="36069" vertical-scroll-proportion="0.5470852" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../yii/framework/base/CApplication.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="89" column="23" selection-start="4455" selection-end="4455" vertical-scroll-proportion="0.74663675" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/extensions/pogostick/widgets/CPSjqToolsWrapper.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="177" column="6" selection-start="5435" selection-end="5435" vertical-scroll-proportion="0.6029197" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../yii/framework/web/widgets/CInputWidget.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="7" selection-start="898" selection-end="898" vertical-scroll-proportion="0.61891115" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/extensions/pogostick/base/CPSWidget.php">
@@ -357,6 +331,13 @@
     <entry file="file://$PROJECT_DIR$/extensions/pogostick/widgets/jqui/CPSjqUIWrapper.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="325" column="0" selection-start="10127" selection-end="10127" vertical-scroll-proportion="0.85985404" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/extensions/pogostick/controllers/CPSCRUDController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="249" column="47" selection-start="6465" selection-end="6465" vertical-scroll-proportion="0.45543584">
+          <folding />
+        </state>
       </provider>
     </entry>
   </component>
