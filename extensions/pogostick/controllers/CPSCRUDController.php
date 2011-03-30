@@ -59,12 +59,9 @@ abstract class CPSCRUDController extends CPSController
 	public function getMenu() { return $this->_menu; }
 	public function setMenu( $value ) { $this->_menu = $value; }
 
-	/***
-	 * @var boolean
-	 */
-
 	/**
-	 * @var boolean $singleViewMode If true, only the 'update' view is called for create and update.
+	 * If true, only the 'update' view is called for create and update.
+	 * @var boolean $singleViewMode
 	 */
 	protected $_singleViewMode = false;
 	public function getSingleViewMode() { return $this->_singleViewMode; }
