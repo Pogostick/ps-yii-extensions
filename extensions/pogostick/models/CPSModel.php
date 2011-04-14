@@ -17,7 +17,7 @@
  * @version 	SVN: $Id: CPSModel.php 401 2010-08-31 21:04:18Z jerryablan@gmail.com $
  * @since 		v1.0.6
  *
- * @filesource
+ * @filesourcet
  *
  * @property-read string $modelName The class name of the model
  */
