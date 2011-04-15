@@ -2,11 +2,7 @@
 /**
  * This file is part of the psYiiExtensions package.
  *
-<<<<<<< HEAD
  * @copyright Copyright &copy; 2009-2011 Pogostick, LLC
-=======
- * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
->>>>>>> 93e55a4c29a0582d3f03de2ad001c9beda57e9bd
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -103,6 +99,10 @@ class CPSHelperBase extends CHtml implements IPSBase
 	* @static CAttributeCollection $appParameters
 	*/
 	protected static $_appParameters = null;
+	/**
+	 * @static
+	 * @return void
+	 */
 	public static function getParams() { self::$_appParameters; }
 
 	/**
@@ -117,13 +117,21 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function getClassPath() { return self::$_classPath; }
 	/**
 	 * @static
+<<<<<<< HEAD
 	 * @param array $arClasses
+=======
+	 * @param  $arClasses
+>>>>>>> 534e19569624f7b79a8389e625e9c055ea399c83
 	 * @return void
 	 */
 	public static function setClassPath( $arClasses ) { self::$_classPath = $arClasses; }
 	/**
 	 * @static
+<<<<<<< HEAD
 	 * @param string $sClass
+=======
+	 * @param  $sClass
+>>>>>>> 534e19569624f7b79a8389e625e9c055ea399c83
 	 * @return void
 	 */
 	public static function addClassToPath( $sClass ) { self::$_classPath[] = $sClass; }
@@ -240,7 +248,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	*/
 	public static function oo( &$optionList = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
 	{
-		return PS::o( PS::o( $optionList, $key, array() ), $subKey, $defaultValue, $unsetValue );
+		return self::o( self::o( $optionList, $key, array() ), $subKey, $defaultValue, $unsetValue );
 	}
 
 	/**
@@ -258,38 +266,40 @@ class CPSHelperBase extends CHtml implements IPSBase
 	*/
 	public static function o( &$optionList = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
-		$_newValue = $defaultValue;
+		if ( ! is_array( $optionList ) || empty( $optionList ) )
+			return $defaultValue;
 
-		if ( is_array( $optionList ) )
+		$_value = $defaultValue;
+
+		if ( array_key_exists( $key, $optionList ) )
 		{
-			if ( ! array_key_exists( $key, $optionList ) )
-			{
-				//	Ignore case and look...
-			    $_newKey = strtolower( $key );
-
-			    foreach ( $optionList as $_key => $_value )
-			    {
-		    		if ( strtolower( $_key ) == $_newKey )
-		    		{
-		    			//	Set correct key and break
-		    			$key = $_key;
-		    			break;
-					}
-				}
-	        }
-
 			if ( isset( $optionList[$key] ) )
-			{
-				$_newValue = $optionList[$key];
-				if ( $unsetValue ) unset( $optionList[$key] );
-			}
+				$_value = $optionList[$key];
 
-			//	Set it in the array if not an unsetter...
-			if ( ! $unsetValue ) $optionList[$key] = $_newValue;
+			if ( $unsetValue )
+			{
+				unset( $optionList[$key] );
+			}
+		}
+		else
+		{
+			//	Ignore case and look...
+			foreach ( $optionList as $_option => $_optionValue )
+			{
+				if ( 0 == strcasecmp( $_option, $key ) )
+				{
+					$_value = $_optionValue;
+
+					if ( $unsetValue )
+						unset( $optionList[$_option] );
+
+					break;
+				}
+			}
 		}
 
 		//	Return...
-		return $_newValue;
+		return $_value;
 	}
 
 	/**
@@ -397,7 +407,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function makeHttpRequest( $url, $sQueryString = null, $method = 'GET', $sNewAgent = null, $iTimeOut = 60 )
 	{
 		//	Our user-agent string
-		$_sAgent = PS::nvl( $sNewAgent, 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506; InfoPath.3)' );
+		$_sAgent = self::nvl( $sNewAgent, 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506; InfoPath.3)' );
 
 		//	Our return results
 		$_sResult = null;
@@ -714,14 +724,18 @@ class CPSHelperBase extends CHtml implements IPSBase
 	}
 
 	/**
-	 * Convienice method returns the current page title
+	 * Convenience method returns the current page title
 	 * @see CController::pageTitle
 	 * @see CHtml::encode
 	 * @return string
 	 */
 	public static function getPageTitle( $notEncoded = false ) { return self::_gpt( $notEncoded ); }
 	/**
+<<<<<<< HEAD
 	 * Convienice method returns the current page title
+=======
+	 * Convenience method returns the current page title
+>>>>>>> 534e19569624f7b79a8389e625e9c055ea399c83
 	 * @see CController::pageTitle
 	 * @see CHtml::encode
 	 * @return string
@@ -843,7 +857,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _rsf( $urlList, $pagePosition = CClientScript::POS_HEAD, $fromPublished = false )
 	{
 		if ( ! is_array( $urlList ) ) $urlList = array( $urlList );
-		$_prefix = ( $fromPublished ? PS::getExternalLibraryUrl() . DIRECTORY_SEPARATOR : null );
+		$_prefix = ( $fromPublished ? self::getExternalLibraryUrl() . DIRECTORY_SEPARATOR : null );
 
 		//	Need external library?
 		foreach ( $urlList as $_url )
@@ -880,7 +894,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _rcf( $urlList, $media = '', $fromPublished = false )
 	{
 		if ( ! is_array( $urlList ) ) $urlList = array( $urlList );
-		$_prefix = ( $fromPublished ? PS::getExternalLibraryUrl() . DIRECTORY_SEPARATOR : null );
+		$_prefix = ( $fromPublished ? self::getExternalLibraryUrl() . DIRECTORY_SEPARATOR : null );
 
 		foreach ( $urlList as $_url )
 		{
@@ -939,7 +953,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _rc( $sId = null, $sCss, $media = '' )
 	{
 		if ( ! self::$_clientScript->isCssRegistered( $sId ) )
-			return self::$_clientScript->registerCss( PS::nvl( $sId, CPSWidgetHelper::getWidgetId() ), $sCss, $media );
+			return self::$_clientScript->registerCss( self::nvl( $sId, CPSWidgetHelper::getWidgetId() ), $sCss, $media );
 	}
 
 	/**
@@ -982,7 +996,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	public static function _rs( $sId = null, $sScript, $ePosition = CClientScript::POS_READY )
 	{
 		if ( ! self::$_clientScript->isScriptRegistered( $sId ) )
-			self::$_clientScript->registerScript( PS::nvl( $sId, CPSWidgetHelper::getWidgetId() ), $sScript, $ePosition );
+			self::$_clientScript->registerScript( self::nvl( $sId, CPSWidgetHelper::getWidgetId() ), $sScript, $ePosition );
 	}
 
 	/**
@@ -1300,7 +1314,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sql( $sql, $dbToUse = null )
 	{
-		if ( null !== ( $_db = PS::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
+		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
 			return $_db->createCommand( $sql );
 
 		return null;
@@ -1315,7 +1329,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sqlAll( $sql, $parameterList = array(), $dbToUse = null )
 	{
-		if ( null !== ( $_db = PS::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
+		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
 			return $_db->createCommand( $sql )->queryAll( true, $parameterList );
 
 		return null;
@@ -1332,7 +1346,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	{
 		$_resultList = null;
 
-		if ( null !== ( $_db = PS::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
+		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
 		{
 			if ( null !== ( $_rowList = $_db->createCommand( $sql )->queryAll( true, $parameterList ) ) )
 			{
