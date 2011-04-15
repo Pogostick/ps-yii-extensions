@@ -1,4 +1,4 @@
-<?php
+z<?php
 /**
  * CPSConsoleCommand class file.
  *
@@ -13,8 +13,8 @@
  * @modifiedby $LastChangedBy: jerryablan@gmail.com $
  * @lastmodified  $Date: 2010-10-21 17:44:02 -0400 (Thu, 21 Oct 2010) $
  *
- * @property-read name The name of the command
- * @property-read commandRunner The command runner
+ * @property-read name $name The name of the command
+ * @property-read commandRunner $commandRunner The command runner
  */
 abstract class CPSConsoleCommand extends CPSComponent
 {

@@ -110,8 +110,22 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @static array $classPath
 	 */
 	protected static $_classPath = array();
+	/**
+	 * @static
+	 * @return array
+	 */
 	public static function getClassPath() { return self::$_classPath; }
+	/**
+	 * @static
+	 * @param array $arClasses
+	 * @return void
+	 */
 	public static function setClassPath( $arClasses ) { self::$_classPath = $arClasses; }
+	/**
+	 * @static
+	 * @param string $sClass
+	 * @return void
+	 */
 	public static function addClassToPath( $sClass ) { self::$_classPath[] = $sClass; }
 
 	//********************************************************************************
@@ -158,7 +172,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	* Allows for multiple nvl chains ( nvl(x,y,z,null) )
 	* Since PHP evaluates the arguments before calling a function, this is NOT a short-circuit method.
 	*
-	* @param mixed
+	* @param mixed [mixed [...]]
 	* @return mixed
 	*/
 	public static function nvl()
@@ -688,6 +702,12 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return string
 	 */
 	public static function getAppName( $notEncoded = false ) { return self::_gan( $notEncoded ); }
+	/**
+	 * Convenience method returns the current app name
+	 * @see CWebApplication::name
+	 * @see CHtml::encode
+	 * @return string
+	 */
 	public static function _gan( $notEncoded = false )
 	{
 		return $notEncoded ? self::_a()->name : self::encode( self::_a()->name );
@@ -700,27 +720,45 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return string
 	 */
 	public static function getPageTitle( $notEncoded = false ) { return self::_gpt( $notEncoded ); }
+	/**
+	 * Convienice method returns the current page title
+	 * @see CController::pageTitle
+	 * @see CHtml::encode
+	 * @return string
+	 */
 	public static function _gpt( $notEncoded = false )
 	{
 		return $notEncoded ? self::_gc()->getPageTitle() : self::encode( self::_gc()->getPageTitle() );
 	}
 
 	/**
-	 * Convienice methond Returns the base url of the current app
+	 * Convenience method Returns the base url of the current app
 	 * @see CWebApplication::getBaseUrl
 	 * @see CHttpRequest::getBaseUrl
 	 * @return string
 	 */
 	public static function getBaseUrl( $absolute = false ) { return self::$_thisApp->getBaseUrl( $absolute ); }
+	/**
+	 * Convenience method Returns the base url of the current app
+	 * @see CWebApplication::getBaseUrl
+	 * @see CHttpRequest::getBaseUrl
+	 * @return string
+	 */
 	public static function _gbu( $absolute = false ) { return self::$_thisApp->getBaseUrl( $absolute ); }
 
 	/**
-	 * Convienice methond Returns the base path of the current app
+	 * Convenience method Returns the base path of the current app
 	 * @see CWebApplication::getBasePath
 	 * @see CHttpRequest::getBasePath
 	 * @return string
 	 */
 	public static function getBasePath() { return self::$_thisApp->getBasePath(); }
+	/**
+	 * Convenience method Returns the base path of the current app
+	 * @see CWebApplication::getBasePath
+	 * @see CHttpRequest::getBasePath
+	 * @return string
+	 */
 	public static function _gbp() { return self::$_thisApp->getBaseUrl(); }
 
 	/***
@@ -762,6 +800,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return CDbConnection the database connection
 	 */
 	public static function getDb() { return self::_db(); }
+	/**
+	 * @return CDbConnection the database connection
+	 */
 	public static function _db()
 	{
 		return self::$_thisApp->getDb();
@@ -1008,6 +1049,11 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return CUserIdentity
 	 */
 	public static function getUser() { return self::_gu(); }
+	/**
+	 * Returns the current user. Equivalent of {@link CWebApplication::getUser}
+	 * @see CWebApplication::getUser
+	 * @return CUserIdentity
+	 */
 	public static function _gu()
 	{
 		return self::$_thisUser;
@@ -1018,6 +1064,10 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return CWebUser
 	 */
 	public static function getCurrentUser() { return self::_gcu(); }
+	/**
+	 * Returns the currently logged in user
+	 * @return CWebUser
+	 */
 	public static function _gcu() { return self::_gs( 'currentUser' ); }
 
 	/**
@@ -1025,6 +1075,10 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return boolean
 	 */
 	public static function isGuest() { return self::_ig(); }
+	/**
+	 * Returns boolean indicating if user is logged in or not
+	 * @return boolean
+	 */
 	public static function _ig() { return self::_gu()->isGuest; }
 
 	/**
@@ -1034,6 +1088,12 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return mixed
 	 */
 	public static function getParam( $paramName, $defaultValue = null ) { return self::_gp( $paramName, $defaultValue ); }
+	/**
+	 * Returns application parameters or default value if not found
+	 * @see CModule::getParams
+	 * @see CModule::setParams
+	 * @return mixed
+	 */
 	public static function _gp( $paramName, $defaultValue = null )
 	{
 		if ( self::$_appParameters && self::$_appParameters->contains( $paramName ) )
@@ -1047,6 +1107,10 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @see CWebApplication::getController
 	 */
 	public static function getController() { return self::_gc(); }
+	/**
+	 * @return CController the currently active controller
+	 * @see CWebApplication::getController
+	 */
 	public static function _gc()
 	{
 		return ( null === self::$_thisController ? self::$_thisController = self::$_thisApp->getController() : self::$_thisController );
@@ -1057,6 +1121,10 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @see CWebApplication::getComponent
 	 */
 	public static function getComponent( $id, $createIfNull = true ) { return self::_gco( $id, $createIfNull ); }
+	/**
+	 * @return CComponent The component, if found
+	 * @see CWebApplication::getComponent
+	 */
 	public static function _gco( $id, $createIfNull = true )
 	{
 		return self::$_thisApp->getComponent( $id, $createIfNull );
