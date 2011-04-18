@@ -4,14 +4,14 @@
     <connections />
   </component>
   <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../../frameworks/yii">
+      <excludeFolder url="file://$MODULE_DIR$/../../frameworks/yii/demos" />
+      <excludeFolder url="file://$MODULE_DIR$/../../frameworks/yii/requirements" />
+    </content>
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/extensions/examples" />
       <excludeFolder url="file://$MODULE_DIR$/nbproject" />
       <excludeFolder url="file://$MODULE_DIR$/orig" />
-    </content>
-    <content url="file://$MODULE_DIR$/../yii">
-      <excludeFolder url="file://$MODULE_DIR$/../yii/demos" />
-      <excludeFolder url="file://$MODULE_DIR$/../yii/requirements" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
