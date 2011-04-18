@@ -89,7 +89,6 @@ class CPSFacebook extends CPSApiComponent
 		'graph' => 'https://graph.facebook.com/',
 		'www' => 'https://www.facebook.com/',
 	);
-
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -343,9 +342,11 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	public function __construct( $config = array( ) )
 	{
-		if ( !function_exists( 'curl_init' ) ) throw new CHttpException( 405, 'This class requires the CURL PHP extension.' );
+		if ( ! function_exists( 'curl_init' ) ) 
+			throw new CHttpException( 405, 'This class requires the CURL PHP extension.' );
 
-		if ( !function_exists( 'json_decode' ) ) throw new CHttpException( 405, 'This class requires the JSON PHP extension.' );
+		if ( ! function_exists( 'json_decode' ) ) 
+			throw new CHttpException( 405, 'This class requires the JSON PHP extension.' );
 
 		$this->_appId = PS::o( $config, 'appId' );
 		$this->_apiSecretKey = PS::o( $config, 'secret' );
@@ -377,12 +378,14 @@ class CPSFacebook extends CPSApiComponent
 	 * @param array $session the session
 	 * @param boolean $writeCookie indicate if a cookie should be written. this value is ignored if cookie support has been disabled.
 	 */
-	public function setSession( $session = null, $writeCookie = true )
+	protected function _setSession( $session = null, $writeCookie = true )
 	{
-		$this->_session = $this->_validateSessionObject( $session );
-		$this->_sessionLoaded = true;
+CPSLog::trace( __METHOD__, 'Setting session: ' . var_export( $session, true ) );		
+		$this->_session = $session;
+		$this->_sessionLoaded = ( null !== $session );
 
-		if ( $writeCookie ) $this->_setCookieFromSession( $this->_session );
+		if ( $writeCookie ) 
+			$this->_setCookieFromSession( $this->_session );
 
 		return $this;
 	}
@@ -395,45 +398,62 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	public function getSession()
 	{
-		if ( !$this->_sessionLoaded )
+CPSLog::trace( __METHOD__, '!!! getsession called' );			
+		if ( ! $this->_sessionLoaded )
 		{
+CPSLog::trace( __METHOD__, '!!! getsession called without loaded session' );			
 			$_session = null;
 			$_writeCookie = true;
 
+CPSLog::trace( __METHOD__, ' . Getting signed request' );			
 			//	Try loading session from signed_request in $_REQUEST
-			if ( $_signedRequest = $this->getSignedRequest() ) $_session = $this->_createSessionFromSignedRequest( $_signedRequest );
+			if ( $_signedRequest = $this->getSignedRequest() )
+			{
+CPSLog::trace( __METHOD__, ' . Check user_id' );			
+				if ( !isset( $_signedRequest['user_id'] ) ) return null;
 
+CPSLog::trace( __METHOD__, ' . creating session' );			
+				$_session = $this->_createSessionFromSignedRequest( $_signedRequest );
+			}
+
+CPSLog::trace( __METHOD__, ' . level 2 check' );
 			//	Try loading session from $_REQUEST
-			if ( !$_session && $_session = PS::o( $_REQUEST, 'session' ) )
+			if ( null === $_session )
 			{
-				$_session = json_decode( get_magic_quotes_gpc() ? stripslashes( $_session ) : $_session, true );
-				$_session = $this->_validateSessionObject( $_session );
-			}
-
-			//	Try getting unsigned fb_sig request...
-			if ( !$_session )
-			{
-				$_session = $this->_getUnsignedSession();
-				$_session = $this->_validateSessionObject( $_session );
-			}
-
-			//	Try loading session from cookie if necessary
-			if ( !$_session && $this->_enableCookieSupport )
-			{
-				$_name = $this->_getSessionCookieName();
-
-				if ( $_cookie = PS::o( $_COOKIE, $_name ) )
+				if ( null !== ( $_session = PS::o( $_REQUEST, 'session' ) ) )
 				{
-					$_session = array( );
-					parse_str( trim( get_magic_quotes_gpc() ? stripslashes( $_cookie ) : $_cookie, '"' ), $_session );
-					$_session = $this->_validateSessionObject( $_session );
-
-					//	Write only if we need to delete a invalid session cookie
-					$_writeCookie = empty( $_session );
+					$_session = $this->_validateSessionObject( json_decode( get_magic_quotes_gpc() ? stripslashes( $_session ) : $_session, true ) );
+					CPSLog::trace( __METHOD__, ' . got session from request' );
 				}
-			}
 
-			$this->setSession( $_session, $_writeCookie );
+CPSLog::trace( __METHOD__, ' . STILL NO SESSION! Trying unsigned' );
+				if ( null === $_session && null === ( $_session = $this->_getUnsignedSession() ) && $this->_enableCookieSupport )
+				{
+					//	Try loading session from cookie if necessary
+CPSLog::trace( __METHOD__, ' . TRYING COOKIE!' );
+					$_name = $this->_getSessionCookieName();
+
+					if ( null !== ( $_cookie = PS::o( $_COOKIE, $_name ) ) )
+					{
+CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
+						$_session = array();
+						parse_str( trim( get_magic_quotes_gpc() ? stripslashes( $_cookie ) : $_cookie, '"' ), $_session );
+						$_session = $this->_validateSessionObject( $_session );
+
+						//	Write only if we need to delete a invalid session cookie
+						$_writeCookie = empty( $_session );
+					}
+					else
+					{
+						CPSLog::trace( __METHOD__, 'No session STILL!!!!!!!!!!!' );
+						$this->_validateSessionObject( null );
+					}
+				}
+				else
+					CPSlog::trace( __METHOD__, 'Woot! good session!' );
+			}
+			else
+				CPSLog::trace( __METHOD__, 'Level 2 session: ' . var_export( $this->_session, true ) );
 		}
 
 		return $this->_session;
@@ -445,7 +465,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	public function getUser()
 	{
-		if ( $_session = $this->getSession() ) 
+		if ( null !== ( $_session = $this->getSession() ) )
 			return PS::o( $_session, 'uid' );
 
 		return null;
@@ -611,26 +631,37 @@ class CPSFacebook extends CPSApiComponent
 			$method = 'GET';
 		}
 
-		//	Method override as we always do a POST
-		$paramList['method'] = $method;
-
-		$_result = $this->_oauthRequest( $this->_getUrl( 'graph', $path ), $paramList );
-		$_result = json_decode( $_result, true );
-
-		//	Results are returned, errors are thrown
-		if ( PS::o( $_result, 'error' ) )
+		try
 		{
-			$_ex = new CPSFacebookApiException( $_result );
+			//	Method override as we always do a POST
+			$paramList['method'] = $method;
 
-			switch ( $_ex->getType() )
+			$_result = $this->_oauthRequest( $this->_getUrl( 'graph', $path ), $paramList );
+			$_result = json_decode( $_result, true );
+
+			//	Results are returned, errors are thrown
+			if ( PS::o( $_result, 'error' ) )
 			{
-				case 'OAuthException':   //	OAuth 2.0 Draft 00 style
-				case 'invalid_token':   //	OAuth 2.0 Draft 10 style
-					$this->setSession( null );
-					break;
-			}
+				$_ex = new CPSFacebookApiException( $_result );
+	CPSLog::error( __METHOD__, 'Exception while calling graph api(' . $path . '): ' . $_ex->getMessage() );
 
-			throw $_ex;
+				switch ( $_ex->getType() )
+				{
+					case 'OAuthException':   //	OAuth 2.0 Draft 00 style
+					case 'invalid_token':   //	OAuth 2.0 Draft 10 style
+						$this->_setSession( null );
+						break;
+
+					default:
+
+				}
+
+	//			throw $_ex;
+			}
+		}
+		catch ( Exception $_ex )
+		{
+			CPSLog::trace( __METHOD__, 'Nastygram from Facebook: ' . $_ex->getMessage() );
 		}
 
 		return $_result;
@@ -646,6 +677,10 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _oauthRequest( $url, $paramList )
 	{
+		$_matches = array( );
+
+		if ( preg_match( "/^(.*)&expires=\d+$/", $paramList['access_token'], $_matches ) ) $paramList['access_token'] = $_matches[1];
+
 		if ( !isset( $paramList['access_token'] ) ) $paramList['access_token'] = $this->getAccessToken();
 
 		//	json_encode all params values that are not strings
@@ -669,15 +704,12 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _makeRequest( $url, $paramList, $curl = null )
 	{
-		if ( ! $curl ) 
-			$curl = curl_init();
+		if ( !$curl ) $curl = curl_init();
 
 		$_options = self::$_CURL_OPTS;
 
-		if ( $this->_fileUploadSupport ) 
-			$_options[CURLOPT_POSTFIELDS] = $paramList;
-		else
-			$_options[CURLOPT_POSTFIELDS] = http_build_query( $paramList, null, '&' );
+		if ( $this->_fileUploadSupport ) $_options[CURLOPT_POSTFIELDS] = $paramList;
+		else $_options[CURLOPT_POSTFIELDS] = http_build_query( $paramList, null, '&' );
 
 		$_options[CURLOPT_URL] = $url;
 
@@ -791,9 +823,7 @@ class CPSFacebook extends CPSApiComponent
 			$_noSigSession = $session;
 			unset( $_noSigSession['sig'] );
 
-			$_expectedSig = self::_generateSignature(
-					$_noSigSession, $this->_apiSecretKey
-			);
+			$_expectedSig = self::_generateSignature( $_noSigSession, $this->_apiSecretKey );
 
 			if ( $session['sig'] != $_expectedSig )
 			{
@@ -801,13 +831,19 @@ class CPSFacebook extends CPSApiComponent
 				//	@codeCoverageIgnoreStart
 				if ( php_sapi_name() != 'cli' ) CPSLog::error( __METHOD__, 'Got invalid session signature in cookie.' );
 				// @codeCoverageIgnoreEnd
-				$session = null;
+				$_session = null;
 			}
-
-			$_session = $session;
+			else
+			{
+				$this->_session = $_session = $session;
+				$this->_sessionLoaded = true;
+				CPSLog::trace( __METHOD__, 'Session is cool! ' . var_export( $_session, true ) );
+				return $_session;
+			}
 		}
 
-		return $_session;
+		$this->_sessionLoaded = false;
+		return null;
 	}
 
 	/**
@@ -820,7 +856,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _createSessionFromSignedRequest( $data )
 	{
-		if ( !PS::o( $data, 'oauth_token' ) ) return null;
+		if ( null === PS::o( $data, 'oauth_token' ) ) return null;
 
 		$_session = array(
 			'uid' => PS::o( $data, 'user_id' ),
@@ -829,9 +865,7 @@ class CPSFacebook extends CPSApiComponent
 		);
 
 		//	Put a real sig, so that validateSignature works
-		$_session['sig'] = self::_generateSignature(
-				$_session, $this->_apiSecretKey
-		);
+		$_session['sig'] = self::_generateSignature( $_session, $this->_apiSecretKey );
 
 		return $_session;
 	}
@@ -953,11 +987,9 @@ class CPSFacebook extends CPSApiComponent
 		'video.getuploadlimits',
 		);
 
-		if ( PS::o( $READ_ONLY_CALLS, strtolower( $method ) ) ) $_name = 'api_read';
+		if ( PS::o( $READ_ONLY_CALLS, $method ) ) $_name = 'api_read';
 
-		return self::_getUrl(
-			'api' . ( in_array( $method, $READ_ONLY_CALLS ) ? '_read' : null ), 'restserver.php'
-		);
+		return self::_getUrl( 'api' . ( in_array( $method, $READ_ONLY_CALLS ) ? '_read' : null ), 'restserver.php' );
 	}
 
 	/**
@@ -1023,9 +1055,12 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _getUnsignedSession()
 	{
+		$_session = null;
+		
 		if ( isset( $_REQUEST['fb_sig_user'] ) )
 		{
-			$_session = array( );
+CPSLog::trace( __METHOD__, 'Got old-school unsigned request...' );			
+			$_session = array();
 
 			$_session['uid'] = PS::o( $_REQUEST, 'fb_sig_user' );
 			$_session['access_token'] = $this->_appId . '|' . PS::o( $_REQUEST, 'fb_sig_session_key' );
@@ -1034,30 +1069,20 @@ class CPSFacebook extends CPSApiComponent
 			$_session['secret'] = PS::o( $_REQUEST, 'fb_sig_ss' );
 
 			if ( null !== ( $_session['session_key'] = PS::o( $_REQUEST, 'fb_sig_session_key' ) ) )
-			{
-				ksort( $_session );
-
-				// generate the base string
-				$_baseString = '';
-
-				foreach ( $_session as $_key => $_value ) $_baseString .= $_key . '=' . $_value;
-
-				$_baseString .= $this->_apiSecretKey;
-				$_session['sig'] = md5( $_baseString );
-			}
-
-			return $_session;
+				$_session['sig'] = $this->_generateSignature( $_session, $this->_apiSecretKey );
 		}
+		
+		return $this->_validateSessionObject( $_session );
 	}
 
 	/**
 	 * Generate a signature for the given params and secret.
 	 *
 	 * @param array $paramList the parameters to sign
-	 * @param string $_secretKey the secret to sign with
+	 * @param string $secretKey the secret to sign with
 	 * @return string the generated signature
 	 */
-	protected static function _generateSignature( $paramList, $_secretKey )
+	protected static function _generateSignature( $paramList, $secretKey )
 	{
 		//	Work with sorted data
 		ksort( $paramList );
@@ -1068,7 +1093,7 @@ class CPSFacebook extends CPSApiComponent
 		foreach ( $paramList as $_key => $_value ) 
 			$_baseString .= $_key . '=' . $_value;
 
-		$_baseString .= $_secretKey;
+		$_baseString .= $secretKey;
 
 		return md5( $_baseString );
 	}
