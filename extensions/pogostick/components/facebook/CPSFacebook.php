@@ -446,8 +446,6 @@ class CPSFacebook extends CPSApiComponent
 				$_session = json_decode( $_REQUEST['session'], true );
 				$_session = $this->_validateSessionObject( $_session );
 			}
-			else
-				CPSLog::trace( __METHOD__, 'No session in $REQUEST' );
 
 			//	Try loading session from cookie if necessary
 			if ( empty( $_session ) && $this->_cookieSupport )
