@@ -28,7 +28,7 @@
       <file leaf-file-name="CPSFacebook.php" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="746" column="0" selection-start="17944" selection-end="17944" vertical-scroll-proportion="0.36728698">
+            <state line="785" column="88" selection-start="19002" selection-end="19002" vertical-scroll-proportion="0.7355534">
               <folding />
             </state>
           </provider>
@@ -37,7 +37,7 @@
       <file leaf-file-name="CPSFacebookUserIdentity.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebookUserIdentity.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="217" column="48" selection-start="5972" selection-end="5972" vertical-scroll-proportion="0.0">
+            <state line="182" column="56" selection-start="5020" selection-end="5020" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -433,14 +433,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebookUserIdentity.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="217" column="48" selection-start="5972" selection-end="5972" vertical-scroll-proportion="0.0">
+        <state line="182" column="56" selection-start="5020" selection-end="5020" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="746" column="0" selection-start="17944" selection-end="17944" vertical-scroll-proportion="0.36728698">
+        <state line="785" column="88" selection-start="19002" selection-end="19002" vertical-scroll-proportion="0.7355534">
           <folding />
         </state>
       </provider>

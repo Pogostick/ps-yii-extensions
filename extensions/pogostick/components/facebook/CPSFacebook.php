@@ -408,7 +408,7 @@ class CPSFacebook extends CPSApiComponent
 	protected function _setSession( $session = null, $writeCookie = true )
 	{
 		$session = $this->_validateSessionObject( $session );
-		$this->_sessionLoaded = true;
+		$this->_sessionLoaded = !empty( $session );
 		$this->_session = $session;
 
 		if ( $writeCookie )
@@ -423,7 +423,7 @@ class CPSFacebook extends CPSApiComponent
 	 *
 	 * @return array the session
 	 */
-	public function getSession( )
+	public function getSession()
 	{
 		if ( ! $this->_sessionLoaded )
 		{
@@ -487,13 +487,16 @@ class CPSFacebook extends CPSApiComponent
 	 *
 	 * @return string the access token
 	 */
-	public function getAccessToken( )
+	public function getAccessToken()
 	{
-		$_session = $this->getSession( );
+		$_token = null;
+		$_session = $this->getSession();
+
+		if ( ! empty( $_session ) && isset( $_session['access_token'] ) )
+			$_token = $_session['access_token'];
 
 		//	Either user session signed, or app signed
-		return $_session ? PS::o( $_session, 'access_token' )
-			: $this->_appId . '|' . $this->_apiSecretKey;
+		return $_token ? $_token : $this->_appId . '|' . $this->_apiSecretKey;
 	}
 
 	/**
@@ -694,9 +697,10 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _oauthRequest( $url, $paramList )
 	{
-		if ( !isset( $paramList['access_token'] ) )
+		if ( ! isset( $paramList['access_token'] ) )
 		{
 			$paramList['access_token'] = $this->getAccessToken( );
+			CPSLog::trace( __METHOD__, 'token: ' . $paramList['access_token'] );
 		}
 
 		//	json_encode all params values that are not strings
@@ -778,6 +782,8 @@ class CPSFacebook extends CPSApiComponent
 
 			throw $_ex;
 		}
+
+		CPSLog::trace( __METHOD__, 'oauth request made: ' . var_export( $_result, true ) );
 
 		curl_close( $_curl );
 		return $_result;
