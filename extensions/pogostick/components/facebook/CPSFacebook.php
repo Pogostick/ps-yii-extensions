@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Pogostick Yii Extension library
  *
@@ -45,6 +44,7 @@
  */
 class CPSFacebook extends CPSApiComponent
 {
+
 	//********************************************************************************
 	//* Constants
 	//********************************************************************************
@@ -67,7 +67,7 @@ class CPSFacebook extends CPSApiComponent
 	/**
 	 * @staticvar array Default options for curl.
 	 */
-	public static $_CURL_OPTS = array(
+	protected static $_curlOptions = array(
 		CURLOPT_CONNECTTIMEOUT => 10,
 		CURLOPT_RETURNTRANSFER => true,
 		CURLOPT_TIMEOUT => 60,
@@ -76,15 +76,16 @@ class CPSFacebook extends CPSApiComponent
 	/**
 	 * @staticvar array List of query parameters that get automatically dropped when rebuilding the current URL.
 	 */
-	protected static $_DROP_QUERY_PARAMS = array(
+	protected static $_queryExcludes = array(
 		'session',
 		'signed_request',
 	);
 	/**
 	 * @staticvar array Maps aliases to Facebook domains.
 	 */
-	public static $_DOMAIN_MAP = array(
+	protected static $_fbDomainMap = array(
 		'api' => 'https://api.facebook.com/',
+		'api_video' => 'https://api-video.facebook.com/',
 		'api_read' => 'https://api-read.facebook.com/',
 		'graph' => 'https://graph.facebook.com/',
 		'www' => 'https://www.facebook.com/',
@@ -96,11 +97,19 @@ class CPSFacebook extends CPSApiComponent
 	 * @var string The Application ID.
 	 */
 	protected $_appId;
+	
+	/**
+	 * @return string
+	 */
 	public function getAppId()
 	{
 		return $this->_appId;
 	}
 
+	/**
+	 * @param string $newValue
+	 * @return CPSFacebook 
+	 */
 	public function setAppId( $newValue )
 	{
 		$this->_appId = $newValue;
@@ -112,11 +121,18 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_appName;
 
+	/**
+	 * @return string
+	 */
 	public function getAppName()
 	{
 		return $this->_appName;
 	}
 
+	/**
+	 * @param string $newValue
+	 * @return CPSFacebook 
+	 */
 	public function setAppName( $newValue )
 	{
 		$this->_appName = $newValue;
@@ -128,11 +144,18 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_appUrl;
 
+	/**
+	 * @return string
+	 */
 	public function getAppUrl()
 	{
 		return $this->_appUrl;
 	}
 
+	/**
+	 * @param string $newValue
+	 * @return CPSFacebook 
+	 */
 	public function setAppUrl( $newValue )
 	{
 		$this->_appUrl = $newValue;
@@ -222,37 +245,32 @@ class CPSFacebook extends CPSApiComponent
 	/**
 	 * @var string The signed request
 	 */
-	protected $_signedRequest;
+	protected $_signedRequest = null;
 
 	public function getSignedRequest()
 	{
-		if ( !$this->_signedRequest )
+		if ( ! $this->_signedRequest )
 		{
-			if ( null !== ( $_request = PS::o( $_REQUEST, 'signed_request' ) ) ) $this->_signedRequest = $this->_parseSignedRequest( $_request );
+			if ( isset( $_REQUEST['signed_request'] ) )
+				$this->_signedRequest = $this->_parseSignedRequest( $_REQUEST['signed_request'] );
 		}
-
+		
 		return $this->_signedRequest;
-	}
-
-	public function setSignedRequest( $newValue )
-	{
-		$this->_signedRequest = $newValue;
-		return $this;
 	}
 
 	/**
 	 * @var boolean Indicates if Cookie support should be enabled.
 	 */
-	protected $_enableCookieSupport = false;
+	protected $_cookieSupport = false;
 
-	public function getEnableCookieSupport()
+	public function getCookieSupport()
 	{
-		return $this->_enableCookieSupport;
+		return $this->_cookieSupport;
 	}
 
-	public function setEnableCookieSupport( $newValue )
+	public function setCookieSupport( $newValue )
 	{
-		$this->_enableCookieSupport = $newValue;
+		$this->_cookieSupport = $newValue;
 		return $this;
 	}
 
@@ -266,7 +284,7 @@ class CPSFacebook extends CPSApiComponent
 		return $this->_baseDomain;
 	}
 
-	public function setbaseDomain( $newValue )
+	public function setBaseDomain( $newValue )
 	{
 		$this->_baseDomain = $newValue;
 		return $this;
@@ -350,7 +368,7 @@ class CPSFacebook extends CPSApiComponent
 
 		$this->_appId = PS::o( $config, 'appId' );
 		$this->_apiSecretKey = PS::o( $config, 'secret' );
-		$this->_enableCookieSupport = PS::o( $config, 'cookie', false );
+		$this->_cookieSupport = PS::o( $config, 'cookie', false );
 		$this->_baseDomain = PS::o( $config, 'domain', '' );
 		$this->_fileUploadSupport = PS::o( $config, 'fileUploadSupport', false );
 	}
@@ -380,13 +398,13 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _setSession( $session = null, $writeCookie = true )
 	{
-CPSLog::trace( __METHOD__, 'Setting session: ' . var_export( $session, true ) );		
+		$session = $this->_validateSessionObject( $session );
+		$this->_sessionLoaded = true;
 		$this->_session = $session;
-		$this->_sessionLoaded = ( null !== $session );
-
-		if ( $writeCookie ) 
-			$this->_setCookieFromSession( $this->_session );
-
+		
+		if ( $writeCookie )
+			$this->_setCookieFromSession( $session );
+		
 		return $this;
 	}
 
@@ -398,62 +416,38 @@ CPSLog::trace( __METHOD__, 'Setting session: ' . var_export( $session, true ) );
 	 */
 	public function getSession()
 	{
-CPSLog::trace( __METHOD__, '!!! getsession called' );			
 		if ( ! $this->_sessionLoaded )
 		{
-CPSLog::trace( __METHOD__, '!!! getsession called without loaded session' );			
 			$_session = null;
 			$_writeCookie = true;
 
-CPSLog::trace( __METHOD__, ' . Getting signed request' );			
 			//	Try loading session from signed_request in $_REQUEST
-			if ( $_signedRequest = $this->getSignedRequest() )
-			{
-CPSLog::trace( __METHOD__, ' . Check user_id' );			
-				if ( !isset( $_signedRequest['user_id'] ) ) return null;
-
-CPSLog::trace( __METHOD__, ' . creating session' );			
+			if ( null !== ( $_signedRequest = $this->_getSignedRequest() ) )
 				$_session = $this->_createSessionFromSignedRequest( $_signedRequest );
-			}
 
-CPSLog::trace( __METHOD__, ' . level 2 check' );
 			//	Try loading session from $_REQUEST
-			if ( null === $_session )
+			if ( null === $_session && isset( $_REQUEST['session'] ) )
 			{
-				if ( null !== ( $_session = PS::o( $_REQUEST, 'session' ) ) )
-				{
-					$_session = $this->_validateSessionObject( json_decode( get_magic_quotes_gpc() ? stripslashes( $_session ) : $_session, true ) );
-					CPSLog::trace( __METHOD__, ' . got session from request' );
-				}
-
-CPSLog::trace( __METHOD__, ' . STILL NO SESSION! Trying unsigned' );
-				if ( null === $_session && null === ( $_session = $this->_getUnsignedSession() ) && $this->_enableCookieSupport )
-				{
-					//	Try loading session from cookie if necessary
-CPSLog::trace( __METHOD__, ' . TRYING COOKIE!' );
-					$_name = $this->_getSessionCookieName();
-
-					if ( null !== ( $_cookie = PS::o( $_COOKIE, $_name ) ) )
-					{
-CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
-						$_session = array();
-						parse_str( trim( get_magic_quotes_gpc() ? stripslashes( $_cookie ) : $_cookie, '"' ), $_session );
-						$_session = $this->_validateSessionObject( $_session );
-
-						//	Write only if we need to delete a invalid session cookie
-						$_writeCookie = empty( $_session );
-					}
-					else
-					{
-						CPSLog::trace( __METHOD__, 'No session STILL!!!!!!!!!!!' );
-						$this->_validateSessionObject( null );
-					}
-				}
-				else
-					CPSlog::trace( __METHOD__, 'Woot! good session!' );
+				$_session = json_decode( $_REQUEST['session'], true );
+				$_session = $this->_validateSessionObject( $_session );
 			}
-			else
-				CPSLog::trace( __METHOD__, 'Level 2 session: ' . var_export( $this->_session, true ) );
+
+			//	Try loading session from cookie if necessary
+			if ( null === $_session && $this->_cookieSupport )
+			{
+				$_cookieName = $this->_getSessionCookieName();
+				
+				if ( isset( $_COOKIE[$cookieName] ) )
+				{
+					$_session = array();
+					
+					parse_str( trim( $_COOKIE[$cookieName], '"' ), $_session );
+					$_session = $this->_validateSessionObject( $_session );
+					$_writeCookie = empty( $_session );
+				}
+			}
+
+			$this->_setSession( $_session, $_writeCookie );
 		}
 
 		return $this->_session;
@@ -465,10 +459,8 @@ CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
 	 */
 	public function getUser()
 	{
-		if ( null !== ( $_session = $this->getSession() ) )
-			return PS::o( $_session, 'uid' );
-
-		return null;
+		$_session = $this->getSession();
+		return $_session ? $_session['uid'] : null;
 	}
 
 	/**
@@ -590,7 +582,7 @@ CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
 	 */
 	protected function _getSessionCookieName()
 	{
-		return 'pYe_fb_' . $this->_appId;
+		return 'yiixl.components.facebook.' . $this->_appId;
 	}
 
 	/**
@@ -643,7 +635,7 @@ CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
 			if ( PS::o( $_result, 'error' ) )
 			{
 				$_ex = new CPSFacebookApiException( $_result );
-	CPSLog::error( __METHOD__, 'Exception while calling graph api(' . $path . '): ' . $_ex->getMessage() );
+				CPSLog::error( __METHOD__, 'Exception while calling graph api(' . $path . '): ' . $_ex->getMessage() );
 
 				switch ( $_ex->getType() )
 				{
@@ -653,10 +645,9 @@ CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
 						break;
 
 					default:
-
 				}
 
-	//			throw $_ex;
+				//			throw $_ex;
 			}
 		}
 		catch ( Exception $_ex )
@@ -706,7 +697,7 @@ CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
 	{
 		if ( !$curl ) $curl = curl_init();
 
-		$_options = self::$_CURL_OPTS;
+		$_options = self::$_curlOptions;
 
 		if ( $this->_fileUploadSupport ) $_options[CURLOPT_POSTFIELDS] = $paramList;
 		else $_options[CURLOPT_POSTFIELDS] = http_build_query( $paramList, null, '&' );
@@ -925,70 +916,81 @@ CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
 		 * @staticvar array
 		 */
 		static $READ_ONLY_CALLS = array(
-		'admin.getallocation',
-		'admin.getappproperties',
-		'admin.getbannedusers',
-		'admin.getlivestreamvialink',
-		'admin.getmetrics',
-		'admin.getrestrictioninfo',
-		'application.getpublicinfo',
-		'auth.getapppublickey',
-		'auth.getsession',
-		'auth.getsignedpublicsessiondata',
-		'comments.get',
-		'connect.getunconnectedfriendscount',
-		'dashboard.getactivity',
-		'dashboard.getcount',
-		'dashboard.getglobalnews',
-		'dashboard.getnews',
-		'dashboard.multigetcount',
-		'dashboard.multigetnews',
-		'data.getcookies',
-		'events.get',
-		'events.getmembers',
-		'fbml.getcustomtags',
-		'feed.getappfriendstories',
-		'feed.getregisteredtemplatebundlebyid',
-		'feed.getregisteredtemplatebundles',
-		'fql.multiquery',
-		'fql.query',
-		'friends.arefriends',
-		'friends.get',
-		'friends.getappusers',
-		'friends.getlists',
-		'friends.getmutualfriends',
-		'gifts.get',
-		'groups.get',
-		'groups.getmembers',
-		'intl.gettranslations',
-		'links.get',
-		'notes.get',
-		'notifications.get',
-		'pages.getinfo',
-		'pages.isadmin',
-		'pages.isappadded',
-		'pages.isfan',
-		'permissions.checkavailableapiaccess',
-		'permissions.checkgrantedapiaccess',
-		'photos.get',
-		'photos.getalbums',
-		'photos.gettags',
-		'profile.getinfo',
-		'profile.getinfooptions',
-		'stream.get',
-		'stream.getcomments',
-		'stream.getfilters',
-		'users.getinfo',
-		'users.getloggedinuser',
-		'users.getstandardinfo',
-		'users.hasapppermission',
-		'users.isappuser',
-		'users.isverified',
-		'video.getuploadlimits',
+			'admin.getallocation',
+			'admin.getappproperties',
+			'admin.getbannedusers',
+			'admin.getlivestreamvialink',
+			'admin.getmetrics',
+			'admin.getrestrictioninfo',
+			'application.getpublicinfo',
+			'auth.getapppublickey',
+			'auth.getsession',
+			'auth.getsignedpublicsessiondata',
+			'comments.get',
+			'connect.getunconnectedfriendscount',
+			'dashboard.getactivity',
+			'dashboard.getcount',
+			'dashboard.getglobalnews',
+			'dashboard.getnews',
+			'dashboard.multigetcount',
+			'dashboard.multigetnews',
+			'data.getcookies',
+			'events.get',
+			'events.getmembers',
+			'fbml.getcustomtags',
+			'feed.getappfriendstories',
+			'feed.getregisteredtemplatebundlebyid',
+			'feed.getregisteredtemplatebundles',
+			'fql.multiquery',
+			'fql.query',
+			'friends.arefriends',
+			'friends.get',
+			'friends.getappusers',
+			'friends.getlists',
+			'friends.getmutualfriends',
+			'gifts.get',
+			'groups.get',
+			'groups.getmembers',
+			'intl.gettranslations',
+			'links.get',
+			'notes.get',
+			'notifications.get',
+			'pages.getinfo',
+			'pages.isadmin',
+			'pages.isappadded',
+			'pages.isfan',
+			'permissions.checkavailableapiaccess',
+			'permissions.checkgrantedapiaccess',
+			'photos.get',
+			'photos.getalbums',
+			'photos.gettags',
+			'profile.getinfo',
+			'profile.getinfooptions',
+			'stream.get',
+			'stream.getcomments',
+			'stream.getfilters',
+			'users.getinfo',
+			'users.getloggedinuser',
+			'users.getstandardinfo',
+			'users.hasapppermission',
+			'users.isappuser',
+			'users.isverified',
+			'video.getuploadlimits',
+			'video.upload',
 		);
 
-		if ( PS::o( $READ_ONLY_CALLS, $method ) ) $_name = 'api_read';
-
+		if ( PS::o( $READ_ONLY_CALLS, $method ) ) 
+		{
+			$_name = 'api_read';
+		}
+		else
+		{
+			if ( 'video.upload' == strtolower( $method ) ) 
+			{
+				$_name = 'api_video';
+			}
+		}
+		
 		return self::_getUrl( 'api' . ( in_array( $method, $READ_ONLY_CALLS ) ? '_read' : null ), 'restserver.php' );
 	}
 
@@ -1002,7 +1004,7 @@ CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
 	 */
 	protected function _getUrl( $name, $path = null, $paramList = array( ) )
 	{
-		$_url = self::$_DOMAIN_MAP[$name];
+		$_url = self::$_fbDomainMap[$name];
 
 		if ( null != $path )
 		{
@@ -1037,7 +1039,7 @@ CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
 
 			parse_str( $_parts['query'], $_paramList );
 
-			foreach ( self::$_DROP_QUERY_PARAMS as $_key ) unset( $_paramList[$_key] );
+			foreach ( self::$_queryExcludes as $_key ) unset( $_paramList[$_key] );
 
 			if ( !empty( $_paramList ) ) $_query = '?' . http_build_query( $_paramList );
 		}
@@ -1056,11 +1058,11 @@ CPSLog::trace( __METHOD__, ' . TRYING COOKIE innards!!!' );
 	protected function _getUnsignedSession()
 	{
 		$_session = null;
-		
+
 		if ( isset( $_REQUEST['fb_sig_user'] ) )
 		{
-CPSLog::trace( __METHOD__, 'Got old-school unsigned request...' );			
-			$_session = array();
+			CPSLog::trace( __METHOD__, 'Got old-school unsigned request...' );
+			$_session = array( );
 
 			$_session['uid'] = PS::o( $_REQUEST, 'fb_sig_user' );
 			$_session['access_token'] = $this->_appId . '|' . PS::o( $_REQUEST, 'fb_sig_session_key' );
@@ -1068,10 +1070,9 @@ CPSLog::trace( __METHOD__, 'Got old-school unsigned request...' );
 			$_session['base_domain'] = PS::o( $_REQUEST, 'fb_sig_base_domain' );
 			$_session['secret'] = PS::o( $_REQUEST, 'fb_sig_ss' );
 
-			if ( null !== ( $_session['session_key'] = PS::o( $_REQUEST, 'fb_sig_session_key' ) ) )
-				$_session['sig'] = $this->_generateSignature( $_session, $this->_apiSecretKey );
+			if ( null !== ( $_session['session_key'] = PS::o( $_REQUEST, 'fb_sig_session_key' ) ) ) $_session['sig'] = $this->_generateSignature( $_session, $this->_apiSecretKey );
 		}
-		
+
 		return $this->_validateSessionObject( $_session );
 	}
 
@@ -1090,8 +1091,7 @@ CPSLog::trace( __METHOD__, 'Got old-school unsigned request...' );
 		//	Generate the base string
 		$_baseString = '';
 
-		foreach ( $paramList as $_key => $_value ) 
-			$_baseString .= $_key . '=' . $_value;
+		foreach ( $paramList as $_key => $_value ) $_baseString .= $_key . '=' . $_value;
 
 		$_baseString .= $secretKey;
 
@@ -1133,6 +1133,7 @@ CPSLog::trace( __METHOD__, 'Got old-school unsigned request...' );
  */
 class CPSFacebookApiException extends CPSException
 {
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
