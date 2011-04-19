@@ -783,7 +783,7 @@ class CPSFacebook extends CPSApiComponent
 			throw $_ex;
 		}
 
-		CPSLog::trace( __METHOD__, 'oauth request made: ' . var_export( $_result, true ) );
+		CPSLog::trace( __METHOD__, 'api request made: url:[' . $url . '] results: ' . var_export( $_result, true ) );
 
 		curl_close( $_curl );
 		return $_result;
