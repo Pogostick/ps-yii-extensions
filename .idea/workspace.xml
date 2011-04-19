@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b8e8de94-c440-44a8-a089-1a03836d304d" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php" afterPath="$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php" />
-    </list>
+    <list default="true" id="b8e8de94-c440-44a8-a089-1a03836d304d" name="Default" comment="" />
     <ignored path="psYiiExtensions.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
