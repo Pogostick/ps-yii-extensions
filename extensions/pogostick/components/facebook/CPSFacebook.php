@@ -249,7 +249,7 @@ class CPSFacebook extends CPSApiComponent
 
 	protected function _getSignedRequest( )
 	{
-		if ( !$this->_signedRequest )
+		if ( ! $this->_signedRequest )
 		{
 			if ( isset( $_REQUEST['signed_request'] ) )
 			{
@@ -436,6 +436,8 @@ class CPSFacebook extends CPSApiComponent
 				CPSLog::trace( __METHOD__, 'Got signed request, creating session...' );
 				$_session = $this->_createSessionFromSignedRequest( $_signedRequest );
 			}
+			else
+				CPSLog::trace( __METHOD__, 'No signed request in $REQUEST' );
 
 			//	Try loading session from $_REQUEST
 			if ( empty( $_session ) && isset( $_REQUEST['session'] ) )
@@ -444,12 +446,14 @@ class CPSFacebook extends CPSApiComponent
 				$_session = json_decode( $_REQUEST['session'], true );
 				$_session = $this->_validateSessionObject( $_session );
 			}
+			else
+				CPSLog::trace( __METHOD__, 'No session in $REQUEST' );
 
 			//	Try loading session from cookie if necessary
 			if ( empty( $_session ) && $this->_cookieSupport )
 			{
-				CPSLog::trace( __METHOD__, 'Checking cookie for a session...' );
 				$_cookieName = $this->_getSessionCookieName();
+				CPSLog::trace( __METHOD__, 'Checking cookie (' . $_cookieName . ') for a session: ' . var_export( $_COOKIE, true ) );
 
 				if ( isset( $_COOKIE[$_cookieName] ) )
 				{
@@ -700,7 +704,7 @@ class CPSFacebook extends CPSApiComponent
 		if ( ! isset( $paramList['access_token'] ) )
 		{
 			$paramList['access_token'] = $this->getAccessToken( );
-			CPSLog::trace( __METHOD__, 'token: ' . $paramList['access_token'] );
+//			CPSLog::trace( __METHOD__, 'token: ' . $paramList['access_token'] );
 		}
 
 		//	json_encode all params values that are not strings
