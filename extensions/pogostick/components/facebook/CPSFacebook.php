@@ -5,16 +5,16 @@
  * @copyright Copyright &copy; 2009-2010 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
- * 
+ *
  * Original concept and portions of the code are:
  * Copyright 2011 Facebook, Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *	  http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,15 +30,15 @@
  * {@link http://github.com/facebook/php-sdk} with my additions and refactored
  * to work within the framework of Yii.
  *
- * @package 	psYiiExtensions
+ * @package	 psYiiExtensions
  * @subpackage	components.facebook
  *
  * @author		Naitik Shah <naitik@facebook.com>
  * @link		http://github.com/facebook/php-sdk
  *
- * @author 		Jerry Ablan <jablan@pogostick.com>
- * @version 	SVN $Id: CPSFacebook.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
- * @since 		v1.0.0
+ * @author		 Jerry Ablan <jablan@pogostick.com>
+ * @version	 SVN $Id: CPSFacebook.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
+ * @since		 v1.0.0
  *
  * @filesource
  */
@@ -97,18 +97,18 @@ class CPSFacebook extends CPSApiComponent
 	 * @var string The Application ID.
 	 */
 	protected $_appId;
-	
+
 	/**
 	 * @return string
 	 */
-	public function getAppId()
+	public function getAppId( )
 	{
 		return $this->_appId;
 	}
 
 	/**
 	 * @param string $newValue
-	 * @return CPSFacebook 
+	 * @return CPSFacebook
 	 */
 	public function setAppId( $newValue )
 	{
@@ -124,14 +124,14 @@ class CPSFacebook extends CPSApiComponent
 	/**
 	 * @return string
 	 */
-	public function getAppName()
+	public function getAppName( )
 	{
 		return $this->_appName;
 	}
 
 	/**
 	 * @param string $newValue
-	 * @return CPSFacebook 
+	 * @return CPSFacebook
 	 */
 	public function setAppName( $newValue )
 	{
@@ -147,14 +147,14 @@ class CPSFacebook extends CPSApiComponent
 	/**
 	 * @return string
 	 */
-	public function getAppUrl()
+	public function getAppUrl( )
 	{
 		return $this->_appUrl;
 	}
 
 	/**
 	 * @param string $newValue
-	 * @return CPSFacebook 
+	 * @return CPSFacebook
 	 */
 	public function setAppUrl( $newValue )
 	{
@@ -167,7 +167,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_appPermissions = 'publish_stream';
 
-	public function getAppPermissions()
+	public function getAppPermissions( )
 	{
 		return $this->_appPermissions;
 	}
@@ -183,7 +183,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_apiKey;
 
-	public function getApiKey()
+	public function getApiKey( )
 	{
 		return $this->_apiKey;
 	}
@@ -199,7 +199,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_apiSecretKey;
 
-	public function getApiSecretKey()
+	public function getApiSecretKey( )
 	{
 		return $this->_apiSecretKey;
 	}
@@ -215,7 +215,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_apiCallbackUrl;
 
-	public function getApiCallbackUrl()
+	public function getApiCallbackUrl( )
 	{
 		return $this->_apiCallbackUrl;
 	}
@@ -231,7 +231,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_sessionLoaded = false;
 
-	public function getSessionLoaded()
+	public function getSessionLoaded( )
 	{
 		return $this->_sessionLoaded;
 	}
@@ -247,14 +247,16 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_signedRequest = null;
 
-	public function getSignedRequest()
+	protected function _getSignedRequest( )
 	{
-		if ( ! $this->_signedRequest )
+		if ( !$this->_signedRequest )
 		{
 			if ( isset( $_REQUEST['signed_request'] ) )
+			{
 				$this->_signedRequest = $this->_parseSignedRequest( $_REQUEST['signed_request'] );
+			}
 		}
-		
+
 		return $this->_signedRequest;
 	}
 
@@ -263,7 +265,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_cookieSupport = false;
 
-	public function getCookieSupport()
+	public function getCookieSupport( )
 	{
 		return $this->_cookieSupport;
 	}
@@ -279,7 +281,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_baseDomain = '';
 
-	public function getBaseDomain()
+	public function getBaseDomain( )
 	{
 		return $this->_baseDomain;
 	}
@@ -295,7 +297,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_fileUploadSupport = false;
 
-	public function getFileUploadSupport()
+	public function getFileUploadSupport( )
 	{
 		return $this->_fileUploadSupport;
 	}
@@ -311,7 +313,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected $_redirectToLoginUrl = true;
 
-	public function getRedirectToLoginUrl()
+	public function getRedirectToLoginUrl( )
 	{
 		return $this->_redirectToLoginUrl;
 	}
@@ -327,7 +329,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	public static $_photoList = null;
 
-	public static function getPhotoList()
+	public static function getPhotoList( )
 	{
 		return self::$_photoList;
 	}
@@ -360,11 +362,15 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	public function __construct( $config = array( ) )
 	{
-		if ( ! function_exists( 'curl_init' ) ) 
+		if ( !function_exists( 'curl_init' ) )
+		{
 			throw new CHttpException( 405, 'This class requires the CURL PHP extension.' );
+		}
 
-		if ( ! function_exists( 'json_decode' ) ) 
+		if ( !function_exists( 'json_decode' ) )
+		{
 			throw new CHttpException( 405, 'This class requires the JSON PHP extension.' );
+		}
 
 		$this->_appId = PS::o( $config, 'appId' );
 		$this->_apiSecretKey = PS::o( $config, 'secret' );
@@ -376,18 +382,21 @@ class CPSFacebook extends CPSApiComponent
 	/**
 	 * Initialize
 	 */
-	public function init()
+	public function init( )
 	{
-		parent::init();
+		parent::init( );
 		self::$_photoList = PS::_gs( self::PHOTO_CACHE );
 	}
 
 	/**
 	 * Put it in the cache..
 	 */
-	public function __destruct()
+	public function __destruct( )
 	{
-		if ( !empty( self::$_photoList ) ) PS::_ss( self::PHOTO_CACHE, self::$_photoList );
+		if ( !empty( self::$_photoList ) )
+		{
+			PS::_ss( self::PHOTO_CACHE, self::$_photoList );
+		}
 	}
 
 	/**
@@ -401,10 +410,12 @@ class CPSFacebook extends CPSApiComponent
 		$session = $this->_validateSessionObject( $session );
 		$this->_sessionLoaded = true;
 		$this->_session = $session;
-		
+
 		if ( $writeCookie )
+		{
 			$this->_setCookieFromSession( $session );
-		
+		}
+
 		return $this;
 	}
 
@@ -414,16 +425,18 @@ class CPSFacebook extends CPSApiComponent
 	 *
 	 * @return array the session
 	 */
-	public function getSession()
+	public function getSession( )
 	{
-		if ( ! $this->_sessionLoaded )
+		if ( !$this->_sessionLoaded )
 		{
 			$_session = null;
 			$_writeCookie = true;
 
 			//	Try loading session from signed_request in $_REQUEST
-			if ( null !== ( $_signedRequest = $this->_getSignedRequest() ) )
+			if ( null !== ( $_signedRequest = $this->_getSignedRequest( ) ) )
+			{
 				$_session = $this->_createSessionFromSignedRequest( $_signedRequest );
+			}
 
 			//	Try loading session from $_REQUEST
 			if ( null === $_session && isset( $_REQUEST['session'] ) )
@@ -435,13 +448,13 @@ class CPSFacebook extends CPSApiComponent
 			//	Try loading session from cookie if necessary
 			if ( null === $_session && $this->_cookieSupport )
 			{
-				$_cookieName = $this->_getSessionCookieName();
-				
-				if ( isset( $_COOKIE[$cookieName] ) )
+				$_cookieName = $this->_getSessionCookieName( );
+
+				if ( isset( $_COOKIE[$_cookieName] ) )
 				{
-					$_session = array();
-					
-					parse_str( trim( $_COOKIE[$cookieName], '"' ), $_session );
+					$_session = array( );
+
+					parse_str( trim( $_COOKIE[$_cookieName], '"' ), $_session );
 					$_session = $this->_validateSessionObject( $_session );
 					$_writeCookie = empty( $_session );
 				}
@@ -457,9 +470,9 @@ class CPSFacebook extends CPSApiComponent
 	 * Get the UID from the session.
 	 * @return string the UID if available
 	 */
-	public function getUser()
+	public function getUser( )
 	{
-		$_session = $this->getSession();
+		$_session = $this->getSession( );
 		return $_session ? $_session['uid'] : null;
 	}
 
@@ -468,14 +481,13 @@ class CPSFacebook extends CPSApiComponent
 	 *
 	 * @return string the access token
 	 */
-	public function getAccessToken()
+	public function getAccessToken( )
 	{
-		$_session = $this->getSession();
+		$_session = $this->getSession( );
 
 		//	Either user session signed, or app signed
-		if ( $_session ) return PS::o( $_session, 'access_token' );
-
-		return $this->_appId . '|' . $this->_apiSecretKey;
+		return $_session ? PS::o( $_session, 'access_token' )
+			: $this->_appId . '|' . $this->_apiSecretKey;
 	}
 
 	/**
@@ -494,20 +506,24 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	public function getLoginUrl( $paramList = array( ) )
 	{
-		$_currentUrl = $this->_getCurrentUrl();
+		$_currentUrl = $this->_getCurrentUrl( );
 
 		return $this->_getUrl(
-			'www', 'login.php',
-   array_merge( array(
-				'api_key' => $this->_appId,
-				'cancel_url' => $_currentUrl,
-				'display' => 'page',
-				'fbconnect' => 1,
-				'next' => $_currentUrl,
-				'return_session' => 1,
-				'session_version' => 3,
-				'v' => '1.0',
-				), $paramList )
+			'www',
+			'login.php',
+			array_merge(
+				array(
+					 'api_key' => $this->_appId,
+					 'cancel_url' => $_currentUrl,
+					 'display' => 'page',
+					 'fbconnect' => 1,
+					 'next' => $_currentUrl,
+					 'return_session' => 1,
+					 'session_version' => 3,
+					 'v' => '1.0',
+				),
+				$paramList
+			)
 		);
 	}
 
@@ -522,13 +538,16 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	public function getLogoutUrl( $paramList = array( ) )
 	{
-		$_session = $this->getSession();
-
 		return $this->_getUrl(
-			'www', 'logout.php', array_merge( array(
-				'next' => $this->_getCurrentUrl(),
-				'access_token' => $this->getAccessToken(),
-				), $paramList )
+			'www',
+			'logout.php',
+			array_merge(
+				array(
+					 'next' => $this->_getCurrentUrl( ),
+					 'access_token' => $this->getAccessToken( ),
+				),
+				$paramList
+			)
 		);
 	}
 
@@ -546,14 +565,18 @@ class CPSFacebook extends CPSApiComponent
 	public function getLoginStatusUrl( $paramList = array( ) )
 	{
 		return $this->_getUrl(
-			'www', 'extern/login_status.php',
-   array_merge( array(
-				'api_key' => $this->_appId,
-				'no_session' => $this->_getCurrentUrl(),
-				'no_user' => $this->_getCurrentUrl(),
-				'ok_session' => $this->_getCurrentUrl(),
-				'session_version' => 3,
-				), $paramList )
+			'www',
+			'extern/login_status.php',
+			array_merge(
+				array(
+					 'api_key' => $this->_appId,
+					 'no_session' => $this->_getCurrentUrl( ),
+					 'no_user' => $this->_getCurrentUrl( ),
+					 'ok_session' => $this->_getCurrentUrl( ),
+					 'session_version' => 3,
+				),
+				$paramList
+			)
 		);
 	}
 
@@ -565,11 +588,14 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	public function api( /* polymorphic */ )
 	{
-		$_args = func_get_args();
+		$_args = func_get_args( );
 
-		if ( is_array( $_args ) && count( $_args ) && is_array( $_args[0] ) ) return $this->_restserver( $_args[0] );
+		if ( is_array( $_args[0] ) )
+		{
+			return $this->_restserver( $_args[0] );
+		}
 
-		return call_user_func_array( array( &$this, '_graph' ), $_args );
+		return call_user_func_array( array( $this, '_graph' ), $_args );
 	}
 
 	//********************************************************************************
@@ -580,7 +606,7 @@ class CPSFacebook extends CPSApiComponent
 	 * The name of the cookie that contains the session.
 	 * @return string the cookie name
 	 */
-	protected function _getSessionCookieName()
+	protected function _getSessionCookieName( )
 	{
 		return 'yiixl.components.facebook.' . $this->_appId;
 	}
@@ -598,10 +624,13 @@ class CPSFacebook extends CPSApiComponent
 		$paramList['api_key'] = $this->_appId;
 		$paramList['format'] = 'json-strings';
 
-		$_result = json_decode( $this->_oauthRequest( $this->_getApiUrl( PS::o( $paramList, 'method' ) ), $paramList ), true );
+		$_result = json_decode( $this->_oauthRequest( $this->_getApiUrl( $paramList['method'] ), $paramList ), true );
 
 		//	Results are returned, errors are thrown
-		if ( PS::o( $_result, 'error_code' ) ) throw new CPSFacebookApiException( $_result );
+		if ( is_array( $_result ) && isset( $_result['error_code'] ) )
+		{
+			throw new CPSFacebookApiException( $_result );
+		}
 
 		return $_result;
 	}
@@ -623,36 +652,30 @@ class CPSFacebook extends CPSApiComponent
 			$method = 'GET';
 		}
 
-		try
+		//	Method override as we always do a POST
+		$paramList['method'] = $method;
+
+		$_result = $this->_oauthRequest( $this->_getUrl( 'graph', $path ), $paramList );
+		$_result = json_decode( $_result, true );
+
+		//	Results are returned, errors are thrown
+		if ( is_array( $_result ) && isset( $_result['error'] ) )
 		{
-			//	Method override as we always do a POST
-			$paramList['method'] = $method;
+			$_ex = new CPSFacebookApiException( $_result );
+			CPSLog::error( __METHOD__, 'Exception while calling graph api(' . $path . '): ' . $_ex->getMessage( ) );
 
-			$_result = $this->_oauthRequest( $this->_getUrl( 'graph', $path ), $paramList );
-			$_result = json_decode( $_result, true );
-
-			//	Results are returned, errors are thrown
-			if ( PS::o( $_result, 'error' ) )
+			switch ( $_ex->getType( ) )
 			{
-				$_ex = new CPSFacebookApiException( $_result );
-				CPSLog::error( __METHOD__, 'Exception while calling graph api(' . $path . '): ' . $_ex->getMessage() );
+				case 'OAuthException': //	OAuth 2.0 Draft 00 style
+				case 'invalid_token': //	OAuth 2.0 Draft 10 style
+					$this->_setSession( null );
+					break;
 
-				switch ( $_ex->getType() )
-				{
-					case 'OAuthException':   //	OAuth 2.0 Draft 00 style
-					case 'invalid_token':   //	OAuth 2.0 Draft 10 style
-						$this->_setSession( null );
-						break;
-
-					default:
-				}
-
-				//			throw $_ex;
+				default:
+					break;
 			}
-		}
-		catch ( Exception $_ex )
-		{
-			CPSLog::trace( __METHOD__, 'Nastygram from Facebook: ' . $_ex->getMessage() );
+
+			throw $_ex;
 		}
 
 		return $_result;
@@ -668,16 +691,18 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _oauthRequest( $url, $paramList )
 	{
-		$_matches = array( );
-
-		if ( preg_match( "/^(.*)&expires=\d+$/", $paramList['access_token'], $_matches ) ) $paramList['access_token'] = $_matches[1];
-
-		if ( !isset( $paramList['access_token'] ) ) $paramList['access_token'] = $this->getAccessToken();
+		if ( !isset( $paramList['access_token'] ) )
+		{
+			$paramList['access_token'] = $this->getAccessToken( );
+		}
 
 		//	json_encode all params values that are not strings
 		foreach ( $paramList as $_key => $_value )
 		{
-			if ( !is_string( $_value ) ) $paramList[$_key] = json_encode( $_value );
+			if ( !is_string( $_value ) )
+			{
+				$paramList[$_key] = json_encode( $_value );
+			}
 		}
 
 		return $this->_makeRequest( $url, $paramList );
@@ -690,17 +715,20 @@ class CPSFacebook extends CPSApiComponent
 	 *
 	 * @param string $url the URL to make the request to
 	 * @param array $paramList the parameters to use for the POST body
-	 * @param integer $curl optional initialized curl handle
+	 * @param integer $_curl optional initialized curl handle
 	 * @return string the response text
 	 */
-	protected function _makeRequest( $url, $paramList, $curl = null )
+	protected function _makeRequest( $url, $paramList, $_curl = null )
 	{
-		if ( !$curl ) $curl = curl_init();
+		if ( ! $_curl )
+			$_curl = curl_init();
 
 		$_options = self::$_curlOptions;
 
-		if ( $this->_fileUploadSupport ) $_options[CURLOPT_POSTFIELDS] = $paramList;
-		else $_options[CURLOPT_POSTFIELDS] = http_build_query( $paramList, null, '&' );
+		if ( $this->_fileUploadSupport )
+			$_options[CURLOPT_POSTFIELDS] = $paramList;
+		else
+			$_options[CURLOPT_POSTFIELDS] = http_build_query( $paramList, null, '&' );
 
 		$_options[CURLOPT_URL] = $url;
 
@@ -708,44 +736,47 @@ class CPSFacebook extends CPSApiComponent
 		 * Disable the 'Expect: 100-continue' behaviour. This causes CURL
 		 * to wait for 2 seconds if the server does not support this header.
 		 */
-		if ( !isset( $_options[CURLOPT_HTTPHEADER] ) ) $_options[CURLOPT_HTTPHEADER] = array( 'Expect:' );
+		if ( ! isset( $_options[CURLOPT_HTTPHEADER] ) )
+		{
+			$_options[CURLOPT_HTTPHEADER] = array( 'Expect:' );
+		}
 		else
 		{
-			$_headers = $opts[CURLOPT_HTTPHEADER];
+			$_headers = $_options[CURLOPT_HTTPHEADER];
 			$_headers[] = 'Expect:';
 			$_options[CURLOPT_HTTPHEADER] = $_headers;
 		}
 
-		curl_setopt_array( $curl, $_options );
+		curl_setopt_array( $_curl, $_options );
 
-		$_result = curl_exec( $curl );
+		$_result = curl_exec( $_curl );
 
-//		//	CURLE_SSL_CACERT
-//		if ( 60 == curl_errno( $curl ) )
-//		{
-//			CPSLog::error( __METHOD__, 'Invalid or no certificate authority found, using bundled information' );
-//			curl_setopt( $curl, CURLOPT_CAINFO, dirname( __FILE__ ) . '/fb_ca_chain_bundle.crt' );
-//			$_result = curl_exec( $curl );
-//		}
+		//	cURL_SSL_CACERT
+		if ( 60 == curl_errno( $_curl ) )
+		{
+			CPSLog::error( __METHOD__, 'Invalid or no certificate authority found, using bundled information' );
+			curl_setopt( $_curl, CURLOPT_CAINFO, dirname( __FILE__ ) . '/fb_ca_chain_bundle.crt' );
+			$_result = curl_exec( $_curl );
+		}
 
 		if ( false === $_result )
 		{
 			$_ex = new CPSFacebookApiException(
-					array(
-						'error_code' => curl_errno( $curl ),
-						'error' => array(
-							'message' => curl_error( $curl ),
-							'type' => 'CurlException',
-						),
-					)
+				array(
+					 'error_code' => curl_errno( $_curl ),
+					 'error' => array(
+						 'message' => curl_error( $_curl ),
+						 'type' => 'CurlException',
+					 ),
+				)
 			);
 
-			curl_close( $curl );
+			curl_close( $_curl );
 
 			throw $_ex;
 		}
 
-		curl_close( $curl );
+		curl_close( $_curl );
 		return $_result;
 	}
 
@@ -757,7 +788,8 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _setCookieFromSession( $session = null )
 	{
-		if ( !$this->_enableCookieSupport ) return;
+		if ( ! $this->_cookieSupport )
+			return;
 
 		$_cookieName = $this->_getSessionCookieName();
 		$_value = 'deleted';
@@ -769,32 +801,31 @@ class CPSFacebook extends CPSApiComponent
 		{
 			$_value = '"' . http_build_query( $session, null, '&' ) . '"';
 
-			if ( isset( $session['base_domain'] ) ) $_domain = $session['base_domain'];
+			if ( isset( $session['base_domain'] ) )
+				$_domain = $session['base_domain'];
 
 			$_expires = $session['expires'];
 		}
 
 		//	prepend dot if a domain is found
-		if ( $_domain ) $_domain = '.' . $_domain;
+		if ( $_domain )
+			$_domain = '.' . $_domain;
 
-		//	if an existing cookie is not set, we dont need to delete it
-		if ( $_value == 'deleted' && empty( $_COOKIE[$_cookieName] ) ) return;
+		//	if an existing cookie is not set, we don't need to delete it
+		if ( $_value == 'deleted' && empty( $_COOKIE[$_cookieName] ) )
+			return;
 
-		if ( headers_sent() )
+		if ( ! headers_sent() )
 		{
-			// disable error log if we are running in a CLI environment
-			// @codeCoverageIgnoreStart
-			if ( php_sapi_name() != 'cli' ) CPSLog::error( __METHOD__, 'Could not set cookie. Headers already sent.' );
-			// @codeCoverageIgnoreEnd
-			// ignore for code coverage as we will never be able to setcookie in a CLI
-			// environment
-			// @codeCoverageIgnoreStart
+			if ( ! PS::isCLI() )
+				setcookie( $_cookieName, $_value, $_expires, '/', $_domain );
 		}
 		else
 		{
-			setcookie( $_cookieName, $_value, $_expires, '/', $_domain );
+			// disable error log if we are running in a CLI environment
+			if ( ! PS::isCLI() )
+				CPSLog::error( __METHOD__, 'Could not set cookie. Headers already sent.' );
 		}
-		// @codeCoverageIgnoreEnd
 	}
 
 	/**
@@ -805,8 +836,6 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _validateSessionObject( $session )
 	{
-		$_session = null;
-
 		//	Make sure some essential fields exist
 		if ( is_array( $session ) && isset( $session['uid'], $session['access_token'], $session['sig'] ) )
 		{
@@ -818,23 +847,19 @@ class CPSFacebook extends CPSApiComponent
 
 			if ( $session['sig'] != $_expectedSig )
 			{
+				$this->_session = $session = null;
+
 				//	Disable error log if we are running in a CLI environment
-				//	@codeCoverageIgnoreStart
-				if ( php_sapi_name() != 'cli' ) CPSLog::error( __METHOD__, 'Got invalid session signature in cookie.' );
-				// @codeCoverageIgnoreEnd
-				$_session = null;
-			}
-			else
-			{
-				$this->_session = $_session = $session;
-				$this->_sessionLoaded = true;
-				CPSLog::trace( __METHOD__, 'Session is cool! ' . var_export( $_session, true ) );
-				return $_session;
+				if ( ! PS::isCLI() )
+					CPSLog::error( __METHOD__, 'Got invalid session signature in cookie.' );
 			}
 		}
+		else
+		{
+			$this->_session = $session = null;
+		}
 
-		$this->_sessionLoaded = false;
-		return null;
+		return $session;
 	}
 
 	/**
@@ -847,12 +872,13 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _createSessionFromSignedRequest( $data )
 	{
-		if ( null === PS::o( $data, 'oauth_token' ) ) return null;
+		if ( null === PS::o( $data, 'oauth_token' ) )
+			return null;
 
 		$_session = array(
-			'uid' => PS::o( $data, 'user_id' ),
-			'access_token' => PS::o( $data, 'oauth_token' ),
-			'expires' => PS::o( $data, 'expires' ),
+			'uid' => $data['user_id'],
+			'access_token' => $data['oauth_token'],
+			'expires' => $data['expires'],
 		);
 
 		//	Put a real sig, so that validateSignature works
@@ -869,9 +895,9 @@ class CPSFacebook extends CPSApiComponent
 	 * @param Boolean Should we remove the parts of the payload that are used by the algorithm?
 	 * @return Array the payload inside it or null if the sig is wrong
 	 */
-	protected function _parseSignedRequest( $_signedRequest )
+	protected function _parseSignedRequest( $signedRequest )
 	{
-		list( $_encodedSignature, $_payload ) = explode( '.', $_signedRequest, 2 );
+		list( $_encodedSignature, $_payload ) = explode( '.', $signedRequest, 2 );
 
 		//	decode the data
 		$_signature = self::_base64UrlDecode( $_encodedSignature );
@@ -879,24 +905,22 @@ class CPSFacebook extends CPSApiComponent
 
 		if ( 'HMAC-SHA256' !== strtoupper( $data['algorithm'] ) )
 		{
-			//	Disable error log if we are running in a CLI environment
-			//	@codeCoverageIgnoreStart
-			if ( php_sapi_name() != 'cli' ) CPSLog::error( __METHOD__, 'Unknown algorithm. Expected HMAC-SHA256' );
-			// @codeCoverageIgnoreEnd
+			if ( ! PS::isCLI() )
+				CPSLog::error( __METHOD__, 'Unknown algorithm. Expected HMAC-SHA256' );
+
 			return null;
 		}
 
 		//	Check signature
 		$_expectedSignature = hash_hmac( 'sha256', $_payload, $this->_apiSecretKey, true );
 
-		if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 ) CPSLog::trace( __METHOD__, 'Sig:[' . $_signature . '] expect:[' . $_expectedSignature . ']' );
+		CPSLog::trace( __METHOD__, 'Signature:[' . $_signature . '] Expected:[' . $_expectedSignature . ']' );
 
 		if ( $_signature !== $_expectedSignature )
 		{
-			//	Disable error log if we are running in a CLI environment
-			//	@codeCoverageIgnoreStart
-			if ( php_sapi_name() != 'cli' ) CPSLog::error( __METHOD__, 'Bad Signed JSON signature!' );
-			// @codeCoverageIgnoreEnd
+			if ( ! PS::isCLI() )
+				CPSLog::error( __METHOD__, 'Bad Signed JSON signature!' );
+
 			return null;
 		}
 
@@ -916,82 +940,76 @@ class CPSFacebook extends CPSApiComponent
 		 * @staticvar array
 		 */
 		static $READ_ONLY_CALLS = array(
-			'admin.getallocation',
-			'admin.getappproperties',
-			'admin.getbannedusers',
-			'admin.getlivestreamvialink',
-			'admin.getmetrics',
-			'admin.getrestrictioninfo',
-			'application.getpublicinfo',
-			'auth.getapppublickey',
-			'auth.getsession',
-			'auth.getsignedpublicsessiondata',
-			'comments.get',
-			'connect.getunconnectedfriendscount',
-			'dashboard.getactivity',
-			'dashboard.getcount',
-			'dashboard.getglobalnews',
-			'dashboard.getnews',
-			'dashboard.multigetcount',
-			'dashboard.multigetnews',
-			'data.getcookies',
-			'events.get',
-			'events.getmembers',
-			'fbml.getcustomtags',
-			'feed.getappfriendstories',
-			'feed.getregisteredtemplatebundlebyid',
-			'feed.getregisteredtemplatebundles',
-			'fql.multiquery',
-			'fql.query',
-			'friends.arefriends',
-			'friends.get',
-			'friends.getappusers',
-			'friends.getlists',
-			'friends.getmutualfriends',
-			'gifts.get',
-			'groups.get',
-			'groups.getmembers',
-			'intl.gettranslations',
-			'links.get',
-			'notes.get',
-			'notifications.get',
-			'pages.getinfo',
-			'pages.isadmin',
-			'pages.isappadded',
-			'pages.isfan',
-			'permissions.checkavailableapiaccess',
-			'permissions.checkgrantedapiaccess',
-			'photos.get',
-			'photos.getalbums',
-			'photos.gettags',
-			'profile.getinfo',
-			'profile.getinfooptions',
-			'stream.get',
-			'stream.getcomments',
-			'stream.getfilters',
-			'users.getinfo',
-			'users.getloggedinuser',
-			'users.getstandardinfo',
-			'users.hasapppermission',
-			'users.isappuser',
-			'users.isverified',
-			'video.getuploadlimits',
-			'video.upload',
+			'admin.getallocation' => 1,
+			'admin.getappproperties' => 1,
+			'admin.getbannedusers' => 1,
+			'admin.getlivestreamvialink' => 1,
+			'admin.getmetrics' => 1,
+			'admin.getrestrictioninfo' => 1,
+			'application.getpublicinfo' => 1,
+			'auth.getapppublickey' => 1,
+			'auth.getsession' => 1,
+			'auth.getsignedpublicsessiondata' => 1,
+			'comments.get' => 1,
+			'connect.getunconnectedfriendscount' => 1,
+			'dashboard.getactivity' => 1,
+			'dashboard.getcount' => 1,
+			'dashboard.getglobalnews' => 1,
+			'dashboard.getnews' => 1,
+			'dashboard.multigetcount' => 1,
+			'dashboard.multigetnews' => 1,
+			'data.getcookies' => 1,
+			'events.get' => 1,
+			'events.getmembers' => 1,
+			'fbml.getcustomtags' => 1,
+			'feed.getappfriendstories' => 1,
+			'feed.getregisteredtemplatebundlebyid' => 1,
+			'feed.getregisteredtemplatebundles' => 1,
+			'fql.multiquery' => 1,
+			'fql.query' => 1,
+			'friends.arefriends' => 1,
+			'friends.get' => 1,
+			'friends.getappusers' => 1,
+			'friends.getlists' => 1,
+			'friends.getmutualfriends' => 1,
+			'gifts.get' => 1,
+			'groups.get' => 1,
+			'groups.getmembers' => 1,
+			'intl.gettranslations' => 1,
+			'links.get' => 1,
+			'notes.get' => 1,
+			'notifications.get' => 1,
+			'pages.getinfo' => 1,
+			'pages.isadmin' => 1,
+			'pages.isappadded' => 1,
+			'pages.isfan' => 1,
+			'permissions.checkavailableapiaccess' => 1,
+			'permissions.checkgrantedapiaccess' => 1,
+			'photos.get' => 1,
+			'photos.getalbums' => 1,
+			'photos.gettags' => 1,
+			'profile.getinfo' => 1,
+			'profile.getinfooptions' => 1,
+			'stream.get' => 1,
+			'stream.getcomments' => 1,
+			'stream.getfilters' => 1,
+			'users.getinfo' => 1,
+			'users.getloggedinuser' => 1,
+			'users.getstandardinfo' => 1,
+			'users.hasapppermission' => 1,
+			'users.isappuser' => 1,
+			'users.isverified' => 1,
+			'video.getuploadlimits' => 1,
 		);
 
-		if ( PS::o( $READ_ONLY_CALLS, $method ) ) 
-		{
+		$_name = 'api';
+
+		if ( isset( $READ_ONLY_CALLS[strtolower( $method )] ) )
 			$_name = 'api_read';
-		}
-		else
-		{
-			if ( 'video.upload' == strtolower( $method ) ) 
-			{
-				$_name = 'api_video';
-			}
-		}
-		
-		return self::_getUrl( 'api' . ( in_array( $method, $READ_ONLY_CALLS ) ? '_read' : null ), 'restserver.php' );
+		else if ( 'video.upload' == strtolower( $method ) )
+			$_name = 'api_video';
+
+		return $this->_getUrl( $_name, 'restserver.php' );
 	}
 
 	/**
@@ -1006,14 +1024,16 @@ class CPSFacebook extends CPSApiComponent
 	{
 		$_url = self::$_fbDomainMap[$name];
 
-		if ( null != $path )
+		if ( null !== $path )
 		{
-			if ( $path[0] == '/' ) $path = substr( $path, 1 );
+			if ( '/' === $path[0] )
+				$path = substr( $path, 1 );
 
 			$_url .= $path;
 		}
 
-		if ( $paramList ) $_url .= '?' . http_build_query( $paramList );
+		if ( ! empty( $paramList ) )
+			$_url .= '?' . http_build_query( $paramList, null, '&' );
 
 		return $_url;
 	}
@@ -1024,56 +1044,37 @@ class CPSFacebook extends CPSApiComponent
 	 *
 	 * @return string the current URL
 	 */
-	protected function _getCurrentUrl()
+	protected function _getCurrentUrl( )
 	{
-		$_proto = PS::o( $_SERVER, 'HTTPS' ) == 'on' ? 'https://' : 'http://';
-		$_currentUrl = $_proto . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		$_protocol = PS::o( $_SERVER, 'HTTPS' ) == 'on' ? 'https://' : 'http://';
+		$_currentUrl = $_protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		$_parts = parse_url( $_currentUrl );
 
 		//	Drop known fb params
 		$_query = null;
 
-		if ( !empty( $_parts['query'] ) )
+		if ( ! empty( $_parts['query'] ) )
 		{
 			$_paramList = array( );
 
 			parse_str( $_parts['query'], $_paramList );
 
-			foreach ( self::$_queryExcludes as $_key ) unset( $_paramList[$_key] );
+			foreach ( self::$_queryExcludes as $_key )
+				unset( $_paramList[$_key] );
 
-			if ( !empty( $_paramList ) ) $_query = '?' . http_build_query( $_paramList );
+			if ( ! empty( $_paramList ) )
+				$_query = '?' . http_build_query( $_paramList, null, '&' );
 		}
 
 		//	use port if non default
-		$_port = isset( $_parts['port'] ) && ( ( $_proto === 'http://' && $_parts['port'] !== 80 ) || ( $_proto === 'https://' && $_parts['port'] !== 443 ) ) ? ':' . $_parts['port'] : '';
+		$_port =
+			isset( $_parts['port'] ) &&
+			( ( $_protocol == 'http://' && $_parts['port'] != 80 ) ||
+			  ( $_protocol == 'https://' && $_parts['port'] != 443 ) )
+			? $_parts['port'] : null;
 
 		//	Rebuild
-		return $_proto . $_parts['host'] . $_port . $_parts['path'] . $_query;
-	}
-
-	/**
-	 * Looks in request for session signatures
-	 * @return array
-	 */
-	protected function _getUnsignedSession()
-	{
-		$_session = null;
-
-		if ( isset( $_REQUEST['fb_sig_user'] ) )
-		{
-			CPSLog::trace( __METHOD__, 'Got old-school unsigned request...' );
-			$_session = array( );
-
-			$_session['uid'] = PS::o( $_REQUEST, 'fb_sig_user' );
-			$_session['access_token'] = $this->_appId . '|' . PS::o( $_REQUEST, 'fb_sig_session_key' );
-			$_session['expires'] = PS::o( $_REQUEST, 'fb_sig_expires' );
-			$_session['base_domain'] = PS::o( $_REQUEST, 'fb_sig_base_domain' );
-			$_session['secret'] = PS::o( $_REQUEST, 'fb_sig_ss' );
-
-			if ( null !== ( $_session['session_key'] = PS::o( $_REQUEST, 'fb_sig_session_key' ) ) ) $_session['sig'] = $this->_generateSignature( $_session, $this->_apiSecretKey );
-		}
-
-		return $this->_validateSessionObject( $_session );
+		return $_protocol . $_parts['host'] . ':' . $_port . $_parts['path'] . $_query;
 	}
 
 	/**
@@ -1091,7 +1092,8 @@ class CPSFacebook extends CPSApiComponent
 		//	Generate the base string
 		$_baseString = '';
 
-		foreach ( $paramList as $_key => $_value ) $_baseString .= $_key . '=' . $_value;
+		foreach ( $paramList as $_key => $_value )
+			$_baseString .= $_key . '=' . $_value;
 
 		$_baseString .= $secretKey;
 
@@ -1119,7 +1121,7 @@ class CPSFacebook extends CPSApiComponent
  * This class is pretty much a complete copy of the Facebook PHP-SDK
  * that has been massaged to work within the framework of Yii.
  *
- * @package 	psYiiExtensions
+ * @package	 psYiiExtensions
  * @subpackage	components.facebook
  *
  * @author		Naitik Shah <naitik@facebook.com>
@@ -1127,7 +1129,7 @@ class CPSFacebook extends CPSApiComponent
  *
  * @author		Jerry Ablan <jablan@pogostick.com>
  *
- * @version 	SVN $Id: CPSFacebook.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
+ * @version	 SVN $Id: CPSFacebook.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
  *
  * @filesource
  */
@@ -1159,7 +1161,8 @@ class CPSFacebookApiException extends CPSException
 	public function __construct( $result )
 	{
 		$this->_result = $result;
-		$_code = PS::o( $_result, 'error_code', 0 );
+		$_code = PS::o( $result, 'error_code', 0 );
+		$_message = 'Unknown Error. Check getResult()';
 
 		if ( isset( $result['error_description'] ) )
 		{
@@ -1176,10 +1179,6 @@ class CPSFacebookApiException extends CPSException
 			// Rest server style
 			$_message = $result['error_msg'];
 		}
-		else
-		{
-			$_message = 'Unknown Error. Check getResult()';
-		}
 
 		parent::__construct( $_message, $_code );
 	}
@@ -1194,19 +1193,14 @@ class CPSFacebookApiException extends CPSException
 		if ( isset( $this->_result['error'] ) )
 		{
 			$_error = $this->_result['error'];
+
+			// OAuth 2.0 Draft 10 style
 			if ( is_string( $_error ) )
-			{
-				// OAuth 2.0 Draft 10 style
 				return $_error;
-			}
-			else if ( is_array( $_error ) )
-			{
-				// OAuth 2.0 Draft 00 style
-				if ( isset( $_error['type'] ) )
-				{
-					return $_error['type'];
-				}
-			}
+
+			// OAuth 2.0 Draft 00 style
+			if ( is_array( $_error ) && isset( $_error['type'] ) )
+				return $_error['type'];
 		}
 
 		return 'Exception';
@@ -1216,9 +1210,13 @@ class CPSFacebookApiException extends CPSException
 	 * A string representation of this exception
 	 * @return string
 	 */
-	public function __toString()
+	public function __toString( )
 	{
-		$_temp = $this->getType() . ': ' . ( $this->code != 0 ? $this->code . ': ' : '' ) . $this->message;
+		$_temp = $this->getType() . ': ';
+		if ( 0 != $this->code )
+			$_temp .= $this->code . ': ';
+
+		return $_temp . $this->message;
 	}
 
 }
