@@ -160,7 +160,8 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	}
 
 	/**
-	 * Passthrough function to api()
+	 * Pass-through function to api()
+	 * @return mixed
 	 */
 	public function api( /* variable */ )
 	{
@@ -212,7 +213,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	{
 		//	Ignore second call and standalone...
 		if ( PS::_gs( 'standalone', false ) || $this->_inForceLogin )
-			return;
+			return false;
 
 		$this->_session = $this->_facebookApi->getSession();
 
@@ -563,7 +564,7 @@ CPSLog::trace( __METHOD__, '  . Loading albums' );
 		if ( false !== strpos( $_SERVER['REQUEST_URI'], 'app/deauthorize' ) )
 		{
 			if ( $this->_loadUser() )
-				Yii::app()->getRequest()->redirect( 'deauthorize', array( 'id' => $this->_user->id ) );
+				PS::redirect( 'deauthorize', array( 'id' => $this->_user->id ) );
 		}
 
 		//	Logout user...
@@ -573,7 +574,7 @@ CPSLog::trace( __METHOD__, '  . Loading albums' );
 
 //		echo 'redirect';//<script type="text/javascript">window.top.location.href = "' . $this->_loginUrl . '";</script>';
 		echo '<script type="text/javascript">window.top.location.href = "' . $this->_loginUrl . '";</script>';
-		Yii::app()->end();
+//		Yii::app()->end();
 	}
 
 	//********************************************************************************
