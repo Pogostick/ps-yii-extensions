@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b8e8de94-c440-44a8-a089-1a03836d304d" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebookUserIdentity.php" afterPath="$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebookUserIdentity.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php" afterPath="$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php" />
     </list>
     <ignored path="psYiiExtensions.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -25,19 +25,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="CPSFacebook.php" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="CPSFacebook.php" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="203" column="36" selection-start="4639" selection-end="4639" vertical-scroll-proportion="-10.384615">
+            <state line="746" column="0" selection-start="17944" selection-end="17944" vertical-scroll-proportion="0.36728698">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CPSFacebookUserIdentity.php" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="CPSFacebookUserIdentity.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebookUserIdentity.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="576" column="2" selection-start="15864" selection-end="15864" vertical-scroll-proportion="6.1488094">
+            <state line="217" column="48" selection-start="5972" selection-end="5972" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -71,8 +71,8 @@
         <option value="$PROJECT_DIR$/extensions/pogostick/controllers/CPSCRUDController.php" />
         <option value="$PROJECT_DIR$/extensions/pogostick/helpers/CPSHelperBase.php" />
         <option value="$PROJECT_DIR$/extensions/pogostick/components/facebook/Facebook.php" />
-        <option value="$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php" />
         <option value="$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebookUserIdentity.php" />
+        <option value="$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php" />
       </list>
     </option>
   </component>
@@ -424,13 +424,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="203" column="36" selection-start="4639" selection-end="4639" vertical-scroll-proportion="-10.384615">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebookUser.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="48" column="1" selection-start="1313" selection-end="1313" vertical-scroll-proportion="0.0">
@@ -440,7 +433,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebookUserIdentity.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="576" column="2" selection-start="15864" selection-end="15864" vertical-scroll-proportion="6.1488094">
+        <state line="217" column="48" selection-start="5972" selection-end="5972" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/facebook/CPSFacebook.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="746" column="0" selection-start="17944" selection-end="17944" vertical-scroll-proportion="0.36728698">
           <folding />
         </state>
       </provider>

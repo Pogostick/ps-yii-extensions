@@ -412,9 +412,7 @@ class CPSFacebook extends CPSApiComponent
 		$this->_session = $session;
 
 		if ( $writeCookie )
-		{
 			$this->_setCookieFromSession( $session );
-		}
 
 		return $this;
 	}
@@ -427,7 +425,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	public function getSession( )
 	{
-		if ( !$this->_sessionLoaded )
+		if ( ! $this->_sessionLoaded )
 		{
 			$_session = null;
 			$_writeCookie = true;
@@ -435,30 +433,38 @@ class CPSFacebook extends CPSApiComponent
 			//	Try loading session from signed_request in $_REQUEST
 			if ( null !== ( $_signedRequest = $this->_getSignedRequest( ) ) )
 			{
+				CPSLog::trace( __METHOD__, 'Got signed request, creating session...' );
 				$_session = $this->_createSessionFromSignedRequest( $_signedRequest );
 			}
 
 			//	Try loading session from $_REQUEST
-			if ( null === $_session && isset( $_REQUEST['session'] ) )
+			if ( empty( $_session ) && isset( $_REQUEST['session'] ) )
 			{
+				CPSLog::trace( __METHOD__, 'Checking $REQUEST for a session...' );
 				$_session = json_decode( $_REQUEST['session'], true );
 				$_session = $this->_validateSessionObject( $_session );
 			}
 
 			//	Try loading session from cookie if necessary
-			if ( null === $_session && $this->_cookieSupport )
+			if ( empty( $_session ) && $this->_cookieSupport )
 			{
-				$_cookieName = $this->_getSessionCookieName( );
+				CPSLog::trace( __METHOD__, 'Checking cookie for a session...' );
+				$_cookieName = $this->_getSessionCookieName();
 
 				if ( isset( $_COOKIE[$_cookieName] ) )
 				{
-					$_session = array( );
+					$_session = array();
 
 					parse_str( trim( $_COOKIE[$_cookieName], '"' ), $_session );
 					$_session = $this->_validateSessionObject( $_session );
 					$_writeCookie = empty( $_session );
 				}
 			}
+
+			if ( empty( $_session ) )
+				CPSLog::trace( __METHOD__, 'Can\'t find a session!: ' . var_export( $_REQUEST, true ) );
+			else
+				CPSLog::info( __METHOD__, 'Session is cool: ' . var_export( $_session, true ) );
 
 			$this->_setSession( $_session, $_writeCookie );
 		}
@@ -669,9 +675,6 @@ class CPSFacebook extends CPSApiComponent
 				case 'OAuthException': //	OAuth 2.0 Draft 00 style
 				case 'invalid_token': //	OAuth 2.0 Draft 10 style
 					$this->_setSession( null );
-					break;
-
-				default:
 					break;
 			}
 
