@@ -619,7 +619,7 @@ class CPSFacebook extends CPSApiComponent
 	 */
 	protected function _getSessionCookieName( )
 	{
-		return 'yiixl.components.facebook.' . $this->_appId;
+		return 'fbs_' . $this->_appId;
 	}
 
 	/**
