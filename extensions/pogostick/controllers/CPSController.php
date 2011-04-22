@@ -274,7 +274,7 @@ abstract class CPSController extends CController implements IPSBase
 	protected $_cleanTrail;
 	protected function getCleanTrail() { return $this->_cleanTrail; }
 	protected function setCleanTrail( $value ) { $this->_cleanTrail = $value; return $this; }
-	
+
 	/**
 	 * @var array $viewData The array of data passed to views
 	 */
@@ -559,18 +559,18 @@ abstract class CPSController extends CController implements IPSBase
 				)
 			);
 		}
-		
+
 		if ( null === $data )
 			$data = array();
 
-		$_output = $this->renderFile( 
-			$_viewFile, 
-			array_merge( 
-				$this->_extraViewDataList, 
-				$this->_viewData, 
-				$data 
-			), 
-			true 
+		$_output = $this->renderFile(
+			$_viewFile,
+			array_merge(
+				$this->_extraViewDataList,
+				$this->_viewData,
+				$data
+			),
+			true
 		);
 
 		if ( $processOutput )
@@ -617,26 +617,33 @@ abstract class CPSController extends CController implements IPSBase
 		if ( PS::o( $options, 'enableFlash', true, true ) )
 		{
 			$_flashClass = PS::o( $options, 'flashSuccessClass', 'operation-result-success' );
-			
+			$_flashTitle = 'Success!';
+
 			if ( null === ( $_message = PS::_gf( 'success' ) ) )
 			{
 				if ( null !== ( $_message = PS::_gf( 'failure' ) ) )
+				{
+					$_flashTitle = 'There was a problem...';
 					$_flashClass = PS::o( $options, 'flashFailureClass', 'operation-result-failure' );
+				}
 			}
+
+			$_flashText = $_message;
 
 			$_spanId = PS::o( $options, 'flashSpanId', 'operation-result', true );
 			PS::_ss( 'psForm-flash-html', PS::tag( 'span', array( 'id' => $_spanId, 'class' => $_flashClass ), $_message ) );
-			
+
 			//	Register a nice little fader...
 			$_fader =<<<SCRIPT
-$('#{$_spanId}').fadeIn('500',function(){
-	$(this).delay(3000).fadeOut(3500);
-});
+notify('default',{title:'{$_title}',text:'{$_flashText}'});
+//$('#___spanId_').fadeIn('500',function(){
+//	$(this).delay(3000).fadeOut(3500);
+//});";
 SCRIPT;
-				
+
 			PS::_rs( $_formId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
 		}
-		
+
 		PS::setFormFieldContainerClass( PS::o( $options, 'rowClass', 'row' ) );
 
 		$_formOptions = array(
@@ -684,12 +691,12 @@ SCRIPT;
 			echo PS::tag( 'p', array(), self::SEARCH_HELP_TEXT );
 			echo PS::link( 'Advanced Search', '#', array( 'class' => 'search-button' ) );
 
-			echo PS::tag( 
-				'div', 
-				array( 'class' => 'search-form' ), 
+			echo PS::tag(
+				'div',
+				array( 'class' => 'search-form' ),
 				$this->renderPartial( '_search', array( 'model' => $model ), true )
 			);
-			
+
 			//	Register the search script, if any
 			if ( null !== ( $_searchScript = PS::o( $options, '__searchScript' ) ) )
 				PS::_rs( 'search', $_searchScript );
@@ -725,7 +732,7 @@ SCRIPT;
 		$_title = PS::o( $options, 'title', null, true );
 		$_subtitle = PS::o( $options, 'subtitle', null, true );
 		$_header = PS::o( $options, 'header' );
-		
+
 		//	Generate subtitle from header...
 		if ( null === $_title && null === $_subtitle && null !== $_header )
 			$_subtitle = $_header;
@@ -751,10 +758,10 @@ SCRIPT;
 			{
 				if ( null === ( $_label = PS::o( $_itemLink, 'label', null, true ) ) )
 					$_label = $_itemLabel;
-				
+
 				if ( null === ( $_link = PS::o( $_itemLink, 'link', null, true ) ) )
 					$_link = $_itemLink;
-				
+
 				$_finalMenu[] = array(
 					'label' => $_label,
 					'url' => $_link,
@@ -791,7 +798,7 @@ $(function(){
 JS;
 			$options['__searchScript'] = $_searchScript;
 		}
-		
+
 		//	Return reconstructed options for standard form use
 		return $options;
 	}
