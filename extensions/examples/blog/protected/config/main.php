@@ -5,7 +5,7 @@ Yii::setPathOfAlias( 'pogostick', '/usr/local/psYiiExtensions/extensions/pogosti
 
 //	Our configuration array
 return array(
-	'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
+	'basePath' => __DIR__ . DIRECTORY_SEPARATOR . '..',
 	'name' => 'Yii/Pogostick Yii Extensions Blog',
 	'defaultController' => 'post',
 
@@ -70,7 +70,7 @@ return array(
 			'class' => 'CLogRouter',
 			'routes' => array(
 				array(
-					'class' => 'CFileLogRoute',
+					'class' => 'pogostick.logging.CPSLiveLogRoute',
 					'levels' => 'info, error, warning, trace',
 					'maxFileSize' => '102400',
 				),
@@ -79,6 +79,6 @@ return array(
 	),
 
 	//	Our application parameters
-	'params' => require( dirname( __FILE__ ) . '/params.php' ),
+	'params' => require( __DIR__ . DIRECTORY_SEPARATOR . 'params.php' ),
 
 );

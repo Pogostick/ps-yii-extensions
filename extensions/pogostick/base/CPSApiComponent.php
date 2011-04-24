@@ -6,8 +6,14 @@
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  * @filesource
+ *
+ * @package		psYiiExtensions
+ * @subpackage 	base.components
+ *
+ * @author			Jerry Ablan <jablan@pogostick.com>
+ * @version		SVN: $Id: CPSApiComponent.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
+ * @since			v1.0.0
  */
-
 /**
  * CPSApiComponent provides a convenient base class for APIs.
  *
@@ -20,15 +26,43 @@
  * Each are called respectively and pass the handler a CPSApiEvent
  * object with details of the call.
  *
- * @package		psYiiExtensions
- * @subpackage 	base.components
- *
- * @author			Jerry Ablan <jablan@pogostick.com>
- * @version		SVN: $Id: CPSApiComponent.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
- * @since			v1.0.0
+ * @throws CPSApiException
+ * @property string $altApiKey
+ * @property string $appendFormat
+ * @property string $apiBaseUrl
+ * @property string $apiKey
+ * @property string $apiQueryName
+ * @property string $apiToUse
+ * @property string $apiSubUrls
+ * @property string $httpMethod
+ * @property integer $returnFormat
+ * @property string $payload
+ * @property string $requestData
+ * @property string $requestMap
+ * @property string $requireApiQueryName
+ * @property string $testApiKey
+ * @property string $testAltApiKey
+ * @property string $userAgent
+ * @property string $lastErrorMessage
+ * @property string $lastErrorMessageExtra
+ * @property string $lastErrorCode
  */
 class CPSApiComponent extends CPSComponent
 {
+	//*************************************************************************
+	//*	Constants
+	//*************************************************************************
+
+	/**
+	 * HTTP Methods
+	 */
+	const
+		HTTP_POST = 'POST',
+		HTTP_GET = 'GET',
+		HTTP_PUT = 'PUT',
+		HTTP_DELETE = 'DELETE'
+	;
+
 	//********************************************************************************
 	//* Properties
 	//********************************************************************************
@@ -56,7 +90,7 @@ class CPSApiComponent extends CPSComponent
 	/**
 	 * @var string
 	 */
-	protected $_apiToUseprotected;
+	protected $_apiToUse;
 	/**
 	 * @var string
 	 */
@@ -73,6 +107,10 @@ class CPSApiComponent extends CPSComponent
 	 * @var string
 	 */
 	protected $_payload;
+	/**
+	 * @var string
+	 */
+	protected $_requestData;
 	/**
 	 * @var string
 	 */
@@ -186,6 +224,7 @@ class CPSApiComponent extends CPSComponent
 	 *
 	 * @param string $subType
 	 * @param array $requestData
+	 * @param string $requestMethod
 	 * @return string
 	 */
 	protected function makeRequest( $subType = '/', $requestData = null, $requestMethod = 'GET' )
@@ -201,6 +240,7 @@ class CPSApiComponent extends CPSComponent
 		}
 
 		//	Default...
+		$_queryString = null;
 		$_payload = $this->_requestData;
 
 		//	Check data...
@@ -399,184 +439,355 @@ class CPSApiComponent extends CPSComponent
 	//* Accessors
 	//********************************************************************************
 
+	/**
+	 * @return string
+	 */
 	public function getAltApiKey()
 	{
 		return $this->_altApiKey;
 	}
 
+	/**
+	 * @param $altApiKey
+	 * @return \CPSApiComponent
+	 */
 	public function setAltApiKey( $altApiKey )
 	{
-		$this->_altApiKey = $_altApiKey;
+		$this->_altApiKey = $altApiKey;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getAppendFormat()
 	{
 		return $this->_appendFormat;
 	}
 
+	/**
+	 * @param $appendFormat
+	 * @return \CPSApiComponent
+	 */
 	public function setAppendFormat( $appendFormat )
 	{
-		$this->_appendFormat = $_appendFormat;
+		$this->_appendFormat = $appendFormat;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getApiBaseUrl()
 	{
 		return $this->_apiBaseUrl;
 	}
 
+	/**
+	 * @param $apiBaseUrl
+	 * @return \CPSApiComponent
+	 */
 	public function setApiBaseUrl( $apiBaseUrl )
 	{
-		$this->_apiBaseUrl = $_apiBaseUrl;
+		$this->_apiBaseUrl = $apiBaseUrl;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getApiKey()
 	{
 		return $this->_apiKey;
 	}
 
+	/**
+	 * @param $apiKey
+	 * @return \CPSApiComponent
+	 */
 	public function setApiKey( $apiKey )
 	{
-		$this->_apiKey = $_apiKey;
+		$this->_apiKey = $apiKey;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getApiQueryName()
 	{
 		return $this->_apiQueryName;
 	}
 
+	/**
+	 * @param $apiQueryName
+	 * @return \CPSApiComponent
+	 */
 	public function setApiQueryName( $apiQueryName )
 	{
-		$this->_apiQueryName = $_apiQueryName;
+		$this->_apiQueryName = $apiQueryName;
+		return $this;
 	}
 
-	public function getApiToUseprotected()
+	/**
+	 * @return string
+	 */
+	public function getApiToUse()
 	{
-		return $this->_apiToUseprotected;
+		return $this->_apiToUse;
 	}
 
-	public function setApiToUseprotected( $apiToUseprotected )
+	/**
+	 * @param $apiToUse
+	 * @return \CPSApiComponent
+	 */
+	public function setApiToUse( $apiToUse )
 	{
-		$this->_apiToUseprotected = $_apiToUseprotected;
+		$this->_apiToUse = $apiToUse;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getApiSubUrls()
 	{
 		return $this->_apiSubUrls;
 	}
 
+	/**
+	 * @param $apiSubUrls
+	 * @return \CPSApiComponent
+	 */
 	public function setApiSubUrls( $apiSubUrls )
 	{
-		$this->_apiSubUrls = $_apiSubUrls;
+		$this->_apiSubUrls = $apiSubUrls;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getHttpMethod()
 	{
 		return $this->_httpMethod;
 	}
 
+	/**
+	 * @param $httpMethod
+	 * @return \CPSApiComponent
+	 */
 	public function setHttpMethod( $httpMethod )
 	{
-		$this->_httpMethod = $_httpMethod;
+		$this->_httpMethod = $httpMethod;
+		return $this;
 	}
 
+	/**
+	 * @return int
+	 */
 	public function getReturnFormat()
 	{
 		return $this->_returnFormat;
 	}
 
+	/**
+	 * @param $returnFormat
+	 * @return \CPSApiComponent
+	 */
 	public function setReturnFormat( $returnFormat )
 	{
-		$this->_returnFormat = $_returnFormat;
+		$this->_returnFormat = $returnFormat;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getRequestData()
 	{
 		return $this->_requestData;
 	}
 
+	/**
+	 * @param $requestData
+	 * @return \CPSApiComponent
+	 */
 	public function setRequestData( $requestData )
 	{
-		$this->_requestData = $_payload;
+		$this->_requestData = $requestData;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getRequestMap()
 	{
 		return $this->_requestMap;
 	}
 
+	/**
+	 * @param $requestMap
+	 * @return \CPSApiComponent
+	 */
 	public function setRequestMap( $requestMap )
 	{
-		$this->_requestMap = $_requestMap;
+		$this->_requestMap = $requestMap;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getRequireApiQueryName()
 	{
 		return $this->_requireApiQueryName;
 	}
 
+	/**
+	 * @param $requireApiQueryName
+	 * @return \CPSApiComponent
+	 */
 	public function setRequireApiQueryName( $requireApiQueryName )
 	{
-		$this->_requireApiQueryName = $_requireApiQueryName;
+		$this->_requireApiQueryName = $requireApiQueryName;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getTestApiKey()
 	{
 		return $this->_testApiKey;
 	}
 
+	/**
+	 * @param $testApiKey
+	 * @return \CPSApiComponent
+	 */
 	public function setTestApiKey( $testApiKey )
 	{
-		$this->_testApiKey = $_testApiKey;
+		$this->_testApiKey = $testApiKey;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getTestAltApiKey()
 	{
 		return $this->_testAltApiKey;
 	}
 
+	/**
+	 * @param $testAltApiKey
+	 * @return \CPSApiComponent
+	 */
 	public function setTestAltApiKey( $testAltApiKey )
 	{
-		$this->_testAltApiKey = $_testAltApiKey;
+		$this->_testAltApiKey = $testAltApiKey;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getUserAgent()
 	{
 		return $this->_userAgent;
 	}
 
+	/**
+	 * @param $userAgent
+	 * @return \CPSApiComponent
+	 */
 	public function setUserAgent( $userAgent )
 	{
-		$this->_userAgent = $_userAgent;
+		$this->_userAgent = $userAgent;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getLastErrorMessage()
 	{
 		return $this->_lastErrorMessage;
 	}
 
+	/**
+	 * @param $lastErrorMessage
+	 * @return \CPSApiComponent
+	 */
 	public function setLastErrorMessage( $lastErrorMessage )
 	{
-		$this->_lastErrorMessage = $_lastErrorMessage;
+		$this->_lastErrorMessage = $lastErrorMessage;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getLastErrorMessageExtra()
 	{
 		return $this->_lastErrorMessageExtra;
 	}
 
+	/**
+	 * @param $lastErrorMessageExtra
+	 * @return \CPSApiComponent
+	 */
 	public function setLastErrorMessageExtra( $lastErrorMessageExtra )
 	{
-		$this->_lastErrorMessageExtra = $_lastErrorMessageExtra;
+		$this->_lastErrorMessageExtra = $lastErrorMessageExtra;
+		return $this;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getLastErrorCode()
 	{
 		return $this->_lastErrorCode;
 	}
 
+	/**
+	 * @param $lastErrorCode
+	 * @return \CPSApiComponent
+	 */
 	public function setLastErrorCode( $lastErrorCode )
 	{
-		$this->_lastErrorCode = $_lastErrorCode;
+		$this->_lastErrorCode = $lastErrorCode;
+		return $this;
+	}
+
+	/**
+	 * @param string $payload
+	 * @return void
+	 */
+	public function setPayload( $payload )
+	{
+		$this->_payload = $payload;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPayload( )
+	{
+		return $this->_payload;
+	}
+
+	public function setPayload( $payload )
+	{
+		$this->payload = $payload;
+	}
+
+	public function getPayload( )
+	{
+		return $this->payload;
 	}
 
 }

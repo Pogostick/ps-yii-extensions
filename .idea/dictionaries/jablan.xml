@@ -2,6 +2,7 @@
   <dictionary name="jablan">
     <words>
       <w>crit</w>
+      <w>directmessage</w>
       <w>rlcf</w>
       <w>unserialize</w>
     </words>

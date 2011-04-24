@@ -289,8 +289,8 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 			//	Check theme overrides...
 			if ( null !== $widgetTheme )
 				$_widgetTheme = $widgetTheme;
-			else if ( null !== $_widget->getTheme() )
-				$_widgetTheme = $_widget->getTheme();
+			else if ( null !== $_widget->theme )
+				$_widgetTheme = $_widget->theme;
 			else if ( null !== PS::_gp( 'theme' ) )
 				$_widgetTheme = PS::_gp( 'theme' );
 			else

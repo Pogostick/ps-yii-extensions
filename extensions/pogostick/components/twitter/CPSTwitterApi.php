@@ -23,60 +23,54 @@
  * @todo Implement Block APIs
  * @todo Implement Trends API
  * @todo Complete Search API integdration
+ *
+ * @property string $userId
+ * @property string $screenName
  */
 class CPSTwitterApi extends CPSOAuthComponent
 {
 	//********************************************************************************
 	//* Constants
 	//********************************************************************************
+	
+	/**
+	 * The available Twitter sub-APIs
+	 */
+	const 
+		STATUS_API = 'statuses',
+		USER_API = 'users',
+		DIRECTMESSAGE_API = 'direct_message',
+		FRIENDSHIP_API = 'friendships',
+		FRIEND_API = 'friends',
+		FOLLOWER_API = 'followers',
+		ACCOUNT_API = 'account',
+		FAVORITE_API = 'favorites',
+		NOTIFICATION_API = 'notifications',
+		BLOCK_API = 'blocks',
+		TRENDS_API = 'trends',
+		SEARCH_API = 'search'
+	;
 
-	const STATUS_API = 'statuses';
-	const USER_API = 'users';
-	const DIRECTMESSAGE_API = 'direct_message';
-	const FRIENDSHIP_API = 'friendships';
-	const FRIEND_API = 'friends';
-	const FOLLOWER_API = 'followers';
-	const ACCOUNT_API = 'account';
-	const FAVORITE_API = 'favorites';
-	const NOTIFICATION_API = 'notifications';
-	const BLOCK_API = 'blocks';
-	const TRENDS_API = 'trends';
-	const SEARCH_API = 'search';
-
-	//********************************************************************************
-	//* Construct
-	//********************************************************************************
+	//*************************************************************************
+	//* Private Members
+	//*************************************************************************
 
 	/**
-	* Preinitialize
-	*/
-	public function preinit()
-	{
-		//	Phone home...
-		parent::preinit();
-
-		//	Add ours...
-		$this->addOptions( self::getBaseOptions() );
-	}
-
+	 * @var string
+	 */
+	protected $_userId;
 	/**
-	* Add our options
-	*/
-	private function getBaseOptions()
-	{
-		return(
-			array(
-				//	Required settings
-				'userId' => 'string:',
-				'screenName' => 'string:',
-			)
-		);
-	}
+	 * @var string
+	 */
+	protected $_screenName;
 
 	//********************************************************************************
 	//* Yii Overrides
 	//********************************************************************************
 
+	/**
+	 * @return void
+	 */
 	public function init()
 	{
 		//	Call daddy
@@ -84,10 +78,10 @@ class CPSTwitterApi extends CPSOAuthComponent
 
 		//	Set current twitter api url
 		if ( ! $this->apiBaseUrl )
-			$this->apiBaseUrl = 'http://twitter.com';
+			$this->setApiBaseUrl( 'http://twitter.com' );
 		
 		//	Create the base array
-		$this->requestMap = array();
+		$this->setRequestMap( array() );
 
 		//********************************************************************************
 		//* Statuses API
@@ -152,7 +146,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'in_reply_to_status_id' => false
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 			)
 		);
 
@@ -161,7 +155,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'id' => true
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 			)
 		);
 
@@ -212,7 +206,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'follow' => false,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
 				'_requireAuth' => true,
 			),
@@ -226,7 +220,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'screen_name' => false,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
 				'_requireAuth' => true,
 			),
@@ -294,7 +288,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 		$this->addTwitterRequestMapping( 'end_session',
 			null,
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireAuth' => true
 			)
 		 );
@@ -304,7 +298,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'device' => true,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireAuth' => true
 			)
 		);
@@ -318,7 +312,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'profile_sidebar_border_color' => false,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireOneOf' => array( 'profile_background_color', 'profile_text_color', 'profile_link_color', 'profile_sidebar_fill_color', 'profile_sidebar_border_color' ),
 				'_requireAuth' => true,
 			)
@@ -329,7 +323,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'image' => true,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireAuth' => true,
 			)
 		);
@@ -340,7 +334,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'tile' => false,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireAuth' => true,
 			)
 		);
@@ -354,7 +348,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'description' => false,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireOneOf' => array( 'name', 'email', 'url', 'location', 'description' ),
 				'_requireAuth' => true,
 			)
@@ -380,7 +374,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'id' => true,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireAuth' => true,
 			)
 		);
@@ -390,7 +384,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'id' => true,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireAuth' => true,
 			)
 		);
@@ -406,7 +400,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'screen_name' => false,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
 				'_requireAuth' => true,
 			),
@@ -420,7 +414,7 @@ class CPSTwitterApi extends CPSOAuthComponent
 				'screen_name' => false,
 			),
 			array(
-				'_method' => CPSApiBehavior::HTTP_POST,
+				'_method' => self::HTTP_POST,
 				'_requireOneOf' => array( 'id', 'user_id', 'screen_name' ),
 				'_requireAuth' => true,
 			)
@@ -914,6 +908,42 @@ class CPSTwitterApi extends CPSOAuthComponent
 		$_arOptions[ 'requestMap' ][ $_sLastController ][ $sAction ] = array( 'params' => $arParams, 'options' => $arOptions, 'controller' => $_sLastController );
 
 		return true;
+	}
+
+	/**
+	 * @param string $screenName
+	 * @return $this
+	 */
+	public function setScreenName( $screenName )
+	{
+		$this->_screenName = $screenName;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getScreenName( )
+	{
+		return $this->_screenName;
+	}
+
+	/**
+	 * @param string $userId
+	 * @return $this
+	 */
+	public function setUserId( $userId )
+	{
+		$this->_userId = $userId;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getUserId( )
+	{
+		return $this->_userId;
 	}
 
 }
