@@ -32,16 +32,16 @@ class CPSRESTAction extends CAction implements IPSBase
 	*/
 	public function run()
 	{
-		$_oController = $this->getController();
+		$_controller = $this->getController();
 		
-		if ( ! ( $_oController instanceof IPSRest ) )
+		if ( ! ( $_controller instanceof IPSRest ) )
 		{
-			$_oController->missingAction( $this->getId() );
+			$_controller->missingAction( $this->getId() );
 			return;
 		}
 		
 		//	Call the controllers dispatch method...
-		$_oController->dispatchRequest( $this );
+		$_controller->dispatchRequest( $this );
 	}
 
 }

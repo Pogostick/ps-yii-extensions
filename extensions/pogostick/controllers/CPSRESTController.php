@@ -52,13 +52,13 @@ class CPSRESTController extends CPSController
 	 * Creates the action instance based on the action name.
 	 * The action can be either an inline action or an object.
 	 * The latter is created by looking up the action map specified in {@link actions}.
-	 * @param string ID of the action. If empty, the {@link defaultAction default action} will be used.
+	 * @param $actionId
 	 * @return CAction the action instance, null if the action does not exist.
 	 * @see actions
 	 */
-	public function createAction( $sActionId )
+	public function createAction( $actionId )
 	{
-		$_actionId = ( $sActionId === '' ) ? $this->defaultAction : $sActionId;
+		$_actionId = ( $actionId === '' ) ? $this->defaultAction : $actionId;
 
 		//	Is it a valid request?
 		if ( ! method_exists( $this, 'get' . $_actionId ) && ! method_exists( $this, 'post' . $_actionId ) && ! method_exists( $this, 'request' . $_actionId ) )
@@ -69,36 +69,37 @@ class CPSRESTController extends CPSController
 
 	/**
 	 * Converts an array to JSON
-	 *
-	 * @param array $arData
+	 * @param array $sourceArray
+	 * @return string
 	 */
-	public function arrayToJSON( $arData = array() )
+	public function arrayToJSON( $sourceArray = array() )
 	{
-		$_arOut = array();
+		$_result = array();
 
-		foreach ( $arData as $_key => &$_value )
-			$_arOut[] = $_key . ':' . $this->toJSON( $_value );
+		foreach ( $sourceArray as $_key => &$_value )
+			$_result[] = $_key . ':' . $this->toJSON( $_value );
 
-		return '{' . implode( ',', $_arOut ) . '}';
+		return '{' . implode( ',', $_result ) . '}';
 	}
 
 	/***
 	 * Converts an item to JSON
 	 *
-	 * @param mixed $oValue
+	 * @param mixed $value
+	 * @return mixed|string
 	 */
-	function toJSON( $oValue )
+	function toJSON( $value )
 	{
-		if ( is_array( $oValue ) )
-			$_oOut = $this->arrayToJSON( $oValue );
-		else if ( is_string( $oValue ) )
-			$_oOut = '"' . addslashes( $oValue ) . '"';
-		else if ( is_bool( $oValue ) )
-			$_oOut = $oValue ? 'true' : 'false';
-		else if ( is_null( $oValue ) )
+		if ( is_array( $value ) )
+			$_oOut = $this->arrayToJSON( $value );
+		else if ( is_string( $value ) )
+			$_oOut = '"' . addslashes( $value ) . '"';
+		else if ( is_bool( $value ) )
+			$_oOut = $value ? 'true' : 'false';
+		else if ( is_null( $value ) )
 			$_oOut = '""';
 		else
-			$_oOut = $oValue;
+			$_oOut = $value;
 
 		return $_oOut;
 	}
@@ -110,12 +111,13 @@ class CPSRESTController extends CPSController
 	/**
 	 * Runs the named REST action.
 	 * Filters specified via {@link filters()} will be applied.
-	 * @param string $sActionId Action id
-	 * @throws CHttpException if the action does not exist or the action name is not proper.
+	 * @param \CAction $action
+	 * @return string
 	 * @see filters
 	 * @see createAction
 	 * @see runAction
 	 * @access protected
+	 * @throws CHttpException if the action does not exist or the action name is not proper.
 	 */
 	protected function dispatchRequest( CAction $action )
 	{
@@ -128,6 +130,7 @@ class CPSRESTController extends CPSController
 		$_uri = PS::_gr()->getRequestUri();
 		$_frag = '/' . $this->getId() . '/' . $_actionId;
 
+		//	Strip off everything after the route...
 		if ( null != ( $_uri = trim( substr( $_uri, stripos( $_uri, $_frag ) + strlen( $_frag ) ), ' /?' ) ) )
 		{
 			$_options = ( ! empty( $_uri ) ? explode( '/', $_uri ) : array() );
@@ -166,7 +169,7 @@ class CPSRESTController extends CPSController
 		}
 
 		//	Is it a valid request?
-		$_requestType = strtolower( $this->getRequest()->getRequestType() );
+		$_requestType = strtolower( PS::_gr()->getRequestType() );
 		$_requestMethod = $_requestType . ucfirst( $_actionId );
 
 		if ( $_requestType == 'post' )
