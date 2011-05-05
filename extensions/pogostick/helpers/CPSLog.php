@@ -19,7 +19,7 @@
  *
  * @filesource
  */
-class CPSLog implements IPSBase
+class CPSLog
 {
 	//********************************************************************************
 	//* Private Members
@@ -80,8 +80,8 @@ class CPSLog implements IPSBase
 		//	Handle writing to multiple levels at once.
 		foreach ( $_levelList as $_level )
 		{
-			$_indicator = PS::o( self::$_levelIndicators, $_level, self::$_defaultLevelIndicator );
-			$_logEntry = self::$prefix . Yii::t( $category, $message, $options, $source, $language );
+			$_indicator = ( in_array( $_level, self::$_levelIndicators ) ? self::$_levelIndicators[$_level] : self::$_defaultLevelIndicator );
+			$_logEntry = self::$prefix . ( class_exists( 'Yii' ) ? Yii::t( $category, $message, $options, $source, $language ) : $message );
 
 			if ( self::$echoData )
 			{
@@ -100,7 +100,12 @@ class CPSLog implements IPSBase
 
 			$_logEntry = str_repeat( '  ', $_tempIndent ) . $_indicator . ' ' . $message;
 
-			Yii::log( $_logEntry, $_level, $category );
+			if ( class_exists( 'Yii' ) )
+				Yii::log( $_logEntry, $_level, $category );
+			else if ( class_exists( 'SimpleLogger' ) )
+				SimpleLogger::getInstance()->write( $_logEntry, 6 );
+			else
+				error_log( $_logEntry );
 		}
 
 		//	Set indent level...
@@ -212,7 +217,7 @@ class CPSLog implements IPSBase
 			{
 				if ( null === ( $_caller = PS::o( $_trace, $level ) ) )
 					break;
-				
+
 				//	If we see ourself, then we must go again
 				if ( null !== ( $_class = PS::o( $_caller, 'class' ) ) && $_class != $_className )
 					return $_class . '::' . PS::o( $_caller, 'function' );
