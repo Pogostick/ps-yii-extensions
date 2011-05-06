@@ -205,7 +205,7 @@ class CPSRESTController extends CPSController
 	 *
 	 * @param array $resultList
 	 * @param boolean $isError
-	 * @param string $errorText
+	 * @param string $errorMessage
 	 * @param integer $errorCode
 	 * @return string JSON encoded array
 	 */
@@ -233,6 +233,26 @@ class CPSRESTController extends CPSController
 		}
 
 		return json_encode( $_response );
+	}
+
+	/**
+	 * Creates a JSON encoded array (as a string) with a standard REST response. Override to provide
+	 * a different response format.
+	 *
+	 * @param string|Exception $errorMessage
+	 * @param integer $errorCode
+	 * @return string JSON encoded array
+	 */
+	protected function _createErrorResponse( $errorMessage = 'failure', $errorCode = 0 )
+	{
+		if ( $errorMessage instanceof Exception )
+		{
+			$_ex = $errorMessage;
+			$errorMessage = $_ex->getMessage();
+			$errorCode = $_ex->getCode();
+		}
+
+		return $this->_createResponse( array(), true, $errorMessage, $errorCode );
 	}
 
 	/***

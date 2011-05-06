@@ -695,6 +695,39 @@ class CPSHelperBase extends CHtml implements IPSBase
 		}
 	}
 
+	/**
+	 * @static
+	 * @param string $key
+	 * @param mixed $defaultValue
+	 * @return mixed
+	 */
+	public static function opost( $key, $defaultValue = null )
+	{
+		return self::o( $_POST, $key, $defaultValue );
+	}
+
+	/**
+	 * @static
+	 * @param string $key
+	 * @param mixed $defaultValue
+	 * @return mixed
+	 */
+	public static function oget( $key, $defaultValue = null )
+	{
+		return self::o( $_GET, $key, $defaultValue );
+	}
+
+	/**
+	 * @static
+	 * @param string $key
+	 * @param mixed $defaultValue
+	 * @return mixed
+	 */
+	public static function oreq( $key, $defaultValue = null )
+	{
+		return self::o( $_REQUEST, $key, $defaultValue );
+	}
+
 	//********************************************************************************
 	//* Yii Convenience Mappings
 	//********************************************************************************
@@ -1430,6 +1463,14 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function isPostRequest()
 	{
+		return self::ipr();
+	}
+
+	/**
+	 * @return boolean whether this is POST request.
+	 */
+	public static function ipr()
+	{
 		return self::_gr()->getIsPostRequest();
 	}
 
@@ -1437,6 +1478,14 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return boolean True if this is an AJAX (xhr) request.
 	 */
 	public static function isAjaxRequest()
+	{
+		return self::iar();
+	}
+
+	/**
+	 * @return boolean True if this is an AJAX (xhr) request.
+	 */
+	public static function iar()
 	{
 		return self::_gr()->getIsAjaxRequest();
 	}
