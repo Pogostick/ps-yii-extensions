@@ -22,6 +22,17 @@
  */
 class CPSRESTController extends CPSController
 {
+	//**************************************************************************
+	//* Private Members
+	//**************************************************************************
+
+	/**
+	 * The requested output format. Defaults to null which requires the handler
+	 * to return the proper format.
+	 * @var int
+	 */
+	protected $_requestedOutputFormat = null;
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -67,43 +78,6 @@ class CPSRESTController extends CPSController
 		return new CPSRESTAction( $this, $_actionId );
 	}
 
-	/**
-	 * Converts an array to JSON
-	 * @param array $sourceArray
-	 * @return string
-	 */
-	public function arrayToJSON( $sourceArray = array() )
-	{
-		$_result = array();
-
-		foreach ( $sourceArray as $_key => &$_value )
-			$_result[] = $_key . ':' . $this->toJSON( $_value );
-
-		return '{' . implode( ',', $_result ) . '}';
-	}
-
-	/***
-	 * Converts an item to JSON
-	 *
-	 * @param mixed $value
-	 * @return mixed|string
-	 */
-	function toJSON( $value )
-	{
-		if ( is_array( $value ) )
-			$_oOut = $this->arrayToJSON( $value );
-		else if ( is_string( $value ) )
-			$_oOut = '"' . addslashes( $value ) . '"';
-		else if ( is_bool( $value ) )
-			$_oOut = $value ? 'true' : 'false';
-		else if ( is_null( $value ) )
-			$_oOut = '""';
-		else
-			$_oOut = $value;
-
-		return $_oOut;
-	}
-
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
@@ -112,12 +86,12 @@ class CPSRESTController extends CPSController
 	 * Runs the named REST action.
 	 * Filters specified via {@link filters()} will be applied.
 	 * @param \CAction $action
-	 * @return string
-	 * @see filters
+	 * @return mixed
 	 * @see createAction
 	 * @see runAction
 	 * @access protected
 	 * @throws CHttpException if the action does not exist or the action name is not proper.
+	 * @todo This needs serious re-working
 	 */
 	protected function dispatchRequest( CAction $action )
 	{
@@ -196,7 +170,37 @@ class CPSRESTController extends CPSController
 			$_requestMethod = 'request' . $_actionId;
 		}
 
-		echo call_user_func_array( array( $this, $_requestMethod ), array_values( $_urlParameters ) );
+		$_callResults = call_user_func_array( array( $this, $_requestMethod ), array_values( $_urlParameters ) );
+
+		//	Transform output
+		switch ( $this->_requestedOutputFormat )
+		{
+			case PS::OF_JSON:
+				$_callResults = json_encode( $_callResults );
+				header( 'Content-type: application/json' );
+				break;
+
+			case PS::OF_XML:
+				$_callResults = PS::arrayToXml( $_callResults, 'response' );
+
+				//	Set appropriate content type
+				if ( stristr( $_SERVER[ 'HTTP_ACCEPT' ], 'application/xhtml+xml' ) )
+					header( 'Content-type: application/xhtml+xml;charset=utf-8' );
+				else
+					header( 'Content-type: text/xml;charset=utf-8' );
+				break;
+
+			case PS::OF_ASSOC_ARRAY:
+			default:
+				//	Nothing to do...
+				break;
+		}
+
+		//	Echo output...
+		echo $_callResults;
+
+		//	Also return the results
+		return $_callResults;
 	}
 
 	/**
@@ -232,7 +236,7 @@ class CPSRESTController extends CPSController
 				$_response['resultData'] = $resultList;
 		}
 
-		return json_encode( $_response );
+		return $_response;
 	}
 
 	/**
@@ -280,5 +284,27 @@ class CPSRESTController extends CPSController
 		}
 
 		return $_errorList;
+	}
+
+	//**************************************************************************
+	//* Properties
+	//**************************************************************************
+
+	/**
+	 * @param int $requestedOutputFormat
+	 * @return \CPSRESTController
+	 */
+	public function setRequestedOutputFormat( $requestedOutputFormat )
+	{
+		$this->_requestedOutputFormat = $requestedOutputFormat;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getRequestedOutputFormat( )
+	{
+		return $this->_requestedOutputFormat;
 	}
 }

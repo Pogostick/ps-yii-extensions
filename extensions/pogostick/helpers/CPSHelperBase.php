@@ -728,6 +728,18 @@ class CPSHelperBase extends CHtml implements IPSBase
 		return self::o( $_REQUEST, $key, $defaultValue );
 	}
 
+	/**
+	 * Shortcut method to pull a key out of $_SERVER
+	 * @static
+	 * @param string $key
+	 * @param mixed $defaultValue
+	 * @return mixed
+	 */
+	public static function osvr( $key, $defaultValue = null )
+	{
+		return self::o( $_SERVER, $key, $defaultValue );
+	}
+
 	//********************************************************************************
 	//* Yii Convenience Mappings
 	//********************************************************************************
