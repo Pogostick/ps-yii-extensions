@@ -63,6 +63,11 @@ abstract class CPSController extends CController implements IPSBase
 	//********************************************************************************
 
 	/**
+	 * @var int
+	 */
+	protected $_debugMode;
+
+	/**
 	 * @var array context menu items. This property will be assigned to {@link CMenu::items}.
 	 */
 	protected $_menu = array();
@@ -590,6 +595,8 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	public function setStandardFormOptions( $model, $options = array() )
 	{
+		$_title = null;
+
 		//	Shortcut... only passed in the title...
 		if ( is_string( $options ) )
 		{
@@ -634,14 +641,17 @@ abstract class CPSController extends CController implements IPSBase
 			PS::_ss( 'psForm-flash-html', PS::tag( 'span', array( 'id' => $_spanId, 'class' => $_flashClass ), $_message ) );
 
 			//	Register a nice little fader...
-			$_fader =<<<SCRIPT
+			if ( $_flashText )
+			{
+				$_fader =<<<SCRIPT
 notify('default',{title:'{$_title}',text:'{$_flashText}'});
 //$('#___spanId_').fadeIn('500',function(){
 //	$(this).delay(3000).fadeOut(3500);
 //});";
 SCRIPT;
 
-			PS::_rs( $_formId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
+				PS::_rs( $_formId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
+			}
 		}
 
 		PS::setFormFieldContainerClass( PS::o( $options, 'rowClass', 'row' ) );
@@ -1042,6 +1052,17 @@ JS;
 
 		echo $_result;
 		return;
+	}
+
+	public function setDebugMode( $debugMode )
+	{
+		$this->_debugMode = $debugMode;
+		return $this;
+	}
+
+	public function getDebugMode( )
+	{
+		return $this->_debugMode;
 	}
 
 }
