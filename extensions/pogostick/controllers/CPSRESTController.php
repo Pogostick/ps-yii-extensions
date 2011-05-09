@@ -31,7 +31,14 @@ class CPSRESTController extends CPSController
 	 * to return the proper format.
 	 * @var int
 	 */
-	protected $_requestedOutputFormat = null;
+	protected $_outputFormat = null;
+
+	/**
+	 * If true, all inbound request parameters will be passed to the action
+	 * as a hash instead of individual arguments.
+	 * @var bool
+	 */
+	protected $_singleParameterActions = false;
 
 	//********************************************************************************
 	//* Public Methods
@@ -70,12 +77,30 @@ class CPSRESTController extends CPSController
 	public function createAction( $actionId )
 	{
 		$_actionId = ( $actionId === '' ) ? $this->defaultAction : $actionId;
+		$_requestMethod = PS::_gr()->getRequestType();
 
 		//	Is it a valid request?
-		if ( ! method_exists( $this, 'get' . $_actionId ) && ! method_exists( $this, 'post' . $_actionId ) && ! method_exists( $this, 'request' . $_actionId ) )
+		if ( ! method_exists( $this, $_requestMethod . $_actionId ) && ! method_exists( $this, 'request' . $_actionId ) )
 			return $this->missingAction( $_actionId );
 
-		return new CPSRESTAction( $this, $_actionId );
+		return new CPSRESTAction( $this, $_actionId, $_requestMethod );
+	}
+
+	/**
+	 * *** THIS IS A PUBLIC EXPOSURE OF THE PROTECTED METHOD ***
+	 *
+	 * Runs the named REST action.
+	 * Filters specified via {@link filters()} will be applied.
+	 * @param \CPSRESTAction $action
+	 * @return mixed
+	 * @see createAction
+	 * @see runAction
+	 * @access protected
+	 * @throws CHttpException if the action does not exist or the action name is not proper.
+	 */
+	public function dispatchRequest( CPSRESTAction $action )
+	{
+		return $this->_dispatchRequest( $action );
 	}
 
 	//********************************************************************************
@@ -91,9 +116,9 @@ class CPSRESTController extends CPSController
 	 * @see runAction
 	 * @access protected
 	 * @throws CHttpException if the action does not exist or the action name is not proper.
-	 * @todo This needs serious re-working
 	 */
-	protected function dispatchRequest( CAction $action )
+	//	@todo This needs serious re-working
+	protected function _dispatchRequest( CAction $action )
 	{
 		$_actionId = $action->getId();
 		$_parameters = $_REQUEST;
@@ -158,6 +183,8 @@ class CPSRESTController extends CPSController
 						$_urlParameters[ $_subKey ] = $_subValue;
 				}
 			}
+		} else if ( 'get' != $_requestType )
+		{
 		}
 
 		if ( ! method_exists( $this, $_requestMethod ) )
@@ -170,18 +197,50 @@ class CPSRESTController extends CPSController
 			$_requestMethod = 'request' . $_actionId;
 		}
 
-		$_callResults = call_user_func_array( array( $this, $_requestMethod ), array_values( $_urlParameters ) );
+		$_callResults = call_user_func_array(
+			array(
+				 $this,
+				 $_requestMethod
+			),
+			//	Pass in parameters collected as a single array or individual values
+			$this->_singleParameterActions ? array( $_urlParameters ) : array_values( $_urlParameters )
+		);
+
+		//	Echo output...
+		echo $this->_formatOutput( $_callResults );
+
+		//	Also return the results should anyone care to have them...
+		return $_callResults;
+	}
+
+	/**
+	 * Converts the given argument to the proper format for
+	 * return the consumer application.
+	 *
+	 * @param mixed $output
+	 * @return mixed
+	 */
+	protected function _formatOutput( $output )
+	{
+		$_response = null;
 
 		//	Transform output
-		switch ( $this->_requestedOutputFormat )
+		switch ( $this->_outputFormat )
 		{
 			case PS::OF_JSON:
-				$_callResults = json_encode( $_callResults );
 				header( 'Content-type: application/json' );
+
+				/**
+				 * Chose NOT to overwrite in the case of an error while
+				 * formatting into json via builtin.
+				 */
+				//	@todo Not sure if this is all that wise, will cause confusion when your methods return nada.
+				if ( false !== ( $_response = json_encode( $output ) ) )
+					$output = $_response;
 				break;
 
 			case PS::OF_XML:
-				$_callResults = PS::arrayToXml( $_callResults, 'response' );
+				$output = PS::arrayToXml( $output, 'response' );
 
 				//	Set appropriate content type
 				if ( stristr( $_SERVER[ 'HTTP_ACCEPT' ], 'application/xhtml+xml' ) )
@@ -192,15 +251,13 @@ class CPSRESTController extends CPSController
 
 			case PS::OF_ASSOC_ARRAY:
 			default:
-				//	Nothing to do...
+				if ( ! is_array( $output ) )
+					$output = array( $output );
 				break;
 		}
 
-		//	Echo output...
-		echo $_callResults;
-
-		//	Also return the results
-		return $_callResults;
+		//	And return the formatted (or not as the case may be) output
+		return $output;
 	}
 
 	/**
@@ -211,9 +268,10 @@ class CPSRESTController extends CPSController
 	 * @param boolean $isError
 	 * @param string $errorMessage
 	 * @param integer $errorCode
+	 * @param array $additionalInfo
 	 * @return string JSON encoded array
 	 */
-	protected function _createResponse( $resultList = array(), $isError = false, $errorMessage = 'failure', $errorCode = 0 )
+	protected function _createResponse( $resultList = array(), $isError = false, $errorMessage = 'failure', $errorCode = 0, $additionalInfo = array() )
 	{
 		if ( $isError )
 		{
@@ -236,6 +294,13 @@ class CPSRESTController extends CPSController
 				$_response['resultData'] = $resultList;
 		}
 
+		//	Add in any additional info...
+		if ( is_array( $additionalInfo ) && ! empty( $additionalInfo ) )
+		{
+			foreach ( $additionalInfo as $_key => $_value )
+				$_response[$_key] = $_value;
+		}
+
 		return $_response;
 	}
 
@@ -249,14 +314,31 @@ class CPSRESTController extends CPSController
 	 */
 	protected function _createErrorResponse( $errorMessage = 'failure', $errorCode = 0 )
 	{
+		$_additionalInfo = null;
+
 		if ( $errorMessage instanceof Exception )
 		{
 			$_ex = $errorMessage;
+
 			$errorMessage = $_ex->getMessage();
-			$errorCode = $_ex->getCode();
+			$errorCode = ( $_ex instanceof CHttpException ? $_ex->statusCode : $_ex->getCode() );
+			$_previous = $_ex->getPrevious();
+
+			//	In debug mode, we output more information
+			if ( $this->_debugMode )
+			{
+				$_additionalInfo = array(
+					'errorType' => 'Exception',
+					'errorClass' => get_class( $_ex ),
+					'errorFile' => $_ex->getFile(),
+					'errorLine' => $_ex->getLine(),
+					'stackTrace' => $_ex->getTrace(),
+					'previous' => ( $_previous ? $this->_createErrorResponse( $_previous ) : null ),
+				);
+			}
 		}
 
-		return $this->_createResponse( array(), true, $errorMessage, $errorCode );
+		return $this->_createResponse( array(), true, $errorMessage, $errorCode, $_additionalInfo );
 	}
 
 	/***
@@ -291,20 +373,38 @@ class CPSRESTController extends CPSController
 	//**************************************************************************
 
 	/**
-	 * @param int $requestedOutputFormat
+	 * @param int $outputFormat
 	 * @return \CPSRESTController
 	 */
-	public function setRequestedOutputFormat( $requestedOutputFormat )
+	public function setOutputFormat( $outputFormat )
 	{
-		$this->_requestedOutputFormat = $requestedOutputFormat;
+		$this->_outputFormat = $outputFormat;
 		return $this;
 	}
 
 	/**
 	 * @return int
 	 */
-	public function getRequestedOutputFormat( )
+	public function getOutputFormat( )
 	{
-		return $this->_requestedOutputFormat;
+		return $this->_outputFormat;
+	}
+
+	/**
+	 * @param boolean $singleParameterActions
+	 * @return \CPSRESTController
+	 */
+	public function setSingleParameterActions( $singleParameterActions )
+	{
+		$this->_singleParameterActions = $singleParameterActions;
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getSingleParameterActions()
+	{
+		return $this->_singleParameterActions;
 	}
 }

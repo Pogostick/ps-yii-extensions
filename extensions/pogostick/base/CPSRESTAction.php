@@ -23,15 +23,48 @@
 class CPSRESTAction extends CAction implements IPSBase
 {
 	//********************************************************************************
+	//* Private Members
+	//********************************************************************************
+
+	/**
+	 * The inbound payload for non-GET/POST requests
+	 * @var mixed
+	 */
+	protected $_payload;
+
+	/**
+	 * @var string The request method
+	 */
+	protected $_method;
+	
+	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
-	
+
+	/**
+	 * @param CController $controller
+	 * @param string $id
+	 * @param string $method
+	 */
+	public function __construct( $controller, $id, $method = 'GET' )
+	{
+		parent::__construct( $controller, $id );
+
+		$this->_method = strtoupper( $method );
+
+		//	Get the payload...
+		if ( 'GET' != $this->_method && 'POST' != $this->_method )
+			$this->_populatePayload();
+	}
+
+
 	/**
 	* Runs the REST action.
 	* @throws CHttpException
 	*/
 	public function run()
 	{
+		/** @var $_controller CPSRESTController */
 		$_controller = $this->getController();
 		
 		if ( ! ( $_controller instanceof IPSRest ) )
@@ -39,9 +72,62 @@ class CPSRESTAction extends CAction implements IPSBase
 			$_controller->missingAction( $this->getId() );
 			return;
 		}
-		
+
 		//	Call the controllers dispatch method...
 		$_controller->dispatchRequest( $this );
+	}
+
+	//*************************************************************************
+	//* Private Methods
+	//*************************************************************************
+
+	/**
+	 * Retrieves the content from the request
+	 * @return void
+	 */
+	protected function _populatePayload()
+	{
+		$this->_payload = null;
+
+		//	Pull out the payload
+		if ( PS::osvr( 'CONTENT_LENGTH', 0 ) > 0 )
+		{
+			try
+			{
+				$_stream = fopen( 'php://input', 'r' );
+
+				while ( false !== ( $_chunk = fread( $_stream, 1024 ) ) )
+					$this->_payload .= $_chunk;
+
+				fclose( $_stream );
+			}
+			catch ( Exception $_ex )
+			{
+				//	@todo Should really log this error... :(
+			}
+		}
+	}
+
+	//*************************************************************************
+	//* Properties
+	//*************************************************************************
+
+	/**
+	 * @param mixed $payload
+	 * @return
+	 */
+	public function setPayload( $payload )
+	{
+		$this->_payload = $payload;
+		return $this;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getPayload()
+	{
+		return $this->_payload;
 	}
 
 }
