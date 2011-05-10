@@ -222,13 +222,15 @@ class CPSRESTController extends CPSController
 	 */
 	protected function _formatOutput( $output )
 	{
-		$_response = null;
-
 		//	Transform output
 		switch ( $this->_outputFormat )
 		{
 			case PS::OF_JSON:
 				header( 'Content-type: application/json' );
+
+				//	Are we already in JSON?
+				if ( false !== @json_decode( $output ) )
+					break;
 
 				/**
 				 * Chose NOT to overwrite in the case of an error while
