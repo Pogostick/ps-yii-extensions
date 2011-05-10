@@ -341,8 +341,8 @@ class CPSApiComponent extends CPSComponent
 		if ( $this->_debugLevel > 3 )
 			CPSLog::trace( __METHOD__, 'Call complete');
 
-		if ( $this->_debugLevel > 4 )
-			CPSLog::trace( __METHOD__, 'Response: ' . var_export( $_response, true ) );
+//		if ( $this->_debugLevel > 4 )
+//			CPSLog::trace( __METHOD__, 'Response: ' . var_export( $_response, true ) );
 
 		//	Handle events...
 		$_event->setUrlResults( $_response );
