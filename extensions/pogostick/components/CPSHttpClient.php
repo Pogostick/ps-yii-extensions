@@ -2,14 +2,14 @@
 /**
  * CPSHttpClient.php
  */
- 
+
 /**
  * CPSHttpClient
  */
 class CPSHttpClient extends CPSComponent
 {
 	//*************************************************************************
-	//* Class Constants 
+	//* Class Constants
 	//*************************************************************************
 
 	/**
@@ -23,7 +23,7 @@ class CPSHttpClient extends CPSComponent
 	;
 
 	//*************************************************************************
-	//* Public Methods 
+	//* Public Methods
 	//*************************************************************************
 
 	/**
@@ -50,6 +50,7 @@ class CPSHttpClient extends CPSComponent
 	 */
 	public static function post( $url, $parameters = array(), $curlOptions = array(), $callback = null )
 	{
+		CPSLog::trace( __METHOD__, 'POST: ' . $url . ' : ' . print_r( $curlOptions, true ) );
 		return self::_http( $url, self::HTTP_POST, $parameters, $curlOptions, $callback );
 	}
 
@@ -63,6 +64,7 @@ class CPSHttpClient extends CPSComponent
 	 */
 	public static function delete( $url, $parameters = array(), $curlOptions = array(), $callback = null )
 	{
+		CPSLog::trace( __METHOD__, 'DELETE: ' . $url );
 		return self::_http( $url, self::HTTP_DELETE, $parameters, $curlOptions, $callback );
 	}
 
@@ -76,6 +78,7 @@ class CPSHttpClient extends CPSComponent
 	 */
 	public static function put( $url, $parameters = array(), $curlOptions = array(), $callback = null )
 	{
+		CPSLog::trace( __METHOD__, 'PUT: ' . $url );
 		return self::_http( $url, self::HTTP_PUT, $parameters, $curlOptions, $callback );
 	}
 
@@ -103,51 +106,55 @@ class CPSHttpClient extends CPSComponent
 				$_payload .= "&{$_key}={$_value}";
 		}
 
-		$_cookieJar = tempnam( '/tmp', 'curl.cookie.' . getmypid() );
+//		$_cookieJar = tempnam( '/tmp', 'curl.cookie.' . getmypid() );
 
-		//	Set up our options
+		//	Set up our default options
 		$_options =	array(
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_TIMEOUT => 60,
 			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_COOKIEJAR => $_cookieJar,
-			CURLOPT_AUTOREFERER => true,
-			CURLOPT_URL => $url,
-			CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1',
+//			CURLOPT_COOKIEJAR => $_cookieJar,
 		);
 
-		//	Add in the callers options
+		//	Now merge in the caller's options
 		foreach ( $curlOptions as $_key => $_value )
 			$_options[$_key] = $_value;
 
-		//	If this is a post, we have to put the post data in another field...
+		//	Various methods require various tweaks
 		switch ( $method )
 		{
 			case 'GET':
 				if ( 'GET' == $method && ! empty( $_payload ) )
-					$curlOptions[CURLOPT_URL] = rtrim( $url, '/' ) . '/?' . rtrim( $_payload, '&' );
+					$url = rtrim( $url, '/' ) . '/?' . rtrim( $_payload, '&' );
+
+				$_options[CURLOPT_HTTPGET] = true;
 				break;
 
 			case 'POST':
-				$curlOptions[CURLOPT_POST] = true;
-				$curlOptions[CURLOPT_POSTFIELDS] = $_payload;
+				$_options[CURLOPT_POST] = true;
+				$_options[CURLOPT_POSTFIELDS] = $_payload;
 				break;
 
 			case 'PUT':
-				$curlOptions[CURLOPT_PUT] = true;
-				$curlOptions[CURLOPT_INFILE] = $_payload;
-				$curlOptions[CURLOPT_INFILESIZE] = strlen( $_payload );
+				$_options[CURLOPT_PUT] = true;
+				$_options[CURLOPT_INFILE] = $_payload;
+				$_options[CURLOPT_INFILESIZE] = strlen( $_payload );
 				break;
 
 			case 'DELETE':
-				$curlOptions[CURLOPT_CUSTOMREQUEST] = 'DELETE';
-				$curlOptions[CURLOPT_POSTFIELDS] = $_payload;
+				$_options[CURLOPT_CUSTOMREQUEST] = 'DELETE';
+				$_options[CURLOPT_POSTFIELDS] = $_payload;
 				break;
 		}
-echo $url;
+
+		//	Set the url
+		$_options[CURLOPT_URL] = $url;
+
+		//	Initialize and set options
 		$_curl = curl_init();
 		curl_setopt_array( $_curl, $_options );
 
+		//	Make the request
 		if ( false === ( $_result = curl_exec( $_curl ) ) )
 			$_result = curl_getinfo( $_curl );
 
@@ -161,7 +168,7 @@ echo $url;
 	}
 
 	//*************************************************************************
-	//* Private Methods 
+	//* Private Methods
 	//*************************************************************************
 
 	//*************************************************************************
