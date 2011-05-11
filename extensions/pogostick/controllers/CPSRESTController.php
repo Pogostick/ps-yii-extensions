@@ -229,7 +229,7 @@ class CPSRESTController extends CPSController
 				header( 'Content-type: application/json' );
 
 				//	Are we already in JSON?
-				if ( false !== @json_decode( $output ) )
+				if ( null !== @json_decode( $output ) )
 					break;
 
 				/**
