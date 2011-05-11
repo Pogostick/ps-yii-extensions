@@ -400,7 +400,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 *
 	 * @param string $url The URL to call
 	 * @param string $sQueryString The query string to attach
-	 * @param string $method The HTTP method to use. Can be 'GET' or 'SET'
+	 * @param string $method The HTTP method to use. Can be 'GET', 'POST', 'PUT', or 'DELETE'
 	 * @param mixed $sNewAgent The custom user method to use. Defaults to 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506; InfoPath.3)'
 	 * @param integer $iTimeOut The number of seconds to wait for a response. Defaults to 60 seconds
 	 * @return mixed The data returned from the HTTP request or null for no data
@@ -411,7 +411,6 @@ class CPSHelperBase extends CHtml implements IPSBase
 		$_sAgent = self::nvl( $sNewAgent, 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506; InfoPath.3)' );
 
 		//	Our return results
-		$_sResult = null;
 		$_payload = $sQueryString;
 
 		//	Convert array to KVPs...
@@ -435,10 +434,10 @@ class CPSHelperBase extends CHtml implements IPSBase
 			curl_setopt( $_oCurl, CURLOPT_URL, $url . ( 'GET' == $method ? ( ! empty( $_payload ) ? "?" . trim( $_payload, '&' ) : '' ) : '' ) );
 
 			//	If this is a post, we have to put the post data in another field...
-			if ( 'POST' == $method )
+			if ( 'GET' != $method && 'DELETE' != $method )
 			{
 				curl_setopt( $_oCurl, CURLOPT_URL, $url );
-				curl_setopt( $_oCurl, CURLOPT_POST, true );
+				curl_setopt( $_oCurl, CURLOPT_POST, ( 'POST' == $method ) );
 				curl_setopt( $_oCurl, CURLOPT_POSTFIELDS, $_payload );
 			}
 
