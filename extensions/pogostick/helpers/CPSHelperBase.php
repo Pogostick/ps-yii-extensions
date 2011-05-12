@@ -1583,6 +1583,21 @@ class CPSHelperBase extends CHtml implements IPSBase
 		return $_value;
 	}
 
+	/**
+	 * Filters a string, returns default value if null
+	 * @param mixed $value
+	 * @param null $defaultValue
+	 * @param int $filterFlags
+	 * @return string Filtered value or false on error
+	 */
+	public static function filterString( $value, $defaultValue = null, $filterFlags = FILTER_SANITIZE_STRING )
+	{
+		if ( false === ( $_value = filter_var( $value, $filterFlags ) ) )
+			$_value = $defaultValue;
+
+		return $_value;
+	}
+
 	//********************************************************************************
 	//* Magic Methods
 	//********************************************************************************

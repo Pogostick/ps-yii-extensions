@@ -5,6 +5,7 @@
 
 /**
  * CPSHttpClient
+ * Encapsulates common HTTP requests
  */
 class CPSHttpClient extends CPSComponent
 {
@@ -23,6 +24,16 @@ class CPSHttpClient extends CPSComponent
 	;
 
 	//*************************************************************************
+	//* Private Members
+	//*************************************************************************
+
+	/**
+	 * @static
+	 * @var array
+	 */
+	protected static $_lastResponse = null;
+
+	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
@@ -32,6 +43,7 @@ class CPSHttpClient extends CPSComponent
 	 * @param string $url
 	 * @param array $parameters
 	 * @param array $curlOptions
+	 * @param null $callback
 	 * @return mixed
 	 */
 	public static function get( $url, $parameters = array(), $curlOptions = array(), $callback = null )
@@ -46,6 +58,7 @@ class CPSHttpClient extends CPSComponent
 	 * @param string $url
 	 * @param array $parameters
 	 * @param array $curlOptions
+	 * @param callback $callback
 	 * @return mixed
 	 */
 	public static function post( $url, $parameters = array(), $curlOptions = array(), $callback = null )
@@ -60,6 +73,7 @@ class CPSHttpClient extends CPSComponent
 	 * @param string $url
 	 * @param array $parameters
 	 * @param array $curlOptions
+	 * @param callback $callback
 	 * @return mixed
 	 */
 	public static function delete( $url, $parameters = array(), $curlOptions = array(), $callback = null )
@@ -74,6 +88,7 @@ class CPSHttpClient extends CPSComponent
 	 * @param string $url
 	 * @param array $parameters
 	 * @param array $curlOptions
+	 * @param callback $callback
 	 * @return mixed
 	 */
 	public static function put( $url, $parameters = array(), $curlOptions = array(), $callback = null )
@@ -86,14 +101,16 @@ class CPSHttpClient extends CPSComponent
 	 * Make an HTTP request
 	 *
 	 * @param string $url The URL to call
-	 * @param string $payload The query string to attach
 	 * @param string $method The HTTP method to use. Can be 'GET', 'POST', 'PUT', or 'DELETE'
-	 * @param mixed $sNewAgent The custom user method to use. Defaults to 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506; InfoPath.3)'
-	 * @param integer $iTimeOut The number of seconds to wait for a response. Defaults to 60 seconds
+	 * @param string $payload The query string to attach
+	 * @param array $curlOptions
+	 * @param callback $callback
 	 * @return mixed The data returned from the HTTP request or null for no data
 	 */
 	protected static function _http( $url, $method = 'GET', $payload = null, $curlOptions = array(), $callback = null )
 	{
+		CPSLog::trace( __METHOD__, 'HttpRequest: "' . $method . '" with payload "' . print_r( $payload, true ) );
+
 		//	Our return results
 		$_payload = $payload;
 
@@ -155,8 +172,8 @@ class CPSHttpClient extends CPSComponent
 		curl_setopt_array( $_curl, $_options );
 
 		//	Make the request
-		if ( false === ( $_result = curl_exec( $_curl ) ) )
-			$_result = curl_getinfo( $_curl );
+		$_result = curl_exec( $_curl );
+		self::$_lastResponse = curl_getinfo( $_curl );
 
 		curl_close( $_curl );
 
@@ -174,5 +191,14 @@ class CPSHttpClient extends CPSComponent
 	//*************************************************************************
 	//* Properties
 	//*************************************************************************
+
+	/**
+	 * @return array
+	 */
+	public static
+	function getLastResponse()
+	{
+		return self::$_lastResponse;
+	}
 
 }

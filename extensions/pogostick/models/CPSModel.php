@@ -152,7 +152,10 @@ class CPSModel extends CActiveRecord implements IPSBase
 	 */
 	public function getAttributeLabel( $attribute )
 	{
-		return PS::o( $this->getAttributeLabels(), $attribute, $this->generateAttributeLabel( $attribute ) );
+		$_labels = $this->getAttributeLabels();
+		$_defaultLabel = $this->generateAttributeLabel( $attribute );
+
+		return PS::o( $_labels, $attribute, $_defaultLabel );
 	}
 
 	/**
@@ -303,6 +306,50 @@ class CPSModel extends CActiveRecord implements IPSBase
 		}
 
 		return new CActiveDataProvider( $this->_modelClass, array( 'criteria' => $_criteria ) );
+	}
+
+	public function generateAdvancedSearchForm()
+	{
+		$_header = '<?php';
+		$_searchFields = null;
+
+		$_model = $this->search();
+
+		foreach ( $this->getTableSchema()->getColumnNames() as $_columnName )
+		{
+			if ( false !== ( stripos( $this->getDbCriteria()->condition, $_columnName ) ) )
+				$_searchFields .= '$_fieldList[] = array( PS::TEXT, \'' . $_columnName . '\' );' . PHP_EOL;
+		}
+
+		echo <<<HTML
+{$_header}
+/**
+ * Advanced Search Partial Form
+ */
+
+PS::setShowRequiredLabel( false );
+
+\$_formOptions = array(
+	'formModel' => \$model,
+	'formClass' => 'wide form ui-widget',
+	'action' => PS::_cu( \$this->route ),
+	'method' => 'GET',
+	'showLegend' => false,
+	'uiStyle' => PS::UI_JQUERY,
+);
+
+\$_fieldList = array();
+
+\$_fieldList[] = array( 'html', '<fieldset><legend>Advanced Search</legend>' );
+{$_searchFields}
+\$_fieldList[] = array( 'html', PS::submitButton( 'Search', array( 'style' => 'float:right;margin-top:5px;' ) ) );
+\$_fieldList[] = array( 'html', '</fieldset>' );
+
+\$_formOptions['fields'] = \$_fieldList;
+
+CPSForm::create( \$_formOptions );
+
+HTML;
 	}
 
 	/**

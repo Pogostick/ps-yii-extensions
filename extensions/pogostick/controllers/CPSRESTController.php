@@ -76,12 +76,13 @@ class CPSRESTController extends CPSController
 	 */
 	public function createAction( $actionId )
 	{
-		$_actionId = ( $actionId === '' ) ? $this->defaultAction : $actionId;
-		$_requestMethod = PS::_gr()->getRequestType();
+		$_actionId = ( empty( $actionId ) ) ? $this->defaultAction : $actionId;
+		$_requestMethod = strtolower( PS::_gr()->getRequestType() ) . ucfirst( $_actionId );
 
-		//	Is it a valid request?
-		if ( ! method_exists( $this, $_requestMethod . $_actionId ) && ! method_exists( $this, 'request' . $_actionId ) )
-			return $this->missingAction( $_actionId );
+//	Let _dispatchRequest() do the check.
+//		//	Is it a valid request?
+//		if ( ! method_exists( $this, $_requestMethod ) && ! method_exists( $this, 'request' . ucfirst( $_actionId ) ) )
+//			return $this->missingAction( $_actionId );
 
 		return new CPSRESTAction( $this, $_actionId, $_requestMethod );
 	}

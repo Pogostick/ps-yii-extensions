@@ -644,7 +644,7 @@ abstract class CPSController extends CController implements IPSBase
 			if ( $_flashText )
 			{
 				$_fader =<<<SCRIPT
-notify('default',{title:'{$_title}',text:'{$_flashText}'});
+notify('default',{title:'{$_flashTitle}',text:'{$_flashText}'});
 //$('#___spanId_').fadeIn('500',function(){
 //	$(this).delay(3000).fadeOut(3500);
 //});";
