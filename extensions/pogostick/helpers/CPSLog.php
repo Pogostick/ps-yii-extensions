@@ -66,6 +66,7 @@ class CPSLog
 	 * @param array $options Parameters to be applied to the message using <code>strtr</code>.
 	 * @param string $source Which message source application component to use.
 	 * @param string $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 * @return string
 	 */
 	public static function log( $category, $message, $level = 'info', $options = array(), $source = null, $language = null )
 	{
@@ -110,6 +111,8 @@ class CPSLog
 
 		//	Set indent level...
 		self::$currentIndent += $_newIndent;
+
+		return $_logEntry;
 	}
 
 	/**
@@ -136,6 +139,7 @@ class CPSLog
 	public static function error( $category, $message, $options = array(), $source = null, $language = null )
 	{
 		self::log( $category, $message, 'error', $options, $source, $language );
+
 	}
 
 	/**
