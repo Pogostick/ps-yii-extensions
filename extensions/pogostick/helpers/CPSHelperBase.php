@@ -1431,6 +1431,25 @@ class CPSHelperBase extends CHtml implements IPSBase
 	}
 
 	/**
+	 * Returns the first column of the first row or null
+	 * @param string $sql
+	 * @param array $parameterList List of parameters for call
+	 * @param CDbConnection $dbToUse
+	 * @return array
+	 */
+	public static function _sqlScalar( $sql, $parameterList = array(), $dbToUse = null )
+	{
+		/** @var CDbConnection $_db */
+		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
+		{
+			if ( null !== ( $_value = $_db->createCommand( $sql )->queryScalar( $parameterList ) ) )
+				return $_value;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Determine if PHP is running CLI mode or not
 	 * @return boolean True if currently running in CLI
 	 */
