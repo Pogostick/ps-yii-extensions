@@ -1398,6 +1398,13 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sqlAll( $sql, $parameterList = array(), $dbToUse = null )
 	{
+		//	Allow laziness
+		if ( $parameterList instanceof CDbConnection )
+		{
+			$dbToUse = $parameterList;
+			$parameterList = array();
+		}
+
 		if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
 			return $_command->queryAll( true, $parameterList );
 
@@ -1413,6 +1420,13 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sqlAllScalar( $sql, $parameterList = array(), $dbToUse = null )
 	{
+		//	Allow laziness
+		if ( $parameterList instanceof CDbConnection )
+		{
+			$dbToUse = $parameterList;
+			$parameterList = array();
+		}
+
 		$_resultList = null;
 
 		/** @var CDbConnection $_db */
@@ -1439,6 +1453,13 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sqlScalar( $sql, $parameterList = array(), $dbToUse = null )
 	{
+		//	Allow laziness
+		if ( $parameterList instanceof CDbConnection )
+		{
+			$dbToUse = $parameterList;
+			$parameterList = array();
+		}
+
 		/** @var CDbConnection $_db */
 		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
 		{
