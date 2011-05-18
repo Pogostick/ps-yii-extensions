@@ -59,7 +59,7 @@ class CPSRESTController extends CPSController
 
 		if ( $this->beforeAction( $action ) )
 		{
-			$this->dispatchRequest( $action );
+			$this->_dispatchRequest( $action );
 			$this->afterAction( $action );
 		}
 
@@ -77,7 +77,7 @@ class CPSRESTController extends CPSController
 	public function createAction( $actionId )
 	{
 		$_actionId = ( empty( $actionId ) ) ? $this->defaultAction : $actionId;
-		$_requestMethod = strtolower( PS::_gr()->getRequestType() ) . ucfirst( $_actionId );
+		$_requestMethod = strtolower( PS::_gr()->getRequestType() );
 
 //	Let _dispatchRequest() do the check.
 //		//	Is it a valid request?
@@ -99,7 +99,7 @@ class CPSRESTController extends CPSController
 	 * @access protected
 	 * @throws CHttpException if the action does not exist or the action name is not proper.
 	 */
-	public function dispatchRequest( CPSRESTAction $action )
+	public function dispatchRequest( CAction $action )
 	{
 		return $this->_dispatchRequest( $action );
 	}
