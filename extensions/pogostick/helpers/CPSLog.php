@@ -38,15 +38,21 @@ class CPSLog
 	/**
 	 * @staticvar integer The base level for getting source of log entry
 	 */
-	public static $baseLevel = 2;
+	public static $baseLevel = 3;
 
 	/**
 	 * @staticvar integer The current indent level
 	 */
 	public static $currentIndent = 0;
 
+	/**
+	 * @var string
+	 */
 	protected static $_defaultLevelIndicator = '.';
 
+	/**
+	 * @var array
+	 */
 	protected static $_levelIndicators = array(
 		'info' => '*',
 		'notice' => '?',
