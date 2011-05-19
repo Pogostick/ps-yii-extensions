@@ -182,10 +182,10 @@ class CPSLog
 	 */
 	public static function trace( $category, $message = null, $options = array(), $source = null, $language = null )
 	{
-		if ( ! defined( 'PYE_TRACE_LEVEL' ) && ! defined( 'YII_DEBUG' ) )
-			return false;
+		if ( defined( 'PYE_TRACE_LEVEL' ) || defined( 'YII_DEBUG' ) || defined( 'YII_TRACE_LEVEL' ) )
+			return self::log( $category, $message, 'trace', $options, $source, $language );
 
-		return self::log( $category, $message, 'trace', $options, $source, $language );
+		return false;
 	}
 
 	/**
