@@ -779,15 +779,4 @@ class CPSApiComponent extends CPSComponent
 	{
 		return $this->_payload;
 	}
-
-	public function setPayload( $payload )
-	{
-		$this->payload = $payload;
-	}
-
-	public function getPayload( )
-	{
-		return $this->payload;
-	}
-
 }

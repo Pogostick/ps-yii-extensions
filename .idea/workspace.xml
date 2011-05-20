@@ -5,23 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b8e8de94-c440-44a8-a089-1a03836d304d" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/extensions/examples/tests/protected/views/site/contact.php" afterPath="$PROJECT_DIR$/extensions/examples/tests/protected/views/test/contact.php" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/extensions/examples/tests/protected/views/site/index.php" afterPath="$PROJECT_DIR$/extensions/examples/tests/protected/views/test/index.php" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/extensions/examples/tests/protected/views/site/login.php" afterPath="$PROJECT_DIR$/extensions/examples/tests/protected/views/test/login.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/psYiiExtensions.iml" afterPath="$PROJECT_DIR$/.idea/psYiiExtensions.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/jablan.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/jablan.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/examples/blog/index.php" afterPath="$PROJECT_DIR$/extensions/examples/blog/index.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/examples/blog/protected/config/console.php" afterPath="$PROJECT_DIR$/extensions/examples/blog/protected/config/console.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/examples/blog/protected/config/main.php" afterPath="$PROJECT_DIR$/extensions/examples/blog/protected/config/main.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/examples/tests/index.php" afterPath="$PROJECT_DIR$/extensions/examples/tests/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/projectCodeStyle.xml" afterPath="$PROJECT_DIR$/.idea/projectCodeStyle.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/base/CPSApiComponent.php" afterPath="$PROJECT_DIR$/extensions/pogostick/base/CPSApiComponent.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/base/CPSApiWidget.php" afterPath="$PROJECT_DIR$/extensions/pogostick/base/CPSApiWidget.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/behaviors/CPSOAuthBehavior.php" afterPath="$PROJECT_DIR$/extensions/pogostick/behaviors/CPSOAuthBehavior.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/components/CPSOAuthComponent.php" afterPath="$PROJECT_DIR$/extensions/pogostick/components/CPSOAuthComponent.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/components/twitter/CPSTwitterApi.php" afterPath="$PROJECT_DIR$/extensions/pogostick/components/twitter/CPSTwitterApi.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extensions/pogostick/widgets/jqui/CPSjqUIWrapper.php" afterPath="$PROJECT_DIR$/extensions/pogostick/widgets/jqui/CPSjqUIWrapper.php" />
     </list>
     <ignored path="psYiiExtensions.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -83,7 +68,7 @@
       <file leaf-file-name="CPSjqUIWrapper.php" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/extensions/pogostick/widgets/jqui/CPSjqUIWrapper.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="296" column="56" selection-start="9056" selection-end="9056" vertical-scroll-proportion="0.4742268">
+            <state line="296" column="0" selection-start="9329" selection-end="9329" vertical-scroll-proportion="0.5074627">
               <folding />
             </state>
           </provider>
@@ -212,18 +197,14 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Favorites" />
       <pane id="Scope" />
+      <pane id="Favorites" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
             <PATH_ELEMENT>
               <option name="myItemId" value="psYiiExtensions" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="External Libraries" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -632,15 +613,15 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="160" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="1068" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="1070" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="1068" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="159" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="153" />
-    <property name="WebServerToolWindowFactoryState" value="true" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="WebServerToolWindowFactoryState" value="true" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="PublishConfig" serverName="scoozi" serverId="b45e5d27-e58b-4b9c-8619-9fe158da5695" overwriteAll="false" traceLevel="DETAILS" autoUpload="true">
     <servers>
@@ -652,7 +633,23 @@
           </mappings>
         </serverdata>
       </server>
+      <server id="2d4a3d66-de59-40e7-ad82-fe99302e4adc">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$/../../frameworks/yii" />
+            <mapping local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </server>
       <server id="625a4f1f-3bbf-41fb-9240-e7a15e6a81d8">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$/../../frameworks/yii" />
+            <mapping local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </server>
+      <server id="66719f12-cfe1-407f-af06-1df7b8d7a8f0">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$/../../frameworks/yii" />
@@ -671,8 +668,8 @@
       <server id="b45e5d27-e58b-4b9c-8619-9fe158da5695">
         <serverdata>
           <mappings>
-            <mapping deploy="nomacros:///var/www/lib/yii'" local="$PROJECT_DIR$/../../frameworks/yii" web="/" />
-            <mapping deploy="nomacros:///var/www/lib/psYiiExtensions" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/var/www/lib/yii'" local="$PROJECT_DIR$/../../frameworks/yii" web="/" />
+            <mapping deploy="/var/www/lib/psYiiExtensions" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </server>
@@ -680,7 +677,9 @@
   </component>
   <component name="RunManager" selected="PHP Web Application.Scoozi">
     <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
-      <method />
+      <method>
+        <option name="PhingTarget" enabled="false" />
+      </method>
     </configuration>
     <configuration default="true" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application" server_name="Scoozi" start_url="/lib/psYiiExtensions/extensions/examples/tests">
       <method>
@@ -688,24 +687,22 @@
           <server_id />
           <server_name />
         </option>
+        <option name="PhingTarget" enabled="false" />
       </method>
     </configuration>
     <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
-      <method />
+      <method>
+        <option name="PhingTarget" enabled="false" />
+      </method>
     </configuration>
     <configuration default="true" type="JavascriptDebugSession" factoryName="Remote">
       <JSRemoteDebuggerConfigurationSettings>
         <option name="engineId" value="firefox" />
         <option name="fileUrl" value="" />
       </JSRemoteDebuggerConfigurationSettings>
-      <method />
-    </configuration>
-    <configuration default="true" type="JavascriptDebugSession" factoryName="Local">
-      <JSDebuggerConfigurationSettings>
-        <option name="engineId" value="firefox" />
-        <option name="fileUrl" />
-      </JSDebuggerConfigurationSettings>
-      <method />
+      <method>
+        <option name="PhingTarget" enabled="false" />
+      </method>
     </configuration>
     <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server" server_id="94e52d9d-234a-470c-b7a1-2bd963fcf068" server_name="CIS Apps">
       <method>
@@ -713,6 +710,16 @@
           <server_id />
           <server_name />
         </option>
+        <option name="PhingTarget" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JavascriptDebugSession" factoryName="Local">
+      <JSDebuggerConfigurationSettings>
+        <option name="engineId" value="firefox" />
+        <option name="fileUrl" />
+      </JSDebuggerConfigurationSettings>
+      <method>
+        <option name="PhingTarget" enabled="false" />
       </method>
     </configuration>
     <list size="2">
@@ -748,39 +755,40 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="0" width="1608" height="878" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="0" width="1600" height="869" extended-state="0" />
+    <editor active="false" />
     <layout>
-      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32888466" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287483" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.6415094" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.3986111" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32749325" sideWeight="0.0" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="CSS-X-Fire" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287483" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.19689119" sideWeight="0.2352132" order="17" side_tool="true" content_ui="tabs" x="332" y="352" width="620" height="472" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2032258" sideWeight="0.67250675" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.6563342" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20609203" sideWeight="0.67250675" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.3986111" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287483" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Kahlua" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32749325" sideWeight="0.0" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" x="100" y="100" width="1400" height="973" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946485" sideWeight="0.87777776" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="DB Execution Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32908913" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32966322" sideWeight="0.6011004" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32888466" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.6415094" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3278237" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946485" sideWeight="0.87777776" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.6563342" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsManagerConfiguration">
@@ -828,34 +836,6 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/views/post/show.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/controllers/CommentController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="40" selection-start="481" selection-end="481" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/controllers/PostController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="294" column="0" selection-start="7437" selection-end="7437" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/extensions/pogostick/behaviors/CPSOAuthBehavior.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="273" column="22" selection-start="11017" selection-end="11017" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/extensions/pogostick/components/CPSOAuthComponent.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="119" column="20" selection-start="2779" selection-end="2779" vertical-scroll-proportion="0.0">
@@ -863,23 +843,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/config/console.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="2" selection-start="232" selection-end="232" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/extensions/pogostick/base/CPSApiComponent.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="72" column="25" selection-start="1990" selection-end="2001" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/extensions/pogostick/controllers/CPSCRUDController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="0" selection-start="6" selection-end="6" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -893,28 +859,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/extensions/examples/blog/index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="0" selection-start="314" selection-end="314" vertical-scroll-proportion="0.23121387">
-          <folding />
-        </state>
+        <state line="10" column="0" selection-start="314" selection-end="314" vertical-scroll-proportion="0.23121387" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/extensions/examples/tests/index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="13" selection-start="261" selection-end="261" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/views/post/index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/controllers/PostController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="294" column="0" selection-start="7437" selection-end="7437" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/config/main.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="81" column="35" selection-start="1933" selection-end="1933" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="81" column="35" selection-start="1933" selection-end="1933" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/extensions/pogostick/controllers/CPSController.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="59" column="0" selection-start="1633" selection-end="1633" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/extensions/examples/tests/index.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="13" selection-start="261" selection-end="261" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -926,16 +896,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/views/post/index.php">
+    <entry file="file://$PROJECT_DIR$/extensions/pogostick/widgets/jqui/CPSjqUIWrapper.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
+        <state line="296" column="0" selection-start="9329" selection-end="9329" vertical-scroll-proportion="0.5074627">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/extensions/pogostick/widgets/jqui/CPSjqUIWrapper.php">
+    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/config/console.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="296" column="56" selection-start="9056" selection-end="9056" vertical-scroll-proportion="0.4742268">
+        <state line="8" column="2" selection-start="232" selection-end="232" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/extensions/pogostick/controllers/CPSCRUDController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1" column="0" selection-start="6" selection-end="6" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/controllers/CommentController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="40" selection-start="481" selection-end="481" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/views/post/list.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/extensions/examples/blog/protected/views/post/show.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>

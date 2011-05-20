@@ -545,7 +545,10 @@ class CPSWidgetHelper extends CPSHelperBase
 				$htmlOptions['style'] = PS::o( $htmlOptions, 'style' ) . ' border:none; background-color: transparent;';
 				$htmlOptions['class'] = PS::addClass( $htmlOptions['class'], 'ps-text-display' );
 				$htmlOptions['readonly'] = 'readonly';
-				$htmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', CPSTransform::valueOf( '*', $model->$attributeName ) ) );
+					
+				if ( null !== PS::o( $htmlOptions, 'content' ) )
+					$htmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', $_value ) );
+
 				$inputFieldType = self::TEXT;
 				break;
 
@@ -731,7 +734,8 @@ class CPSWidgetHelper extends CPSHelperBase
 			return parent::dropDownList( $attributeName, $_value, $listData, $htmlOptions );
 
 		//	Otherwise output the field if we have a type
-		if ( null != $_sType ) return self::inputField( $_sType, $attributeName, $_value, $htmlOptions );
+		if ( null != $_sType )
+			return self::inputField( $_sType, $attributeName, $_value, $htmlOptions );
 
 		//	No clue...
 		return;
