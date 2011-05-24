@@ -906,7 +906,7 @@ SCRIPT;
 
 		//	Do some auto-page-setup...
 		if ( null !== ( $_subHeader = PS::o( $options, 'subHeader' ) ) )
-			echo PS::tag( 'div', array(), $_subHeader );
+			echo PS::tag( 'div', array( 'class' => 'ui-state-active ui-generated-subheader' ), $_subHeader );
 
 		if ( false !== PS::o( $options, 'renderSearch', false ) )
 		{
