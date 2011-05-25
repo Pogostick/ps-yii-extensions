@@ -308,20 +308,20 @@ class CPSModel extends CActiveRecord implements IPSBase
 		return new CActiveDataProvider( $this->_modelClass, array( 'criteria' => $_criteria ) );
 	}
 
-	public function generateAdvancedSearchForm()
+	public function generateAdvancedSearchForm( $addHeader = true, $returnOutput = false )
 	{
-		$_header = '<?php';
+		$_header = ( $addHeader ? '<?php' : null );
 		$_searchFields = null;
 
-		$_model = $this->search();
+		$_criteria = $this->search()->getCriteria();
 
 		foreach ( $this->getTableSchema()->getColumnNames() as $_columnName )
 		{
-			if ( false !== ( stripos( $this->getDbCriteria()->condition, $_columnName ) ) )
+			if ( false !== ( stripos( $_criteria->condition, $_columnName ) ) )
 				$_searchFields .= '$_fieldList[] = array( PS::TEXT, \'' . $_columnName . '\' );' . PHP_EOL;
 		}
 
-		echo <<<HTML
+		$_output = <<<HTML
 {$_header}
 /**
  * Advanced Search Partial Form
@@ -350,6 +350,11 @@ PS::setShowRequiredLabel( false );
 CPSForm::create( \$_formOptions );
 
 HTML;
+
+		if ( $returnOutput )
+			return $_output;
+
+		echo $_output;
 	}
 
 	/**
