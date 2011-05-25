@@ -1466,7 +1466,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param string $sql
 	 * @param array $parameterList List of parameters for call
 	 * @param CDbConnection $dbToUse
-	 * @return array
+	 * @return mixed
 	 */
 	public static function _sqlScalar( $sql, $parameterList = array(), $dbToUse = null )
 	{
