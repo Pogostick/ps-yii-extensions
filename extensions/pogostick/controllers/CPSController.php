@@ -924,7 +924,7 @@ SCRIPT;
 				PS::_rs( 'search', $_searchScript );
 		}
 
-		if ( PS::UI_JQUERY == ( $_uiStyle = PS::o( $options, 'uiStyle', PS::UI_JQUERY ) ) )
+		if ( PS::UI_JQUERY == PS::o( $options, 'uiStyle', PS::UI_JQUERY ) )
 			CPSjqUIWrapper::loadScripts();
 
 		if ( PS::o( $options, 'validate', true ) )
@@ -947,6 +947,7 @@ SCRIPT;
 	/**
 	 * Sets the standard page navigation options (title, crumbs, menu, etc.)
 	 * @param array $options
+	 * @return array
 	 */
 	public function setViewNavigationOptions( &$options = array() )
 	{
