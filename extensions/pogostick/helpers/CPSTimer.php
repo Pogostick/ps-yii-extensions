@@ -84,6 +84,7 @@ class CPSTimer implements IPSBase
 	public static
 	function start()
 	{
+		return;
 		// push current time
 		self::_pushTime( self::START_TIMER );
 	}
@@ -96,6 +97,7 @@ class CPSTimer implements IPSBase
 	public static
 	function stop()
 	{
+		return;
 		// push current time
 		self::_pushTime( self::STOP_TIMER );
 	}
@@ -185,6 +187,7 @@ class CPSTimer implements IPSBase
 	public static
 	function get( $format = self::PRECISION_SECONDS )
 	{
+		return 0;
 		//	Stop timer if it is still running
 		if ( self::$_timerRunning || ! isset( $_timer[self::STOP_TIMER] ) )
 			self::stop();
@@ -223,6 +226,7 @@ class CPSTimer implements IPSBase
 	public static
 	function getAverage( $format = self::PRECISION_SECONDS )
 	{
+		return 0;
 		$_seconds = 0;
 		$_uSeconds = self::get( self::PRECISION_MICROSECONDS );
 
