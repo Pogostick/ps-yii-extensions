@@ -46,7 +46,8 @@ class CPSTimer implements IPSBase
 	 * @const int Timer commands
 	 */
 	const
-		START_TIMER = 0, STOP_TIMER = 1;
+		START_TIMER = 'start',
+		STOP_TIMER = 'stop';
 
 	//********************************************************************************
 	//* Member Variables
@@ -121,16 +122,23 @@ class CPSTimer implements IPSBase
 		switch ( $command )
 		{
 			case self::START_TIMER:
-				if ( ! self::$_timerRunning )
+				if ( self::$_timerRunning )
 				{
-					self::$_timerRunning = true;
-					$_time = microtime();
+	                trigger_error( 'Your timer was already started', E_USER_NOTICE );
+    	            return;
 				}
+
+				self::$_timerRunning = true;
 				break;
 
 			case self::STOP_TIMER:
-				if ( self::$_timerRunning )
-					self::$_timerRunning = false;
+				if ( ! self::$_timerRunning )
+				{
+	                trigger_error( 'Timer already stopped', E_USER_NOTICE );
+    	            return;
+				}
+
+				self::$_timerRunning = false;
 				break;
 
 			default:
@@ -138,18 +146,22 @@ class CPSTimer implements IPSBase
 				return;
 		}
 
+		//	Refresh time on start
+		if ( self::START_TIMER == $command )
+			$_time = microtime();
+
 		// split the time into components
-		list( $_microSeconds, $_seconds ) = explode( ' ', $_time );
+		list( $_uSeconds, $_seconds ) = explode( ' ', $_time );
 
 		//	Cast to required types
 		$_seconds = (int)$_seconds;
-		$_microSeconds = (float)$_microSeconds;
-		$_microSeconds = (int)( $_microSeconds * self::MICROSECONDS_PER_SECOND );
+		$_uSeconds = (float)$_uSeconds;
+		$_uSeconds = (int)( $_uSeconds * self::MICROSECONDS_PER_SECOND );
 
 		$_timer = array(
 			$command => array(
-				'sec' => $_seconds,
-				'usec' => $_microSeconds,
+				'seconds' => $_seconds,
+				'uSeconds' => $_uSeconds,
 			),
 		);
 
@@ -158,9 +170,9 @@ class CPSTimer implements IPSBase
 			array_push( self::$_timerQueue, $_timer );
 		else
 		{
-			$_count = count( self::$_timerQueue );
-			$_lastTimer =& self::$_timerQueue[$_count - 1];
-			$_lastTimer = array_merge( $_lastTimer, $_timer );
+   			$_count = count( self::$_timerQueue );
+            $_array =& self::$_timerQueue[$_count - 1];
+            $_array = array_merge( $_array, $_timer );
 		}
 	}
 
@@ -174,32 +186,32 @@ class CPSTimer implements IPSBase
 	function get( $format = self::PRECISION_SECONDS )
 	{
 		//	Stop timer if it is still running
-		if ( self::$_timerRunning )
+		if ( self::$_timerRunning || ! isset( $_timer[self::STOP_TIMER] ) )
 			self::stop();
 
-		$_seconds = $_microSeconds = 0;
+		$_seconds = $_uSeconds = 0;
 
 		foreach ( self::$_timerQueue as $_timer )
 		{
-			$_startTime = $_timer[self::START_TIMER];
-			$_endTime = $_timer[self::STOP_TIMER];
+			$_startTime = PS::o( $_timer, self::START_TIMER, time() );
+			$_endTime = PS::o( $_timer, self::STOP_TIMER, time() );
 
 			//	Get the difference
-			$_difference = $_endTime['sec'] - $_startTime['sec'];
+			$_difference = $_endTime['seconds'] - $_startTime['seconds'];
 
 			if ( 0 === $_difference )
-				$_microSeconds += ( $_endTime['usec'] - $_startTime['usec'] );
+				$_uSeconds += ( $_endTime['uSeconds'] - $_startTime['uSeconds'] );
 			else
 			{
 				// add the difference in seconds (compensate for microseconds)
 				$_seconds += $_difference - 1;
 
 				// add the difference time between start and end microseconds
-				$_microSeconds += ( self::MICROSECONDS_PER_SECOND - $_startTime['usec'] ) + $_endTime['usec'];
+				$_uSeconds += ( self::MICROSECONDS_PER_SECOND - $_startTime['uSeconds'] ) + $_endTime['uSeconds'];
 			}
 		}
 
-		return self::_getFormattedTime( $_seconds, $_microSeconds, $format );
+		return self::_getFormattedTime( $_seconds, $_uSeconds, $format );
 	}
 
 	/**
@@ -212,42 +224,41 @@ class CPSTimer implements IPSBase
 	function getAverage( $format = self::PRECISION_SECONDS )
 	{
 		$_seconds = 0;
-		$_count = count( self::$_timerQueue );
-		$_microSeconds = self::get( self::PRECISION_MICROSECONDS );
+		$_uSeconds = self::get( self::PRECISION_MICROSECONDS );
 
-		return self::_getFormattedTime( $_seconds, $_microSeconds, $format );
+		return self::_getFormattedTime( $_seconds, $_uSeconds, $format );
 	}
 
 	/**
 	 * Returns a value of time formatted per request
 	 * @static
 	 * @param int $seconds
-	 * @param float $microSeconds
+	 * @param float $uSeconds
 	 * @param int $format
 	 * @return bool|float|int
 	 */
-	protected static function _getFormattedTime( $seconds, $microSeconds, $format = self::PRECISION_SECONDS )
+	protected static function _getFormattedTime( $seconds, $uSeconds, $format = self::PRECISION_SECONDS )
 	{
-		if ( $microSeconds > self::MICROSECONDS_PER_SECOND )
+		if ( $uSeconds > self::MICROSECONDS_PER_SECOND )
 		{
 			// move the full second microseconds to the seconds' part
-			$seconds += (int)floor( $microSeconds / self::MICROSECONDS_PER_SECOND );
+			$seconds += (int)floor( $uSeconds / self::MICROSECONDS_PER_SECOND );
 
 			// keep only the microseconds that are over the self::MICROSECONDS_PER_SECOND
-			$microSeconds = $microSeconds % self::MICROSECONDS_PER_SECOND;
+			$uSeconds = $uSeconds % self::MICROSECONDS_PER_SECOND;
 		}
 
 		switch ( $format )
 		{
 			case self::PRECISION_MICROSECONDS:
-				return ( $seconds * self::MICROSECONDS_PER_SECOND ) + $microSeconds;
+				return ( $seconds * self::MICROSECONDS_PER_SECOND ) + $uSeconds;
 
 			case self::PRECISION_MILLISECONDS:
-				return ( $seconds * 1000 ) + (int)round( $microSeconds / 1000, 0 );
+				return ( $seconds * 1000 ) + (int)round( $uSeconds / 1000, 0 );
 
 			case self::PRECISION_SECONDS:
 			default:
-				return (float)$seconds + (float)( $microSeconds / self::MICROSECONDS_PER_SECOND );
+				return (float)$seconds + (float)( $uSeconds / self::MICROSECONDS_PER_SECOND );
 		}
 	}
 
