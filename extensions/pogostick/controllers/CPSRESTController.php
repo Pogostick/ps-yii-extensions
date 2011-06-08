@@ -184,7 +184,8 @@ class CPSRESTController extends CPSController
 						$_urlParameters[ $_subKey ] = $_subValue;
 				}
 			}
-		} else if ( 'get' != $_requestType )
+		}
+		else if ( 'get' != $_requestType )
 		{
 		}
 

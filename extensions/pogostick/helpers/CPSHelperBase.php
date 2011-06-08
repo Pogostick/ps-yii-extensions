@@ -1610,6 +1610,24 @@ class CPSHelperBase extends CHtml implements IPSBase
 		return false;
 	}
 
+	/**
+	 * Sorts an array by a single column
+	 * @param array $sourceArray
+	 * @param string $column
+	 * @param int $sortDirection
+	 */
+	public static function array_sort_by_column( &$sourceArray, $column, $sortDirection = SORT_ASC )
+	{
+		$_sortColumn = array();
+
+		foreach ( $sourceArray as $_key => $_row )
+		{
+			$_sortColumn[$_key] = TaskHelper::getOption( $_row, $column );
+		}
+
+		array_multisort( $_sortColumn, $sortDirection, $sourceArray );
+	}
+
 	//********************************************************************************
 	//* Filter Helpers
 	//********************************************************************************
