@@ -252,6 +252,10 @@ class CPSRESTController extends CPSController
 					header( 'Content-type: text/xml;charset=utf-8' );
 				break;
 
+			case PS::OF_RAW:
+				//	Nothing to do...
+				break;
+
 			case PS::OF_ASSOC_ARRAY:
 			default:
 				if ( ! is_array( $output ) )

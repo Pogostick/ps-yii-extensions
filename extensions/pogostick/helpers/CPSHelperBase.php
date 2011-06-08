@@ -32,7 +32,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 		OF_JSON 		= 0,
 		OF_HTTP 		= 1,
 		OF_ASSOC_ARRAY 	= 2,
-		OF_XML		 	= 3
+		OF_XML		 	= 3,
+		OF_RAW			= 4
 	;
 
 	/**
