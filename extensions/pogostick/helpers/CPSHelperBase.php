@@ -1612,9 +1612,11 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Sorts an array by a single column
+	 * @static
 	 * @param array $sourceArray
 	 * @param string $column
 	 * @param int $sortDirection
+	 * @return bool
 	 */
 	public static function array_sort_by_column( &$sourceArray, $column, $sortDirection = SORT_ASC )
 	{
@@ -1622,10 +1624,10 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 		foreach ( $sourceArray as $_key => $_row )
 		{
-			$_sortColumn[$_key] = TaskHelper::getOption( $_row, $column );
+			$_sortColumn[$_key] = self::o( $_row, $column );
 		}
 
-		array_multisort( $_sortColumn, $sortDirection, $sourceArray );
+		return array_multisort( $_sortColumn, $sortDirection, $sourceArray );
 	}
 
 	//********************************************************************************
