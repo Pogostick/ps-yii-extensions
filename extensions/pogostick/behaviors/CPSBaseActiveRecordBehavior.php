@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  *
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -26,10 +26,13 @@ class CPSBaseActiveRecordBehavior extends CActiveRecordBehavior implements IPSBe
 	//********************************************************************************
 
 	/**
-	* My name
-	* @var string
+	* @var string The internal name of the component.
 	*/
 	protected $_internalName;
+
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
 
 	/**
 	 * Constructor

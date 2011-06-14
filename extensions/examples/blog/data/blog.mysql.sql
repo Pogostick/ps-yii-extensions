@@ -1,5 +1,5 @@
 /*
- * This file is part of the psYiiExtensions package.
+ ** This file is part of PYEL: Pogostick Yii Extensions Library  
  * 
  * @copyright Copyright &copy; 2009 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.

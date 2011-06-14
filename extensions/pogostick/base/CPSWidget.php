@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  *
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -72,6 +72,17 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	}
 
 	/**
+	 * Choose your destructor!
+	 */
+	public function __destruct()
+	{
+		//	Make sure scripts get regged before we die...
+		$this->registerClientScripts();
+
+		parent::__destruct();
+	}
+
+	/**
 	 * Preinitialize the component
 	 * Override to add your own functionality before init() is called.
 	 */
@@ -94,14 +105,15 @@ class CPSWidget extends CInputWidget implements IPSComponent
 			//	Now call parent's init...
 			parent::init();
 
-			if ( empty( $this->name ) ) $this->name = $this->_internalName;
-
 			//	Call our behaviors init() method if they exist
 			foreach ( $this->_behaviorCache as $_name )
 				$this->asa( $_name )->init();
 
 			//	Get the id/name of this widget
 			list( $this->name, $this->id ) = $this->resolveNameID();
+
+			if ( empty( $this->name ) )
+				$this->name = $this->_internalName;
 
 			//	We are now...
 			$this->_initialized = true;
@@ -115,7 +127,22 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	*/
 	public function pushCssFile( $path, $media = 'screen' )
 	{
-		return $this->_cssFiles[] = array( $path, $media );
+		array_push(
+			$this->_cssFiles,
+			array(
+				'path' => $path,
+				'media' => $media,
+			)
+		);
+	}
+
+	/**
+	* Pops a css file off the top of the page load stack.
+	* @return string|null
+	*/
+	public function popCssFile()
+	{
+		return array_shift( $this->_cssFiles );
 	}
 
 	/**
@@ -127,7 +154,24 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	*/
 	public function pushScriptFile( $path, $position = CClientScript::POS_HEAD )
 	{
+		array_push(
+			$this->_scriptFiles,
+			array(
+				'path' => $path,
+				'position' => $position,
+			)
+		);
+
 		$this->_scriptFiles[] = array( $path, $position );
+	}
+
+	/**
+	* Pops a script file off the top of the page load stack.
+	* @return string|null
+	*/
+	public function popScriptFile()
+	{
+		return array_shift( $this->_scriptFiles );
 	}
 
 	/***
@@ -137,20 +181,26 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	public function registerClientScripts()
 	{
 		//	Register a special CSS file if we have one...
-		if ( $this->cssFile ) $this->pushCssFile( $this->cssFile );
+		if ( $this->cssFile )
+		{
+			$this->pushCssFile( $this->cssFile );
+			$this->cssFile = null;
+		}
+
+		$_baseUrl = CPSHelperBase::_gbu();
 
 		//	Load css files and unset from array...
-		foreach ( $this->_cssFiles as $_key => $_fileList )
+		while ( null !== ( $_file = $this->popCssFile() ) )
 		{
-			CPSHelperBase::_rcf( CPSHelperBase::_gbu() . $_fileList[0], $_fileList[1] );
-			unset( $this->_cssFiles[ $_key ] );
+CPSLog::trace( __METHOD__, 'Popped css: ' . print_r($_file,true) );
+			CPSHelperBase::_rcf( $_baseUrl . $_file['path'], $_file['media'] );
 		}
 
 		//	Load script files and unset from array...
-		foreach ( $this->_scriptFiles as $_key => $_fileList )
+		while ( null !== ( $_file = $this->popScriptFile() ) )
 		{
-			CPSHelperBase::_rsf( PS::_gbu() . $_fileList[0], $_fileList[1] );
-			unset( $this->_scriptFiles[ $_key ] );
+CPSLog::trace( __METHOD__, 'Popped script: ' . print_r($_file,true) );
+			CPSHelperBase::_rsf( $_baseUrl . $_file['path'], $_file['position'] );
 		}
 
 		//	Send upstream for convenience
@@ -246,111 +296,6 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	public function setInternalName( $value ) { $this->_internalName = $value; }
 
 	//********************************************************************************
-	//* Magic Methods
-	//********************************************************************************
-
-	/**
-	 * Gets an option from the collection or passes through to parent.
-	 * @param string $name the option, property or event name
-	 * @return mixed
-	 * @throws CException if the property or event is not defined
-	 * @see __set
-	 */
-	public function __get( $name )
-	{
-		//	Then behaviors
-		foreach ( $this->_behaviorCache as $_behaviorName )
-		{
-			if ( ( $_behavior = $this->asa( $_behaviorName ) ) instanceof IPSOptionContainer && $_behavior->contains( $name ) )
-				return $_behavior->getValue( $name );
-		}
-
-		//	Try daddy...
-		return parent::__get( $name );
-	}
-
-	/**
-	 * Sets value of a component option or property.
-	 * @param string $name the property, option or event name
-	 * @param mixed $value the property value or callback
-	 * @throws CException if the property/event is not defined or the property is read only.
-	 * @see __get
-	 */
-	public function __set( $name, $value )
-	{
-		//	Then behaviors
-		foreach ( $this->_behaviorCache as $_behaviorName )
-		{
-			if ( ( $_behavior = $this->asa( $_behaviorName ) ) instanceof IPSOptionContainer && $_behavior->contains( $name ) )
-				return $_behavior->setValue( $name, $value );
-		}
-
-		//	Let parent take a stab. He'll check getter/setters and Behavior methods
-		return parent::__set( $name, $value );
-	}
-
-	/**
-	 * Test to see if an option is set.
-	 * @param string $name
-	 */
-	public function __isset( $name )
-	{
-		//	Then behaviors
-		foreach ( $this->_behaviorCache as $_behaviorName )
-		{
-			if ( ( $_behavior = $this->asa( $_behaviorName ) ) instanceof IPSOptionContainer && $_behavior->contains( $name ) )
-				return $_behavior->getValue( $name ) !== null;
-		}
-
-		return parent::__isset( $name );
-	}
-
-	/**
-	 * Unset an option
-	 * @param string $name
-	 */
-	public function __unset( $name )
-	{
-		//	Check my options first...
-		if ( ! $this->m_oOptions->contains( $name ) )
-			$this->unsetOption( $name );
-		else
-			//	Try dad
-			parent::__unset( $name );
-	}
-
-	/**
-	 * Calls the named method which is not a class method.
-	 * Do not call this method. This is a PHP magic method that we override
-	 * @param string $name The method name
-	 * @param array $parameters The method parameters
-	 * @throws CPSOptionException if the property/event is not defined or the property is read only.
-	 * @see __call
-	 * @return mixed The method return value
-	 */
-	public function __call( $name, $parameters )
-	{
-		$_event = null;
-
-		try
-		{
-			//	Look for behavior methods
-			foreach ( $this->_behaviorCache as $_behaviorName )
-			{
-				if ( $_behavior = $this->asa( $_behaviorName ) )
-				{
-					if ( method_exists( $_behavior, $name ) )
-						return call_user_func_array( array( $_behavior, $name ), $parameters );
-				}
-			}
-		}
-		catch ( CPSOptionException $_ex ) { /* Ignore and pass through */ }
-
-		//	Pass on to dad
-		return parent::__call( $name, $parameters );
-	}
-
-	//********************************************************************************
 	//* Statics
 	//********************************************************************************
 
@@ -374,9 +319,9 @@ class CPSWidget extends CInputWidget implements IPSComponent
 		}
 
 		//	Instantiate...
-		$_name = CPSHelperBase::nvl( $name, ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $name );
-		$_class = CPSHelperBase::o( $options, 'class', ( version_compare( PHP_VERSION, '5.3.0' ) >= 0 ) ? get_called_class() : $_name, true );
-		$_widget = new $_class;
+		$_name = CPSHelperBase::nvl( $name, ( is_callable( 'get_called_class' ) ? get_called_class() : $name ) );
+		$_class = CPSHelperBase::o( $options, 'class', ( is_callable( 'get_called_class' ) ? get_called_class() : $_name ), true );
+		$_widget = new $_class();
 		$_widget->widgetName = $_name;
 		$_widget->id = $_widget->name = CPSHelperBase::o( $options, 'id', $_name );
 		$_widget->name = CPSHelperBase::o( $options, 'name', $_widget->id );

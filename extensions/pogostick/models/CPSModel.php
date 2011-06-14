@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  *
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -318,7 +318,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	{
 		if ( null !== ( $_builder = self::getDb()->getCommandBuilder() ) )
 		{
-			if ( null !== ( $_command = $_builder->createFindCommand( $this->getTableSchema(), $criteria ) ) )
+			if ( null !== ( $_command = $_builder->createFindCommand( self::model()->getTableSchema(), $criteria ) ) )
 				return $_command->queryAll( $fetchAssociative, $parameters );
 		}
 
@@ -374,6 +374,8 @@ class CPSModel extends CActiveRecord implements IPSBase
 	 */
 	public static function beginTransaction()
 	{
+		$_transaction = null;
+
 		if ( version_compare( PHP_VERSION, '5.3.0' ) > 0 )
 		{
 			$_modelClass = get_called_class();
@@ -392,7 +394,8 @@ class CPSModel extends CActiveRecord implements IPSBase
 	 */
 	public static function commitTransaction()
 	{
-		if ( null !== ( $_transaction = array_pop( self::$_transactionStack ) ) ) $_transaction->commit();
+		if ( null !== ( $_transaction = array_pop( self::$_transactionStack ) ) )
+			$_transaction->commit();
 	}
 
 	/**
@@ -402,10 +405,12 @@ class CPSModel extends CActiveRecord implements IPSBase
 	 */
 	public static function rollbackTransaction( Exception $exception = null )
 	{
-		if ( null !== ( $_transaction = array_pop( self::$_transactionStack ) ) ) $_transaction->rollback();
+		if ( null !== ( $_transaction = array_pop( self::$_transactionStack ) ) )
+			$_transaction->rollback();
 
 		//	Throw it if given
-		if ( null !== $exception ) throw $exception;
+		if ( null !== $exception )
+			throw $exception;
 	}
 
 	//*******************************************************************************

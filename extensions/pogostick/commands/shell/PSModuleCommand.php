@@ -5,7 +5,7 @@
  * This is a convenience class to place in your Yii commands directory
  *
  * @filesource
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @author Jerry Ablan <jablan@pogostick.com>
  * @link http://www.pogostick.com Pogostick, LLC.
  * @package psYiiExtensions

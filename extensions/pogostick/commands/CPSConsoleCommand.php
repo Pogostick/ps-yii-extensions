@@ -4,7 +4,7 @@
  *
  * @filesource
  * @author Jerry Ablan <jablan@pogostick.com>
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @package psYiiExtensions
  * @subpackage commands
@@ -12,7 +12,7 @@
  * @version SVN: $Revision: 405 $
  * @modifiedby $LastChangedBy: jerryablan@gmail.com $
  * @lastmodified  $Date: 2010-10-21 17:44:02 -0400 (Thu, 21 Oct 2010) $
- * 
+ *
  * @property-read name The name of the command
  * @property-read commandRunner The command runner
  */
@@ -21,7 +21,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 	//********************************************************************************
 	//* Constants
 	//********************************************************************************
-	
+
 	/**
 	* Minimum column width for display
 	*/
@@ -34,11 +34,11 @@ abstract class CPSConsoleCommand extends CPSComponent
 	* Our version
 	*/
 	const	VERSION = '1.1.0';
-	
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
-	
+
 	/**
 	* @var string This command's name
 	*/
@@ -86,31 +86,31 @@ abstract class CPSConsoleCommand extends CPSComponent
 	{
 		//	Phone home
 		parent::__construct( $optionList );
-		
+
 		//	Note settings
 		$this->_name = $commandName;
 		$this->_commandRunner = $commandRunner;
 		$this->_defaultAction = 'index';
 	}
-	
+
 	/***
 	* Initialize
-	* 
+	*
 	*/
 	public function init()
 	{
 		//	Phone home
 		parent::init();
-		
+
 		//	Add our options
 		$this->addOptions( self::getBaseOptions() );
 	}
 
 	/**
 	* Provides the command description.
-	* 
+	*
 	* This method may be overridden to return the actual command description.
-	* 
+	*
 	* @return string the command description. Defaults to 'Usage: php entry-script.php command-name'.
 	*/
 	public function getHelp()
@@ -120,9 +120,9 @@ abstract class CPSConsoleCommand extends CPSComponent
 
 	/**
 	* Displays a usage error.
-	* 
+	*
 	* This method will then terminate the execution of the current application.
-	* 
+	*
 	* @param string the error message
 	*/
 	public function usageError( $sMessage )
@@ -132,7 +132,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 
 	/**
 	* Copies a list of files from one place to another.
-	* 
+	*
 	* @param array the list of files to be copied (name=>spec).
 	* The array keys are names displayed during the copy process, and array values are specifications
 	* for files to be copied. Each array value must be an array of the following structure:
@@ -157,7 +157,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 
 		echo "Results" . PHP_EOL;
 		echo "============================================================" . PHP_EOL;
-		
+
 		foreach ( $arFileList as $_name => $_arFile )
 		{
 			$_sSource = strtr( $_arFile['source'], '/\\', DIRECTORY_SEPARATOR );
@@ -184,7 +184,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 					$this->boldEchoString( $_name, 'Unchanged' );
 					continue;
 				}
-				
+
 				if ( $this->force || $_bOverwriteAll )
 				{
 					$arFileList[ $_name ][ '_status' ] = 1;
@@ -194,12 +194,12 @@ abstract class CPSConsoleCommand extends CPSComponent
 				{
 					$this->boldEchoString( $_name, 'Existing' );
 					$this->echoString( "[\033[1my\033[0mes|\033[1mn\033[0mo|\033[1ma\033[0mll|\033[1mq\033[0muit] ", '--> Overwrite? ', false, ' ', false, 8 );
-					
+
 					switch ( substr( strtolower( trim( fgets( STDIN ) ) ), 0, 1 ) )
 					{
 						case 'q':
 							return;
-							
+
 						case 'a':
 							$_bOverwriteAll = true;
 
@@ -207,7 +207,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 							$arFileList[ $_name ][ '_status' ] = 1;
 							$this->boldEchoString( $_name, 'Overwriting' );
 							break;
-						
+
 						case 'n':
 							$arFileList[ $_name ][ '_status' ] = 0;
 							$this->boldEchoString( $_name, 'Skipping' );
@@ -221,17 +221,17 @@ abstract class CPSConsoleCommand extends CPSComponent
 				$this->ensureDirectory( dirname( $_sTarget ) );
 				$this->boldEchoString( $_name, 'Generating' );
 			}
-			
+
 			@file_put_contents( $_sTarget, $_sContent );
 		}
-		
+
 		//	Return array with statuses
 		return $arFileList;
 	}
 
 	/**
 	* Converts a word to its plural form.
-	* 
+	*
 	* @param string the word to be pluralized
 	* @return string the pluralized word
 	*/
@@ -245,21 +245,21 @@ abstract class CPSConsoleCommand extends CPSComponent
 			'/(r|t|b|d)y$/i' => '\1ies',
 			'/s$/' => 's',
 		);
-		
+
 		//	Check our pattern list
 		foreach ( $_arRules as $_sRule => $_sReplace )
 			if ( preg_match( $_sRule, $sString ) ) return preg_replace( $_sRule, $_sReplace, $sString );
-		
+
 		return $sString . 's';
 	}
 
 	/**
 	* Builds the file list of a directory.
-	* 
+	*
 	* This method traverses through the specified directory and builds
 	* a list of files and subdirectories that the directory contains.
 	* The result of this function can be passed to {@link copyFiles}.
-	* 
+	*
 	* @param string the source directory
 	* @param string the target directory
 	* @param string base directory
@@ -280,9 +280,9 @@ abstract class CPSConsoleCommand extends CPSComponent
 			$_sTargetPath = $sTargetDir . DIRECTORY_SEPARATOR . $_sFile;
 			$_name = $sBaseDir === '' ? $_sFile : $sBaseDir . DIRECTORY_SEPARATOR . $_sFile;
 
-			if ( is_dir( $_sSourcePath ) ) 
+			if ( is_dir( $_sSourcePath ) )
 				$_arList = array_merge( $_arList, $this->buildFileList( $_sSourcePath, $_sTargetPath, $_name ) );
-			else                                      
+			else
 			{
 				$_arList[ $_name ] = array(
 					'source' => $_sSourcePath,
@@ -292,7 +292,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 				);
 			}
 		}
-		
+
 		closedir( $_iDir );
 
 		return $_arList;
@@ -300,7 +300,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 
 	/**
 	* Creates all parent directories if they do not exist.
-	* 
+	*
 	* @param string the directory to be checked
 	* @param integer The directory mode
 	*/
@@ -308,19 +308,19 @@ abstract class CPSConsoleCommand extends CPSComponent
 	{
 		$_bResult = true;
 		$_arInfo = pathinfo( $sTarget );
-		
+
 		if ( ! is_dir( $_arInfo['dirname'] ) )
 		{
 			$this->boldEchoString( strtr( $_arInfo['dirname'], '\\', '/' ), 'Created Directory' );
 			$_bResult = @mkdir( $_arInfo['dirname'] );
 		}
-		
+
 		return $_bResult;
 	}
 
     /**
     * Generates the file
-    * 
+    *
     * @param string $sSource
     * @param array $arParams
     * @return string
@@ -329,23 +329,23 @@ abstract class CPSConsoleCommand extends CPSComponent
 	{
 		return $this->renderFile( $sSource, $arParams, true );
 	}
-	
+
 	/**
 	* Renders a view file.
-	* 
+	*
 	* @param string view file path
 	* @param array optional data to be extracted as local view variables
 	* @param boolean whether to return the rendering result instead of displaying it
-	* 
+	*
 	* @return mixed the rendering result if required. Null otherwise.
 	*/
 	public function renderFile( $sViewFile, $oData = null, $bReturn = false )
 	{
-		if ( is_array( $oData ) ) 
+		if ( is_array( $oData ) )
 			extract( $oData, EXTR_PREFIX_SAME, 'data' );
 		else
 			$data = $oData;
-			
+
 		if ( $bReturn )
 		{
 			ob_start();
@@ -359,7 +359,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 
 	/**
 	* Writes a neat string to the console
-	* 
+	*
 	* @param string $sStr
 	* @param mixed $sLabel
 	* @param mixed $bReturnValue
@@ -370,31 +370,31 @@ abstract class CPSConsoleCommand extends CPSComponent
 	public function echoString( $sStr, $sLabel = null, $bReturnValue = false, $sSuffix = ' : ', $bNewLine = true, $iExtraSpace = 0, $bBold = false )
 	{
 		$_sVal = null;
-		
+
 		if ( $sLabel == ' ' )
 			$sSuffix = null;
 		else
 			$sLabel = trim( $sLabel );
 
-		if ( null !== $sLabel ) 
+		if ( null !== $sLabel )
 		{
 			if ( strlen( $sLabel ) > $this->colWidth ) $this->colWidth = strlen( $sLabel );
 			$_sVal = str_pad( $sLabel . $sSuffix, $this->colWidth + self::COL_PADDING + $iExtraSpace, ' ', STR_PAD_LEFT );
 		}
 
 		$_sVal .= ( is_object( $sStr ) ? get_class( $sStr ) : $sStr ) . ( $bNewLine ?  PHP_EOL : '' );
-		
+
 		if ( $bBold ) $_sVal = str_replace( $sLabel, $this->bold( $sLabel ), $_sVal );
 
 		if ( $bReturnValue ) return $_sVal;
-		
+
 		//	Otherwise echo!
 		echo $_sVal;
 	}
-	
+
 	/**
 	* Writes neat output to console, applying bold codes to label if provided
-	* 
+	*
 	* @param mixed $sStr
 	* @param mixed $sLabel
 	* @param mixed $bReturnValue
@@ -407,10 +407,10 @@ abstract class CPSConsoleCommand extends CPSComponent
 	{
 		return $this->echoString( $sStr, $sLabel, $bReturnValue, $sSuffix, $bNewLine, $iExtraSpace, true );
 	}
-	
+
 	/**
 	* Wraps a string bold codes for console display
-	* 
+	*
 	* @param string $sStr
 	*/
 	public function bold( $sStr )
@@ -420,7 +420,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 
 	/**
 	* Processes the command line arguments
-	* 
+	*
 	* @param array $arArgs
 	* @return array
 	*/
@@ -431,10 +431,10 @@ abstract class CPSConsoleCommand extends CPSComponent
 			'rebuilt' => array(),
 			'options' => array(),
 		);
-		
+
 		//	Our return options array...
 		$_arOptions = array();
-		
+
 		//	Rebuild args...
 		for ( $_i = 0, $_iCount = count( $arArgs ); $_i < $_iCount; $_i++ )
 		{
@@ -448,16 +448,16 @@ abstract class CPSConsoleCommand extends CPSComponent
 			else
 				$_arResults['rebuilt'][] = $arArgs[ $_i ];
 		}
-		
+
 		$_arResults['options'] = $_arOptions;
-		
+
 		//	Return the processed results...
-		return $_arResults;		
+		return $_arResults;
 	}
 
 	/**
 	* Ensures the db connection is valid
-	* 
+	*
 	*/
 	public function getDbConnection()
 	{
@@ -473,17 +473,17 @@ abstract class CPSConsoleCommand extends CPSComponent
 
 		$_oDB->active = true;
 		$this->schema = $_oDB->schema;
-		
+
 		return true;
 	}
-	
+
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
 
 	/**
 	* Based on a class name, the module is selected
-	* 
+	*
 	* @param string $sClassName
 	* @return CModule
 	*/
@@ -491,24 +491,24 @@ abstract class CPSConsoleCommand extends CPSComponent
 	{
 		$_oModule = Yii::app();
 		$_sModelClass = $sClassName;
-		
+
 		if ( false === ( $_iPos = strpos( $_sModelClass, '.' ) ) )
 			$_sModelClass = 'application.models.' . $_sModelClass;
 		else
 		{
 			$_sId = substr( $_sModelClass, 0, $_iPos );
-			
+
 			if ( null !== ( $_oNewModule = Yii::app()->getModule( $_sId ) ) )
 				$_oModule = $_oNewModule;
 		}
-		
+
 		//	Return module
 		return $_oModule;
 	}
 
 	/**
 	* Process arguments passed in
-	* 
+	*
 	* @param array $arArgs
 	* @return array
 	*/
@@ -531,27 +531,27 @@ abstract class CPSConsoleCommand extends CPSComponent
 				case 'template-name':
 					$this->templateName = $_sValue;
 					break;
-					
+
 				case 'force':
 				case 'f':
 					$this->force = true;
 					break;
-					
+
 				case 'd':
 				case 'database':
 					$this->databaseName = $_sValue;
 					break;
-					
+
 				case 'b':
 				case 'base-class':
 					$this->baseClass = $_sValue;
 					break;
-					
+
 				case 't':
 				case 'template-path':
 					$this->templatePath = $_sValue;
 					break;
-					
+
 				default:
 					//	Look through options..
 					foreach ( $this->makeOptions( true, PS::OF_ASSOC_ARRAY, true ) as $_sOptKey => $_sOptValue )
@@ -565,10 +565,10 @@ abstract class CPSConsoleCommand extends CPSComponent
 					break;
 			}
 		}
-		
+
 		return $arArgs;
 	}
-	
+
 	/**
 	* Get options to display
 	* @return string
@@ -576,7 +576,7 @@ abstract class CPSConsoleCommand extends CPSComponent
 	protected function getDisplayOptions()
 	{
 		$_sOptions = null;
-		
+
 		//	Look through options..
 		foreach ( $this->makeOptions( true, PS::OF_ASSOC_ARRAY ) as $_sOptKey => $_sOptValue )
 		{
@@ -584,15 +584,15 @@ abstract class CPSConsoleCommand extends CPSComponent
 			if ( $_sOptValue ) $_sOptions .= 'Default value is "' . ( is_array( $_sOptValue ) ? implode( ', ', $_sOptValue ) : $_sOptValue ) . '"';
 			$_sOptions .= PHP_EOL;
 		}
-		
-		if ( $_sOptions ) $_sOptions = "MORE OPTIONS" . PHP_EOL . "$_sOptions" ;	
-		
+
+		if ( $_sOptions ) $_sOptions = "MORE OPTIONS" . PHP_EOL . "$_sOptions" ;
+
 		return $_sOptions;
 	}
-	
+
 	/**
 	* Returns a pretty list of generated files
-	* 
+	*
 	* @param array $arFileList
 	* @param boolean $bInclude
 	* @param integer $iNew Returns the number of new files created
@@ -600,8 +600,9 @@ abstract class CPSConsoleCommand extends CPSComponent
 	protected function getResultDisplay( $arFileList = array(), $bInclude = false, &$iNew = 0 )
 	{
 		$_iGen = 0;
+		$_sClasses = null;
 		$_sMsg = PHP_EOL . "No files were created or destroyed." . PHP_EOL;
-		
+
 		foreach ( $arFileList as $_sFile => $_arParams )
 		{
 			if ( PS::o( $_arParams, '_status', 0 ) )
@@ -609,26 +610,26 @@ abstract class CPSConsoleCommand extends CPSComponent
 				$_sClasses .= $this->boldEchoString( '(' . $_arParams[ 'target' ] . ')', $_sFile, true );
 				$_iGen++;
 			}
-				
+
 			if ( $bInclude ) @include_once( $_arParams[ 'target' ] );
 		}
-		
-		if ( $_iGen ) 
+
+		if ( $_iGen )
 		{
 			$_sMsg = PHP_EOL . 'The following file' . ( $_iGen > 1 ? 's were generated:' : ' was generated:' ) . PHP_EOL . PHP_EOL .
 				$this->echoString( '(File Name)', 'Class Name', true ) .
 				"============================================================" . PHP_EOL .
 				$_sClasses;
 		}
-		
+
 		$iNew = $_iGen;
 
 		return $_sMsg;
 	}
-	
+
 	/**
 	* Display command header and parameters
-	* 
+	*
 	* @param string $commandName
 	* @param array $arExtra
 	*/
@@ -636,11 +637,11 @@ abstract class CPSConsoleCommand extends CPSComponent
 	{
 		$_arOptions = array_merge( $arExtra, $this->makeOptions( true, PS::OF_ASSOC_ARRAY, true ) );
 		$_iColWidth = $this->colWidth;
-		
+
 		//	Update column width based on option keys...
-		foreach ( $_arOptions as $_sKey => $_sVal ) 
+		foreach ( $_arOptions as $_sKey => $_sVal )
 			$_iColWidth = max( $_iColWidth, strlen( $_sKey ) + self::COL_PADDING );
-		
+
 		$this->colWidth = $_iColWidth;
 
 		echo PHP_EOL;
@@ -659,20 +660,20 @@ abstract class CPSConsoleCommand extends CPSComponent
 				if ( count( $_sValue ) && is_array( current( $_sValue ) ) )
 				{
 					$_arOut = array();
-					
+
 					foreach ( $_sValue as $_sSubKey => $_sSubValue )
 						$_arOut[] = $_sSubKey;
 
 					$_sValue = $_arOut;
 				}
-				
-				echo $this->boldEchoString( implode( ', ', $_sValue ), $_sKey, true );				
+
+				echo $this->boldEchoString( implode( ', ', $_sValue ), $_sKey, true );
 			}
 		}
-			                  
+
 		echo PHP_EOL;
 	}
-	
+
 	/**
 	* Easier on the eyes
 	*
@@ -693,5 +694,5 @@ abstract class CPSConsoleCommand extends CPSComponent
 			)
 		);
 	}
-	
+
 }

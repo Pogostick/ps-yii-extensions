@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  *
  * @copyright Copyright &copy; 2010 Pogostick, LLC
@@ -212,14 +212,29 @@ class CPSLog implements IPSBase
 			{
 				if ( null === ( $_caller = PS::o( $_trace, $level ) ) )
 					break;
-				
-				//	If we see ourself, then we must go again
-				if ( null !== ( $_class = PS::o( $_caller, 'class' ) ) && $_class != $_className )
+
+				if ( null !== ( $_class = PS::o( $_caller, 'class' ) ) )
+				{
+					//	If we see ourself, then we must go again
+					if ( $_class == $_className )
+					{
+						//	One louder
+						$level++;
+						continue;
+					}
+
 					return $_class . '::' . PS::o( $_caller, 'function' );
+				}
 
 				//	If we see ourself, then we must go again
-				if ( $_className != basename( PS::o( $_caller, 'file' ) ) )
-					return basename( PS::o( $_caller, 'file' ) ) . '::' . PS::o( $_caller, 'function' ) . ' (Line ' . PS::o( $_caller, 'line' ) . ')';
+				if ( $_className == basename( PS::o( $_caller, 'file' ) ) )
+				{
+					//	One louder
+					$level++;
+					continue;
+				}
+
+				return basename( PS::o( $_caller, 'file' ) ) . '::' . PS::o( $_caller, 'function' ) . ' (Line ' . PS::o( $_caller, 'line' ) . ')';
 
 				$level--;
 			}

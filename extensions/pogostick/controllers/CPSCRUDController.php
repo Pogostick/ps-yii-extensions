@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  *
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -24,6 +24,15 @@ abstract class CPSCRUDController extends CPSController
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
+
+	/**
+	 * If true, the admin system will not process commands, but render the admin page
+	 * in a manner suitable for use with {@link CGridView}
+	 * @var string
+	 */
+	protected $_enableAdminDashboard = false;
+	public function getEnableAdminDashboard() { return $this->_enableAdminDashboard; }
+	public function setEnableAdminDashboard( $value ) { $this->_enableAdminDashboard = $value; }
 
 	/**
 	* The name of the Login Form class. Defaults to 'LoginForm'
@@ -50,12 +59,9 @@ abstract class CPSCRUDController extends CPSController
 	public function getMenu() { return $this->_menu; }
 	public function setMenu( $value ) { $this->_menu = $value; }
 
-	/***
-	 * @var boolean 
-	 */
-	
 	/**
-	 * @var boolean $singleViewMode If true, only the 'update' view is called for create and update.
+	 * If true, only the 'update' view is called for create and update.
+	 * @var boolean $singleViewMode
 	 */
 	protected $_singleViewMode = false;
 	public function getSingleViewMode() { return $this->_singleViewMode; }
@@ -235,9 +241,9 @@ abstract class CPSCRUDController extends CPSController
 		//	Handle singleViewMode...
 		$_model = ( $fromCreate ? new $this->m_sModelName : $this->loadModel()  );
 		$_viewName = ( $fromCreate ? ( $this->_singleViewMode ? 'update' : 'create' ) : 'update' );
-		
+
 		if ( $this->isPostRequest ) $this->saveModel( $_model, $_POST, 'update' );
-		
+
 		$options['update'] = ( ! $fromCreate );
 		$this->genericAction( $_viewName, $_model, $options );
 	}
@@ -285,8 +291,48 @@ abstract class CPSCRUDController extends CPSController
 	*/
 	public function actionAdmin( $options = array(), $oCriteria = null )
 	{
-		if ( $this->m_sModelName ) @list( $_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadPaged( true, $oCriteria );
+		if ( $this->_enableAdminDashboard )
+		{
+			$this->actionAdminDashboard( $options );
+			return;
+		}
+
+		//	Regular old admin page...
+		if ( $this->m_sModelName )
+			@list( $_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadPaged( true, $oCriteria );
+
 		$this->render( 'admin', array_merge( $options, array( 'models' => $_arModels, 'pages' => $_oPage, 'sort' => $_oSort ) ) );
+	}
+
+	/**
+	 * Admin page for use with a {@link CGridView}
+	 * @param array $options
+	 * @return void
+	 */
+	public function actionAdminDashboard( $options = array() )
+	{
+		if ( null !== $this->_modelName )
+		{
+			$_model = new $this->_modelName( 'search' );
+			$_model->unsetAttributes();
+
+			if ( isset( $_REQUEST[$this->_modelName] ) )
+				$_model->attributes = $_REQUEST[$this->_modelName];
+
+			$this->render(
+				'admin',
+				array_merge(
+					$options,
+					array(
+						'model' => $_model,
+					)
+				)
+			);
+
+			return;
+		}
+
+		throw new Exception( 'No model name/class set, unable to render "adminDashboard" page.' );
 	}
 
 	//********************************************************************************

@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of the psYiiExtensions package.
  * 
- * @copyright Copyright &copy; 2009 Pogostick, LLC
+ * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
@@ -110,7 +110,7 @@ class CPSTransform implements IPSBase
 	* @param string $sFormatColumn
 	* @return mixed
 	*/
-	protected static function getValue( $oModel, $sColumn, $sFormatColumn = null )
+	public static function getValue( $oModel, $sColumn, $sFormatColumn = null )
 	{
 		if ( ! $oModel instanceof CModel ) 
 			return $oModel[ self::columnChain( PS::nvl( $sFormatColumn, $sColumn ) ) ];
