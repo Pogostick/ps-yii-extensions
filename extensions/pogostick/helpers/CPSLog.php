@@ -21,6 +21,16 @@
  */
 class CPSLog implements IPSBase
 {
+	//**************************************************************************
+	//* Constants
+	//**************************************************************************
+
+	/**
+	 * @const string The string to use for each log entry indentation
+	 */
+	const
+		INDENT_STRING = '  ';
+
 	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
@@ -88,17 +98,16 @@ class CPSLog implements IPSBase
 		$_logEntry = $message;
 
 		//	Handle writing to multiple levels at once.
-		foreach (
-			$_levelList as $_level
-		)
+		foreach ( $_levelList as $_level )
 		{
 			$_indicator = ( in_array( $_level, self::$_levelIndicators ) ? self::$_levelIndicators[$_level] : self::$_defaultLevelIndicator );
 			$_logEntry = self::$prefix . ( class_exists( 'Yii' ) ? Yii::t( $category, $message, $options, $source, $language ) : $message );
 
 			if ( self::$echoData )
 			{
-				echo date( 'Y.m.d h.i.s' ) . '[' . strtoupper( $_level[0] ) . '] ' . '[' .
-					sprintf( '%-40s', $category ) . '] ' . $_logEntry . '<br />';
+				echo date( 'Y.m.d h.i.s' ) . '[' . strtoupper( $_level[0] ) . '] ' .
+					sprintf( '[%40.40s]', $category ) .
+					$_logEntry;
 				flush();
 			}
 
@@ -115,14 +124,22 @@ class CPSLog implements IPSBase
 				$_tempIndent = 0;
 			}
 
-			$_logEntry = str_repeat( '', $_tempIndent ) . $_indicator . ' ' . $message;
+			$_logEntry = str_repeat( self::INDENT_STRING, $_tempIndent ) . $_indicator . ' ' . $message;
 
-			if ( class_exists( 'Yii' ) )
-			Yii::log( $_logEntry, $_level, $category );
-			else if ( class_exists( 'SimpleLogger' ) )
-				SimpleLogger::getInstance()->write( $_logEntry, 6 );
-			else
-				error_log( $_logEntry );
+			try
+			{
+				if ( @class_exists( 'Yii' ) )
+					Yii::log( $_logEntry, $_level, $category );
+				else if ( @class_exists( 'SimpleLogger' ) )
+					@SimpleLogger::getInstance()->write( $_logEntry, 6 );
+				else
+					@error_log( $_logEntry );
+			}
+			catch ( Exception $_ex )
+			{
+				@error_log( 'CPSLog::_log exception: ' . $_ex->getMessage() );
+				@error_log( '             Log Entry: ' . $_logEntry );
+			}
 		}
 
 		//	Set indent level...
@@ -168,7 +185,7 @@ class CPSLog implements IPSBase
 	 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
 	 * @return string
 	 */
-	public static function warning( $category, $message, $options = array(), $source = null, $language = null )
+	public static function warning( $category, $message = null, $options = array(), $source = null, $language = null )
 	{
 		self::log( $category, $message, 'warning', $options, $source, $language );
 	}
@@ -196,7 +213,7 @@ class CPSLog implements IPSBase
 	 * @param mixed $response The API response to log
 	 * @return string
 	 */
-	public static function api( $apiCall, $response )
+	public static function api( $apiCall, $response = null )
 	{
 		return self::log( $apiCall, PHP_EOL . print_r( $response, true ) . PHP_EOL, 'api' );
 	}
@@ -219,7 +236,7 @@ class CPSLog implements IPSBase
 	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
 	 * @return string
 	 */
-	public static function write( $message, $level, $category = null )
+	public static function write( $message, $level = null, $category = null )
 	{
 		return self::log( $category, $message, $level );
 	}

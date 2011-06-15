@@ -5,18 +5,21 @@
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
- * @package		psYiiExtensions
- * @subpackage 	base.components
- * @author			Jerry Ablan <jablan@pogostick.com>
- * @version		SVN $Id: CPSComponent.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
- * @since			v1.0.0
  * @filesource
  */
+
 /**
- * CPSComponent
+ * CPSComponent class
  * This is the base class for all Pogostick Yii Extension library objects.
  * It extends the base functionality of the Yii Framework without replacing
  * and core code.
+ *
+ * @package		psYiiExtensions
+ * @subpackage 	base.components
+ *
+ * @author			Jerry Ablan <jablan@pogostick.com>
+ * @version		SVN $Id: CPSComponent.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
+ * @since			v1.0.0
  *
  * @property string $internalName The internal name of the component.
  * @property boolean $debugMode Enable trace-level debugging
@@ -43,21 +46,6 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	public function setInternalName( $value ) { $this->_internalName = $value; }
 
 	/**
-	* @var array Our configuration options
-	*/
-	protected $_optionList;
-	/**
-	 * Gets configuration options
-	 * @return array
-	 */
-	public function getOptionList() { return $this->_optionList; }
-	/**
-	 * Sets configuration options
-	 * @return array
-	 */
-	public function setOptionList( $value = array() ) { $this->_optionList = $value; }
-
-	/**
 	 * @var boolean Tracks the status of debug mode for component
 	 */
 	protected $_debugMode = false;
@@ -66,9 +54,10 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	 * @return boolean The current debug mode
 	 */
 	public function getDebugMode() { return $this->_debugMode; }
+
 	/**
 	 * Sets the debug mode
-	 * @param boolean The new debug mode
+	 * @param bool $value
 	 */
 	public function setDebugMode( $value = true ) { $this->_debugMode = $value; }
 
@@ -85,7 +74,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	 * Sets the debug level
 	 * @param integer The new debug level
 	 */
-	public function setDebugLevel( $value = 0 ) { $this->_debugLevel = $value; }
+	public function setDebugLevel( $value ) { $this->_debugLevel = $value; }
 
 	/**
 	 * @var SplStack
@@ -171,6 +160,8 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	/**
 	 * Loads an array into properties if they exist.
 	 * @param array $optionList
+	 * @param bool $overwriteExisting
+	 *
 	 */
 	protected function _loadConfiguration( $optionList = array(), $overwriteExisting = true )
 	{
