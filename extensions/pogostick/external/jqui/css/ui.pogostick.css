@@ -701,3 +701,16 @@ div.ps-edit-container div.yiiForm div.wide {
 .ui-accordion-content a.ps-menu-current {
 	font-weight: bold !important;
 }
+
+/**
+ * Form subheader
+ */
+div.ui-generated-subheader {
+    border-radius: 7px 7px 7px 7px;
+	-webkit-border-radius: 7px 7px 7px 7px;
+	-mozilla-border-radius: 7px 7px 7px 7px;
+    font-size: 1.1em;
+    margin-left: 5px;
+    padding: 10px;
+}
+

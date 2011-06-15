@@ -684,5 +684,5 @@ class CPSTransform implements IPSBase
 			
 		return $_arOut;
 	}
-	
+
 }

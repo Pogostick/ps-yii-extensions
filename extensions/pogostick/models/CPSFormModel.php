@@ -20,20 +20,8 @@
  * @filesource
  * 
  * @property-read string $modelName The class name of the model
+ * @deprecated Removing in 1.1.0
  */
 class CPSFormModel extends CFormModel implements IPSBase
 {
-	/**
-	* Fixup attribute labels for my funky naming conventions...
-	*
-	* @param string $sName
-	* @return mixed
-	*/
-	public function generateAttributeLabel( $sName )
-	{
-		if ( substr( $sName, 0, 2 ) == 'm_' )
-			$sName = substr( $sName, 3 );
-
-		return( parent::generateAttributeLabel( $sName ) );
-	}
 }

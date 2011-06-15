@@ -200,7 +200,17 @@ CPSLog::trace( __METHOD__, 'Popped css: ' . print_r($_file,true) );
 		while ( null !== ( $_file = $this->popScriptFile() ) )
 		{
 CPSLog::trace( __METHOD__, 'Popped script: ' . print_r($_file,true) );
-			CPSHelperBase::_rsf( $_baseUrl . $_file['path'], $_file['position'] );
+			$_position = null;
+
+			if ( ! is_array( $_file ) )
+				$_path = $_file;
+			else
+			{
+				$_path = PS::o( $_file, 'path' );
+				$_position = PS::o( $_file, 'position' );
+			}
+
+			CPSHelperBase::_rsf( $_baseUrl . $_path, $_position );
 		}
 
 		//	Send upstream for convenience

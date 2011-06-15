@@ -1,4 +1,3 @@
-/** @noinspection PhpUnimplementedMethodsInspection */
 <?php
 /**
  * This file is part of the psYiiExtensions package.
@@ -23,9 +22,7 @@
  * @property boolean $debugMode Enable trace-level debugging
  * @property integer $debugLevel A user-defined debugging level
  */
- 
- 
-class CPSComponent extends CApplicationComponent implements IPSComponent, IApplicationComponent
+class CPSComponent extends CApplicationComponent implements IPSComponent
 {
 	//********************************************************************************
 	//* Properties
@@ -90,6 +87,11 @@ class CPSComponent extends CApplicationComponent implements IPSComponent, IAppli
 	 */
 	public function setDebugLevel( $value = 0 ) { $this->_debugLevel = $value; }
 
+	/**
+	 * @var SplStack
+	 */
+	protected $_exceptionStack;
+
 	//********************************************************************************
 	//* Yii Overrides
 	//********************************************************************************
@@ -99,6 +101,8 @@ class CPSComponent extends CApplicationComponent implements IPSComponent, IAppli
 	*/
 	public function __construct( $config = array() )
 	{
+		$this->_exceptionStack = new SplStack();
+
 		//	Set any properties via standard config array
 		if ( is_array( $config ) && ! empty( $config ) )
 			$this->_loadConfiguration( $config );
@@ -142,6 +146,24 @@ class CPSComponent extends CApplicationComponent implements IPSComponent, IAppli
 			echo $message . '<BR />';
 	}
 
+	/**
+	 * @param Exception $exception
+	 * @return \SplStack
+	 */
+	public function setLastException( $exception )
+	{
+		$this->_exceptionStack->push( $exception );
+		return $this;
+	}
+
+	/**
+	 * @return \Exception
+	 */
+	public function getLastException()
+	{
+		return $this->_exceptionStack->pop();
+	}
+
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
@@ -181,4 +203,5 @@ class CPSComponent extends CApplicationComponent implements IPSComponent, IAppli
 			CPSLog::error( __METHOD__, 'Error while loading configuration options: ' . $_ex->getMessage() );
 		}
 	}
+
 }
