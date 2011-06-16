@@ -160,7 +160,8 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	}
 
 	/**
-	 * Passthrough function to api()
+	 * Pass-through function to api()
+	 * @return mixed
 	 */
 	public function api( /* variable */ )
 	{
@@ -212,7 +213,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	{
 		//	Ignore second call and standalone...
 		if ( PS::_gs( 'standalone', false ) || $this->_inForceLogin )
-			return;
+			return false;
 
 		$this->_session = $this->_facebookApi->getSession();
 
@@ -229,12 +230,24 @@ class CPSFacebookUserIdentity extends CUserIdentity
 			//	Get our info...
 			$this->_me = PS::_gs( 'currentMe' );
 
-			if ( null === $this->_me && ! ( $this->_me = $this->_facebookApi->api( '/me' ) ) )
-				throw new Exception( 'Not really logged in...' );
+CPSLog::trace( __METHOD__, '  . Pulling /me' );
+			try
+			{
+				if ( null === $this->_me && ! ( $this->_me = $this->_facebookApi->api( '/me' ) ) )
+					throw new Exception( 'Not really logged in...' );
+			}
+			catch ( CPSFacebookApiException $_ex )
+			{
+CPSLog::error( __METHOD__, 'FB API Exception: ' . $_ex->getMessage() );
+			}
+
+CPSLog::trace( __METHOD__, '  . Authenticating session' );
 
 			//	Not logged in? Authenticate!
 			if ( PS::_ig() && ! CPSFacebookUser::authenticateUser( $this->_facebookApi, $this ) )
 				throw new Exception( 'Invalid session' );
+
+CPSLog::trace( __METHOD__, '  . Loading user' );
 
 			//	Log into system...
 			$this->_me = $this->_facebookApi->api( '/me' );
@@ -245,6 +258,8 @@ class CPSFacebookUserIdentity extends CUserIdentity
 
 			if ( $this->_autoLoadPictures )
 			{
+CPSLog::trace( __METHOD__, '  . Loading albums' );
+
 				CPSFacebook::$_photoList = $this->getAlbums();
 
 				if ( empty( CPSFacebook::$_photoList ) )
@@ -256,7 +271,8 @@ class CPSFacebookUserIdentity extends CUserIdentity
 		catch ( Exception $_ex )
 		{
 			CPSLog::error( __METHOD__, 'FB Exception: ' . $_ex->getMessage() );
-			error_log( 'init exception: ' . $_ex->getMessage() );
+
+			$this->_inForceLogin = true;
 			$this->_forceLogin();
 		}
 
@@ -313,12 +329,12 @@ class CPSFacebookUserIdentity extends CUserIdentity
 			$_user->app_del_date = null;
 			$_user->app_add_count_nbr += 1;
 
-			//	Invite friends?
-			if ( $this->_inviteAfterInstall )
-			{
-				$this->redirect( 'inviteFriends', true, 301 );
-				return false;
-			}
+//			//	Invite friends?
+//			if ( $this->_inviteAfterInstall )
+//			{
+//				$this->redirect( 'inviteFriends', true, 301 );
+//				return false;
+//			}
 		}
 
 		if ( $this->_me )
@@ -379,8 +395,7 @@ class CPSFacebookUserIdentity extends CUserIdentity
 		}
 		catch ( Exception $_ex )
 		{
-			CPSLog::error( __METHOD__, 'Exception: ' . $_ex->getMessage() );
-			error_log( 'Get all friends failed: ' . $_ex->getMessage() );
+			CPSLog::error( __METHOD__, 'Exception getAllFriends: ' . $_ex->getMessage() );
 			$this->_forceLogin();
 		}
 
@@ -418,7 +433,6 @@ class CPSFacebookUserIdentity extends CUserIdentity
 		}
 		catch ( Exception $_ex )
 		{
-			error_log( 'Get APP friends failed: ' . $_ex->getMessage() );
 			CPSLog::error( __METHOD__, 'Exception: ' . $_ex->getMessage() );
 			$this->_forceLogin();
 		}
@@ -544,24 +558,23 @@ class CPSFacebookUserIdentity extends CUserIdentity
 	 */
 	protected function _forceLogin()
 	{
+		CPSLog::info( __METHOD__, 'Force logging out user, no session found.' );
+
 		//	If this is a deauth, clean up the database...
 		if ( false !== strpos( $_SERVER['REQUEST_URI'], 'app/deauthorize' ) )
 		{
 			if ( $this->_loadUser() )
-				Yii::app()->getRequest()->redirect( 'deauthorize', array( 'id' => $this->_user->id ) );
+				PS::redirect( 'deauthorize', array( 'id' => $this->_user->id ) );
 		}
-
-		error_log( 'Force logging out user, no session found.' );
-		CPSLog::info( __METHOD__, 'Force logging out user, no session found.' );
 
 		//	Logout user...
 		PS::_gu()->logout();
 
 		CPSLog::trace( __METHOD__, 'Facebook login redirect: ' . $this->_loginUrl );
 
+//		echo 'redirect';//<script type="text/javascript">window.top.location.href = "' . $this->_loginUrl . '";</script>';
 		echo '<script type="text/javascript">window.top.location.href = "' . $this->_loginUrl . '";</script>';
-		flush();
-		exit;
+//		Yii::app()->end();
 	}
 
 	//********************************************************************************

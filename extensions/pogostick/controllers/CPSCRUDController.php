@@ -65,7 +65,7 @@ abstract class CPSCRUDController extends CPSController
 	 */
 	protected $_singleViewMode = false;
 	public function getSingleViewMode() { return $this->_singleViewMode; }
-	public function setSingleViewMode( $value ) { $this->_singleViewMode = $value; }
+	public function setSingleViewMode( $value = true ) { $this->_singleViewMode = $value; return $this; }
 
 	//********************************************************************************
 	//* Public Methods

@@ -25,12 +25,21 @@
  * and you don’t have to notify anyone which license you are using.
  */
 
-//	Include Files
-//	Constants
-//	Global Settings
+//*************************************************************************
+//* File Constants
+//*************************************************************************
+
+/**#@+
+ * Extra GLOB constant for safe_glob()
+ */
+define( 'GLOB_NODIR',	0x0100 );
+define( 'GLOB_PATH',	0x0200 );
+define( 'GLOB_NODOTS',	0x0400 );
+define( 'GLOB_RECURSE',	0x0800 );
+/**#@-*/
 
 /**
- * A quicky down and dirty file object
+ * A quicky down and dirty file object with a sprinkle of awesomeness
  *
  * @package 	psYiiExtensions
  * @subpackage	components
@@ -41,8 +50,8 @@
  *
  * @filesource
  *
- * @property-read fileHandle The handle of the current file
- * @property-read fileName The name of the current file
+ * @property-read $fileHandle The handle of the current file
+ * @property-read $fileName The name of the current file
  */
 class CPSFile extends CPSComponent
 {
@@ -54,72 +63,103 @@ class CPSFile extends CPSComponent
 	 * The name of the current file
 	 * @var string
 	 */
-	protected $m_sFileName = false;
-	public function getFileName() { return $this->m_sFileName; }
-
+	protected $_fileName = false;
 	/**
 	 * The handle of the current file
 	 * @var integer
 	 */
-	protected $m_iFileHandle = false;
-	public function getFileHandle() { return $this->m_iFileHandle; }
-	public function validHandle() { return ( false !== $this->m_iFileHandle ); }
+	protected $_fileHandle = false;
 
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 
-	public function __construct( $sName )
+	/**
+	 * Constructo
+	 */
+	public function __construct( $fileName )
 	{
-		$this->m_sFileName = $sName;
+		$this->_fileName = $fileName;
 		$this->open();
 	}
 
+	/**
+	 * @return bool
+	 */
+	public function validHandle()
+	{
+		return ( false !== $this->_fileHandle );
+	}
+
+	/**
+	 * @return bool
+	 */
 	public function open()
 	{
-		if ( file_exists( $this->m_sFileName ) )
+		if ( file_exists( $this->_fileName ) )
 		{
-			if ( false !== ( $this->m_iFileHandle = @fopen( $this->m_sFileName, 'a+' ) ) )
-				$this->m_iFileHandle = @fopen( $this->m_sFileName, 'r' );
+			if ( false !== ( $this->_fileHandle = @fopen( $this->_fileName, 'a+' ) ) )
+				$this->_fileHandle = @fopen( $this->_fileName, 'r' );
 		}
 
 		return $this->validHandle();
 	}
 
+	/**
+	 */
 	public function close()
 	{
-		@fclose( $this->m_iFileHandle );
-		$this->m_iFileSize = $this->m_iFileHandle = false;
+		@fclose( $this->_fileHandle );
+		$this->_fileHandle = false;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function filesize()
 	{
-		return $this->validHandle() && filesize( $this->m_sFileName );
+		return $this->validHandle() && filesize( $this->_fileName );
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function atime()
 	{
-		return $this->validHandle() && fileatime( $this->m_sFileName );
+		return $this->validHandle() && fileatime( $this->_fileName );
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function fileowner()
 	{
-		return $this->validHandle() && fileowner( $this->m_sFileName );
+		return $this->validHandle() && fileowner( $this->_fileName );
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function filegroup()
 	{
-		return $this->validHandle() && filegroup( $this->m_sFileName );
+		return $this->validHandle() && filegroup( $this->_fileName );
 	}
 
+	/**
+	 * @param int $iOffset
+	 * @return bool
+	 */
 	public function fseek( $iOffset = 0 )
 	{
-		return $this->validHandle() && fseek( $this->m_iFileHandle, $iOffset );
+		return $this->validHandle() && fseek( $this->_fileHandle, $iOffset );
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function ftell()
 	{
-		return $this->validHandle() && ftell( $this->m_iFileHandle );
+		return $this->validHandle() && ftell( $this->_fileHandle );
 	}
 
 	/**
@@ -128,9 +168,119 @@ class CPSFile extends CPSComponent
 	public function fgets( $iOffset = 0 )
 	{
 		if ( false !== $this->ftell() )
-			rewind( $this->m_iFileHandle );
+			rewind( $this->_fileHandle );
 
-		return fgets( $this->m_iFileHandle );
+		return fgets( $this->_fileHandle );
 	}
 
+	/**
+	 * As found on php.net posted by: BigueNique at yahoo dot ca 20-Apr-2010 07:15
+	 * A safe empowered glob().
+	 *
+	 * Supported flags: GLOB_MARK, GLOB_NOSORT, GLOB_ONLYDIR
+	 * Additional flags: GLOB_NODIR, GLOB_PATH, GLOB_NODOTS, GLOB_RECURSE (not original glob() flags, defined here)
+	 * @author BigueNique AT yahoo DOT ca
+	 * @param string $pattern
+	 * @param int flags
+	 * @return array|false
+	 */
+	public static function glob( $pattern, $flags = 0 )
+	{
+		$_split = explode( '/', str_replace( '\\', '/', $pattern ) );
+		$_mask = array_pop( $_split );
+		$_path = implode( '/', $_split );
+		$_glob = false;
+
+		if ( false !== ( $_directory = opendir( $_path ) ) )
+		{
+			$_glob = array();
+
+			while ( false !== ( $_file = readdir( $_directory ) ) )
+			{
+				//	Recurse directories
+				if ( ( $flags & GLOB_RECURSE ) && is_dir( $_file ) && ( ! in_array( $_file, array( '.', '..' ) ) ) )
+				{
+					$_glob = array_merge(
+						$_glob,
+						self::array_prepend(
+							self::glob(
+								$_path . '/' . $_file . '/' . $_mask,
+								$flags
+							),
+							( $flags & GLOB_PATH ? '' : $_file . '/' )
+						)
+					);
+				}
+
+				// Match file mask
+				if ( fnmatch( $_mask, $_file ) )
+				{
+					if ( ( ( !( $flags & GLOB_ONLYDIR ) ) || is_dir( "$_path/$_file" ) )
+						 && ( ( !( $flags & GLOB_NODIR ) ) || ( ! is_dir( $_path . '/' . $_file ) ) )
+						 && ( ( !( $flags & GLOB_NODOTS ) ) || ( ! in_array( $_file, array( '.', '..' ) ) ) )
+					)
+					{
+						$_glob[] = ( $flags & GLOB_PATH ? $_path . '/' : '' ) . $_file . ( $flags & GLOB_MARK ? '/' : '' );
+					}
+				}
+			}
+
+			closedir( $_directory );
+
+			if ( !( $flags & GLOB_NOSORT ) )
+			{
+				sort( $_glob );
+			}
+		}
+
+		return $_glob;
+	}
+
+	/**
+	 * @static
+	 * @param array $array
+	 * @param string $string
+	 * @param bool $deep
+	 * @return array
+	 */
+	public static function array_prepend( $array, $string, $deep = false )
+	{
+		if ( empty( $array ) || empty( $string ) )
+			return $array;
+
+		foreach ( $array as $key => $element )
+		{
+			if ( is_array( $element ) )
+			{
+				if ( $deep )
+					$array[$key] = array_prepend( $element, $string, $deep );
+				else
+					trigger_error( 'array_prepend: array element', E_USER_WARNING );
+			}
+			else
+				$array[$key] = $string . $element;
+		}
+
+		return $array;
+	}
+
+	//*************************************************************************
+	//* Properties
+	//*************************************************************************
+
+	/**
+	 * @return string
+	 */
+	public function getFileName( )
+	{
+		return $this->_fileName;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getFileHandle( )
+	{
+		return $this->_fileHandle;
+	}
 }

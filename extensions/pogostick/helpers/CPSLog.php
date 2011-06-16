@@ -10,17 +10,27 @@
 /**
  * Logging helper methods
  *
- * @package 	psYiiExtensions
- * @subpackage 	helpers
+ * @package	 psYiiExtensions
+ * @subpackage	 helpers
  *
- * @author 		Jerry Ablan <jablan@pogostick.com>
- * @version 	SVN: $Id: CPSLog.php 401 2010-08-31 21:04:18Z jerryablan@gmail.com $
- * @since 		v1.0.6
+ * @author		 Jerry Ablan <jablan@pogostick.com>
+ * @version	 SVN: $Id: CPSLog.php 401 2010-08-31 21:04:18Z jerryablan@gmail.com $
+ * @since		 v1.0.6
  *
  * @filesource
  */
 class CPSLog implements IPSBase
 {
+	//**************************************************************************
+	//* Constants
+	//**************************************************************************
+
+	/**
+	 * @const string The string to use for each log entry indentation
+	 */
+	const
+		INDENT_STRING = '  ';
+
 	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
@@ -29,24 +39,25 @@ class CPSLog implements IPSBase
 	 * @staticvar boolean If true, all applicable log entries will be echoed to the screen
 	 */
 	public static $echoData = false;
-
 	/**
 	 * @staticvar string Prepended to each log entry before writing.
 	 */
 	public static $prefix = null;
-
 	/**
 	 * @staticvar integer The base level for getting source of log entry
 	 */
-	public static $baseLevel = 2;
-
+	public static $baseLevel = 3;
 	/**
 	 * @staticvar integer The current indent level
 	 */
 	public static $currentIndent = 0;
-
+	/**
+	 * @staticvar string
+	 */
 	protected static $_defaultLevelIndicator = '.';
-
+	/**
+	 * @staticvar array
+	 */
 	protected static $_levelIndicators = array(
 		'info' => '*',
 		'notice' => '?',
@@ -66,9 +77,17 @@ class CPSLog implements IPSBase
 	 * @param array $options Parameters to be applied to the message using <code>strtr</code>.
 	 * @param string $source Which message source application component to use.
 	 * @param string $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 * @return string
 	 */
-	public static function log( $category, $message, $level = 'info', $options = array(), $source = null, $language = null )
+	public static function log( $category, $message = null, $level = 'info', $options = array(), $source = null, $language = null )
 	{
+		//	Allow null categories
+		if ( null !== $category && null === $message )
+		{
+			$message = $category;
+			$category = null;
+		}
+
 		if ( null === $category )
 			$category = self::_getCallingMethod();
 
@@ -76,16 +95,19 @@ class CPSLog implements IPSBase
 		$_unindent = ( 0 > ( $_newIndent = self::_processMessage( $message ) ) );
 
 		$_levelList = explode( '|', $level );
+		$_logEntry = $message;
 
 		//	Handle writing to multiple levels at once.
 		foreach ( $_levelList as $_level )
 		{
-			$_indicator = PS::o( self::$_levelIndicators, $_level, self::$_defaultLevelIndicator );
-			$_logEntry = self::$prefix . Yii::t( $category, $message, $options, $source, $language );
+			$_indicator = ( in_array( $_level, self::$_levelIndicators ) ? self::$_levelIndicators[$_level] : self::$_defaultLevelIndicator );
+			$_logEntry = self::$prefix . ( class_exists( 'Yii' ) ? Yii::t( $category, $message, $options, $source, $language ) : $message );
 
 			if ( self::$echoData )
 			{
-				echo date( 'Y.m.d h.i.s' ) . '[' . strtoupper( $_level[0] ) . '] ' . '[' . sprintf( '%-40s', $category ) . '] ' . $_logEntry . '<br />';
+				echo date( 'Y.m.d h.i.s' ) . '[' . strtoupper( $_level[0] ) . '] ' .
+					sprintf( '[%40.40s]', $category ) .
+					$_logEntry;
 				flush();
 			}
 
@@ -93,18 +115,37 @@ class CPSLog implements IPSBase
 			$_tempIndent = self::$currentIndent;
 
 			if ( $_unindent )
+			{
 				$_tempIndent--;
+			}
 
 			if ( $_tempIndent < 0 )
+			{
 				$_tempIndent = 0;
+			}
 
-			$_logEntry = str_repeat( '  ', $_tempIndent ) . $_indicator . ' ' . $message;
+			$_logEntry = str_repeat( self::INDENT_STRING, $_tempIndent ) . $_indicator . ' ' . $message;
 
-			Yii::log( $_logEntry, $_level, $category );
+			try
+			{
+				if ( @class_exists( 'Yii' ) )
+					Yii::log( $_logEntry, $_level, $category );
+				else if ( @class_exists( 'SimpleLogger' ) )
+					@SimpleLogger::getInstance()->write( $_logEntry, 6 );
+				else
+					@error_log( $_logEntry );
+			}
+			catch ( Exception $_ex )
+			{
+				@error_log( 'CPSLog::_log exception: ' . $_ex->getMessage() );
+				@error_log( '             Log Entry: ' . $_logEntry );
+			}
 		}
 
 		//	Set indent level...
 		self::$currentIndent += $_newIndent;
+
+		return $_logEntry;
 	}
 
 	/**
@@ -114,10 +155,11 @@ class CPSLog implements IPSBase
 	 * @param mixed $options Parameters to be applied to the message using <code>strtr</code>.
 	 * @param mixed $source Which message source application component to use.
 	 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 * @return string
 	 */
-	public static function info( $category, $message, $options = array(), $source = null, $language = null )
+	public static function info( $category, $message = null, $options = array(), $source = null, $language = null )
 	{
-		self::log( $category, $message, 'info', $options, $source, $language );
+		return self::log( $category, $message, 'info', $options, $source, $language );
 	}
 
 	/**
@@ -127,10 +169,11 @@ class CPSLog implements IPSBase
 	 * @param mixed $options Parameters to be applied to the message using <code>strtr</code>.
 	 * @param mixed $source Which message source application component to use.
 	 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 * @return string
 	 */
-	public static function error( $category, $message, $options = array(), $source = null, $language = null )
+	public static function error( $category, $message = null, $options = array(), $source = null, $language = null )
 	{
-		self::log( $category, $message, 'error', $options, $source, $language );
+		return self::log( $category, $message, 'error', $options, $source, $language );
 	}
 
 	/**
@@ -140,8 +183,9 @@ class CPSLog implements IPSBase
 	 * @param mixed $options Parameters to be applied to the message using <code>strtr</code>.
 	 * @param mixed $source Which message source application component to use.
 	 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 * @return string
 	 */
-	public static function warning( $category, $message, $options = array(), $source = null, $language = null )
+	public static function warning( $category, $message = null, $options = array(), $source = null, $language = null )
 	{
 		self::log( $category, $message, 'warning', $options, $source, $language );
 	}
@@ -153,33 +197,36 @@ class CPSLog implements IPSBase
 	 * @param mixed $options Parameters to be applied to the message using <code>strtr</code>.
 	 * @param mixed $source Which message source application component to use.
 	 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 * @return string
 	 */
-	public static function trace( $category, $message, $options = array(), $source = null, $language = null )
+	public static function trace( $category, $message = null, $options = array(), $source = null, $language = null )
 	{
-		if ( defined( 'PYE_TRACE_LEVEL' ) && 0 == PYE_TRACE_LEVEL )
-			return;
+		if ( defined( 'PYE_TRACE_LEVEL' ) || defined( 'YII_DEBUG' ) || defined( 'YII_TRACE_LEVEL' ) )
+			return self::log( $category, $message, 'trace', $options, $source, $language );
 
-		self::log( $category, $message, 'trace', $options, $source, $language );
+		return false;
 	}
 
 	/**
 	 * Creates an 'api' log entry
 	 * @param string $apiCall The API call made
 	 * @param mixed $response The API response to log
+	 * @return string
 	 */
-	public static function api( $apiCall, $response )
+	public static function api( $apiCall, $response = null )
 	{
-		self::log( $apiCall, PHP_EOL . print_r( $response, true ) . PHP_EOL, 'api' );
+		return self::log( $apiCall, PHP_EOL . print_r( $response, true ) . PHP_EOL, 'api' );
 	}
 
 	/**
 	 * Creates a 'debug' log entry
 	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
 	 * @param mixed $message The message to log
+	 * @return string
 	 */
-	public static function debug( $category, $message )
+	public static function debug( $category, $message = null )
 	{
-		self::log( $category, $message, 'debug' );
+		return self::log( $category, $message, 'debug' );
 	}
 
 	/**
@@ -187,11 +234,29 @@ class CPSLog implements IPSBase
 	 * @param mixed $message The message
 	 * @param string $level The message level
 	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
+	 * @return string
 	 */
-	public static function write( $message, $level, $category = null )
+	public static function write( $message, $level = null, $category = null )
 	{
-		self::log( $category, $message, $level );
+		return self::log( $category, $message, $level );
 	}
+
+	/**
+	 * Safely decrements the current indent level
+	 */
+	public static function decrementIndent( $howMuch = 1 )
+	{
+		self::$currentIndent -= $howMuch;
+
+		if ( self::$currentIndent < 0 )
+		{
+			self::$currentIndent = 0;
+		}
+	}
+
+	//*************************************************************************
+	//* Private Methods
+	//*************************************************************************
 
 	/**
 	 * Returns the name of the method that made the call
@@ -211,30 +276,23 @@ class CPSLog implements IPSBase
 			while ( $level >= 0 && isset( $_trace[$level] ) )
 			{
 				if ( null === ( $_caller = PS::o( $_trace, $level ) ) )
-					break;
-
-				if ( null !== ( $_class = PS::o( $_caller, 'class' ) ) )
 				{
-					//	If we see ourself, then we must go again
-					if ( $_class == $_className )
-					{
-						//	One louder
-						$level++;
-						continue;
-					}
+					break;
+				}
 
+				//	If we see our self, then we must go again
+				if ( null !== ( $_class = PS::o( $_caller, 'class' ) ) && $_class != $_className )
+				{
 					return $_class . '::' . PS::o( $_caller, 'function' );
 				}
 
-				//	If we see ourself, then we must go again
-				if ( $_className == basename( PS::o( $_caller, 'file' ) ) )
+				//	If we see our self, then we must go again
+				if ( $_className != basename( PS::o( $_caller, 'file' ) ) )
 				{
-					//	One louder
-					$level++;
-					continue;
+					return basename( PS::o( $_caller, 'file' ) ) . '::' .
+						PS::o( $_caller, 'function' ) .
+						' (Line ' . PS::o( $_caller, 'line' ) . ')';
 				}
-
-				return basename( PS::o( $_caller, 'file' ) ) . '::' . PS::o( $_caller, 'function' ) . ' (Line ' . PS::o( $_caller, 'line' ) . ')';
 
 				$level--;
 			}
@@ -245,17 +303,6 @@ class CPSLog implements IPSBase
 		}
 
 		return null;
-	}
-
-	/**
-	 * Safely decrements the current indent level
-	 */
-	public static function decrementIndent( $howMuch = 1 )
-	{
-		self::$currentIndent -= $howMuch;
-
-		if ( self::$currentIndent < 0 )
-			self::$currentIndent = 0;
 	}
 
 	/**
@@ -281,5 +328,105 @@ class CPSLog implements IPSBase
 		}
 
 		return $_newIndent;
+	}
+
+	//*************************************************************************
+	//* Properties
+	//*************************************************************************
+
+	/**
+	 * @param $defaultLevelIndicator
+	 */
+	public static function setDefaultLevelIndicator( $defaultLevelIndicator )
+	{
+		self::$_defaultLevelIndicator = $defaultLevelIndicator;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getDefaultLevelIndicator()
+	{
+		return self::$_defaultLevelIndicator;
+	}
+
+	/**
+	 * @param $levelIndicators
+	 */
+	public static function setLevelIndicators( $levelIndicators )
+	{
+		self::$_levelIndicators = $levelIndicators;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getLevelIndicators()
+	{
+		return self::$_levelIndicators;
+	}
+
+	/**
+	 * @param $baseLevel
+	 */
+	public static function setBaseLevel( $baseLevel )
+	{
+		self::$baseLevel = $baseLevel;
+	}
+
+	/**
+	 * @return int
+	 */
+	public static function getBaseLevel()
+	{
+		return self::$baseLevel;
+	}
+
+	/**
+	 * @param $currentIndent
+	 */
+	public static function setCurrentIndent( $currentIndent )
+	{
+		self::$currentIndent = $currentIndent;
+	}
+
+	/**
+	 * @return int
+	 */
+	public static function getCurrentIndent()
+	{
+		return self::$currentIndent;
+	}
+
+	/**
+	 * @param $echoData
+	 */
+	public static function setEchoData( $echoData )
+	{
+		self::$echoData = $echoData;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function getEchoData()
+	{
+		return self::$echoData;
+	}
+
+	/**
+	 * @param $prefix
+	 */
+	public static function setPrefix( $prefix )
+	{
+		self::$prefix = $prefix;
+	}
+
+	/**
+	 * @return null
+	 */
+	public static function getPrefix()
+	{
+		return self::$prefix;
 	}
 }

@@ -114,6 +114,24 @@
         <prompt-filter-dialog value="true" />
         <default-filter-type value="BASIC" />
       </filters>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+      <lob-content-types text-length-threshold="300">
+        <content-type name="Text" enabled="true" />
+        <content-type name="XML" enabled="true" />
+        <content-type name="DTD" enabled="true" />
+        <content-type name="HTML" enabled="true" />
+        <content-type name="XHTML" enabled="true" />
+        <content-type name="CSS" enabled="true" />
+        <content-type name="SQL" enabled="true" />
+        <content-type name="PL/SQL" enabled="true" />
+        <content-type name="JavaScript" enabled="true" />
+        <content-type name="YAML" enabled="true" />
+        <content-type name="Bash" enabled="true" />
+      </lob-content-types>
+=======
+>>>>>>> 6e7d22adfbe201d2f24a01ca517b49b77b954788
       <qualified-text-editor text-length-threshold="300">
         <content-types>
           <content-type name="Text" enabled="true" />
@@ -126,13 +144,20 @@
           <content-type name="PL/SQL" enabled="true" />
           <content-type name="JavaScript" enabled="true" />
           <content-type name="PHP" enabled="true" />
+<<<<<<< HEAD
           <content-type name="JSP" enabled="true" />
           <content-type name="JSPx" enabled="true" />
+=======
+>>>>>>> 6e7d22adfbe201d2f24a01ca517b49b77b954788
           <content-type name="ASP" enabled="true" />
           <content-type name="YAML" enabled="true" />
           <content-type name="Bash" enabled="true" />
         </content-types>
       </qualified-text-editor>
+<<<<<<< HEAD
+=======
+>>>>>>> d46a04953b63286912767b147ce074c3f2510f51
+>>>>>>> 6e7d22adfbe201d2f24a01ca517b49b77b954788
     </dataset-editor-settings>
     <code-completion-settings>
       <filters>

@@ -51,18 +51,31 @@ abstract class CPSController extends CController implements IPSBase
 	/**
 	 * Standard search text for rendering
 	 */
-	const SEARCH_HELP_TEXT = 'You may optionally enter a comparison operator (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b>or <b>=</b>) at the beginning of each search value to specify how the comparison should be done.';
+	const SEARCH_HELP_TEXT = 'You may optionally enter a comparison operator (<strong>&lt;</strong>,
+		<strong>&lt;=</strong>,
+		<strong>&gt;</strong>, <strong>&gt;=</strong>, <strong>&lt;&gt;</strong>or <strong>=</strong>) at the beginning
+		 of each search value to specify how the
+		 comparison should be done.';
 
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
 
 	/**
+	 * @var int
+	 */
+	protected $_debugMode;
+
+	/**
 	 * @var array context menu items. This property will be assigned to {@link CMenu::items}.
 	 */
 	protected $_menu = array();
+
+	/**
+	 * @return array
+	 */
 	public function getMenu() { return $this->_menu; }
-	public function setMenu( $value ) { $this->_menu = $value; }
+	public function setMenu( $value ) { $this->_menu = $value; return $this; }
 
 	/**
 	 * @var array the breadcrumbs of the current page. The value of this property will
@@ -70,7 +83,16 @@ abstract class CPSController extends CController implements IPSBase
 	 * for more details on how to specify this property.
 	 */
 	protected $_breadcrumbs = array();
+
+	/**
+	 * @return array
+	 */
 	public function getBreadcrumbs() { return $this->_breadcrumbs; }
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	public function setBreadcrumbs( $value ) { $this->_breadcrumbs = $value; return $this; }
 
 	/**
@@ -78,7 +100,16 @@ abstract class CPSController extends CController implements IPSBase
 	 * @var string
 	 */
 	protected $m_sPageHeading;
+
+	/**
+	 * @return string
+	 */
 	public function getPageHeading() { return $this->m_sPageHeading; }
+
+	/**
+	 * @param $sValue
+	 * @return \CPSController
+	 */
 	public function setPageHeading( $sValue ) { $this->m_sPageHeading = $sValue; return $this; }
 
 	/***
@@ -87,7 +118,16 @@ abstract class CPSController extends CController implements IPSBase
 	* @var string
 	*/
 	protected $m_sMethodPrefix = 'action';
+
+	/**
+	 * @return string
+	 */
 	public function getMethodPrefix() { return $this->m_sMethodPrefix; }
+
+	/**
+	 * @param $sValue
+	 * @return \CPSController
+	 */
 	public function setMethodPrefix( $sValue ) { $this->m_sMethodPrefix = $sValue; return $this; }
 
 	/**
@@ -95,7 +135,16 @@ abstract class CPSController extends CController implements IPSBase
 	* @access protected
 	*/
 	protected $m_oModel = null;
+
+	/**
+	 * @return \CActiveRecord|null
+	 */
 	public function getModel() { return $this->m_oModel; }
+
+	/**
+	 * @param $oValue
+	 * @return \CPSController
+	 */
 	protected function setModel( $oValue ) { $this->m_oModel = $oValue; return $this; }
 
 	/**
@@ -104,7 +153,16 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	protected $m_sModelName = null;
 	protected $_modelName = null;
+
+	/**
+	 * @return null|string
+	 */
 	public function getModelName() { return $this->m_sModelName; }
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	protected function setModelName( $value )
 	{
 		$this->_modelName = $this->m_sModelName = $value;
@@ -126,8 +184,7 @@ abstract class CPSController extends CController implements IPSBase
 	public function getIsAjaxRequest() { return PS::_gr()->getIsAjaxRequest(); }
 
 	/**
-	 * Returns the base url of the current app. Optionally absolute
-	 * @param boolean
+	 * Returns the base url of the current app
 	 * @return string
 	 */
 	public function getAppBaseUrl() { return PS::_gbu(); }
@@ -144,7 +201,16 @@ abstract class CPSController extends CController implements IPSBase
 	* @var array
 	*/
 	protected $m_arCurrentSearchCriteria = null;
+
+	/**
+	 * @return array|null
+	 */
 	public function getSearchCriteria() { return $this->m_arCurrentSearchCriteria; }
+
+	/**
+	 * @param $arValue
+	 * @return \CPSController
+	 */
 	public function setSearchCriteria( $arValue )
 	{
 		$this->m_arCurrentSearchCriteria = $arValue;
@@ -157,7 +223,16 @@ abstract class CPSController extends CController implements IPSBase
 	 * meaning using a single column layout. See 'protected/views/layouts/column1.php'.
 	 */
 	public $_pageLayout = 'main';
+
+	/**
+	 * @return #P#C\CPSController.layout|?
+	 */
 	public function getPageLayout() { return $this->_pageLayout = $this->layout; }
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	public function setPageLayout( $value ) { $this->_pageLayout = $this->layout = $value; return $this; }
 
 	/**
@@ -165,7 +240,16 @@ abstract class CPSController extends CController implements IPSBase
 	 * content is passed through this layout before it is sent to your main page layout.
 	 */
 	protected $_contentLayout = null;
+
+	/**
+	 * @return null|string
+	 */
 	public function getContentLayout() { return $this->_contentLayout; }
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	public function setContentLayout( $value ) { $this->_contentLayout = $value; return $this; }
 
 	/**
@@ -173,7 +257,16 @@ abstract class CPSController extends CController implements IPSBase
 	* @access protected
 	*/
 	protected $m_bAutoLayout = true;
+
+	/**
+	 * @return bool
+	 */
 	public function getAutoLayout() { return $this->m_bAutoLayout; }
+
+	/**
+	 * @param $bValue
+	 * @return \CPSController
+	 */
 	public function setAutoLayout( $bValue ) { $this->m_bAutoLayout = $bValue; return $this; }
 
 	/**
@@ -181,7 +274,16 @@ abstract class CPSController extends CController implements IPSBase
 	* @access protected
 	*/
 	protected $m_bAutoMissing = true;
+
+	/**
+	 * @return bool
+	 */
 	public function getAutoMissing() { return $this->m_bAutoMissing; }
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	public function setAutoMissing( $value ) { $this->m_bAutoMissing = $value; return $this; }
 
 	/**
@@ -189,8 +291,24 @@ abstract class CPSController extends CController implements IPSBase
 	* @access protected
 	*/
 	protected $m_arCommandMap = array();
+
+	/**
+	 * @return array
+	 */
 	public function getCommandMap() { return $this->m_arCommandMap; }
+
+	/**
+	 * @param $oValue
+	 * @return \CPSController
+	 */
 	public function setCommandMap( $oValue ) { $this->m_arCommandMap = $oValue; return $this; }
+
+	/**
+	 * @param $sKey
+	 * @param null $oValue
+	 * @param null $eWhich
+	 * @return \CPSController
+	 */
 	public function addCommandToMap( $sKey, $oValue = null, $eWhich = null ) { $this->m_arCommandMap[ $sKey ] = $oValue; if ( $eWhich ) $this->addUserActions( $eWhich, array( $sKey ) ); return $this; }
 
 	/**
@@ -204,8 +322,23 @@ abstract class CPSController extends CController implements IPSBase
 	 * @var array
 	 */
 	protected $m_arPortletActions = array();
+
+	/**
+	 * @return array
+	 */
 	public function getPortletActions() { return $this->m_arPortletActions; }
+
+	/**
+	 * @param $arValue
+	 * @return \CPSController
+	 */
 	public function setPortletActions( $arValue ) { $this->m_arPortletActions = $arValue; return $this; }
+
+	/**
+	 * @param $sName
+	 * @param $arCallback
+	 * @return \CPSController
+	 */
 	public function addPortletAction( $sName, $arCallback ) { $this->m_arPortletActions[ $sName ] = $arCallback; return $this; }
 
 	/**
@@ -213,15 +346,44 @@ abstract class CPSController extends CController implements IPSBase
 	* @access protected
 	*/
 	protected $m_arUserActionList = array();
+
+	/**
+	 * @return \CPSController
+	 */
 	protected function resetUserActionList() { $this->m_arUserActionList = array(); $this->addUserAction( self::ACCESS_TO_ANY, 'error' ); return $this; }
-	protected function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = null; $this->addUserActions( $eWhich, $arValue ); return $this; }
+
+	/**
+	 * @param $eWhich
+	 * @param $arValue
+	 * @return \CPSController
+	 */
+	protected function setUserActionList( $eWhich, $arValue ) { $this->m_arUserActionList[ $eWhich ] = null;
+																$this->addUserActions( $eWhich,
+																					   $arValue ); return $this; }
+
+	/**
+	 * @param $eWhich
+	 * @return #M#C\PS.o|?
+	 */
 	public function getUserActionList( $eWhich ) { return PS::o( $this->m_arUserActionList, $eWhich ); }
+
+	/**
+	 * @param $eWhich
+	 * @param $roleName
+	 * @param $action
+	 * @return \CPSController
+	 */
 	public function addUserActionRole( $eWhich, $roleName, $action )
 	{
 		$this->m_arUserActionList[ $eWhich ]['roles'][$roleName] = $action;
 		return $this;
 	}
 
+	/**
+	 * @param $eWhich
+	 * @param $sAction
+	 * @return \CPSController
+	 */
 	public function removeUserAction( $eWhich, $sAction )
 	{
 		if ( ! isset( $this->m_arUserActionList[ $eWhich ] ) || ! is_array( $this->m_arUserActionList[ $eWhich ] ) )
@@ -233,6 +395,11 @@ abstract class CPSController extends CController implements IPSBase
 		return $this;
 	}
 
+	/**
+	 * @param $eWhich
+	 * @param $sAction
+	 * @return \CPSController
+	 */
 	public function addUserAction( $eWhich, $sAction )
 	{
 		if ( ! isset( $this->m_arUserActionList[ $eWhich ] ) || ! is_array( $this->m_arUserActionList[ $eWhich ] ) )
@@ -251,7 +418,12 @@ abstract class CPSController extends CController implements IPSBase
 		return $this;
 	}
 
-	public function addUserActions( $grantee, $arActions = array() )
+	/**
+	 * @param $eWhich
+	 * @param array $arActions
+	 * @return \CPSController
+	 */
+	public function addUserActions( $eWhich, $arActions = array() )
 	{
 		if ( ! is_array( PS::o( $this->m_arUserActionList, $grantee ) ) )
 			$this->m_arUserActionList[ $grantee ] = array();
@@ -263,32 +435,75 @@ abstract class CPSController extends CController implements IPSBase
 	}
 
 	protected $_displayName;
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	protected function setDisplayName( $value ) { $this->_displayName = $value; return $this; }
+
+	/**
+	 */
 	protected function getDisplayName() { return $this->_displayName; }
 
 	protected $_cleanTrail;
+
+	/**
+	 */
 	protected function getCleanTrail() { return $this->_cleanTrail; }
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	protected function setCleanTrail( $value ) { $this->_cleanTrail = $value; return $this; }
-	
+
 	/**
 	 * @var array $viewData The array of data passed to views
 	 */
 	protected $_viewData = array();
+
+	/**
+	 * @return array
+	 */
 	protected function getViewData() { return $this->_viewData; }
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	protected function setViewData( $value ) { $this->_viewData = $value; return $this; }
 
 	/**
 	 * @var array Any values in this array will be extracted into each view before it's rendered. The value "currentUser" is added automatically.
 	 */
 	protected $_extraViewDataList;
+
+	/**
+	 * @return array
+	 */
 	protected function getExtraViewDataList() { return $this->_extraViewDataList; }
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	protected function setExtraViewDataList( $value ) { $this->_extraViewDataList = $value; return $this; }
 
 	/**
 	 * @var string The prefix to prepend to variables extracted into the view from {@link $_extraViewDataList}. Defaults to '_' (single underscore).
 	 */
 	protected $_extraViewDataPrefix = '_';
+
+	/**
+	 * @return string
+	 */
 	protected function getExtraViewDataPrefix() { return $this->_extraViewDataPrefix; }
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	protected function setExtraViewDataPrefix( $value ) { $this->_extraViewDataPrefix = $value; return $this; }
 
 	//********************************************************************************
@@ -437,24 +652,27 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	public function actionError()
 	{
-		if ( null !== ( $_error = Yii::app()->getErrorHandler()->getError() ) )
+		if ( null !== ( $_error = PS::_ge() ) )
 		{
-			if ( ! $this->getIsAjaxRequest() )
+			if ( $this->getIsAjaxRequest() )
+				echo $_error['message'];
+			else
 				throw new CHttpException( 404, 'Page not found.' );
-
-			echo $_error['message'];
 		}
+
+		if ( ! $this->hasView( 'error' ) )
+			throw new CHttpException( 404, 'Page not found.' );
 
 		$this->render( 'error', array( 'error' => $_error ) );
 	}
 
 	/**
-	* Convenience access to Yii request
-	*
-	*/
+	 * Convenience access to Yii request
+	 * @return CHttpRequest
+	 */
 	public function getRequest()
 	{
-		return Yii::app()->getRequest();
+		return PS::_gr();
 	}
 
 	/**
@@ -553,18 +771,18 @@ abstract class CPSController extends CController implements IPSBase
 				)
 			);
 		}
-		
+
 		if ( null === $data )
 			$data = array();
 
-		$_output = $this->renderFile( 
-			$_viewFile, 
-			array_merge( 
-				$this->_extraViewDataList, 
-				$this->_viewData, 
-				$data 
-			), 
-			true 
+		$_output = $this->renderFile(
+			$_viewFile,
+			array_merge(
+				$this->_extraViewDataList,
+				$this->_viewData,
+				$data
+			),
+			true
 		);
 
 		if ( $processOutput )
@@ -584,6 +802,8 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	public function setStandardFormOptions( $model, $options = array() )
 	{
+		$_title = null;
+
 		//	Shortcut... only passed in the title...
 		if ( is_string( $options ) )
 		{
@@ -611,26 +831,36 @@ abstract class CPSController extends CController implements IPSBase
 		if ( PS::o( $options, 'enableFlash', true, true ) )
 		{
 			$_flashClass = PS::o( $options, 'flashSuccessClass', 'operation-result-success' );
-			
+			$_flashTitle = 'Success!';
+
 			if ( null === ( $_message = PS::_gf( 'success' ) ) )
 			{
 				if ( null !== ( $_message = PS::_gf( 'failure' ) ) )
+				{
+					$_flashTitle = 'There was a problem...';
 					$_flashClass = PS::o( $options, 'flashFailureClass', 'operation-result-failure' );
+				}
 			}
+
+			$_flashText = $_message;
 
 			$_spanId = PS::o( $options, 'flashSpanId', 'operation-result', true );
 			PS::_ss( 'psForm-flash-html', PS::tag( 'span', array( 'id' => $_spanId, 'class' => $_flashClass ), $_message ) );
-			
+
 			//	Register a nice little fader...
-			$_fader =<<<SCRIPT
-$('#{$_spanId}').fadeIn('500',function(){
-	$(this).delay(3000).fadeOut(3500);
-});
+			if ( $_flashText )
+			{
+				$_fader =<<<SCRIPT
+notify('default',{title:'{$_flashTitle}',text:'{$_flashText}'});
+//$('#___spanId_').fadeIn('500',function(){
+//	$(this).delay(3000).fadeOut(3500);
+//});";
 SCRIPT;
-				
-			PS::_rs( $_formId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
+
+				PS::_rs( $_formId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
+			}
 		}
-		
+
 		PS::setFormFieldContainerClass( PS::o( $options, 'rowClass', 'row' ) );
 
 		$_formOptions = array(
@@ -671,25 +901,25 @@ SCRIPT;
 
 		//	Do some auto-page-setup...
 		if ( null !== ( $_subHeader = PS::o( $options, 'subHeader' ) ) )
-			echo PS::tag( 'div', array(), $_subHeader );
+			echo PS::tag( 'div', array( 'class' => 'ui-state-active ui-generated-subheader' ), $_subHeader );
 
 		if ( false !== PS::o( $options, 'renderSearch', false ) )
 		{
 			echo PS::tag( 'p', array(), self::SEARCH_HELP_TEXT );
 			echo PS::link( 'Advanced Search', '#', array( 'class' => 'search-button' ) );
 
-			echo PS::tag( 
-				'div', 
-				array( 'class' => 'search-form' ), 
+			echo PS::tag(
+				'div',
+				array( 'class' => 'search-form' ),
 				$this->renderPartial( '_search', array( 'model' => $model ), true )
 			);
-			
+
 			//	Register the search script, if any
 			if ( null !== ( $_searchScript = PS::o( $options, '__searchScript' ) ) )
 				PS::_rs( 'search', $_searchScript );
 		}
 
-		if ( PS::UI_JQUERY == ( $_uiStyle = PS::o( $options, 'uiStyle', PS::UI_JQUERY ) ) )
+		if ( PS::UI_JQUERY == PS::o( $options, 'uiStyle', PS::UI_JQUERY ) )
 			CPSjqUIWrapper::loadScripts();
 
 		if ( PS::o( $options, 'validate', true ) )
@@ -712,6 +942,7 @@ SCRIPT;
 	/**
 	 * Sets the standard page navigation options (title, crumbs, menu, etc.)
 	 * @param array $options
+	 * @return array
 	 */
 	public function setViewNavigationOptions( &$options = array() )
 	{
@@ -719,7 +950,7 @@ SCRIPT;
 		$_title = PS::o( $options, 'title', null, true );
 		$_subtitle = PS::o( $options, 'subtitle', null, true );
 		$_header = PS::o( $options, 'header' );
-		
+
 		//	Generate subtitle from header...
 		if ( null === $_title && null === $_subtitle && null !== $_header )
 			$_subtitle = $_header;
@@ -745,10 +976,10 @@ SCRIPT;
 			{
 				if ( null === ( $_label = PS::o( $_itemLink, 'label', null, true ) ) )
 					$_label = $_itemLabel;
-				
+
 				if ( null === ( $_link = PS::o( $_itemLink, 'link', null, true ) ) )
 					$_link = $_itemLink;
-				
+
 				$_finalMenu[] = array(
 					'label' => $_label,
 					'url' => $_link,
@@ -785,9 +1016,19 @@ $(function(){
 JS;
 			$options['__searchScript'] = $_searchScript;
 		}
-		
+
 		//	Return reconstructed options for standard form use
 		return $options;
+	}
+
+	/**
+	 * Checks to see if a view is available
+	 * @param string $viewName
+	 * @return bool
+	 */
+	public function hasView( $viewName )
+	{
+		return ( false !== $this->getViewFile( $viewName ) );
 	}
 
 	//********************************************************************************
@@ -1029,6 +1270,24 @@ JS;
 
 		echo $_result;
 		return;
+	}
+
+	/**
+	 * @param $debugMode
+	 * @return \CPSController
+	 */
+	public function setDebugMode( $debugMode )
+	{
+		$this->_debugMode = $debugMode;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getDebugMode( )
+	{
+		return $this->_debugMode;
 	}
 
 }

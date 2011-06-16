@@ -21,6 +21,30 @@
  */
 class CPSDateHelper implements IPSBase
 {
+	//*************************************************************************
+	//* Private Members
+	//*************************************************************************
+
+	/**
+	 * @staticvar array
+	 */
+	protected static $_quarterBounds = array(
+		1 => array( 'Jan 01', 'Mar 31' ),
+		2 => array( 'Apr 01', 'Jun 30' ),
+		3 => array( 'Jul 01', 'Sep 30' ),
+		4 => array( 'Oct 01', 'Dec 31' ),
+	);
+
+	/**
+	 * @staticvar array
+	 */
+	protected static $_quarterMap = array(
+		1 => 1, 2 => 1, 3 => 1,
+		4 => 2, 5 => 2, 6 => 2,
+		7 => 3, 8 => 3, 9 => 3,
+		10 => 4, 11 => 4, 12 => 4,
+	);
+
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
@@ -42,44 +66,45 @@ class CPSDateHelper implements IPSBase
 	/**
 	* Returns the time difference in seconds between two time zones
 	*
-	* @param string $sTimeZone
-	* @param string $sMyZone
+	* @param string $timeZone
+	* @param string $myTimeZone
 	* @return int
 	*/
-	public static function zoneDiff( $sTimeZone, $sMyZone = null )
+	public static function zoneDiff( $timeZone, $myTimeZone = null )
 	{
-		$sMyZone = PS::nvl( $sMyZone, date_default_timezone_get() );
+		if ( null === $myTimeZone )
+			$myTimeZone = date_default_timezone_get();
 		
-		$_oDest = new DateTimeZone( $sTimeZone );
-		$_oSrc = new DateTimeZone( $sMyZone );
+		$_targetZone = new DateTimeZone( $timeZone );
+		$_sourceZone = new DateTimeZone( $myTimeZone );
 		
-		$_oDestTime = new DateTime( 'now', $_oDest );
-		$_oSrcTime = new DateTime( 'now', $_oSrc );
+		$_targetZoneTime = new DateTime( 'now', $_targetZone );
+		$_sourceZoneTime = new DateTime( 'now', $_sourceZone );
 		
-		return $_oDest->getOffset( $_oSrcTime );
+		return $_targetZone->getOffset( $_sourceZoneTime );
 	}
 
 	/**
 	* Returns value (or current date) formatted
 	* 
-	* @param mixed $sDate
+	* @param mixed $date
 	* @return string
 	*/
-	public static function asDate( $sDate = null )
+	public static function asDate( $date = null )
 	{
-		return self::format( $sDate, 'Y-m-d' );
+		return self::format( $date, 'Y-m-d' );
 	}
 	
 	/**
 	* Returns value (or current date/time) formatted
 	* 
-	* @param mixed $sDate
+	* @param mixed $date
 	* @param string $sFormat The date() format. Defaults to 'Y-m-d H:i:s'
 	* @return string
 	*/
-	public static function asDateTime( $sDate = null )
+	public static function asDateTime( $date = null )
 	{
-		return self::format( $sDate, 'Y-m-d H:i:s' );
+		return self::format( $date, 'Y-m-d H:i:s' );
 	}
 	
 	/**
@@ -106,5 +131,26 @@ class CPSDateHelper implements IPSBase
         }
 
 	    return false;
+	}
+
+	/**
+	 * Given a date, return the quarter in which it resides. Returns 1 - 4
+	 * @param string|date|null $date
+	 * @return int
+	 */
+	public static function getQuarterNumber( $date = null )
+	{
+		return self::$_quarterMap[ date( 'n', strtotime( null === $date ? time() : $date ) ) ];
+	}
+
+	/**
+	 * Returns the boundaries of a quarter based on the date passed in.
+	 * If null, current date is used. Date format of returned data is "M d"
+	 * @param string|date|null $date
+	 * @return array
+	 */
+	public static function getQuarterBounds( $date = null )
+	{
+		return self::$_quarterBounds[ self::getQuarterNumber( $date ) ];
 	}
 }

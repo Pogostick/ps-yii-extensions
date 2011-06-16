@@ -545,7 +545,10 @@ class CPSWidgetHelper extends CPSHelperBase
 				$htmlOptions['style'] = PS::o( $htmlOptions, 'style' ) . ' border:none; background-color: transparent;';
 				$htmlOptions['class'] = PS::addClass( $htmlOptions['class'], 'ps-text-display' );
 				$htmlOptions['readonly'] = 'readonly';
-				$htmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', CPSTransform::valueOf( '*', $model->$attributeName ) ) );
+					
+				if ( null !== PS::o( $htmlOptions, 'content' ) )
+					$htmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', $_value ) );
+
 				$inputFieldType = self::TEXT;
 				break;
 
@@ -602,7 +605,7 @@ class CPSWidgetHelper extends CPSHelperBase
 
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
-				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
+				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_id, 'name' => $_sName ) ) );
 				$inputFieldType = self::TEXTAREA;
 				break;
 
@@ -645,20 +648,20 @@ class CPSWidgetHelper extends CPSHelperBase
 
 		$_fieldOutput = null;
 
-		try
+//		try
 		{
 			if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
 				CPSLog::trace( __METHOD__, 'Rendering field "' . $attributeName . '" of type "' . $inputFieldType . '"' );
 
-			if ( method_exists( 'CPSWidgetHelper', $inputFieldType ) )
+			if ( method_exists( __CLASS__, $inputFieldType ) )
 				$_fieldOutput = self::$inputFieldType( $model, $attributeName, $htmlOptions );
 			else
 				throw new Exception( 'Unknown input field type: ' . $inputFieldType );
 		}
-		catch ( Exception $_ex )
-		{
-			CPSLog::error( __METHOD__, 'Error rendering field "' . $attributeName . '" of type "' . $inputFieldType . '": ' . $_ex->getMessage() );
-		}
+//		catch ( Exception $_ex )
+//		{
+//			CPSLog::error( __METHOD__, 'Error rendering field "' . $attributeName . '" of type "' . $inputFieldType . '": ' . $_ex->getMessage() );
+//		}
 
 		return $_beforeHtml . $_fieldOutput . $_appendHtml;
 	}
@@ -703,7 +706,7 @@ class CPSWidgetHelper extends CPSHelperBase
 
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
-				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
+				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_id, 'name' => $_sName ) ) );
 				$_sType = 'textarea';
 				break;
 
@@ -731,7 +734,8 @@ class CPSWidgetHelper extends CPSHelperBase
 			return parent::dropDownList( $attributeName, $_value, $listData, $htmlOptions );
 
 		//	Otherwise output the field if we have a type
-		if ( null != $_sType ) return self::inputField( $_sType, $attributeName, $_value, $htmlOptions );
+		if ( null != $_sType )
+			return self::inputField( $_sType, $attributeName, $_value, $htmlOptions );
 
 		//	No clue...
 		return;
@@ -802,7 +806,7 @@ class CPSWidgetHelper extends CPSHelperBase
 
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
-				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_sId, 'name' => $_sName ) ) );
+				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_id, 'name' => $_sName ) ) );
 				$inputFieldType = self::TEXTAREA;
 				break;
 
@@ -901,26 +905,44 @@ class CPSWidgetHelper extends CPSHelperBase
 	*/
 	public static function activeDataDropDownList( $model, $sAttribute, &$htmlOptions = array(), $iDefaultUID = 0 )
 	{
-		if ( null != ( $_sModel = PS::o( $htmlOptions, 'dataModel', null, true ) ) )
+		if ( null != ( $_modelName = PS::o( $htmlOptions, 'dataModel', null, true ) ) )
 		{
-			$_oModel = new $_sModel;
+			$_model = new $_modelName();
 
-			$_sId = PS::o( $htmlOptions, 'dataId', 'id', true );
+			$_id = PS::o( $htmlOptions, 'dataId', 'id', true );
 			$_sName = PS::o( $htmlOptions, 'dataName', null, true );
 			$_condition = PS::o( $htmlOptions, 'dataCondition', null, true );
 			$_order = PS::o( $htmlOptions, 'dataOrder', null, true );
 
-			if ( $_sId && $_sName )
+			if ( $_id && $_sName )
 			{
-				$_arOptions = self::listData( $_oModel->findAll( array( 'select' => $_sId . ', ' . $_sName, 'order' => PS::nvl( $_order, $_sName ), 'condition' => $_condition ) ), $_sId, $_sName );
-
-				if ( isset( $htmlOptions[ 'multiple' ] ) )
+				try
 				{
-					if ( substr( $htmlOptions[ 'name' ], -2 ) !== '[]' )
-						$htmlOptions[ 'name' ] .= '[]';
-				}
+					$_arOptions = self::listData(
+						$_model->findAll(
+							array(
+								 'select' => $_id . ', ' . $_sName,
+								 'order' => PS::nvl( $_order, $_sName ),
+								 'condition' => $_condition
+							)
+						),
+						$_id,
+						$_sName
+					);
 
-				return self::activeDropDownList( $model, $sAttribute, $_arOptions, $htmlOptions );
+					if ( isset( $htmlOptions[ 'multiple' ] ) )
+					{
+						if ( substr( $htmlOptions[ 'name' ], -2 ) !== '[]' )
+							$htmlOptions[ 'name' ] .= '[]';
+					}
+
+					return self::activeDropDownList( $model, $sAttribute, $_arOptions, $htmlOptions );
+				}
+				catch ( Exception $_ex )
+				{
+					CPSLog::error( __METHOD__, 'Exception pulling data: ' . $_ex->getMessage() );
+					throw $_ex;
+				}
 			}
 		}
 
@@ -1311,7 +1333,7 @@ CSS;
 		$_sLink = is_array( $sLink ) ? CHtml::normalizeUrl( $sLink ) : $sLink;
 		$_bSubmit = ( $_sLink == '_submit_' || PS::o( $arOptions, 'submit', false, true ) );
 
-		$_sId = PS::o( $arOptions, 'id', self::getWidgetId( self::ID_PREFIX . '.jqbtn' ), true );
+		$_id = PS::o( $arOptions, 'id', self::getWidgetId( self::ID_PREFIX . '.jqbtn' ), true );
 		$_sFormId = PS::o( $arOptions, 'formId', self::$m_sCurrentFormId, true );
 
 		if ( $_sIcon = PS::o( $arOptions, 'icon', null, true ) )
@@ -1373,7 +1395,7 @@ HTML;
 		}
 
 		//	Set our link options
-		$arOptions['id'] = $_sId;
+		$arOptions['id'] = $_id;
 		$arOptions['title'] = $sLabel;
 		$_sClass = PS::o( $arOptions, 'class', null );
 		$arOptions['class'] = "ps-button {$_sIconPos} ui-state-default ui-corner-all {$_sClass}";
@@ -1640,9 +1662,9 @@ HTML;
 
 		if ( ! is_array( $_arModel ) ) $_arModel = array( $model );
 
-		foreach ( $_arModel as $_oModel )
+		foreach ( $_arModel as $_model )
 		{
-			$_arError = $_oModel->getErrors();
+			$_arError = $_model->getErrors();
 
 			foreach ( $_arError as $_oError )
 			{
@@ -1817,19 +1839,19 @@ HTML;
 					break;
 
 				case self::DD_DATA_LOOKUP:
-					$_sId = PS::o( $htmlOptions, 'dataId', null, true );
+					$_id = PS::o( $htmlOptions, 'dataId', null, true );
 					$_sName = PS::o( $htmlOptions, 'dataName', null, true );
-					$_sModel = PS::o( $htmlOptions, 'dataModel', null, true );
+					$_modelName = PS::o( $htmlOptions, 'dataModel', null, true );
 					$_condition = PS::o( $htmlOptions, 'dataCondition', null, true );
 
-					if ( $_sId && $_sName && $_sModel )
+					if ( $_id && $_sName && $_modelName )
 					{
-						if ( $_model = call_user_func( array( $_sModel, 'model' ) ) )
+						if ( $_model = call_user_func( array( $_modelName, 'model' ) ) )
 						{
-							if ( $_arModels = $_model->findAll( array( 'select' => $_sId . ',' . $_sName, 'condition' => $_condition ) ) )
+							if ( $_arModels = $_model->findAll( array( 'select' => $_id . ',' . $_sName, 'condition' => $_condition ) ) )
 							{
-								foreach ( $_arModel as $_oModel )
-									$_ardata[ $_oModel->getAttribute( $_sId ) ] = $_oModel->getAttribute( $_sName );
+								foreach ( $_arModels as $_model )
+									$_ardata[ $_model->getAttribute( $_id ) ] = $_model->getAttribute( $_sName );
 							}
 						}
 					}

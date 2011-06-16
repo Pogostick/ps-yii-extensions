@@ -29,11 +29,10 @@ class CPSLiveLogRoute extends CFileLogRoute
 	protected $_excludeCategories = array();
 	public function getExcludeCategories() { return $this->_excludeCategories; }
 	public function setExcludeCategories( $value ) { $this->_excludeCategories = $value; }
-
 	/**
 	 * @property integer $categoryWidth The minimum width of the category column in the log output
 	 */
-	protected $_categoryWidth = 40;
+	protected $_categoryWidth = 35;
 	/**
 	 * Get the minimum width of the category column in the log output
 	 * @return integer
@@ -67,7 +66,7 @@ class CPSLiveLogRoute extends CFileLogRoute
 	 * Writes log messages in files.
 	 * @param array $logs list of log messages
 	 */
-	protected function processLogs( $logs = array() )
+	protected function processLogs( $logs )
 	{
 		try
 		{
@@ -75,6 +74,9 @@ class CPSLiveLogRoute extends CFileLogRoute
 
 			if ( @filesize( $_logFile ) > $this->getMaxFileSize() * 1024 )
 				$this->rotateFiles();
+
+			if ( ! is_array( $logs ) )
+				return;
 
 			//	Write out the log entries
 			foreach ( $logs as $_log )
@@ -121,7 +123,7 @@ class CPSLiveLogRoute extends CFileLogRoute
 	/**
 	 * Formats a log message given different fields.
 	 * @param string $message message content
-	 * @param integer $level message level
+	 * @param int|string $level message level
 	 * @param string $category message category
 	 * @param integer $time timestamp
 	 * @return string formatted message
@@ -131,8 +133,12 @@ class CPSLiveLogRoute extends CFileLogRoute
 		if ( null === $time )
 			$time = time();
 
-		$level = strtoupper( $level[0] );
+		if ( $this->_categoryWidth > 40 )
+			$this->_categoryWidth = 40;
 
-		return @date( 'M d H:i:s', $time ) . ' [' . sprintf( '%-' . $this->_categoryWidth . 's', $category ) . '] ' . ': <' . $level . '> ' . $message . PHP_EOL;
+		$level = strtoupper( $level[0] );
+		$category = sprintf( " [%{$this->_categoryWidth}.{$this->_categoryWidth}s] ", $category );
+
+		return @date( 'M j H:i:s', $time ) . $category . ': <' . $level . '> ' . $message . PHP_EOL;
 	}
 }

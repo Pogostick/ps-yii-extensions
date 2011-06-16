@@ -17,7 +17,7 @@
  * @version 	SVN: $Id: CPSModel.php 401 2010-08-31 21:04:18Z jerryablan@gmail.com $
  * @since 		v1.0.6
  *
- * @filesource
+ * @filesourcet
  *
  * @property-read string $modelName The class name of the model
  */
@@ -152,7 +152,10 @@ class CPSModel extends CActiveRecord implements IPSBase
 	 */
 	public function getAttributeLabel( $attribute )
 	{
-		return PS::o( $this->getAttributeLabels(), $attribute, $this->generateAttributeLabel( $attribute ) );
+		$_labels = $this->getAttributeLabels();
+		$_defaultLabel = $this->generateAttributeLabel( $attribute );
+
+		return PS::o( $_labels, $attribute, $_defaultLabel );
 	}
 
 	/**
@@ -303,6 +306,55 @@ class CPSModel extends CActiveRecord implements IPSBase
 		}
 
 		return new CActiveDataProvider( $this->_modelClass, array( 'criteria' => $_criteria ) );
+	}
+
+	public function generateAdvancedSearchForm( $addHeader = true, $returnOutput = false )
+	{
+		$_header = ( $addHeader ? '<?php' : null );
+		$_searchFields = null;
+
+		$_criteria = $this->search()->getCriteria();
+
+		foreach ( $this->getTableSchema()->getColumnNames() as $_columnName )
+		{
+			if ( false !== ( stripos( $_criteria->condition, $_columnName ) ) )
+				$_searchFields .= '$_fieldList[] = array( PS::TEXT, \'' . $_columnName . '\' );' . PHP_EOL;
+		}
+
+		$_output = <<<HTML
+{$_header}
+/**
+ * Advanced Search Partial Form
+ */
+
+PS::setShowRequiredLabel( false );
+
+\$_formOptions = array(
+	'formModel' => \$model,
+	'formClass' => 'wide form ui-widget',
+	'action' => PS::_cu( \$this->route ),
+	'method' => 'GET',
+	'showLegend' => false,
+	'uiStyle' => PS::UI_JQUERY,
+);
+
+\$_fieldList = array();
+
+\$_fieldList[] = array( 'html', '<fieldset><legend>Advanced Search</legend>' );
+{$_searchFields}
+\$_fieldList[] = array( 'html', PS::submitButton( 'Search', array( 'style' => 'float:right;margin-top:5px;' ) ) );
+\$_fieldList[] = array( 'html', '</fieldset>' );
+
+\$_formOptions['fields'] = \$_fieldList;
+
+CPSForm::create( \$_formOptions );
+
+HTML;
+
+		if ( $returnOutput )
+			return $_output;
+
+		echo $_output;
 	}
 
 	/**
@@ -487,4 +539,122 @@ class CPSModel extends CActiveRecord implements IPSBase
 		parent::afterConstruct();
 	}
 
+//	//*******************************************************************************
+//	//* PHP 5.3+ Awesomeness!
+//	//*******************************************************************************
+//
+//	/**
+//	 * Returns a model for the currently called class
+//	 * @static
+//	 * @return CActiveRecord
+//	 */
+//	protected static function _model()
+//	{
+//		$_class = get_called_class();
+//		return $_class::model();
+//	}
+//
+//	/**
+//	 * Finds a single active record with the specified condition.
+//	 * @param mixed $condition query condition or criteria.
+//	 * If a string, it is treated as query condition (the WHERE clause);
+//	 * If an array, it is treated as the initial values for constructing a {@link CDbCriteria} object;
+//	 * Otherwise, it should be an instance of {@link CDbCriteria}.
+//	 * @param array $params parameters to be bound to an SQL statement.
+//	 * This is only used when the first parameter is a string (query condition).
+//	 * In other cases, please use {@link CDbCriteria::params} to set parameters.
+//	 * @return CActiveRecord the record found. Null if no record is found.
+//	 */
+//	public static function find( $condition = '', $params = array() )
+//	{
+//		return self::_model()->find( $condition, $params );
+//	}
+//
+//	/**
+//	 * Finds all active records satisfying the specified condition.
+//	 * See {@link find()} for detailed explanation about $condition and $params.
+//	 * @param mixed $condition query condition or criteria.
+//	 * @param array $params parameters to be bound to an SQL statement.
+//	 * @return array list of active records satisfying the specified condition. An empty array is returned if none is found.
+//	 */
+//	public static function findAll( $condition = '', $params = array() )
+//	{
+//		return self::_model()->findAll( $condition, $params );
+//	}
+//
+//	/**
+//	 * Finds a single active record with the specified primary key.
+//	 * See {@link find()} for detailed explanation about $condition and $params.
+//	 * @param mixed $pk primary key value(s). Use array for multiple primary keys. For composite key, each key value must be an array (column name=>column value).
+//	 * @param mixed $condition query condition or criteria.
+//	 * @param array $params parameters to be bound to an SQL statement.
+//	 * @return CActiveRecord the record found. Null if none is found.
+//	 */
+//	public static function findByPk( $condition = '', $params = array() )
+//	{
+//		return self::_model()->findByPk( $condition, $params );
+//	}
+//
+//	/**
+//	 * Finds all active records with the specified primary keys.
+//	 * See {@link find()} for detailed explanation about $condition and $params.
+//	 * @param mixed $pk primary key value(s). Use array for multiple primary keys. For composite key, each key value must be an array (column name=>column value).
+//	 * @param mixed $condition query condition or criteria.
+//	 * @param array $params parameters to be bound to an SQL statement.
+//	 * @return array the records found. An empty array is returned if none is found.
+//	 */
+//	public static function findAllByPk( $key, $condition = '', $params = array() )
+//	{
+//		return self::_model()->findAllByPk( $key, $condition, $params );
+//	}
+//
+//	/**
+//	 * Finds a single active record that has the specified attribute values.
+//	 * See {@link find()} for detailed explanation about $condition and $params.
+//	 * @param array $attributes list of attribute values (indexed by attribute names) that the active records should match.
+//	 * Since version 1.0.8, an attribute value can be an array which will be used to generate an IN condition.
+//	 * @param mixed $condition query condition or criteria.
+//	 * @param array $params parameters to be bound to an SQL statement.
+//	 * @return CActiveRecord the record found. Null if none is found.
+//	 */
+//	public static function findByAttributes( $attributes, $condition = '', $params = array() )
+//	{
+//		return self::_model()->findByAttributes( $attributes, $condition, $params );
+//	}
+//
+//	/**
+//	 * Finds all active records that have the specified attribute values.
+//	 * See {@link find()} for detailed explanation about $condition and $params.
+//	 * @param array $attributes list of attribute values (indexed by attribute names) that the active records should match.
+//	 * Since version 1.0.8, an attribute value can be an array which will be used to generate an IN condition.
+//	 * @param mixed $condition query condition or criteria.
+//	 * @param array $params parameters to be bound to an SQL statement.
+//	 * @return array the records found. An empty array is returned if none is found.
+//	 */
+//	public static function findAllByAttributes( $attributes, $condition = '', $params = array() )
+//	{
+//		return self::_model()->findAllByAttributes( $attributes, $condition, $params );
+//	}
+//
+//	/**
+//	 * Finds a single active record with the specified SQL statement.
+//	 * @param string $sql the SQL statement
+//	 * @param array $params parameters to be bound to the SQL statement
+//	 * @return CActiveRecord the record found. Null if none is found.
+//	 */
+//	public static function findBySql( $sql, $params = array() )
+//	{
+//		return self::_model()->findBySql( $sql, $params );
+//	}
+//
+//	/**
+//	 * Finds all active records using the specified SQL statement.
+//	 * @param string $sql the SQL statement
+//	 * @param array $params parameters to be bound to the SQL statement
+//	 * @return array the records found. An empty array is returned if none is found.
+//	 */
+//	public static function findAllBySql( $sql, $params = array() )
+//	{
+//		return self::_model()->findAllBySql( $sql, $params );
+//	}
 }
