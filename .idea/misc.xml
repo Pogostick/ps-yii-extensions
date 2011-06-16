@@ -37,7 +37,7 @@
         <show-object-details value="false" />
       </general>
       <filters>
-        <visible-objects>
+        <object-type-filter>
           <object-type name="SCHEMA" enabled="true" />
           <object-type name="USER" enabled="true" />
           <object-type name="ROLE" enabled="true" />
@@ -62,7 +62,7 @@
           <object-type name="DIMENSION" enabled="true" />
           <object-type name="CLUSTER" enabled="true" />
           <object-type name="DBLINK" enabled="true" />
-        </visible-objects>
+        </object-type-filter>
       </filters>
     </browser-settings>
     <navigation-settings>
@@ -98,7 +98,7 @@
       </lookup-filters>
     </navigation-settings>
     <dataset-editor-settings>
-      <autopopup-text-editor active="true" active-if-empty="false" data-length-threshold="100" delay="1000" />
+      <text-editor-popup active="true" active-if-empty="false" data-length-threshold="100" delay="1000" />
       <values-list-popup>
         <active-for-primary-keys value="false" />
         <threshold-upper-limit value="1000" />
@@ -114,19 +114,25 @@
         <prompt-filter-dialog value="true" />
         <default-filter-type value="BASIC" />
       </filters>
-      <lob-content-types text-length-threshold="300">
-        <content-type name="Text" enabled="true" />
-        <content-type name="XML" enabled="true" />
-        <content-type name="DTD" enabled="true" />
-        <content-type name="HTML" enabled="true" />
-        <content-type name="XHTML" enabled="true" />
-        <content-type name="CSS" enabled="true" />
-        <content-type name="SQL" enabled="true" />
-        <content-type name="PL/SQL" enabled="true" />
-        <content-type name="JavaScript" enabled="true" />
-        <content-type name="YAML" enabled="true" />
-        <content-type name="Bash" enabled="true" />
-      </lob-content-types>
+      <qualified-text-editor text-length-threshold="300">
+        <content-types>
+          <content-type name="Text" enabled="true" />
+          <content-type name="XML" enabled="true" />
+          <content-type name="DTD" enabled="true" />
+          <content-type name="HTML" enabled="true" />
+          <content-type name="XHTML" enabled="true" />
+          <content-type name="CSS" enabled="true" />
+          <content-type name="SQL" enabled="true" />
+          <content-type name="PL/SQL" enabled="true" />
+          <content-type name="JavaScript" enabled="true" />
+          <content-type name="PHP" enabled="true" />
+          <content-type name="JSP" enabled="true" />
+          <content-type name="JSPx" enabled="true" />
+          <content-type name="ASP" enabled="true" />
+          <content-type name="YAML" enabled="true" />
+          <content-type name="Bash" enabled="true" />
+        </content-types>
+      </qualified-text-editor>
     </dataset-editor-settings>
     <code-completion-settings>
       <filters>
