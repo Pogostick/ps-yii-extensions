@@ -215,7 +215,8 @@ class CPSRESTController extends CPSController
 		);
 
 		//	Echo output...
-		echo $this->_formatOutput( $_callResults );
+		$_output = $this->_formatOutput( $_callResults );
+		echo $_output;
 
 		//	Also return the results should anyone care to have them...
 		return $_callResults;
