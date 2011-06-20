@@ -235,7 +235,7 @@ class CPSRESTController extends CPSController
 		switch ( $this->_outputFormat )
 		{
 			case PS::OF_JSON:
-				header( 'Content-type: application/json' );
+				@header( 'Content-type: application/json' );
 
 				//	Are we already in JSON?
 				if ( null !== @json_decode( $output ) )

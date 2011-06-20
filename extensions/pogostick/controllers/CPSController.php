@@ -6,6 +6,7 @@
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
  */
+
 /**
  * CPSController provides filtered access to resources
  *
@@ -75,6 +76,11 @@ abstract class CPSController extends CController implements IPSBase
 	 * @return array
 	 */
 	public function getMenu() { return $this->_menu; }
+
+	/**
+	 * @param $value
+	 * @return \CPSController
+	 */
 	public function setMenu( $value ) { $this->_menu = $value; return $this; }
 
 	/**
@@ -191,6 +197,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	* The id in the state of our current filter/search criteria
+	*
 	* @var string
 	*/
 	protected $m_sSearchStateId = null;
@@ -405,13 +412,13 @@ abstract class CPSController extends CController implements IPSBase
 		if ( ! isset( $this->m_arUserActionList[ $eWhich ] ) || ! is_array( $this->m_arUserActionList[ $eWhich ] ) )
 			$this->m_arUserActionList[ $eWhich ] = array();
 
-		if ( ! in_array( $action, $this->m_arUserActionList[ $grantee ] ) )
-			$this->m_arUserActionList[ $grantee ][] = $action;
+		if ( ! in_array( $sAction, $this->m_arUserActionList[ $eWhich ] ) )
+			$this->m_arUserActionList[ $eWhich ][] = $sAction;
 
 		//	Make sure we don't lose our error handler...
-		if ( $grantee == self::ACCESS_TO_ANY )
+		if ( $eWhich == self::ACCESS_TO_ANY )
 		{
-			if ( ! in_array( 'error', $this->m_arUserActionList[ $grantee ] ) )
+			if ( ! in_array( 'error', $this->m_arUserActionList[ $eWhich ] ) )
 				$this->addUserAction( self::ACCESS_TO_ANY, 'error' );
 		}
 
@@ -425,8 +432,8 @@ abstract class CPSController extends CController implements IPSBase
 	 */
 	public function addUserActions( $eWhich, $arActions = array() )
 	{
-		if ( ! is_array( PS::o( $this->m_arUserActionList, $grantee ) ) )
-			$this->m_arUserActionList[ $grantee ] = array();
+		if ( ! is_array( PS::o( $this->m_arUserActionList, $eWhich ) ) )
+			$this->m_arUserActionList[ $eWhich ] = array();
 
 		foreach ( $arActions as $_sAction )
 			$this->addUserAction( $eWhich, $_sAction );
@@ -594,7 +601,7 @@ abstract class CPSController extends CController implements IPSBase
 	* @param array Extra parameters to pass to the view
 	* @param string The name of the variable to pass to the view. Defaults to 'model'
 	*/
-	public function genericAction( $actionId, $model = null, $parameters = array(), $modelVariableName = 'model', $flashKey = null, $flashValue = null, $defaultValue = null )
+	public function genericAction( $sActionId, $oModel = null, $arExtraParams = array(), $sModelVarName = 'model', $sFlashKey = null, $sFlashValue = null, $sFlashDefaultValue = null )
 	{
 		if ( $sFlashKey ) PS::_sf( $sFlashKey, $sFlashValue, $sFlashDefaultValue );
 		$this->render( $sActionId, array_merge( $arExtraParams, array( $sModelVarName => ( $oModel ) ? $oModel : $this->loadModel() ) ) );
@@ -629,22 +636,22 @@ abstract class CPSController extends CController implements IPSBase
 	* Provide automatic missing action mapping...
 	* Also handles a theme change request from any portlets
 	*
-	* @param string $actionId
+	* @param string $sActionId
 	*/
-	public function missingAction( $actionId = null )
+	public function missingAction( $sActionId = null )
 	{
 		if ( $this->m_bAutoMissing )
 		{
-			if ( empty( $actionId ) ) $actionId = $this->defaultAction;
+			if ( empty( $sActionId ) ) $sActionId = $this->defaultAction;
 
-			if ( $this->getViewFile( $actionId ) )
+			if ( $this->getViewFile( $sActionId ) )
 			{
-				$this->render( $actionId );
+				$this->render( $sActionId );
 				return;
 			}
 		}
 
-		parent::missingAction( $actionId );
+		parent::missingAction( $sActionId );
 	}
 
 	/**
@@ -652,12 +659,10 @@ abstract class CPSController extends CController implements IPSBase
 	*/
 	public function actionError()
 	{
-		if ( null !== ( $_error = PS::_ge() ) )
+		if ( null === ( $_error = PS::_ge() ) )
 		{
-			if ( $this->getIsAjaxRequest() )
+			if ( ! $this->getIsAjaxRequest() )
 				echo $_error['message'];
-			else
-				throw new CHttpException( 404, 'Page not found.' );
 		}
 
 		if ( ! $this->hasView( 'error' ) )
@@ -1070,33 +1075,33 @@ JS;
 
 	/**
 	* Saves the data in the model
-	 * @param CPSModel $model
-	 * @param array $arData
-	 * @param string $sRedirectAction
-	 * @param bool $bAttributesSet
-	 * @param null $sModelName
-	 * @param null $sSuccessMessage
-	 * @param bool $bNoCommit
-	 * @param bool $bSafeOnly
-	 * @return bool
-	 */
-	protected function saveModel( &$model, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false, $bSafeOnly = false )
+	*
+	* @param CModel $oModel The model to save
+	* @param array $arData The array of data to merge with the model
+	* @param string $sRedirectAction Where to redirect after a successful save
+	* @param boolean $bAttributesSet If true, attributes will not be set from $arData
+	* @param string $sModelName Optional model name
+	* @param string $sSuccessMessage Flash message to set if successful
+	* @param boolean $bNoCommit If true, transaction will not be committed
+	* @return boolean
+	*/
+	protected function saveModel( &$oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false, $bSafeOnly = false )
 	{
 		$_sMessage = PS::nvl( $sSuccessMessage, 'Your changes have been saved.' );
-		$_sModelName = PS::nvl( $sModelName, PS::nvl( $model->getModelClass(), $this->m_sModelName ) );
+		$_sModelName = PS::nvl( $sModelName, PS::nvl( $oModel->getModelClass(), $this->m_sModelName ) );
 
 		if ( isset( $arData, $arData[ $_sModelName ] ) )
 		{
-			if ( ! $bAttributesSet ) $model->setAttributes( $arData[ $_sModelName ], $bSafeOnly );
+			if ( ! $bAttributesSet ) $oModel->setAttributes( $arData[ $_sModelName ], $bSafeOnly );
 
-			if ( $model->save() )
+			if ( $oModel->save() )
 			{
-				if ( ! $bNoCommit && $model instanceof CPSModel && $model->hasTransaction() ) $model->commitTransaction();
+				if ( ! $bNoCommit && $oModel instanceof CPSModel && $oModel->hasTransaction() ) $oModel->commitTransaction();
 
 				PS::_sf( 'success', $_sMessage );
 
 				if ( $sRedirectAction )
-					$this->redirect( array( $sRedirectAction, 'id' => $model->id ) );
+					$this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
 
 				return true;
 			}
@@ -1108,16 +1113,16 @@ JS;
 	/***
 	* Just like saveModel, but doesn't commit, and never redirects.
 	*
-	* @param CPSModel $model
+	* @param CPSModel $oModel
 	* @param array $arData
 	* @param boolean $bAttributesSet
 	* @param string $sSuccessMessage
 	* @return boolean
 	* @see saveModel
 	*/
-	protected function saveTransactionModel( &$model, $arData = array(), $bAttributesSet = false, $sSuccessMessage = null )
+	protected function saveTransactionModel( &$oModel, $arData = array(), $bAttributesSet = false, $sSuccessMessage = null )
 	{
-		return $this->saveModel( $model, $arData, false, $bAttributesSet, null, $sSuccessMessage, true );
+		return $this->saveModel( $oModel, $arData, false, $bAttributesSet, null, $sSuccessMessage, true );
 	}
 
 	/**
