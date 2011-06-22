@@ -810,7 +810,7 @@ abstract class CPSController extends CController implements IPSBase
 		$_title = null;
 
 		//	Shortcut... only passed in the title...
-		if ( is_string( $options ) )
+		if ( ! empty( $options ) && is_string( $options ) )
 		{
 			$_title = $options;
 
@@ -828,7 +828,8 @@ abstract class CPSController extends CController implements IPSBase
 		}
 
 		//	Set the standard nav options
-		$this->setViewNavigationOptions( $options );
+		if ( false !== PS::o( $options, 'viewNavigation', true ) )
+			$this->setViewNavigationOptions( $options );
 
 		$_formId = PS::o( $options, 'id', 'ps-edit-form' );
 
@@ -896,17 +897,22 @@ SCRIPT;
 		);
 
 		//	Do some auto-page-setup...
-		if ( null !== ( $_header = PS::o( $options, 'header', PS::o( $options, 'title' ) ) ) )
+		$_header = PS::o( $options, 'header' );
+
+		if ( false !== $_header && null === $_header )
+			$_header = PS::o( $options, 'title' );
+
+		if ( ! empty( $_header ) )
 		{
 			if ( null !== ( $_headerIcon = PS::o( $options, 'headerIcon' ) ) )
 				$_header = PS::tag( 'span', array(), PS::image( $_headerIcon ) ) . $_header;
 
 			echo PS::tag( 'h1', array( 'class' => 'ui-generated-header' ), $_header );
-		}
 
-		//	Do some auto-page-setup...
-		if ( null !== ( $_subHeader = PS::o( $options, 'subHeader' ) ) )
-			echo PS::tag( 'div', array( 'class' => 'ui-state-active ui-generated-subheader' ), $_subHeader );
+			//	Do some auto-page-setup...
+			if ( null !== ( $_subHeader = PS::o( $options, 'subHeader' ) ) )
+				echo PS::tag( 'div', array( 'class' => 'ui-state-active ui-generated-subheader' ), $_subHeader );
+		}
 
 		if ( false !== PS::o( $options, 'renderSearch', false ) )
 		{

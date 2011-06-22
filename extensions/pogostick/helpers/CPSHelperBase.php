@@ -746,7 +746,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Shorthand version of Yii::app()
-	 * @return CApplication the application singleton, null if the singleton has not been created yet.
+	 * @return CApplication|CWebApplication|CConsoleApplication the application singleton, null if the singleton has not been created yet.
 	 */
 	public static function _a()
 	{
