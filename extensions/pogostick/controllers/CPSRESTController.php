@@ -44,6 +44,9 @@ class CPSRESTController extends CPSController
 	//* Private Members
 	//********************************************************************************
 
+	/**
+	 * @var int The type of data
+	 */
 	protected $_dataFormat = PS::OF_JSON;
 
 	//********************************************************************************

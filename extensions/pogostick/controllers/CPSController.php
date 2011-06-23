@@ -232,7 +232,8 @@ abstract class CPSController extends CController implements IPSBase
 	public $_pageLayout = 'main';
 
 	/**
-	 * @return #P#C\CPSController.layout|?
+
+	 * @return #P#C\CPSController.layout|? #P#C\CPSController.layout|?
 	 */
 	public function getPageLayout() { return $this->_pageLayout = $this->layout; }
 
@@ -370,7 +371,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $eWhich
-	 * @return #M#C\PS.o|?
+	 * @return #M#C\PS.o|? #M#C\PS.o|?
 	 */
 	public function getUserActionList( $eWhich ) { return PS::o( $this->m_arUserActionList, $eWhich ); }
 
@@ -594,13 +595,24 @@ abstract class CPSController extends CController implements IPSBase
 	}
 
 	/**
-	* A generic action that renders a page and passes in the model
-	*
-	* @param string The action id
-	* @param CModel The model
-	* @param array Extra parameters to pass to the view
-	* @param string The name of the variable to pass to the view. Defaults to 'model'
-	*/
+	 * A generic action that renders a page and passes in the model
+	 *
+	 * @param $sActionId
+	 * @param null $oModel
+	 * @param array $arExtraParams
+	 * @param string $sModelVarName
+	 * @param null $sFlashKey
+	 * @param null $sFlashValue
+	 * @param null $sFlashDefaultValue
+	 *
+	 * @internal param \The $string action id
+	 *
+	 * @internal param \The $CModel model
+	 *
+	 * @internal param \Extra $array parameters to pass to the view
+	 *
+	 * @internal param \The $string name of the variable to pass to the view. Defaults to 'model'
+	 */
 	public function genericAction( $sActionId, $oModel = null, $arExtraParams = array(), $sModelVarName = 'model', $sFlashKey = null, $sFlashValue = null, $sFlashDefaultValue = null )
 	{
 		if ( $sFlashKey ) PS::_sf( $sFlashKey, $sFlashValue, $sFlashDefaultValue );
@@ -608,12 +620,15 @@ abstract class CPSController extends CController implements IPSBase
 	}
 
 	/**
-	* Returns the data model based on the primary key given in the GET variable.
-	* If the data model is not found, an HTTP exception will be raised.
-	*
-	* @param integer the primary key value. Defaults to null, meaning using the 'id' GET variable
-	* @throws CHttpException
-	*/
+	 * Returns the data model based on the primary key given in the GET variable.
+	 * If the data model is not found, an HTTP exception will be raised.
+	 *
+	 * @param null $iId
+	 * @return \CActiveRecord|null
+	 *
+	 * @internal param \the $integer primary key value. Defaults to null, meaning using the 'id' GET variable
+	 * @throws CHttpException
+	 */
 	public function loadModel( $iId = null )
 	{
 		if ( null === $this->m_oModel )
@@ -706,10 +721,16 @@ abstract class CPSController extends CController implements IPSBase
 	 * By default, the layout view script is "protected/views/layouts/main.php".
 	 * This may be customized by changing {@link layout}.
 	 *
-	 * @param string name of the view to be rendered. See {@link getViewFile} for details
+	 * @param $viewName
+	 * @param null $viewData
+	 * @param bool $returnString
+	 *
+	 * @internal param \name $string of the view to be rendered. See {@link getViewFile} for details
 	 * about how the view script is resolved.
-	 * @param array data to be extracted into PHP variables and made available to the view script
-	 * @param boolean whether the rendering result should be returned instead of being displayed to end users.
+	 *
+	 * @internal param \data $array to be extracted into PHP variables and made available to the view script
+	 *
+	 * @internal param \whether $boolean the rendering result should be returned instead of being displayed to end users.
 	 * @return string the rendering result. Null if the rendering result is not required.
 	 * @see renderPartial
 	 * @see getLayoutFile
@@ -750,11 +771,19 @@ abstract class CPSController extends CController implements IPSBase
 	 *
 	 * This override adds the current user to the data automatically in the $_currentUser variable
 	 *
-	 * @param string name of the view to be rendered. See {@link getViewFile} for details
+	 * @param $view
+	 * @param null $data
+	 * @param bool $return
+	 * @param bool $processOutput
+	 *
+	 * @internal param \name $string of the view to be rendered. See {@link getViewFile} for details
 	 * about how the view script is resolved.
-	 * @param array data to be extracted into PHP variables and made available to the view script
-	 * @param boolean whether the rendering result should be returned instead of being displayed to end users
-	 * @param boolean whether the rendering result should be postprocessed using {@link processOutput}.
+	 *
+	 * @internal param \data $array to be extracted into PHP variables and made available to the view script
+	 *
+	 * @internal param \whether $boolean the rendering result should be returned instead of being displayed to end users
+	 *
+	 * @internal param \whether $boolean the rendering result should be postprocessed using {@link processOutput}.
 	 * @return string the rendering result. Null if the rendering result is not required.
 	 * @throws CException if the view does not exist
 	 * @see getViewFile
@@ -802,7 +831,9 @@ abstract class CPSController extends CController implements IPSBase
 	/**
 	 * Creates a standard form options array and loads page niceties
 	 * @param CModel $model
-	 * @param string|array If a string is passed in, it is used as the title.
+	 * @param array $options
+	 *
+	 * @internal param array|string $If a string is passed in, it is used as the title.
 	 * @return array
 	 */
 	public function setStandardFormOptions( $model, $options = array() )
@@ -941,8 +972,11 @@ SCRIPT;
 
 	/**
 	 * Sets the content type for this page to the specified MIME type
-	 * @param <type> $contentType The MIME type to set
+	 * @param $contentType
 	 * @param boolean $noLayout If true, the layout for this page is set to false
+	 *
+	 * @internal param $ <type> $contentType The MIME type to set
+	 *
 	 */
 	public function setContentType( $contentType, $noLayout = true )
 	{
@@ -1047,11 +1081,13 @@ JS;
 	//********************************************************************************
 
 	/**
-	* Executes any commands
-	* Maps to {@link CPSController::commandMap} and calls the appropriate method.
-	*
-	* @return mixed
-	*/
+	 * Executes any commands
+	 * Maps to {@link CPSController::commandMap} and calls the appropriate method.
+	 * @param array $arData
+	 * @param string $sIndexName
+	 *
+	 * @return mixed
+	 */
 	protected function processCommand( $arData = array(), $sIndexName = self::COMMAND_FIELD_NAME )
 	{
 		//	Our return variable
@@ -1080,17 +1116,18 @@ JS;
 	}
 
 	/**
-	* Saves the data in the model
-	*
-	* @param CModel $oModel The model to save
-	* @param array $arData The array of data to merge with the model
-	* @param string $sRedirectAction Where to redirect after a successful save
-	* @param boolean $bAttributesSet If true, attributes will not be set from $arData
-	* @param string $sModelName Optional model name
-	* @param string $sSuccessMessage Flash message to set if successful
-	* @param boolean $bNoCommit If true, transaction will not be committed
-	* @return boolean
-	*/
+	 * Saves the data in the model
+	 *
+	 * @param CModel $oModel The model to save
+	 * @param array $arData The array of data to merge with the model
+	 * @param string $sRedirectAction Where to redirect after a successful save
+	 * @param boolean $bAttributesSet If true, attributes will not be set from $arData
+	 * @param string $sModelName Optional model name
+	 * @param string $sSuccessMessage Flash message to set if successful
+	 * @param boolean $bNoCommit If true, transaction will not be committed
+	 * @param bool $bSafeOnly
+	 * @return boolean
+	 */
 	protected function saveModel( &$oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null, $sSuccessMessage = null, $bNoCommit = false, $bSafeOnly = false )
 	{
 		$_sMessage = PS::nvl( $sSuccessMessage, 'Your changes have been saved.' );
@@ -1132,11 +1169,14 @@ JS;
 	}
 
 	/**
-	* Loads a page of models
-	* @param boolean Whether or not to apply a sort. Defaults to false
-	*
-	* @return array Element 0 is the results of the find. Element 1 is the pagination object
-	*/
+	 * Loads a page of models
+	 * @param bool $bSort
+	 * @param null $oCriteria
+	 *
+	 * @internal param \Whether $boolean or not to apply a sort. Defaults to false
+	 *
+	 * @return array Element 0 is the results of the find. Element 1 is the pagination object
+	 */
 	protected function loadPaged( $bSort = false, $oCriteria = null )
 	{
 		$_oSort = $_oCrit = $_oPage = null;
@@ -1160,14 +1200,22 @@ JS;
 	}
 
 	/**
-	* Loads a model(s) based on criteria and scopes.
-	*
-	* @param string The method to append
-	* @param CDbCriteria The criteria for the lookup
-	* @param array Scopes to apply to this request
-	* @param array Options for the data load
-	* @return CActiveRecord|array
-	*/
+	 * Loads a model(s) based on criteria and scopes.
+	 *
+	 * @param $sMethod
+	 * @param null $oCrit
+	 * @param array $arScope
+	 * @param array $arOptions
+	 *
+	 * @internal param \The $string method to append
+	 *
+	 * @internal param \The $CDbCriteria criteria for the lookup
+	 *
+	 * @internal param \Scopes $array to apply to this request
+	 *
+	 * @internal param \Options $array for the data load
+	 * @return CActiveRecord|array
+	 */
 	protected function genericModelLoad( $sMethod, &$oCrit = null, $arScope = array(), $arOptions = array() )
 	{
 		$_sMethod = $this->getModelLoadString( $arScope, $arOptions ) . $sMethod;
@@ -1209,12 +1257,13 @@ JS;
 	}
 
 	/**
-	* Builds a string suitable for {@link eval}. The verb is intentionally not appeneded.
-	*
-	* @param array $arScope
-	* @return string
-	* @todo Will be deprecated after upgrade to PHP v5.3
-	*/
+	 * Builds a string suitable for {@link eval}. The verb is intentionally not appeneded.
+	 *
+	 * @param array $arScope
+	 * @param array $arOptions
+	 * @return string
+	 * @todo Will be deprecated after upgrade to PHP v5.3
+	 */
 	protected function getModelLoadString( $arScope = array(), $arOptions = array() )
 	{
 		$_sScopes = ( count( $arScope ) ) ? implode( '->', $arScope ) . '->' : null;
@@ -1265,9 +1314,11 @@ JS;
 
 	/**
 	 * Turns off the layout, echos the JSON encoded version of data and returns. Optionally encoding HTML characters.
-	 * @param array $payload The response data
+	 * @param array|bool $payload The response data
 	 * @param boolean $encode If true, response is run through htmlspecialchars()
-	 * @param integer $encodeOptions Options for htmlspecialchars. Defaults to ENT_NOQUOTES
+	 * @param #DENT_NOQUOTES|int|? $encodeOptions Options for htmlspecialchars. Defaults to ENT_NOQUOTES
+	 * @return
+	 *
 	 */
 	protected function _ajaxReturn( $payload = false, $encode = false, $encodeOptions = ENT_NOQUOTES )
 	{

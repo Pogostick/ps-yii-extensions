@@ -76,10 +76,17 @@ class CPSWidget extends CInputWidget implements IPSComponent
 	 */
 	public function __destruct()
 	{
-		//	Make sure scripts get regged before we die...
-		$this->registerClientScripts();
+		try
+		{
+			//	Make sure scripts get regged before we die...
+			$this->registerClientScripts();
 
-		parent::__destruct();
+			parent::__destruct();
+		}
+		catch ( Exception $_ex )
+		{
+			//	Ignore.
+		}
 	}
 
 	/**
