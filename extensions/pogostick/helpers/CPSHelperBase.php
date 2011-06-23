@@ -1135,7 +1135,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * Returns the current user. Equivalent of {@link CWebApplication::getUser}
 	 * @see CWebApplication::getUser
-	 * @return CUserIdentity
+	 * @return CWebUser
 	 */
 	public static function _gu()
 	{
