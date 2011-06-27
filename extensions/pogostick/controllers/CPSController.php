@@ -5,11 +5,6 @@
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
- */
-
-/**
- * CPSController provides filtered access to resources
- *
  * @package 	psYiiExtensions
  * @subpackage 	controllers
  *
@@ -18,6 +13,16 @@
  * @since 		v1.0.4
  *
  * @filesource
+ */
+
+/**
+ * CPSController
+ * A generic base class for controllers
+ *
+ * @throws CException|CHttpException
+ *
+ * @property boolean $isPostRequest
+ * @property boolean $isAjaxRequest
  */
 abstract class CPSController extends CController implements IPSBase
 {
@@ -898,8 +903,6 @@ SCRIPT;
 			}
 		}
 
-		PS::setFormFieldContainerClass( PS::o( $options, 'rowClass', 'row' ) );
-
 		$_formOptions = array(
 			'id' => $_formId,
 			'showLegend' => PS::o( $options, 'showLegend', true ),
@@ -927,22 +930,16 @@ SCRIPT;
 			),
 		);
 
-		//	Do some auto-page-setup...
-		$_header = PS::o( $options, 'header' );
+		PS::setFormFieldContainerClass( PS::o( $options, 'rowClass', 'row' ) );
 
-		if ( false !== $_header && null === $_header )
-			$_header = PS::o( $options, 'title' );
-
-		if ( ! empty( $_header ) )
+		if ( null !== ( $_header = PS::o( $options, 'header' ) ) )
 		{
-			if ( null !== ( $_headerIcon = PS::o( $options, 'headerIcon' ) ) )
-				$_header = PS::tag( 'span', array(), PS::image( $_headerIcon ) ) . $_header;
+			echo $_header;
+		}
 
-			echo PS::tag( 'h1', array( 'class' => 'ui-generated-header' ), $_header );
-
-			//	Do some auto-page-setup...
-			if ( null !== ( $_subHeader = PS::o( $options, 'subHeader' ) ) )
-				echo PS::tag( 'div', array( 'class' => 'ui-state-active ui-generated-subheader' ), $_subHeader );
+		if ( null !== ( $_subHeader = PS::o( $options, 'subHeader' ) ) )
+		{
+			echo $_subHeader;
 		}
 
 		if ( false !== PS::o( $options, 'renderSearch', false ) )
@@ -994,19 +991,51 @@ SCRIPT;
 		//	Page title
 		$_title = PS::o( $options, 'title', null, true );
 		$_subtitle = PS::o( $options, 'subtitle', null, true );
-		$_header = PS::o( $options, 'header' );
 
-		//	Generate subtitle from header...
-		if ( null === $_title && null === $_subtitle && null !== $_header )
-			$_subtitle = $_header;
+		//	Do some auto-page-setup...
+		if ( false !== ( $_header = PS::o( $options, 'header' ) ) )
+		{
+			if ( null === $_header )
+			{
+				$_header = $_title;
+			}
 
-		if ( $_subtitle )
-			$_title = PS::_gan() . ' :: ' . $_subtitle;
+			if ( ! empty( $_header ) )
+			{
+				if ( null !== ( $_headerIcon = PS::o( $options, 'headerIcon', null, true ) ) )
+				{
+					$_header = PS::tag( 'span', array( ), PS::image( $_headerIcon ) ) . $_header;
+				}
 
-		if ( ! $_title )
-			$_title =  PS::_gan();
+				$options['header'] = PS::tag( 'h1', array( 'class' => 'ui-generated-header' ), $_header );
 
-		$this->setPageTitle( $options['title'] = $_title );
+				//	Do some auto-page-setup...
+				$_subHeader = PS::o( $options, 'subHeader' );
+
+				if ( ! empty( $_subHeader ) )
+				{
+					$options['subHeader'] = PS::tag( 'div', array( 'class' => 'ui-state-active ui-generated-subheader' ), $_subHeader );
+				}
+
+				//	Generate subtitle from header...
+				if ( null === $_title && null === $_subtitle && null !== $_header )
+				{
+					$_subtitle = $_header;
+				}
+
+				if ( null === $_subtitle )
+				{
+					$_title = PS::_gan( ) . ' :: ' . $_subtitle;
+				}
+
+				if ( null === $_title )
+				{
+					$_title = PS::_gan( );
+				}
+
+				$this->setPageTitle( $options['title'] = $_title );
+			}
+		}
 
 		//	Set crumbs
 		$this->_breadcrumbs = PS::o( $options, 'breadcrumbs' );

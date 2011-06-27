@@ -14,11 +14,15 @@
  * @lastmodified  $Date: 2010-09-11 19:00:16 -0400 (Sat, 11 Sep 2010) $
  */
 
- /**
+/**
  * CPSRESTController provides REST functionality
  *
  * @package psYiiExtensions
  * @subpackage Controllers
+ *
+ * @property integer $outputFormat
+ * @property boolean $singleParameterActions
+ *
  */
 class CPSRESTController extends CPSController
 {
@@ -403,7 +407,7 @@ class CPSRESTController extends CPSController
 	/**
 	 * @return int
 	 */
-	public function getOutputFormat( )
+	public function getOutputFormat()
 	{
 		return $this->_outputFormat;
 	}

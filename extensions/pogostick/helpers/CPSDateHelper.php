@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright &copy; 2010 Pogostick, LLC
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -9,14 +9,14 @@
 
 /**
  * Date helper methods
- * 
+ *
  * @package 	psYiiExtensions
  * @subpackage 	helpers
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id: CPSDateHelper.php 377 2010-03-31 16:16:02Z jerryablan@gmail.com $
  * @since 		v1.0.6
- *  
+ *
  * @filesource
  */
 class CPSDateHelper implements IPSBase
@@ -51,7 +51,7 @@ class CPSDateHelper implements IPSBase
 
 	/**
 	* Returns the differnce between the two dates
-	* 
+	*
 	* @param string $dtStart
 	* @param string $dtEnd
 	* @return DateInterval
@@ -62,7 +62,7 @@ class CPSDateHelper implements IPSBase
 		$_dtEnd = new DateTime( PS::nvl( $dtEnd, date( 'Y-m-d H:i:s' ) ) );
 		return $_dtEnd->diff( $_dtStart, $bAbsolute );
 	}
-	
+
 	/**
 	* Returns the time difference in seconds between two time zones
 	*
@@ -74,19 +74,19 @@ class CPSDateHelper implements IPSBase
 	{
 		if ( null === $myTimeZone )
 			$myTimeZone = date_default_timezone_get();
-		
+
 		$_targetZone = new DateTimeZone( $timeZone );
 		$_sourceZone = new DateTimeZone( $myTimeZone );
-		
+
 		$_targetZoneTime = new DateTime( 'now', $_targetZone );
 		$_sourceZoneTime = new DateTime( 'now', $_sourceZone );
-		
+
 		return $_targetZone->getOffset( $_sourceZoneTime );
 	}
 
 	/**
 	* Returns value (or current date) formatted
-	* 
+	*
 	* @param mixed $date
 	* @return string
 	*/
@@ -94,10 +94,10 @@ class CPSDateHelper implements IPSBase
 	{
 		return self::format( $date, 'Y-m-d' );
 	}
-	
+
 	/**
 	* Returns value (or current date/time) formatted
-	* 
+	*
 	* @param mixed $date
 	* @param string $sFormat The date() format. Defaults to 'Y-m-d H:i:s'
 	* @return string
@@ -106,7 +106,7 @@ class CPSDateHelper implements IPSBase
 	{
 		return self::format( $date, 'Y-m-d H:i:s' );
 	}
-	
+
 	/**
 	 * Formats a date
 	 * @param mixed $dtDate
@@ -117,11 +117,12 @@ class CPSDateHelper implements IPSBase
 	{
 		return date( $sFormat, $dtDate ? strtotime( $dtDate ) : time() );
 	}
-	
+
 	/**
-	* Checks to see if a date/time is valid
-	* @param string $dtValue
-	*/
+	 * Checks to see if a date/time is valid
+	 * @param string $dtValue
+	 * @return bool
+	 */
 	public static function isValid( $dtValue )
 	{
 		if ( preg_match( "/^(\d{4})-(\d{2})-(\d{2}) ([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/", $dtValue, $_arMatches ) )
@@ -140,7 +141,14 @@ class CPSDateHelper implements IPSBase
 	 */
 	public static function getQuarterNumber( $date = null )
 	{
-		return self::$_quarterMap[ date( 'n', strtotime( null === $date ? time() : $date ) ) ];
+		if ( null !== $date && is_numeric( $date ) && $date >= 1 && $date <= 4 )
+			return $date;
+
+		$_month = date( 'n', ( null === $date ? time() : strtotime( $date ) ) );
+
+		CPSLog::trace( 'Month of date: ' . $date . ' is ' . $_month );
+
+		return self::$_quarterMap[ $_month ];
 	}
 
 	/**
