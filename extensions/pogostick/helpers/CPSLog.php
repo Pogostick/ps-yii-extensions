@@ -46,7 +46,7 @@ class CPSLog implements IPSBase
 	/**
 	 * @staticvar integer The base level for getting source of log entry
 	 */
-	public static $baseLevel = 4;
+	public static $baseLevel = 3;
 	/**
 	 * @staticvar integer The current indent level
 	 */
@@ -130,7 +130,11 @@ class CPSLog implements IPSBase
 			try
 			{
 				if ( @class_exists( 'Yii' ) )
+				{
+					//	Flush immediately...
+					Yii::getLogger()->autoFlush = 1;
 					Yii::log( $_logEntry, $_level, $category );
+				}
 				else if ( @class_exists( 'SimpleLogger' ) )
 					@SimpleLogger::getInstance()->write( $_logEntry, 6 );
 				else
