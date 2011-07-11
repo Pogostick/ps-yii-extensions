@@ -244,7 +244,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		'select' => 'slt_',
 		'file' => 'file_',
 	);
-	public static function getIdPrefix() { return self::$m_bUseIdPrefixes ? PS::o( self::$m_arIdPrefixes, $sType ) : null; }
+	public static function getIdPrefix( $type = 'text' ) { return self::$m_bUseIdPrefixes ? PS::o( self::$m_arIdPrefixes, $type ) : null; }
 
 	/**
 	* Whether or not to use the name prefix. Defaults to false.
@@ -545,7 +545,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				$htmlOptions['style'] = PS::o( $htmlOptions, 'style' ) . ' border:none; background-color: transparent;';
 				$htmlOptions['class'] = PS::addClass( $htmlOptions['class'], 'ps-text-display' );
 				$htmlOptions['readonly'] = 'readonly';
-					
+
 				if ( null !== PS::o( $htmlOptions, 'content' ) )
 					$htmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', $_value ) );
 
@@ -605,7 +605,7 @@ class CPSWidgetHelper extends CPSHelperBase
 
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
-				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_id, 'name' => $_sName ) ) );
+				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $htmlOptions[ 'id' ], 'name' => $htmlOptions[ 'name' ] ) ) );
 				$inputFieldType = self::TEXTAREA;
 				break;
 
@@ -706,7 +706,7 @@ class CPSWidgetHelper extends CPSHelperBase
 
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
-				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $_id, 'name' => $_sName ) ) );
+				CPSWysiwygWidget::create( null, array_merge( $widgetOptions, array( 'autoRun' => true, 'id' => $htmlOptions[ 'id' ], 'name' => $htmlOptions[ 'name' ] ) ) );
 				$_sType = 'textarea';
 				break;
 
@@ -1030,11 +1030,11 @@ CODE;
 
 		if ( ! empty( $_sFieldImageUrl ) )
 		{
-			$_sTempCss = <<<CSS
-	background-image: url({$sFieldImageUrl});
-	background-repeat: {$sFieldImageRepeat};
-	background-position {$sFieldImagePosition};
-CSS;
+			$_sTempCss = <<<CSS1
+ 	background-image: url({$_sFieldImageUrl});
+	background-repeat: {$_sFieldImageRepeat};
+	background-position {$_sFieldImagePosition};
+CSS1;
 		}
 
 		//	Add anything else we've appended...
@@ -1974,5 +1974,10 @@ HTML;
 		}
 
 		return $_result;
+	}
+
+	public static function formatSeconds( $seconds = 0 )
+	{
+
 	}
 }

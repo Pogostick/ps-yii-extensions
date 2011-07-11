@@ -103,10 +103,11 @@ class CPSLog implements IPSBase
 			$_indicator = ( in_array( $_level, self::$_levelIndicators ) ? self::$_levelIndicators[$_level] : self::$_defaultLevelIndicator );
 			$_logEntry = self::$prefix . ( class_exists( 'Yii' ) ? Yii::t( $category, $message, $options, $source, $language ) : $message );
 
-			if ( self::$echoData )
+			//	Echo if we're CLI && user wants it...
+			if ( PS::isCLI() && self::$echoData )
 			{
 				echo date( 'Y.m.d h.i.s' ) . '[' . strtoupper( $_level[0] ) . '] ' .
-					sprintf( '[%40.40s]', $category ) .
+					sprintf( '[%35.35s]', $category ) .
 					$_logEntry;
 				flush();
 			}
@@ -129,7 +130,11 @@ class CPSLog implements IPSBase
 			try
 			{
 				if ( @class_exists( 'Yii' ) )
+				{
+					//	Flush immediately...
+					Yii::getLogger()->autoFlush = 1;
 					Yii::log( $_logEntry, $_level, $category );
+				}
 				else if ( @class_exists( 'SimpleLogger' ) )
 					@SimpleLogger::getInstance()->write( $_logEntry, 6 );
 				else
@@ -203,8 +208,6 @@ class CPSLog implements IPSBase
 	{
 		if ( defined( 'PYE_TRACE_LEVEL' ) || defined( 'YII_DEBUG' ) || defined( 'YII_TRACE_LEVEL' ) )
 			return self::log( $category, $message, 'trace', $options, $source, $language );
-
-		return false;
 	}
 
 	/**
@@ -271,7 +274,6 @@ class CPSLog implements IPSBase
 		try
 		{
 			$_trace = debug_backtrace();
-			$_count = count( $_trace );
 
 			while ( $level >= 0 && isset( $_trace[$level] ) )
 			{

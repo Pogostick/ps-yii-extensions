@@ -14,11 +14,15 @@
  * @lastmodified  $Date: 2010-09-11 19:00:16 -0400 (Sat, 11 Sep 2010) $
  */
 
- /**
+/**
  * CPSRESTController provides REST functionality
  *
  * @package psYiiExtensions
  * @subpackage Controllers
+ *
+ * @property integer $outputFormat
+ * @property boolean $singleParameterActions
+ *
  */
 class CPSRESTController extends CPSController
 {
@@ -44,6 +48,9 @@ class CPSRESTController extends CPSController
 	//* Private Members
 	//********************************************************************************
 
+	/**
+	 * @var int The type of data
+	 */
 	protected $_dataFormat = PS::OF_JSON;
 
 	//********************************************************************************
@@ -215,7 +222,8 @@ class CPSRESTController extends CPSController
 		);
 
 		//	Echo output...
-		echo $this->_formatOutput( $_callResults );
+		$_output = $this->_formatOutput( $_callResults );
+		echo $_output;
 
 		//	Also return the results should anyone care to have them...
 		return $_callResults;
@@ -234,7 +242,7 @@ class CPSRESTController extends CPSController
 		switch ( $this->_outputFormat )
 		{
 			case PS::OF_JSON:
-				header( 'Content-type: application/json' );
+				@header( 'Content-type: application/json' );
 
 				//	Are we already in JSON?
 				if ( null !== @json_decode( $output ) )
@@ -399,7 +407,7 @@ class CPSRESTController extends CPSController
 	/**
 	 * @return int
 	 */
-	public function getOutputFormat( )
+	public function getOutputFormat()
 	{
 		return $this->_outputFormat;
 	}

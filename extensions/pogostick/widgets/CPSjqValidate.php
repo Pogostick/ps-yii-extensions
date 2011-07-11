@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -9,14 +9,14 @@
 
 /**
  * Widget that implements jQuery plug-in {@link http://bassistance.de/jquery-plugins/jquery-plugin-validation/ Validate}
- * 
+ *
  * @package 	psYiiExtensions
  * @subpackage 	widgets
- * 
+ *
  * @author 		Jerry Ablan <jablan@pogostick.com>
  * @version 	SVN: $Id: CPSjqValidate.php 399 2010-08-09 03:03:15Z jerryablan@gmail.com $
  * @since 		v1.0.5
- *  
+ *
  * @filesource
  */
 class CPSjqValidate extends CPSjQueryWidget
@@ -53,22 +53,22 @@ class CPSjqValidate extends CPSjQueryWidget
 	{
 		//	Daddy...
 		parent::registerClientScripts( $bLocateScript );
-		
+
 		//	Reset the baseUrl for our own scripts
 		$this->baseUrl = $this->extLibUrl . self::PS_EXTERNAL_PATH;
 
 		self::loadScripts();
-		
+
 		//	Don't forget subclasses
 		return PS::_cs();
 	}
 
 	/**
 	* Constructs and returns a jQuery Tools widget
-	* 
-	* The options passed in are dynamically added to the options array and will be accessible 
+	*
+	* The options passed in are dynamically added to the options array and will be accessible
 	* and modifiable as normal (.i.e. $this->theme, $this->baseUrl, etc.)
-	* 
+	*
 	* @param string $sName The widget name
 	* @param array $arOptions The options for the widget
 	* @param string $sClass The class of the calling object if different
@@ -82,7 +82,7 @@ class CPSjqValidate extends CPSjQueryWidget
 	//********************************************************************************
 	//* Private Methods
 	//********************************************************************************
-	
+
 	/**
 	* Generates the javascript code for the widget
 	*
@@ -102,7 +102,7 @@ class CPSjqValidate extends CPSjQueryWidget
 		//	Get the options...
 		$_arOptions = ( null != $arOptions ) ? $arOptions : $this->makeOptions();
 		$_sId = $this->getTargetSelector( $sTargetSelector );
-		
+
 		//	Jam something in front of options?
 		if ( null != $sInsertBeforeOptions )
 		{
@@ -113,10 +113,10 @@ class CPSjqValidate extends CPSjQueryWidget
 
 		$_sValidate = '$.validator.addMethod( "phoneUS", function(phone_number, element) { phone_number = phone_number.replace(/\s+/g, ""); return this.optional(element) || phone_number.length > 9 && phone_number.match(/^(1[\s\.-]?)?(\([2-9]\d{2}\)|[2-9]\d{2})[\s\.-]?[2-9]\d{2}[\s\.-]?\d{4}$/);}, "Please specify a valid phone number");';
 		$_sValidate .= '$.validator.addMethod( "postalcode", function(postalcode, element) { return this.optional(element) || postalcode.match(/(^\d{5}(-\d{4})?$)|(^[ABCEGHJKLMNPRSTVXYabceghjklmnpstvxy]{1}\d{1}[A-Za-z]{1} ?\d{1}[A-Za-z]{1}\d{1})$/);}, "Please specify a valid postal/zip code");';
-		
+
 		//	Put these via registerScript as not to double them up.
 		PS::_rs( '#psValidate.validator.addMethod#', $_sValidate );
-		
+
 		$this->script =<<<CODE
 var _psValidator = $('{$_sId}').validate({$_arOptions});
 CODE;
@@ -128,8 +128,8 @@ CODE;
 	{
 		$_base = PS::_a()->getAssetManager()->publish( PS::_gpoa( 'pogostick.external' ), true );
 		PS::_rsf( $_base . '/jquery-plugins/jquery.metadata.js', CClientScript::POS_HEAD );
-		PS::_rsf( self::CDN_SSL_PATH, CClientScript::POS_HEAD );
-		PS::_rsf( self::CDN_SSL_ROOT . '/additional-methods.js', CClientScript::POS_HEAD );
+		PS::_rsf( self::CDN_PATH, CClientScript::POS_HEAD );
+		PS::_rsf( self::CDN_ROOT . '/additional-methods.js', CClientScript::POS_HEAD );
 	}
 
 }

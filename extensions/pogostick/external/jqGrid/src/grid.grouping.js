@@ -8,7 +8,10 @@ $.jgrid.extend({
 			if(grp !== null && ( (typeof grp === 'object') || $.isFunction(grp) ) ) {
 				if(!grp.groupField.length) {
 					$t.p.grouping = false;
-                } else {
+				} else {
+					if ( typeof(grp.visibiltyOnNextGrouping) == 'undefined') {
+						grp.visibiltyOnNextGrouping = [];
+					}
 					for(var i=0;i<grp.groupField.length;i++) {
 						if(!grp.groupOrder[i]) {
 							grp.groupOrder[i] = 'asc';
@@ -23,8 +26,10 @@ $.jgrid.extend({
 							grp.groupSummary[i] = false;
 						}
 						if(grp.groupColumnShow[i] === true) {
+							grp.visibiltyOnNextGrouping[i] = true;
 							$($t).jqGrid('showCol',grp.groupField[i]);
 						} else {
+							grp.visibiltyOnNextGrouping[i] = $("#"+$t.p.id+"_"+grp.groupField[i]).is(":visible");
 							$($t).jqGrid('hideCol',grp.groupField[i]);
 						}
 						grp.sortitems[i] = [];
@@ -88,18 +93,44 @@ $.jgrid.extend({
 			uid = hid.substring(0,strpos+1),
 			num = parseInt(hid.substring(strpos+1),10)+1,
 			minus = grp.minusicon,
-			plus = grp.plusicon;
-			if( $("#"+hid+" span").hasClass(minus) ) {
+			plus = grp.plusicon,
+			tar = $("#"+hid),
+			r = tar[0].nextSibling,
+			tarspan = $("#"+hid+" span."+"tree-wrap-"+$t.p.direction),
+			collapsed = false;
+			if( tarspan.hasClass(minus) ) {
 				if(grp.showSummaryOnHide && grp.groupSummary[0]) {
-					$("#"+hid).nextUntil(".jqfoot").hide();
+					if(r){
+						while(r) {
+							if($(r).hasClass('jqfoot') ) { break; }
+							$(r).hide();
+							r = r.nextSibling;
+						}
+					}
 				} else  {
-					$("#"+hid).nextUntil("#"+uid+String(num)).hide();
+					if(r){
+						while(r) {
+							if($(r).attr('id') ==uid+String(num) ) { break; }
+							$(r).hide();
+							r = r.nextSibling;
 				}
-				$("#"+hid+" span").removeClass(minus).addClass(plus);
+					}
+				}
+				tarspan.removeClass(minus).addClass(plus);
+				collapsed = true;
 			} else {
-				$("#"+hid).nextUntil("#"+uid+String(num)).show();
-				$("#"+hid+" span").removeClass(plus).addClass(minus);
+				if(r){
+					while(r) {
+						if($(r).attr('id') ==uid+String(num) ) { break; }
+						$(r).show();
+						r = r.nextSibling;
+					}
+				}
+				tarspan.removeClass(plus).addClass(minus);
+				collapsed = false;
 			}
+			if( $.isFunction($t.p.onClickGroup)) { $t.p.onClickGroup.call($t, hid , collapsed); }
+
 		});
 		return false;
 	},
@@ -191,12 +222,16 @@ $.jgrid.extend({
 			}
 			var grp = $t.p.groupingView;
 			$t.p.grouping = true;
-			// show previoous hidden  groups if they are hidden
-			for(var i=0;i<grp.groupField.length;i++) {
-				if(!grp.groupColumnShow[i]) {
-					$($t).jqGrid('showCol',grp.groupField[i]);
-				}
-			}
+      // show previous hidden groups if they are hidden and weren't removed yet
+      for(var i=0;i<grp.groupField.length;i++) {
+        if(!grp.groupColumnShow[i] && grp.visibiltyOnNextGrouping[i]) {
+          $($t).jqGrid('showCol',grp.groupField[i]);
+        }
+      }
+      // set visibility status of current group columns on next grouping
+      for(var i=0;i<name.length;i++) {
+        grp.visibiltyOnNextGrouping[i] = $("#"+$t.p.id+"_"+name[i]).is(":visible");
+      }
 			$t.p.groupingView = $.extend($t.p.groupingView, options || {});
 			grp.groupField = name;
 			$($t).trigger("reloadGrid");
@@ -210,6 +245,13 @@ $.jgrid.extend({
 			}
 			$t.p.grouping = false;
 			if(current===true) {
+        var grp = $t.p.groupingView;
+        // show previous hidden groups if they are hidden and weren't removed yet
+        for(var i=0;i<grp.groupField.length;i++) {
+          if (!grp.groupColumnShow[i] && grp.visibiltyOnNextGrouping[i]) {
+            $($t).jqGrid('showCol', grp.groupField);
+          }
+        }
 				$("tr.jqgroup, tr.jqfoot","#"+$t.p.id+" tbody:first").remove();
 				$("tr.jqgrow:hidden","#"+$t.p.id+" tbody:first").show();
 			} else {
