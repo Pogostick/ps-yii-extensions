@@ -446,6 +446,7 @@ HTML;
 	 */
 	public static function commitTransaction()
 	{
+		/** @var $_transaction CDbTransaction */
 		if ( null !== ( $_transaction = array_pop( self::$_transactionStack ) ) )
 			$_transaction->commit();
 	}

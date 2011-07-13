@@ -1396,15 +1396,19 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param string $sql
 	 * @param array $parameters
 	 * @param CDbConnection $dbToUse
-	 * @return integer The number of affected rows
+	 * @return false|integer The number of affected rows
 	 */
 	public static function _sqlExecute( $sql, $parameters = array(), $dbToUse = null )
 	{
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
-			/** @var $_db CDbConnection */
-			return $_db->createCommand( $sql )->execute( $parameters );
-
-		return null;
+		try
+		{
+			return PS::_sql( $sql, $dbToUse )->execute( $parameters );
+		}
+		catch ( Exception $_ex )
+		{
+			CPSLog::error( '_sqlExecute', 'Exception: ' . $_ex->getMessage() );
+			return false;
+		}
 	}
 
 	/**
