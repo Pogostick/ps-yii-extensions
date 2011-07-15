@@ -146,7 +146,7 @@ class CPSDateHelper implements IPSBase
 
 		$_month = date( 'n', ( null === $date ? time() : strtotime( $date ) ) );
 
-		CPSLog::trace( 'Month of date: ' . $date . ' is ' . $_month );
+//		CPSLog::trace( 'Month of date: ' . $date . ' is ' . $_month );
 
 		return self::$_quarterMap[ $_month ];
 	}

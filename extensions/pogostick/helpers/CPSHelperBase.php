@@ -113,7 +113,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * @return void
 	 */
-	public static function getParams( )
+	public static function getParams()
 	{
 		self::$_appParameters;
 	}
@@ -122,12 +122,12 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * An array of class names to search in for missing methods
 	 * @var array $classPath
 	 */
-	protected static $_classPath = array( );
+	protected static $_classPath = array();
 
 	/**
 	 * @return array
 	 */
-	public static function getClassPath( )
+	public static function getClassPath()
 	{
 		return self::$_classPath;
 	}
@@ -157,29 +157,29 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * Initialize our private statics
 	 */
-	public static function init( )
+	public static function init()
 	{
 		//	Initialize my variables...
-		self::$_thisApp = Yii::app( );
+		self::$_thisApp = Yii::app();
 
 		//	May or may not be available...
 		try
 		{
-			self::$_clientScript = self::$_thisApp->getClientScript( );
+			self::$_clientScript = self::$_thisApp->getClientScript();
 		}
 		catch ( Exception $_ex )
 		{
 		}
 		try
 		{
-			self::$_thisUser = self::$_thisApp->getUser( );
+			self::$_thisUser = self::$_thisApp->getUser();
 		}
 		catch ( Exception $_ex )
 		{
 		}
 		try
 		{
-			self::$_thisRequest = self::$_thisApp->getRequest( );
+			self::$_thisRequest = self::$_thisApp->getRequest();
 		}
 		catch ( Exception $_ex )
 		{
@@ -221,11 +221,11 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @internal mixed $param
 	 * @return mixed
 	 */
-	public static function nvl( )
+	public static function nvl()
 	{
 		$_default = null;
-		$_args = func_num_args( );
-		$_haystack = func_get_args( );
+		$_args = func_num_args();
+		$_haystack = func_get_args();
 
 		for ( $_i = 0; $_i < $_args; $_i++ )
 		{
@@ -251,9 +251,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @internal mixed $param
 	 * @return bool
 	 */
-	public static function in( )
+	public static function in()
 	{
-		$_haystack = func_get_args( );
+		$_haystack = func_get_args();
 
 		if ( count( $_haystack ) > 1 )
 		{
@@ -269,9 +269,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 *
 	 * @return integer
 	 */
-	public static function currentTimeMillis( )
+	public static function currentTimeMillis()
 	{
-		list( $_uSec, $_sec ) = explode( ' ', microtime( ) );
+		list( $_uSec, $_sec ) = explode( ' ', microtime() );
 		return ( ( float )$_uSec + ( float )$_sec );
 	}
 
@@ -285,9 +285,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param boolean $unsetValue
 	 * @return mixed
 	 */
-	public static function oo( &$optionList = array( ), $key, $subKey, $defaultValue = null, $unsetValue = false )
+	public static function oo( &$optionList = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
 	{
-		return self::o( self::o( $optionList, $key, array( ) ), $subKey, $defaultValue, $unsetValue );
+		return self::o( self::o( $optionList, $key, array() ), $subKey, $defaultValue, $unsetValue );
 	}
 
 	/**
@@ -303,7 +303,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @static
 	 * @see CPSHelperBase::getOption
 	 */
-	public static function o( &$optionList = array( ), $key, $defaultValue = null, $unsetValue = false )
+	public static function o( &$optionList = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
 		if ( !is_array( $optionList ) || empty( $optionList ) )
 		{
@@ -359,7 +359,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @access public
 	 * @static
 	 */
-	public static function getOption( &$optionList = array( ), $key, $defaultValue = null, $unsetValue = false )
+	public static function getOption( &$optionList = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
 		return self::o( $optionList, $key, $defaultValue, $unsetValue );
 	}
@@ -422,10 +422,10 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * If an index exists in the target array, it is appended to the value.
 	 * @return array
 	 */
-	public static function smart_array_merge( )
+	public static function smart_array_merge()
 	{
-		$_iCount = func_num_args( );
-		$_arResult = array( );
+		$_iCount = func_num_args();
+		$_arResult = array();
 
 		for ( $_i = 0; $_i < $_iCount; $_i++ )
 		{
@@ -476,7 +476,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 		// Use CURL if installed...
 		if ( function_exists( 'curl_init' ) )
 		{
-			$_oCurl = curl_init( );
+			$_oCurl = curl_init();
 			curl_setopt( $_oCurl, CURLOPT_RETURNTRANSFER, true );
 			curl_setopt( $_oCurl, CURLOPT_FAILONERROR, true );
 			curl_setopt( $_oCurl, CURLOPT_USERAGENT, $_sAgent );
@@ -570,7 +570,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param boolean $bUseDiv If true, a <div> tag will be used instead of a <span>
 	 * @return string The generated hyperlink
 	 */
-	public static function wrappedLink( $sText, $url = '#', $sWrapperId = null, $arHtmlOptions = array( ), $sClass = null, $bUseDiv = false )
+	public static function wrappedLink( $sText, $url = '#', $sWrapperId = null, $arHtmlOptions = array(), $sClass = null, $bUseDiv = false )
 	{
 		return ( '<' . ( $bUseDiv ? 'div' : 'span' ) . ( null != $sWrapperId ? ' id="' . $sWrapperId . '"' : '' ) .
 				 ( null != $sClass ? ' class="' . $sClass . '"' : '' ) . '>' . CHtml::link( $sText, $url, $arHtmlOptions ) . '</' .
@@ -637,14 +637,14 @@ class CPSHelperBase extends CHtml implements IPSBase
 			}
 		}
 
-		return ( $sXml->asXML( ) );
+		return ( $sXml->asXML() );
 	}
 
 	/**
 	 * Returns the Url of the currently loaded page.
 	 * @return string
 	 */
-	public static function getCurrentPageUrl( )
+	public static function getCurrentPageUrl()
 	{
 		$_bSSL = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' );
 		return 'http' . ( ( $_bSSL ) ? 's' : '' ) . '://' . $_SERVER["SERVER_NAME"] .
@@ -686,8 +686,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function makeArray( $oData )
 	{
-		$_arOut = array( );
-		$_iCount = func_num_args( );
+		$_arOut = array();
+		$_iCount = func_num_args();
 
 		for ( $_i = 0; $_i < $_iCount; $_i++ )
 		{
@@ -718,7 +718,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function makePath()
 	{
-		$_haystack = func_get_args( );
+		$_haystack = func_get_args();
 		return implode( DIRECTORY_SEPARATOR, $_haystack );
 	}
 
@@ -824,7 +824,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * Shorthand version of Yii::app()
 	 * @return CApplication|CWebApplication|CConsoleApplication the application singleton, null if the singleton has not been created yet.
 	 */
-	public static function _a( )
+	public static function _a()
 	{
 		return self::$_thisApp;
 	}
@@ -850,7 +850,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _gan( $notEncoded = false )
 	{
-		return $notEncoded ? self::_a( )->name : self::encode( self::_a( )->name );
+		return $notEncoded ? self::_a()->name : self::encode( self::_a()->name );
 	}
 
 	/**
@@ -874,7 +874,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _gpt( $notEncoded = false )
 	{
-		return $notEncoded ? self::_gc( )->getPageTitle( ) : self::encode( self::_gc( )->getPageTitle( ) );
+		return $notEncoded ? self::_gc()->getPageTitle() : self::encode( self::_gc()->getPageTitle() );
 	}
 
 	/**
@@ -907,9 +907,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @see CHttpRequest::getBasePath
 	 * @return string
 	 */
-	public static function getBasePath( )
+	public static function getBasePath()
 	{
-		return self::$_thisApp->getBasePath( );
+		return self::$_thisApp->getBasePath();
 	}
 
 	/**
@@ -918,9 +918,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @see CHttpRequest::getBasePath
 	 * @return string
 	 */
-	public static function _gbp( )
+	public static function _gbp()
 	{
-		return self::$_thisApp->getBaseUrl( );
+		return self::$_thisApp->getBaseUrl();
 	}
 
 	/***
@@ -929,7 +929,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @access public
 	 * @static
 	 */
-	public static function getClientScript( )
+	public static function getClientScript()
 	{
 		return self::$_clientScript;
 	}
@@ -940,7 +940,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @access public
 	 * @static
 	 */
-	public static function _cs( )
+	public static function _cs()
 	{
 		return self::$_clientScript;
 	}
@@ -962,17 +962,17 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * @return CDbConnection the database connection
 	 */
-	public static function getDb( )
+	public static function getDb()
 	{
-		return self::_db( );
+		return self::_db();
 	}
 
 	/**
 	 * @return CDbConnection the database connection
 	 */
-	public static function _db( )
+	public static function _db()
 	{
-		return self::$_thisApp->getDb( );
+		return self::$_thisApp->getDb();
 	}
 
 	/**
@@ -1019,7 +1019,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 		{
 			$urlList = array( $urlList );
 		}
-		$_prefix = ( $fromPublished ? self::getExternalLibraryUrl( ) . DIRECTORY_SEPARATOR : null );
+		$_prefix = ( $fromPublished ? CPSWidgetHelper::getExternalLibraryUrl() . DIRECTORY_SEPARATOR : null );
 
 		//	Need external library?
 		foreach ( $urlList as $_url )
@@ -1066,7 +1066,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 		{
 			$urlList = array( $urlList );
 		}
-		$_prefix = ( $fromPublished ? self::getExternalLibraryUrl( ) . DIRECTORY_SEPARATOR : null );
+		$_prefix = ( $fromPublished ? CPSWidgetHelper::getExternalLibraryUrl() . DIRECTORY_SEPARATOR : null );
 
 		foreach ( $urlList as $_url )
 		{
@@ -1142,7 +1142,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	{
 		if ( !self::$_clientScript->isCssRegistered( $sId ) )
 		{
-			self::$_clientScript->registerCss( self::nvl( $sId, CPSWidgetHelper::getWidgetId( ) ), $sCss, $media );
+			self::$_clientScript->registerCss( self::nvl( $sId, CPSWidgetHelper::getWidgetId() ), $sCss, $media );
 		}
 
 		return self::$_clientScript;
@@ -1189,7 +1189,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	{
 		if ( !self::$_clientScript->isScriptRegistered( $sId ) )
 		{
-			self::$_clientScript->registerScript( self::nvl( $sId, CPSWidgetHelper::getWidgetId( ) ), $sScript, $ePosition );
+			self::$_clientScript->registerScript( self::nvl( $sId, CPSWidgetHelper::getWidgetId() ), $sScript, $ePosition );
 		}
 
 		return self::$_clientScript;
@@ -1205,7 +1205,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @access public
 	 * @static
 	 */
-	public static function registerMetaTag( $sContent, $sName = null, $sHttpEquiv = null, $optionList = array( ) )
+	public static function registerMetaTag( $sContent, $sName = null, $sHttpEquiv = null, $optionList = array() )
 	{
 		return self::_rmt( $sContent, $sName, $sHttpEquiv, $optionList );
 	}
@@ -1220,7 +1220,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @access public
 	 * @static
 	 */
-	public static function _rmt( $sContent, $sName = null, $sHttpEquiv = null, $optionList = array( ) )
+	public static function _rmt( $sContent, $sName = null, $sHttpEquiv = null, $optionList = array() )
 	{
 		self::$_clientScript->registerMetaTag( $sContent, $sName, $sHttpEquiv, $optionList );
 		return self::$_clientScript;
@@ -1233,7 +1233,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param string the token separating name-value pairs in the URL.
 	 * @return string the constructed URL
 	 */
-	public static function _cu( $route, $options = array( ), $ampersand = '&' )
+	public static function _cu( $route, $options = array(), $ampersand = '&' )
 	{
 		return self::$_thisApp->createUrl( $route, $options, $ampersand );
 	}
@@ -1243,9 +1243,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @see CApplication::getRequest
 	 * @return CHttpRequest
 	 */
-	public static function getRequest( )
+	public static function getRequest()
 	{
-		return self::_gr( );
+		return self::_gr();
 	}
 
 	/**
@@ -1253,7 +1253,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @see CApplication::getRequest
 	 * @return CHttpRequest
 	 */
-	public static function _gr( )
+	public static function _gr()
 	{
 		return self::$_thisRequest;
 	}
@@ -1263,9 +1263,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @see CWebApplication::getUser
 	 * @return CUserIdentity
 	 */
-	public static function getUser( )
+	public static function getUser()
 	{
-		return self::_gu( );
+		return self::_gu();
 	}
 
 	/**
@@ -1273,7 +1273,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @see CWebApplication::getUser
 	 * @return CWebUser
 	 */
-	public static function _gu( )
+	public static function _gu()
 	{
 		return self::$_thisUser;
 	}
@@ -1282,16 +1282,16 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * Returns the currently logged in user
 	 * @return CWebUser
 	 */
-	public static function getCurrentUser( )
+	public static function getCurrentUser()
 	{
-		return self::_gcu( );
+		return self::_gcu();
 	}
 
 	/**
 	 * Returns the currently logged in user
 	 * @return CWebUser
 	 */
-	public static function _gcu( )
+	public static function _gcu()
 	{
 		return self::_gs( 'currentUser' );
 	}
@@ -1300,18 +1300,18 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * Returns boolean indicating if user is logged in or not
 	 * @return boolean
 	 */
-	public static function isGuest( )
+	public static function isGuest()
 	{
-		return self::_ig( );
+		return self::_ig();
 	}
 
 	/**
 	 * Returns boolean indicating if user is logged in or not
 	 * @return boolean
 	 */
-	public static function _ig( )
+	public static function _ig()
 	{
-		return self::_gu( )->isGuest;
+		return self::_gu()->getIsGuest();
 	}
 
 	/**
@@ -1345,18 +1345,18 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return CController the currently active controller
 	 * @see CWebApplication::getController
 	 */
-	public static function getController( )
+	public static function getController()
 	{
-		return self::_gc( );
+		return self::_gc();
 	}
 
 	/**
 	 * @return CController the currently active controller
 	 * @see CWebApplication::getController
 	 */
-	public static function _gc( )
+	public static function _gc()
 	{
-		return ( null === self::$_thisController ? self::$_thisController = self::$_thisApp->getController( ) : self::$_thisController );
+		return ( null === self::$_thisController ? self::$_thisController = self::$_thisApp->getController() : self::$_thisController );
 	}
 
 	/**
@@ -1405,7 +1405,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _publish( $path, $hashByName = false, $level = -1 )
 	{
-		return self::$_thisApp->getAssetManager( )->publish( $path, $hashByName, $level );
+		return self::$_thisApp->getAssetManager()->publish( $path, $hashByName, $level );
 	}
 
 	/**
@@ -1437,7 +1437,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _gs( $stateName, $defaultValue = null )
 	{
-		$_user = self::_gu( );
+		$_user = self::_gu();
 		return ( null !== $_user ? $_user->getState( $stateName, $defaultValue ) : null );
 	}
 
@@ -1467,7 +1467,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _gf( $key, $defaultValue = null, $delete = true )
 	{
-		$_user = self::_gu( );
+		$_user = self::_gu();
 		return ( null !== $_user ? $_user->getFlash( $key, $defaultValue, $delete ) : null );
 	}
 
@@ -1488,7 +1488,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _ss( $stateName, $stateValue, $defaultValue = null )
 	{
-		$_user = self::_gu( );
+		$_user = self::_gu();
 		return ( null !== $_user ? $_user->setState( $stateName, $stateValue, $defaultValue ) : false );
 	}
 
@@ -1517,7 +1517,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sf( $key, $value, $defaultValue = null )
 	{
-		if ( null !== ( $_user = self::_gu( ) ) )
+		if ( null !== ( $_user = self::_gu() ) )
 		{
 			$_user->setFlash( $key, $value, $defaultValue );
 		}
@@ -1537,9 +1537,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * </ul>
 	 * @return array the error details. Null if there is no error.
 	 */
-	public static function _ge( )
+	public static function _ge()
 	{
-		return self::_a( )->getErrorHandler( )->getError( );
+		return self::_a()->getErrorHandler()->getError();
 	}
 
 	/**
@@ -1551,7 +1551,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sql( $sql, $dbToUse = null )
 	{
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb( ) ) ) )
+		/** @var $_db CDbConnection */
+		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
 		{
 			return $_db->createCommand( $sql );
 		}
@@ -1565,18 +1566,19 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param string $sql
 	 * @param array $parameters
 	 * @param CDbConnection $dbToUse
-	 * @return integer The number of affected rows
+	 * @return false|integer The number of affected rows
 	 */
-	public static function _sqlExecute( $sql, $parameters = array( ), $dbToUse = null )
+	public static function _sqlExecute( $sql, $parameters = array(), $dbToUse = null )
 	{
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb( ) ) )
-		)
-			/** @var $_db CDbConnection */
+		try
 		{
-			return $_db->createCommand( $sql )->execute( $parameters );
+			return PS::_sql( $sql, $dbToUse )->execute( $parameters );
 		}
-
-		return null;
+		catch ( Exception $_ex )
+		{
+			CPSLog::error( '_sqlExecute', 'Exception: ' . $_ex->getMessage() );
+			return false;
+		}
 	}
 
 	/**
@@ -1586,13 +1588,13 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param CDbConnection $dbToUse
 	 * @return mixed
 	 */
-	public static function _sqlAll( $sql, $parameterList = array( ), $dbToUse = null )
+	public static function _sqlAll( $sql, $parameterList = array(), $dbToUse = null )
 	{
 		//	Allow laziness
 		if ( $parameterList instanceof CDbConnection )
 		{
 			$dbToUse = $parameterList;
-			$parameterList = array( );
+			$parameterList = array();
 		}
 
 		if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
@@ -1610,23 +1612,23 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param CDbConnection $dbToUse
 	 * @return array
 	 */
-	public static function _sqlAllScalar( $sql, $parameterList = array( ), $dbToUse = null )
+	public static function _sqlAllScalar( $sql, $parameterList = array(), $dbToUse = null )
 	{
 		//	Allow laziness
 		if ( $parameterList instanceof CDbConnection )
 		{
 			$dbToUse = $parameterList;
-			$parameterList = array( );
+			$parameterList = array();
 		}
 
 		$_resultList = null;
 
 		/** @var CDbConnection $_db */
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb( ) ) ) )
+		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
 		{
 			if ( null !== ( $_rowList = $_db->createCommand( $sql )->query( $parameterList ) ) )
 			{
-				$_resultList = array( );
+				$_resultList = array();
 
 				foreach ( $_rowList as $_row )
 				{
@@ -1645,17 +1647,17 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param CDbConnection $dbToUse
 	 * @return mixed
 	 */
-	public static function _sqlScalar( $sql, $parameterList = array( ), $dbToUse = null )
+	public static function _sqlScalar( $sql, $parameterList = array(), $dbToUse = null )
 	{
 		//	Allow laziness
 		if ( $parameterList instanceof CDbConnection )
 		{
 			$dbToUse = $parameterList;
-			$parameterList = array( );
+			$parameterList = array();
 		}
 
 		/** @var CDbConnection $_db */
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb( ) ) ) )
+		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
 		{
 			if ( null !== ( $_value = $_db->createCommand( $sql )->queryScalar( $parameterList ) ) )
 			{
@@ -1670,9 +1672,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * Determine if PHP is running CLI mode or not
 	 * @return boolean True if currently running in CLI
 	 */
-	public static function isCLI( )
+	public static function isCLI()
 	{
-		return ( 'cli' == php_sapi_name( ) && empty( $_SERVER['REMOTE_ADDR'] ) );
+		return ( 'cli' == php_sapi_name() && empty( $_SERVER['REMOTE_ADDR'] ) );
 	}
 
 	/**
@@ -1710,33 +1712,33 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * @return boolean whether this is POST request.
 	 */
-	public static function isPostRequest( )
+	public static function isPostRequest()
 	{
-		return self::ipr( );
+		return self::ipr();
 	}
 
 	/**
 	 * @return boolean whether this is POST request.
 	 */
-	public static function ipr( )
+	public static function ipr()
 	{
-		return self::_gr( )->getIsPostRequest( );
+		return self::_gr()->getIsPostRequest();
 	}
 
 	/**
 	 * @return boolean True if this is an AJAX (xhr) request.
 	 */
-	public static function isAjaxRequest( )
+	public static function isAjaxRequest()
 	{
-		return self::iar( );
+		return self::iar();
 	}
 
 	/**
 	 * @return boolean True if this is an AJAX (xhr) request.
 	 */
-	public static function iar( )
+	public static function iar()
 	{
-		return self::_gr( )->getIsAjaxRequest( );
+		return self::_gr()->getIsAjaxRequest();
 	}
 
 	/**
@@ -1754,7 +1756,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @param array $columnsToSort Array of columns in $arrayToSort to sort.
 	 * @return boolean
 	 */
-	public static function arraySort( &$arrayToSort, $columnsToSort = array( ) )
+	public static function arraySort( &$arrayToSort, $columnsToSort = array() )
 	{
 		//	Convert to an array
 		if ( !empty( $columnsToSort ) && !is_array( $columnsToSort ) )
@@ -1810,7 +1812,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function array_sort_by_column( &$sourceArray, $column, $sortDirection = SORT_ASC )
 	{
-		$_sortColumn = array( );
+		$_sortColumn = array();
 
 		foreach ( $sourceArray as $_key => $_row )
 		{
@@ -1913,7 +1915,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 		{
 			if ( $value instanceof SimpleXMLElement || $value instanceof Util_SpXmlElement )
 			{
-				return $value->asXML( );
+				/** @var $value SimpleXMLElement */
+				return $value->asXML();
 			}
 
 			if ( is_object( $value ) )
@@ -1970,4 +1973,4 @@ class CPSHelperBase extends CHtml implements IPSBase
 /**
  * Call our init method to populate our privates...
  */
-CPSHelperBase::init( );
+CPSHelperBase::init();

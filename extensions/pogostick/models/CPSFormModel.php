@@ -8,7 +8,9 @@
  */
 
 /**
- * CPSFormModel provides something selfish. I'm old and prefix my member variable names with 'm_'. This class looks for that.
+ * CPSFormModel provided something selfish for me. I'm old and lazy and used to prefix my member variable names with 'm_' (Yeah, I used to do a lot of MS stuff).
+ * This class would look for that when doing gets/sets. In any case, I've embraced non-hungarian notation and this is now just an unnecessary layer. Therefore,
+ * deprecated.
  * 
  * @package 	psYiiExtensions
  * @subpackage 	models
