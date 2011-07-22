@@ -977,11 +977,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _db( $componentName = 'db' )
 	{
-<<<<<<< HEAD
 		return self::$_thisApp->getComponent( $componentName );
-=======
-		return self::_gco( 'db' );
->>>>>>> 6896664cec8a553a9b7581c4613682219660c855
 	}
 
 	/**
@@ -1560,16 +1556,6 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sql( $sql, $dbToUse = null )
 	{
-<<<<<<< HEAD
-		$_db = $dbToUse;
-
-		if ( null === $_db )
-		{
-			$_db = self::_db();
-		}
-
-		return $_db->createCommand( $sql );
-=======
 		/** @var CDbConnection $_db */
 		if ( null === $dbToUse )
 		{
@@ -1582,7 +1568,6 @@ class CPSHelperBase extends CHtml implements IPSBase
 		}
 
 		return $dbToUse->createCommand( $sql );
->>>>>>> 6896664cec8a553a9b7581c4613682219660c855
 	}
 
 	/**
@@ -1699,7 +1684,6 @@ class CPSHelperBase extends CHtml implements IPSBase
 			$parameterList = array();
 		}
 
-<<<<<<< HEAD
 		try
 		{
 			if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
@@ -1715,17 +1699,6 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 					return $_resultList;
 				}
-=======
-		$_resultList = null;
-
-		if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
-		{
-			$_resultList = array();
-
-			foreach ( $_command->queryAll( true, $parameterList ) as $_row )
-			{
-				$_resultList[] = current( $_row );
->>>>>>> 6896664cec8a553a9b7581c4613682219660c855
 			}
 		}
 		catch ( Exception $_ex )
@@ -1753,18 +1726,12 @@ class CPSHelperBase extends CHtml implements IPSBase
 			$parameterList = array();
 		}
 
-<<<<<<< HEAD
 		try
 		{
 			if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
 			{
 				return $_command->queryScalar( $parameterList );
 			}
-=======
-		if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
-		{
-			return $_command->queryScalar( $parameterList );
->>>>>>> 6896664cec8a553a9b7581c4613682219660c855
 		}
 		catch ( Exception $_ex )
 		{
