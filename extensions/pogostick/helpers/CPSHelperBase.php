@@ -972,7 +972,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _db()
 	{
-		return self::$_thisApp->getDb();
+		return self::_gco( 'db' );
 	}
 
 	/**
@@ -1551,13 +1551,18 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sql( $sql, $dbToUse = null )
 	{
-		/** @var $_db CDbConnection */
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
+		/** @var CDbConnection $_db */
+		if ( null === $dbToUse )
 		{
-			return $_db->createCommand( $sql );
+			$dbToUse = self::_db();
 		}
 
-		return null;
+		if ( null === $dbToUse )
+		{
+			throw new Exception( 'No database could be found for this query.' );
+		}
+
+		return $dbToUse->createCommand( $sql );
 	}
 
 	/**
@@ -1623,17 +1628,13 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 		$_resultList = null;
 
-		/** @var CDbConnection $_db */
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
+		if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
 		{
-			if ( null !== ( $_rowList = $_db->createCommand( $sql )->query( $parameterList ) ) )
-			{
-				$_resultList = array();
+			$_resultList = array();
 
-				foreach ( $_rowList as $_row )
-				{
-					$_resultList[] = current( $_row );
-				}
+			foreach ( $_command->queryAll( true, $parameterList ) as $_row )
+			{
+				$_resultList[] = current( $_row );
 			}
 		}
 
@@ -1656,13 +1657,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 			$parameterList = array();
 		}
 
-		/** @var CDbConnection $_db */
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
+		if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
 		{
-			if ( null !== ( $_value = $_db->createCommand( $sql )->queryScalar( $parameterList ) ) )
-			{
-				return $_value;
-			}
+			return $_command->queryScalar( $parameterList );
 		}
 
 		return null;
