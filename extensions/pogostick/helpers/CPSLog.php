@@ -93,7 +93,7 @@ class CPSLog implements IPSBase
 
 		if ( strlen( $category ) > 35 )
 		{
-			$category = substr( $category, strlen( $category ) - 35 );
+			$category = substr( $category, -35 );
 		}
 
 		//	Get the indent, if any
