@@ -170,6 +170,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 		catch ( Exception $_ex )
 		{
 		}
+
 		try
 		{
 			self::$_thisUser = self::$_thisApp->getUser();
@@ -177,6 +178,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 		catch ( Exception $_ex )
 		{
 		}
+
 		try
 		{
 			self::$_thisRequest = self::$_thisApp->getRequest();
@@ -184,6 +186,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 		catch ( Exception $_ex )
 		{
 		}
+
 		try
 		{
 			self::$_appParameters = self::$_thisApp->getParams();
@@ -960,19 +963,21 @@ class CPSHelperBase extends CHtml implements IPSBase
 	}
 
 	/**
+	 * @param string $componentName
 	 * @return CDbConnection the database connection
 	 */
-	public static function getDb()
+	public static function getDb( $componentName = 'db' )
 	{
-		return self::_db();
+		return self::$_thisApp->getComponent( $componentName );
 	}
 
 	/**
+	 * @param string $componentName
 	 * @return CDbConnection the database connection
 	 */
-	public static function _db()
+	public static function _db( $componentName = 'db' )
 	{
-		return self::$_thisApp->getDb();
+		return self::$_thisApp->getComponent( $componentName );
 	}
 
 	/**
@@ -1551,13 +1556,18 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sql( $sql, $dbToUse = null )
 	{
-		/** @var $_db CDbConnection */
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
+		/** @var CDbConnection $_db */
+		if ( null === $dbToUse )
 		{
-			return $_db->createCommand( $sql );
+			$dbToUse = self::_db();
 		}
 
-		return null;
+		if ( null === $dbToUse )
+		{
+			throw new Exception( 'No database could be found for this query.' );
+		}
+
+		return $dbToUse->createCommand( $sql );
 	}
 
 	/**
@@ -1570,15 +1580,60 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function _sqlExecute( $sql, $parameters = array(), $dbToUse = null )
 	{
+		//	Allow laziness
+		if ( $parameters instanceof CDbConnection )
+		{
+			$dbToUse = $parameters;
+			$parameters = array();
+		}
+
 		try
 		{
-			return PS::_sql( $sql, $dbToUse )->execute( $parameters );
+			if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
+			{
+				return $_command->execute( $parameters );
+			}
 		}
 		catch ( Exception $_ex )
 		{
 			CPSLog::error( '_sqlExecute', 'Exception: ' . $_ex->getMessage() );
 			return false;
 		}
+
+		return null;
+	}
+
+	/**
+	 * Executes a given SQL query
+	 *
+	 * @param string $sql
+	 * @param array $parameters
+	 * @param CDbConnection $dbToUse
+	 * @return false|array
+	 */
+	public static function _sqlQuery( $sql, $parameters = array(), $dbToUse = null )
+	{
+		//	Allow laziness
+		if ( $parameters instanceof CDbConnection )
+		{
+			$dbToUse = $parameters;
+			$parameters = array();
+		}
+
+		try
+		{
+			if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
+			{
+				return $_command->query( $parameters );
+			}
+		}
+		catch ( Exception $_ex )
+		{
+			CPSLog::error( '_sqlQuery', 'Exception: ' . $_ex->getMessage() );
+			return false;
+		}
+
+		return null;
 	}
 
 	/**
@@ -1597,9 +1652,17 @@ class CPSHelperBase extends CHtml implements IPSBase
 			$parameterList = array();
 		}
 
-		if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
+		try
 		{
-			return $_command->queryAll( true, $parameterList );
+			if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
+			{
+				return $_command->queryAll( true, $parameterList );
+			}
+		}
+		catch ( Exception $_ex )
+		{
+			CPSLog::error( '_sqlAll', 'Exception: ' . $_ex->getMessage() );
+			return false;
 		}
 
 		return null;
@@ -1621,23 +1684,30 @@ class CPSHelperBase extends CHtml implements IPSBase
 			$parameterList = array();
 		}
 
-		$_resultList = null;
-
-		/** @var CDbConnection $_db */
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
+		try
 		{
-			if ( null !== ( $_rowList = $_db->createCommand( $sql )->query( $parameterList ) ) )
+			if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
 			{
-				$_resultList = array();
-
-				foreach ( $_rowList as $_row )
+				if ( null !== ( $_rowList = $_command->query( $parameterList ) ) )
 				{
-					$_resultList[] = current( $_row );
+					$_resultList = array();
+
+					foreach ( $_rowList as $_row )
+					{
+						$_resultList[] = current( $_row );
+					}
+
+					return $_resultList;
 				}
 			}
 		}
+		catch ( Exception $_ex )
+		{
+			CPSLog::error( '_sqlAllScalar', 'Exception: ' . $_ex->getMessage() );
+			return false;
+		}
 
-		return $_resultList;
+		return null;
 	}
 
 	/**
@@ -1656,13 +1726,17 @@ class CPSHelperBase extends CHtml implements IPSBase
 			$parameterList = array();
 		}
 
-		/** @var CDbConnection $_db */
-		if ( null !== ( $_db = self::nvl( $dbToUse, self::$_thisApp->getDb() ) ) )
+		try
 		{
-			if ( null !== ( $_value = $_db->createCommand( $sql )->queryScalar( $parameterList ) ) )
+			if ( null !== ( $_command = self::_sql( $sql, $dbToUse ) ) )
 			{
-				return $_value;
+				return $_command->queryScalar( $parameterList );
 			}
+		}
+		catch ( Exception $_ex )
+		{
+			CPSLog::error( '_sqlScalar', 'Exception: ' . $_ex->getMessage() );
+			return false;
 		}
 
 		return null;

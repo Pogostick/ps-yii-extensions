@@ -91,6 +91,11 @@ class CPSLog implements IPSBase
 		if ( null === $category )
 			$category = self::_getCallingMethod();
 
+		if ( strlen( $category ) > 35 )
+		{
+			$category = substr( $category, -35 );
+		}
+
 		//	Get the indent, if any
 		$_unindent = ( 0 > ( $_newIndent = self::_processMessage( $message ) ) );
 
