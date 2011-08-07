@@ -269,8 +269,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns an analog to Java System.currentTimeMillis()
-	 *
-	 * @return integer
+	 * @return float
 	 */
 	public static function currentTimeMillis()
 	{
