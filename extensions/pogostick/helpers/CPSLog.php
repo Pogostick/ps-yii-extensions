@@ -169,7 +169,11 @@ class CPSLog implements IPSBase
 
 		if ( null === $category )
 		{
+<<<<<<< HEAD
 			$category = self::_getCallingMethod();
+=======
+			$category = substr( $category, -35 );
+>>>>>>> 0548b5c3fe5263c92e34dc18b8135a132e839eba
 		}
 
 		$category = substr( $category, -self::$_categoryWindowWidth );
