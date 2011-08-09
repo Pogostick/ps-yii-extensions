@@ -1747,7 +1747,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function isCLI()
 	{
-		return ( 'cli' == php_sapi_name() && empty( $_SERVER['REMOTE_ADDR'] ) );
+		return ( 'cli' == php_sapi_name() );
 	}
 
 	/**
