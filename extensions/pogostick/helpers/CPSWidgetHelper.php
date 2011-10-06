@@ -1681,18 +1681,41 @@ HTML;
 
 		if ( $_content !== null )
 		{
-			if ( ! $_iconClass )
-				$_sIcon = ( ! $_bNoIcon ) ? '<span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>' : null;
+			if ( !$_iconClass )
+			{
+				$_sIcon = ( !$_bNoIcon )
+					?
+					'<span class="ui-icon ui-icon-alert" style="float: left; margin-top: 3px; margin-left: 0.5em; margin-right: 6px;"></span>'
+					:
+					null;
+			}
 			else
-				$_sIcon = '<span class="' . $_iconClass . '" style="float: left; margin-right: .3em;"></span>';
+			{
+				$_sIcon = '<span class="' . $_iconClass . '" style="float: left; margin-top: 0.5em; margin-left: 0.5em; margin-right: 6px;
+				"></span>';
+			}
 
-			if ( null === $sHeader ) $sHeader = self::tag( $_headerTag, array(), Yii::t( 'yii', 'Please fix the following input errors:' ) );
+			if ( null === $sHeader )
+			{
+				$sHeader = self::tag(
+					$_headerTag, array( 'style' => 'font-style: italic; font-weight: bold;' ),
+					Yii::t( 'yii', 'Please fix the following input errors:' )
+				);
+			}
 
 			//	Different class for single errors perhaps?
-			if ( $_errorCount == 1 ) $_errorListClass = $_singleErrorListClass;
+			if ( $_errorCount == 1 )
+				$_errorListClass = $_singleErrorListClass;
 
 			$htmlOptions['class'] = PS::o( $htmlOptions, 'class', self::$errorSummaryCss, true );
-			return self::tag( 'div', $htmlOptions, $_sIcon . $sHeader . self::tag( 'ul', array( 'class' => $_errorListClass ), $_content ) ) . $sFooter;
+			return self::tag(
+				'div', $htmlOptions, $_sIcon . $sHeader . self::tag(
+				'ul', array(
+						   'class' => $_errorListClass,
+						   'style' => 'margin-left:25px; margin-top:5px'
+					  ), $_content
+			)
+			) . $sFooter;
 		}
 	}
 
