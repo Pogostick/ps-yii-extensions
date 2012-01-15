@@ -29,46 +29,25 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @const int Standard output formats
 	 */
 	const
-		OF_JSON = 0,
-		OF_HTTP = 1,
-		OF_ASSOC_ARRAY = 2,
-		OF_XML = 3,
-		OF_RAW = 4
-	;
+		OF_JSON = 0, OF_HTTP = 1, OF_ASSOC_ARRAY = 2, OF_XML = 3, OF_RAW = 4;
 
 	/**
 	 * @const int Pager locations
 	 */
 	const
-		PL_TOP_LEFT = 0,
-		PL_TOP_RIGHT = 1,
-		PL_BOTTOM_LEFT = 2,
-		PL_BOTTOM_RIGHT = 3;
+		PL_TOP_LEFT = 0, PL_TOP_RIGHT = 1, PL_BOTTOM_LEFT = 2, PL_BOTTOM_RIGHT = 3;
 
 	/***
 	 * @const int Predefined action types for CPSForm
 	 */
 	const
-		ACTION_NONE = 0,
-		ACTION_CREATE = 1,
-		ACTION_VIEW = 2,
-		ACTION_EDIT = 3,
-		ACTION_SAVE = 4,
-		ACTION_DELETE = 5,
-		ACTION_ADMIN = 6,
-		ACTION_LOCK = 7,
-		ACTION_UNLOCK = 8
-	;
+		ACTION_NONE = 0, ACTION_CREATE = 1, ACTION_VIEW = 2, ACTION_EDIT = 3, ACTION_SAVE = 4, ACTION_DELETE = 5, ACTION_ADMIN = 6, ACTION_LOCK = 7, ACTION_UNLOCK = 8;
 
 	/**
 	 * @const int Add your own in between 4 and 997...
 	 */
 	const
-		ACTION_PREVIEW = 996,
-		ACTION_RETURN = 997,
-		ACTION_CANCEL = 998,
-		ACTION_GENERIC = 999
-	;
+		ACTION_PREVIEW = 996, ACTION_RETURN = 997, ACTION_CANCEL = 998, ACTION_GENERIC = 999;
 
 	//********************************************************************************
 	//* Private Members
@@ -76,36 +55,42 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Cache the current app for speed
+	 *
 	 * @var CWebApplication $thisApp
 	 */
 	protected static $_thisApp = null;
 
 	/**
 	 * Cache the current request
+	 *
 	 * @var CHttpRequest $thisRequest
 	 */
 	protected static $_thisRequest = null;
 
 	/**
 	 * Cache the client script object for speed
+	 *
 	 * @var CClientScript $clientScript
 	 */
 	protected static $_clientScript = null;
 
 	/**
 	 * Cache the user object for speed
+	 *
 	 * @var CWebUser $thisUser
 	 */
 	protected static $_thisUser = null;
 
 	/**
 	 * Cache the current controller for speed
+	 *
 	 * @var CController $thisController
 	 */
 	protected static $_thisController = null;
 
 	/**
 	 * Cache the application parameters for speed
+	 *
 	 * @var CAttributeCollection $appParameters
 	 */
 	protected static $_appParameters = null;
@@ -120,6 +105,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * An array of class names to search in for missing methods
+	 *
 	 * @var array $classPath
 	 */
 	protected static $_classPath = array();
@@ -197,7 +183,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	}
 
 	/**
-	 * Creates the internal name of a component/widget. Use (@link setInternalName) to change.
+	 * Creates the internal name of a component/widget. Use (
+	 *
+	 * @link setInternalName) to change.
 	 * @param $component \IPSComponent
 	 * @return \IPSComponent
 	 */
@@ -269,6 +257,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns an analog to Java System.currentTimeMillis()
+	 *
 	 * @return float
 	 */
 	public static function currentTimeMillis()
@@ -293,6 +282,64 @@ class CPSHelperBase extends CHtml implements IPSBase
 	}
 
 	/**
+	 * Retrieves an option from the given array. $defaultValue is set and returned if $key is not 'set'.
+	 * Optionally will unset option in array.
+	 *
+	 * @param array $options
+	 * @param string $key
+	 * @param mixed|null $defaultValue
+	 * @param boolean $unsetValue
+	 * @return mixed
+	 * @see CPSHelperBase::getOption
+	 */
+	public static function o( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+	{
+		//	Set the default value
+		$_newValue = $defaultValue;
+
+		//	Get array value if it exists
+		if ( is_array( $options ) )
+		{
+			if ( isset( $options[$key] ) )
+			{
+				$_newValue = $options[$key];
+
+				if ( $unsetValue )
+				{
+					unset( $options[$key] );
+				}
+			}
+
+			//	Set it in the array if not an unsetter...
+			if ( !$unsetValue )
+			{
+				$options[$key] = $_newValue;
+			}
+		}
+		//	Also now handle accessible object properties
+		else if ( is_object( $options ) )
+		{
+			if ( property_exists( $options, $key ) || isset( $options->{$key} ) )
+			{
+				$_newValue = $options->{$key};
+
+				if ( $unsetValue )
+				{
+					unset( $options->{$key} );
+				}
+			}
+
+			if ( !$unsetValue )
+			{
+				$options->{$key} = $_newValue;
+			}
+		}
+
+		//	Return...
+		return $_newValue;
+	}
+
+	/**
 	 * Alias for {@link CPSHelperBase::getOption)
 	 *
 	 * @param array $optionList
@@ -304,8 +351,9 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @access public
 	 * @static
 	 * @see CPSHelperBase::getOption
+	 * @deprecated
 	 */
-	public static function o( &$optionList = array(), $key, $defaultValue = null, $unsetValue = false )
+	public static function _o( &$optionList = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
 		if ( !is_array( $optionList ) || empty( $optionList ) )
 		{
@@ -367,14 +415,38 @@ class CPSHelperBase extends CHtml implements IPSBase
 	}
 
 	/**
+	 * Sets an value in the given array at key.
+	 *
+	 * @param array|object $options
+	 * @param string $key
+	 * @param mixed|null $value
+	 * @return mixed The new value of the key
+	 */
+	public static function so( &$options = array(), $key, $value = null )
+	{
+		if ( is_array( $options ) )
+		{
+			return $options[$key] = $value;
+		}
+		else if ( is_object( $options ) )
+		{
+			return $options->$key = $value;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Sets an option in the given array. Alias of {@link CPSHelperBase::setOption}
+	 *
 	 * @param array $optionList
 	 * @param string $key
 	 * @param mixed $value
 	 * @return mixed The new value of the key
 	 * @static
+	 * @deprecated
 	 */
-	public static function so( array &$optionList, $key, $value = null )
+	public static function _so( array &$optionList, $key, $value = null )
 	{
 		return $optionList[$key] = $value;
 	}
@@ -388,7 +460,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return mixed The new value of the key
 	 * @static
 	 */
-	public static function setOption( array &$optionList, $key, $value = null )
+	public static function setOption( &$optionList = array(), $key, $value = null )
 	{
 		return self::so( $optionList, $key, $value );
 	}
@@ -401,7 +473,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return mixed The last value of the key
 	 * @static
 	 */
-	public static function uo( array &$optionList, $key )
+	public static function uo( &$optionList = array(), $key )
 	{
 		return self::o( $optionList, $key, null, true );
 	}
@@ -414,7 +486,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * @return mixed The last value of the key
 	 * @static
 	 */
-	public static function unsetOption( array &$optionList, $key )
+	public static function unsetOption( &$optionList = array(), $key )
 	{
 		return self::uo( $optionList, $key );
 	}
@@ -422,6 +494,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * Merges an array without overwriting. Accepts multiple array arguments
 	 * If an index exists in the target array, it is appended to the value.
+	 *
 	 * @return array
 	 */
 	public static function smart_array_merge()
@@ -484,7 +557,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 			curl_setopt( $_oCurl, CURLOPT_USERAGENT, $_sAgent );
 			curl_setopt( $_oCurl, CURLOPT_TIMEOUT, 60 );
 			curl_setopt( $_oCurl, CURLOPT_FOLLOWLOCATION, true );
-			curl_setopt( $_oCurl, CURLOPT_URL, $url . ( 'GET' == $method ? ( !empty( $_payload ) ? "?" . trim( $_payload, '&' ) : '' ) : '' ) );
+			curl_setopt( $_oCurl, CURLOPT_URL,
+				$url . ( 'GET' == $method ? ( !empty( $_payload ) ? "?" . trim( $_payload, '&' ) : '' ) : '' ) );
 
 			//	If this is a post, we have to put the post data in another field...
 			if ( 'GET' != $method && 'DELETE' != $method )
@@ -574,9 +648,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 */
 	public static function wrappedLink( $sText, $url = '#', $sWrapperId = null, $arHtmlOptions = array(), $sClass = null, $bUseDiv = false )
 	{
-		return ( '<' . ( $bUseDiv ? 'div' : 'span' ) . ( null != $sWrapperId ? ' id="' . $sWrapperId . '"' : '' ) .
-				 ( null != $sClass ? ' class="' . $sClass . '"' : '' ) . '>' . CHtml::link( $sText, $url, $arHtmlOptions ) . '</' .
-				 ( $bUseDiv ? 'div' : 'span' ) . '>' );
+		return ( '<' . ( $bUseDiv ? 'div' : 'span' ) . ( null != $sWrapperId ? ' id="' . $sWrapperId . '"' : '' ) . ( null != $sClass ? ' class="' . $sClass . '"' : '' ) . '>' . CHtml::link( $sText,
+			$url, $arHtmlOptions ) . '</' . ( $bUseDiv ? 'div' : 'span' ) . '>' );
 	}
 
 	/**
@@ -644,13 +717,13 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns the Url of the currently loaded page.
+	 *
 	 * @return string
 	 */
 	public static function getCurrentPageUrl()
 	{
 		$_bSSL = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' );
-		return 'http' . ( ( $_bSSL ) ? 's' : '' ) . '://' . $_SERVER["SERVER_NAME"] .
-			   ( ( $_SERVER["SERVER_PORT"] != "80" ) ? ":" . $_SERVER["SERVER_PORT"] : '' ) . $_SERVER["REQUEST_URI"];
+		return 'http' . ( ( $_bSSL ) ? 's' : '' ) . '://' . $_SERVER["SERVER_NAME"] . ( ( $_SERVER["SERVER_PORT"] != "80" ) ? ":" . $_SERVER["SERVER_PORT"] : '' ) . $_SERVER["REQUEST_URI"];
 	}
 
 	/**
@@ -672,7 +745,13 @@ class CPSHelperBase extends CHtml implements IPSBase
 		{
 			throw new CPSException( '"$iSize" parameter is out of bounds. Must be between 1 and 512.' );
 		}
-		if ( !in_array( $sRating, array( 'g', 'pg', 'r', 'x' ) ) )
+		if ( !in_array( $sRating, array(
+				'g',
+				'pg',
+				'r',
+				'x'
+			) )
+		)
 		{
 			throw new CPSException( '"$sRating" parameter must be either "G", "PG", "R", or "X".' );
 		}
@@ -716,6 +795,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Takes the arguments and makes a file path out of them.
+	 *
 	 * @return string
 	 */
 	public static function makePath()
@@ -726,6 +806,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Multidimensional array search.
+	 *
 	 * @param array $arHaystack
 	 * @param string|int $arNeedle
 	 * @param array $arResult
@@ -808,6 +889,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Shortcut method to pull a key out of $_SERVER
+	 *
 	 * @static
 	 * @param string $key
 	 * @param mixed $defaultValue
@@ -824,6 +906,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Shorthand version of Yii::app()
+	 *
 	 * @return CApplication|CWebApplication|CConsoleApplication the application singleton, null if the singleton has not been created yet.
 	 */
 	public static function _a()
@@ -833,6 +916,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Convenience method returns the current app name
+	 *
 	 * @see CWebApplication::name
 	 * @see CHtml::encode
 	 * @param $notEncoded bool
@@ -845,6 +929,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Convenience method returns the current app name
+	 *
 	 * @see CWebApplication::name
 	 * @see CHtml::encode
 	 * @param $notEncoded bool
@@ -857,6 +942,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Convenience method returns the current page title
+	 *
 	 * @see CController::pageTitle
 	 * @see CHtml::encode
 	 * @param $notEncoded bool
@@ -869,6 +955,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Convenience method returns the current page title
+	 *
 	 * @see CController::pageTitle
 	 * @see CHtml::encode
 	 * @param $notEncoded bool
@@ -881,6 +968,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Convenience method Returns the base url of the current app
+	 *
 	 * @see CWebApplication::getBaseUrl
 	 * @see CHttpRequest::getBaseUrl
 	 * @param $absolute bool
@@ -893,6 +981,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Convenience method Returns the base url of the current app
+	 *
 	 * @see CWebApplication::getBaseUrl
 	 * @see CHttpRequest::getBaseUrl
 	 * @param $absolute bool
@@ -905,6 +994,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Convenience method Returns the base path of the current app
+	 *
 	 * @see CWebApplication::getBasePath
 	 * @see CHttpRequest::getBasePath
 	 * @return string
@@ -916,6 +1006,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Convenience method Returns the base path of the current app
+	 *
 	 * @see CWebApplication::getBasePath
 	 * @see CHttpRequest::getBasePath
 	 * @return string
@@ -927,6 +1018,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/***
 	 * Retrieves and caches the Yii ClientScript object
+	 *
 	 * @return CClientScript
 	 * @access public
 	 * @static
@@ -938,6 +1030,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns the current clientScript object. Caches for subsequent calls...
+	 *
 	 * @return CClientScript
 	 * @access public
 	 * @static
@@ -950,6 +1043,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * Terminates the application.
 	 * This method replaces PHP's exit() function by calling {@link onEndRequest} before exiting.
+	 *
 	 * @param integer $status exit status (value 0 means normal exit while other values mean abnormal exit).
 	 * @param boolean $exit whether to exit the current request. This parameter has been available since version 1.1.5. It defaults to true,
 	 * meaning the PHP's exit() function will be called at the end of this method.
@@ -1028,7 +1122,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 		//	Need external library?
 		foreach ( $urlList as $_url )
 		{
-			if ( $_url[0] != '/' && $fromPublished )
+			if ( isset( $_url, $_url[0] ) && $_url[0] != '/' && $fromPublished )
 			{
 				$_url = $_prefix . $_url;
 			}
@@ -1090,6 +1184,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Registers a CSS file relative to the current layout directory
+	 *
 	 * @param array|string $urlList
 	 * @param string $media
 	 * @param bool $fromPublished
@@ -1193,7 +1288,8 @@ class CPSHelperBase extends CHtml implements IPSBase
 	{
 		if ( !self::$_clientScript->isScriptRegistered( $sId ) )
 		{
-			self::$_clientScript->registerScript( self::nvl( $sId, CPSWidgetHelper::getWidgetId() ), $sScript, $ePosition );
+			self::$_clientScript->registerScript( self::nvl( $sId, CPSWidgetHelper::getWidgetId() ), $sScript,
+				$ePosition );
 		}
 
 		return self::$_clientScript;
@@ -1232,6 +1328,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Creates a relative URL based on the given controller and action information.
+	 *
 	 * @param string the URL route. This should be in the format of 'ControllerID/ActionID'.
 	 * @param array additional GET parameters (name=>value). Both the name and value will be URL-encoded.
 	 * @param string the token separating name-value pairs in the URL.
@@ -1244,6 +1341,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns the current request. Equivalent of {@link CApplication::getRequest}
+	 *
 	 * @see CApplication::getRequest
 	 * @return CHttpRequest
 	 */
@@ -1254,6 +1352,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns the current request. Equivalent of {@link CApplication::getRequest}
+	 *
 	 * @see CApplication::getRequest
 	 * @return CHttpRequest
 	 */
@@ -1264,6 +1363,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns the current user. Equivalent of {@link CWebApplication::getUser}
+	 *
 	 * @see CWebApplication::getUser
 	 * @return CUserIdentity
 	 */
@@ -1274,6 +1374,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns the current user. Equivalent of {@link CWebApplication::getUser}
+	 *
 	 * @see CWebApplication::getUser
 	 * @return CWebUser
 	 */
@@ -1284,6 +1385,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns the currently logged in user
+	 *
 	 * @return CWebUser
 	 */
 	public static function getCurrentUser()
@@ -1293,6 +1395,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns the currently logged in user
+	 *
 	 * @return CWebUser
 	 */
 	public static function _gcu()
@@ -1302,6 +1405,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns boolean indicating if user is logged in or not
+	 *
 	 * @return boolean
 	 */
 	public static function isGuest()
@@ -1311,6 +1415,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns boolean indicating if user is logged in or not
+	 *
 	 * @return boolean
 	 */
 	public static function _ig()
@@ -1320,6 +1425,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns application parameters or default value if not found
+	 *
 	 * @see CModule::getParams
 	 * @see CModule::setParams
 	 * @return mixed
@@ -1331,6 +1437,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns application parameters or default value if not found
+	 *
 	 * @see CModule::getParams
 	 * @see CModule::setParams
 	 * @return mixed
@@ -1394,6 +1501,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * be published recursively. Note, in this case the method only checks the
 	 * existence of the target directory to avoid repetitive copying.</li>
 	 * </ul>
+	 *
 	 * @param string the asset (file or directory) to be published
 	 * @param boolean whether the published directory should be named as the hashed basename.
 	 * If false, the name will be the hashed dirname of the path being published.
@@ -1447,6 +1555,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Alternative to {@link CWebUser::getState} that takes an array of key parts and assembles them into a hashed key
+	 *
 	 * @param array Array of key parts
 	 * @param mixed default value
 	 * @return mixed the value of the variable. If it doesn't exist in the session, the provided default value will be returned
@@ -1462,6 +1571,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * Returns a flash message.
 	 * A flash message is available only in the current and the next requests.
+	 *
 	 * @param string $key key identifying the flash message
 	 * @param mixed $defaultValue value to be returned if the flash message is not available.
 	 * @param boolean $delete whether to delete this flash message after accessing it.
@@ -1498,6 +1608,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Alternative to {@link CWebUser::setState} that takes an array of key parts and assembles them into a hashed key
+	 *
 	 * @param array array of key parts
 	 * @param mixed variable value
 	 * @param mixed default value
@@ -1513,6 +1624,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * Stores a flash message.
 	 * A flash message is available only in the current and the next requests.
+	 *
 	 * @param string $key key identifying the flash message
 	 * @param mixed $value flash message
 	 * @param mixed $defaultValue if this value is the same as the flash message, the flash message
@@ -1539,6 +1651,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * <li>trace - the call stack of the error</li>
 	 * <li>source - the context source code where the error occurs</li>
 	 * </ul>
+	 *
 	 * @return array the error details. Null if there is no error.
 	 */
 	public static function _ge()
@@ -1637,6 +1750,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Executes the given sql statement and returns all results
+	 *
 	 * @param string $sql
 	 * @param array $parameterList List of parameters for call
 	 * @param CDbConnection $dbToUse
@@ -1669,6 +1783,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Executes the given sql statement and returns the first column of all results in an array
+	 *
 	 * @param string $sql
 	 * @param array $parameterList List of parameters for call
 	 * @param CDbConnection $dbToUse
@@ -1711,6 +1826,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Returns the first column of the first row or null
+	 *
 	 * @param string $sql
 	 * @param array $parameterList List of parameters for call
 	 * @param CDbConnection $dbToUse
@@ -1743,6 +1859,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Determine if PHP is running CLI mode or not
+	 *
 	 * @return boolean True if currently running in CLI
 	 */
 	public static function isCLI()
@@ -1753,6 +1870,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	/**
 	 * Create a path alias.
 	 * Note, this method neither checks the existence of the path nor normalizes the path.
+	 *
 	 * @param string $alias alias to the path
 	 * @param string $path the path corresponding to the alias. If this is null, the corresponding
 	 * path alias will be removed.
@@ -1766,6 +1884,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	 * Translates an alias into a file path.
 	 * Note, this method does not ensure the existence of the resulting file path.
 	 * It only checks if the root alias is valid or not.
+	 *
 	 * @param string $alias alias (e.g. system.web.CController)
 	 * @param string $url Additional url combine with alias
 	 * @return mixed file path corresponding to the alias, false if the alias is invalid.
@@ -1853,15 +1972,11 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 				if ( 'desc' == strtolower( $_order ) )
 				{
-					$_evalCode .=
-						( !$_first ? 'if ( ! $_result ) ' : null ) . '$_result = strnatcmp( $b["' . $_column . '"], $a["' . $_column . '"]);' .
-						PHP_EOL;
+					$_evalCode .= ( !$_first ? 'if ( ! $_result ) ' : null ) . '$_result = strnatcmp( $b["' . $_column . '"], $a["' . $_column . '"]);' . PHP_EOL;
 				}
 				else
 				{
-					$_evalCode .=
-						( !$_first ? 'if ( ! $_result ) ' : null ) . '$_result = strnatcmp( $a["' . $_column . '"], $b["' . $_column . '"]);' .
-						PHP_EOL;
+					$_evalCode .= ( !$_first ? 'if ( ! $_result ) ' : null ) . '$_result = strnatcmp( $a["' . $_column . '"], $b["' . $_column . '"]);' . PHP_EOL;
 				}
 
 				$_first = false;
@@ -1877,6 +1992,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Sorts an array by a single column
+	 *
 	 * @static
 	 * @param array $sourceArray
 	 * @param string $column
@@ -1901,6 +2017,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Filters an int optionally returns null
+	 *
 	 * @param mixed $value
 	 * @param boolean $nullIfZero
 	 * @param integer $min
@@ -1934,6 +2051,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Filters a string, returns default value if null
+	 *
 	 * @param mixed $value
 	 * @param null $defaultValue
 	 * @param int $filterFlags
@@ -1979,6 +2097,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Serializer that can handle SimpleXmlElement objects
+	 *
 	 * @param mixed $value
 	 * @return mixed
 	 */
@@ -2006,6 +2125,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Unserializer that can handle SimpleXmlElement objects
+	 *
 	 * @param mixed $value
 	 * @return mixed
 	 */
@@ -2032,6 +2152,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 
 	/**
 	 * Tests if a value needs unserialization
+	 *
 	 * @param mixed $value
 	 * @return boolean
 	 */

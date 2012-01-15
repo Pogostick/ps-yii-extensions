@@ -78,10 +78,14 @@ class CPSTwitterApi extends CPSOAuthComponent
 
 		//	Set current twitter api url
 		if ( ! $this->apiBaseUrl )
-			$this->setApiBaseUrl( 'http://twitter.com' );
-		
+			$this->setApiBaseUrl( 'https://api.twitter.com' );
+
 		//	Create the base array
 		$this->setRequestMap( array() );
+
+		//*************************************************************************
+		//* Events
+		//*************************************************************************
 
 		//********************************************************************************
 		//* Statuses API
@@ -875,6 +879,15 @@ class CPSTwitterApi extends CPSOAuthComponent
 	{
 		$this->apiToUse = self::SEARCH_API;
 		return $this->makeRequest( '/', array( 'q' => $sTerm, 'callback' => $sCallback, 'lang' => $sLang, 'rpp' => $iRPP, 'page' => $iPage, 'since_id' => $sSinceId, 'geogode' => $sGeocode, 'show_user' => $bShowUser ) );
+	}
+
+	//*************************************************************************
+	//*
+	//*************************************************************************
+
+	public function onUserAuthorized( $event )
+	{
+		return true;
 	}
 
 	//********************************************************************************

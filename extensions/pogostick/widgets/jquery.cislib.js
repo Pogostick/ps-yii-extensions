@@ -5,8 +5,8 @@
  *
  * CIS jQuery plugin/uility library for front-end applications
  *
- * Copyright (c) 2010 Silverpop Systems, Inc. <cis@silverpop.com>
- * @author Jerry Ablan <jablan@silverpop.com>
+ * Copyright (c) 2010 Silverpop Systems, Inc. <cis@jablan@pogostick.com>
+ * @author Jerry Ablan <jablan@jablan@pogostick.com>
  * @package sp.cis
  * @subpackage js
  * @version 1.0.0

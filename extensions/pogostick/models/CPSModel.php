@@ -214,7 +214,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	public function __construct( $_scenario = 'insert' )
 	{
 		parent::__construct( $_scenario );
-		$this->_modelClass = ( version_compare( PHP_VERSION, '5.3.0' ) > 0 ) ? get_called_class() : get_class( $this );
+		$this->_modelClass = get_class( $this );
 	}
 
 	/**
