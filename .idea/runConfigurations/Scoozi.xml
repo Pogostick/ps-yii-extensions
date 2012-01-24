@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Scoozi" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application" server_name="Scoozi" start_url="/lib/psYiiExtensions/extensions/examples/tests">
+    <RunnerSettings RunnerId="PhpWebAppDebugRunner" />
+    <ConfigurationWrapper RunnerId="PhpWebAppDebugRunner" />
+    <method />
+  </configuration>
+</component>

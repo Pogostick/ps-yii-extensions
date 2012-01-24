@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="psYiiExtensions on scoozi" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server" editBeforeRun="true" debug_server_name="Scoozi" scope="Directory" path="$PROJECT_DIR$" workingDirectory="" server_id="b45e5d27-e58b-4b9c-8619-9fe158da5695" server_name="scoozi">
+    <RunnerSettings RunnerId="PhpUnitRemoteDebugRunner" />
+    <ConfigurationWrapper RunnerId="PhpUnitRemoteDebugRunner" />
+    <method />
+  </configuration>
+</component>
