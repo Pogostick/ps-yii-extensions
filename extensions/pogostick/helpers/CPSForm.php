@@ -76,13 +76,13 @@ class CPSForm implements IPSBase
 		if ( null === PS::_gs( 'psForm-flash-html' ) && ! PS::o( $arOptions, 'noFlash', false, true ) )
 		{
 			$_flashClass = PS::o( $options, 'flashSuccessClass', 'operation-result-success' );
-			
+
 			if ( null === ( $_message = PS::_gf( 'success' ) ) )
 			{
 				if ( null !== ( $_message = PS::_gf( 'failure' ) ) )
 					$_flashClass = PS::o( $options, 'flashFailureClass', 'operation-result-failure' );
 			}
-			
+
 			$_spanId = PS::o( $options, 'flashSpanId', 'operation-result', true );
 			PS::_ss( 'psForm-flash-html', PS::tag( 'span', array( 'id' => $_spanId, 'class' => $_flashClass ), $_message ) );
 
@@ -98,7 +98,7 @@ SCRIPT;
 
 		//	Let's begin...
 		$_sOut = PS::beginFormEx( $arOptions );
-		
+
 		//	Error summary wanted?
 		if ( $_oModel && $_bErrorSummary )
 			$_sOut .= PS::errorSummary( $_oModel, $_errorSummaryHeader, null, $_errorSummaryOptions );
@@ -194,7 +194,7 @@ SCRIPT;
 
 		//	Ok, done building form...
 		$_sOut .= PS::endForm();
-		
+
 		//	Does user want data returned?
 		if ( $_bReturnString ) return $_sOut;
 
@@ -203,34 +203,31 @@ SCRIPT;
 	}
 
 	/**
-	* Creates a standard form header
-	*
-	* Pass in menu item array as follows:
-	*
-	* array( 'id' => array( 'label', 'url', 'icon' ), ... )
-	*
-	* Each item is made into a jQuery UI button with an optional jQUI icon.
-	*
-	* Example:
-	*
-	* 	echo CPSForm::formHeader( 'Site Manager',
-	*		array( 'new' =>
-	*			array(
-	*				'label' => 'New Site',
-	*				'url' => array( 'create' ),
-	* 				'formId' => 'id for form' // optional
-	*				'icon' => 'circle-plus',
-	*			)
-	*		)
-	* 	);
-	*
-	* @param string $sTitle
-	* @param array $arMenuItems
-	* @param string $sDivClass
-	* @param boolean $bShowFlashDiv If true, will output a standard ps-flash-display div
-	* @return string
-	*
-	*/
+	 * Creates a standard form header
+	 *
+	 * Pass in menu item array as follows:
+	 *
+	 * array( 'id' => array( 'label', 'url', 'icon' ), ... )
+	 *
+	 * Each item is made into a jQuery UI button with an optional jQUI icon.
+	 *
+	 * Example:
+	 *
+	 *	 echo CPSForm::formHeader( 'Site Manager',
+	 *		array( 'new' =>
+	 *			array(
+	 *				'label' => 'New Site',
+	 *				'url' => array( 'create' ),
+	 *				 'formId' => 'id for form' // optional
+	 *				'icon' => 'circle-plus',
+	 *			)
+	 *		)
+	 *	 );
+	 *
+	 * @param string $sTitle
+	 * @param array $arOptions
+	 * @return string
+	 */
 	public static function formHeaderEx( $sTitle, $arOptions = array() )
 	{
 		$arMenuItems = PS::o( $arOptions, 'menuItems', array() );
@@ -341,7 +338,10 @@ HTML;
 
 	/**
 	 * Send in an array of standard actions and they will be converted to spiffy action buttons.
+	 * @param $sItemName
 	 * @param array $arWhich
+	 * @param null $sAdminName
+	 * @param null $sAdminAction
 	 * @return array
 	 */
 	public static function createMenuButtons( $sItemName, $arWhich = array(), $sAdminName = null, $sAdminAction = null )
