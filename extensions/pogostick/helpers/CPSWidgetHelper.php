@@ -38,7 +38,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	 * A prefix for generated ids
 	 */
 	const ID_PREFIX = 'pye';
-	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget';
+	const STD_JQUI_FORM_CONTAINER_CLASS = 'setViewNavigationOptionsui-edit-container ui-widget';
 	const STD_FORM_CONTAINER_CLASS = 'ps-edit-form';
 	const STD_BOOTSTRAP_FORM_CONTAINER_CLASS = 'bootstrap-edit-form';
 	const STD_BOOTSTRAP2_FORM_CONTAINER_CLASS = 'bootstrap2-edit-form';
@@ -595,6 +595,11 @@ class CPSWidgetHelper extends CPSHelperBase
 
 				$_arDivOpts['id'] = self::$m_sFormFieldContainerPrefix . '_' . PS::nvl( PS::o( $_arDivOpts, 'id' ), $arOptions['id'] );
 				$_arDivOpts['class'] = PS::addClass( $_divClass, PS::$m_sFormFieldContainerClass . ' ' . PS::o( $_arDivOpts, 'class' ) );
+
+                if ( self::UI_BOOTSTRAP == self::$_uiStyle && $model->getError( $attributeName ) )
+                {
+                    $_arDivOpts['class'] = PS::addClass( $_arDivOpts['class'], 'error' );
+                }
 			}
 		}
 
@@ -1961,7 +1966,16 @@ HTML;
 		$_errorListClass = PS::o( $htmlOptions, 'errorListClass', null, true );
 		$_singleErrorListClass = PS::o( $htmlOptions, 'singleErrorListClass', $_errorListClass, true );
 
-		self::$errorSummaryCss = 'ps-error-summary ui-state-error';
+		if ( self::UI_BOOTSTRAP == PS::o( $htmlOptions, 'uiStyle', self::UI_JQUERY ) )
+		{
+			$_bootstrap = true;
+			self::$errorSummaryCss = 'alert alert-error fade in';
+		}
+		else
+		{
+			$_bootstrap = false;
+			self::$errorSummaryCss = 'ps-error-summary ui-state-error';
+		}
 
 		if ( !is_array( $_arModel ) )
 		{
@@ -1987,43 +2001,58 @@ HTML;
 
 		if ( $_content !== null )
 		{
-			if ( !$_iconClass )
+			if ( $_bootstrap )
 			{
-				$_sIcon = ( !$_bNoIcon )
-					?
-					'<span class="ui-icon ui-icon-alert" style="float: left; margin-top: 3px; margin-left: 0.5em; margin-right: 6px;"></span>'
-					:
-					null;
+				return <<<HTML
+<div class="alert alert-error" style="margin-top: 15px;">
+<a class="close" data-dismiss="alert" href="#">&times;</a>
+<h4 class="alert-heading">Please check for the following errors:</h4>
+<ul>{$_content}</ul>
+</div>
+HTML;
+
 			}
 			else
 			{
-				$_sIcon = '<span class="' . $_iconClass . '" style="float: left; margin-top: 0.5em; margin-left: 0.5em; margin-right: 6px;
+				if ( !$_iconClass )
+				{
+					$_sIcon = ( !$_bNoIcon )
+						?
+						'<span class="ui-icon ui-icon-alert" style="float: left; margin-top: 3px; margin-left: 0.5em; margin-right: 6px;"></span>'
+						:
+						null;
+				}
+				else
+				{
+					$_sIcon = '<span class="' . $_iconClass . '" style="float: left; margin-top: 0.5em; margin-left: 0.5em; margin-right: 6px;
 				"></span>';
-			}
+				}
 
-			if ( null === $sHeader )
-			{
-				$sHeader = self::tag(
-					$_headerTag, array( 'style' => 'font-style: italic; font-weight: bold;' ),
-					Yii::t( 'yii', 'Please fix the following input errors:' )
-				);
-			}
+				if ( null === $sHeader )
+				{
+					$sHeader = self::tag(
+						$_headerTag, array( 'style' => 'font-style: italic; font-weight: bold;' ),
+						Yii::t( 'yii', 'Please fix the following input errors:' )
+					);
+				}
 
-			//	Different class for single errors perhaps?
-			if ( $_errorCount == 1 )
-			{
-				$_errorListClass = $_singleErrorListClass;
-			}
+				//	Different class for single errors perhaps?
+				if ( $_errorCount == 1 )
+				{
+					$_errorListClass = $_singleErrorListClass;
+				}
 
-			$htmlOptions['class'] = PS::o( $htmlOptions, 'class', self::$errorSummaryCss, true );
-			return self::tag(
-				'div', $htmlOptions, $_sIcon . $sHeader . self::tag(
-				'ul', array(
-					'class' => $_errorListClass,
-					'style' => 'margin-left:25px; margin-top:5px'
-				), $_content
-			)
-			) . $sFooter;
+				$htmlOptions['class'] = PS::o( $htmlOptions, 'class', self::$errorSummaryCss, true );
+
+				return self::tag(
+					'div', $htmlOptions, $_sIcon . $sHeader . self::tag(
+					'ul', array(
+						'class' => $_errorListClass,
+						'style' => 'margin-left:25px; margin-top:5px'
+					), $_content
+				)
+				) . $sFooter;
+			}
 		}
 	}
 
