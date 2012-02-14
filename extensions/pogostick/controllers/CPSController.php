@@ -1089,10 +1089,11 @@ abstract class CPSController extends CController implements IPSBase
 			if ( $_flashText )
 			{
 				$_fader = <<<SCRIPT
-//notify('default',{title:'{$_flashTitle}',text:'{$_flashText}'});
-$('span.{$_flashClass}').fadeIn('500',function(){
-	$(this).delay(3000).fadeOut(3500);
-});
+notify('default',{title:'{$_flashTitle}',text:'{$_flashText}'});
+//
+//$('span.{$_flashClass}').fadeIn('500',function(){
+//	$(this).delay(3000).fadeOut(3500);
+//});
 SCRIPT;
 				PS::_rs( $_formId . '.' . $_spanId . '.fader', $_fader, CClientScript::POS_READY );
 			}
@@ -1222,8 +1223,6 @@ SCRIPT;
 		$_title = PS::o( $options, 'title', null, true );
 		$_subtitle = PS::o( $options, 'subtitle', null, true );
 
-		$_flash = PS::_gs( 'psForm-flash-html' );
-
 		//	Do some auto-page-setup...
 		if ( false !== ( $_header = PS::o( $options, 'header' ) ) )
 		{
@@ -1237,10 +1236,8 @@ SCRIPT;
 				if ( null !== ( $_headerIcon = PS::o( $options, 'headerIcon', null, true ) ) )
 				{
 					$_header =
-						PS::tag( 'div', array( 'class' => 'ps-form-header-title' ), $_flash .
+						PS::tag( 'div', array( 'class' => 'ps-form-header-title' ),
 							PS::tag( 'span', array(), PS::image( $_headerIcon ) ) . $_header );
-
-					PS::_ss( 'psForm-flash-html', $_flash = null );
 				}
 
 				$options['header'] = PS::tag( 'h1', array( 'class' => 'ui-generated-header' ), $_header );

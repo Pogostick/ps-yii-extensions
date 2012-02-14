@@ -4,9 +4,9 @@
     <connections />
   </component>
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$/../../frameworks/yii">
-      <excludeFolder url="file://$MODULE_DIR$/../../frameworks/yii/demos" />
-      <excludeFolder url="file://$MODULE_DIR$/../../frameworks/yii/requirements" />
+    <content url="file:///frameworks/yii">
+      <excludeFolder url="file:///frameworks/yii/demos" />
+      <excludeFolder url="file:///frameworks/yii/requirements" />
     </content>
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/nbproject" />
