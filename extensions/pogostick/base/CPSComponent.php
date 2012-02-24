@@ -14,12 +14,12 @@
  * It extends the base functionality of the Yii Framework without replacing
  * and core code.
  *
- * @package		psYiiExtensions
- * @subpackage	 base.components
+ * @package        psYiiExtensions
+ * @subpackage     base.components
  *
- * @author			Jerry Ablan <jablan@pogostick.com>
- * @version		SVN $Id: CPSComponent.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
- * @since			v1.0.0
+ * @author            Jerry Ablan <jablan@pogostick.com>
+ * @version        SVN $Id: CPSComponent.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
+ * @since            v1.0.0
  *
  * @property string $internalName The internal name of the component.
  * @property boolean $debugMode Enable trace-level debugging

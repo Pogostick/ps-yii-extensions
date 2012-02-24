@@ -96,7 +96,7 @@ class CPSHelperBase extends CHtml implements IPSBase
 	protected static $_appParameters = null;
 
 	/**
-	 * @return void
+	 * @return array
 	 */
 	public static function getParams()
 	{
