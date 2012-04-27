@@ -38,9 +38,15 @@ class CPSWidgetHelper extends CPSHelperBase
 	 * A prefix for generated ids
 	 */
 	const ID_PREFIX = 'pye';
+<<<<<<< HEAD
 	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget form';
+=======
+	const STD_JQUI_FORM_CONTAINER_CLASS = 'setViewNavigationOptionsui-edit-container ui-widget';
+>>>>>>> d86bde1bfd080a174148f922f8e23a015606c350
 	const STD_FORM_CONTAINER_CLASS = 'ps-edit-form';
 	const STD_BOOTSTRAP_FORM_CONTAINER_CLASS = 'bootstrap-edit-form';
+	const STD_BOOTSTRAP2_FORM_CONTAINER_CLASS = 'bootstrap2-edit-form';
+	const STD_BOOTSTRAP2_FORM_CLASS = 'form-vertical';
 	const STD_FORM_CLASS = 'yiiForm';
 
 	/**
@@ -82,6 +88,8 @@ class CPSWidgetHelper extends CPSHelperBase
 	const	UI_DEFAULT = 0;
 	const	UI_JQUERY = 1;
 	const	UI_BOOTSTRAP = 2;
+	const	UI_BOOTSTRAP1 = 2;
+	const	UI_BOOTSTRAP2 = 3;
 
 	/**
 	 * Available built-in drop-down lists
@@ -232,6 +240,11 @@ class CPSWidgetHelper extends CPSHelperBase
 	 * @var boolean
 	 */
 	protected static $m_bCssLoaded = false;
+
+	/**
+	 * @var int
+	 */
+	protected static $_uiStyle = self::UI_DEFAULT;
 
 	//********************************************************************************
 	//* Properties
@@ -465,7 +478,8 @@ class CPSWidgetHelper extends CPSHelperBase
 			$_output = PS::activeHiddenField( $model, $attributeName );
 			$_output .= PS::field( $inputFieldType, $model, $attributeName, $arOptions );
 		}
-		else {
+		else
+		{
 			if ( $inputFieldType == PS::MULTISELECT )
 			{
 				//	Another special dealio
@@ -574,21 +588,30 @@ class CPSWidgetHelper extends CPSHelperBase
 				}
 
 				//	Build our field
-				$_output .= $_prependHtml;
-				$_output .= ( null !== $_content ) ? $_content :
-					self::activeField( $inputFieldType, $model, $attributeName, $arOptions, $_widgetOptions, $_arData );
-				$_output .= $_sHtml;
+				$_markup =
+					( null !== $_content ) ? $_content :
+						self::activeField( $inputFieldType, $model, $attributeName, $arOptions, $_widgetOptions, $_arData );
+
+				//	Wrap bootstrap controls in a div
+				$_controls = PS::in( self::getUiStyle(), self::UI_BOOTSTRAP, self::UI_BOOTSTRAP1, self::UI_BOOTSTRAP2 );
+
+				$_output .= $_prependHtml . ( $_controls ? '<div class="controls">' : null ) . $_markup . $_sHtml . ( $_controls ? '</div>' : null );
 
 				$_arDivOpts['id'] = self::$m_sFormFieldContainerPrefix . '_' . PS::nvl( PS::o( $_arDivOpts, 'id' ), $arOptions['id'] );
 				$_arDivOpts['class'] = PS::addClass( $_divClass, PS::$m_sFormFieldContainerClass . ' ' . PS::o( $_arDivOpts, 'class' ) );
+
+                if ( self::UI_BOOTSTRAP == self::$_uiStyle && $model->getError( $attributeName ) )
+                {
+                    $_arDivOpts['class'] = PS::addClass( $_arDivOpts['class'], 'error' );
+                }
 			}
 		}
 
 		//	Any hints?
 		if ( $_sHint )
-				{
-					$_sHint = str_ireplace( '%%HINT%%', $_sHint, self::$m_sHintTemplate );
-				}
+		{
+			$_sHint = str_ireplace( '%%HINT%%', $_sHint, self::$m_sHintTemplate );
+		}
 
 		return PS::tag( self::$m_sFormFieldContainer, $_arDivOpts, $_output . $_sHint );
 	}
@@ -644,9 +667,13 @@ class CPSWidgetHelper extends CPSHelperBase
 	{
 		//	Auto set id and name if they aren't already...
 		if ( !isset( $htmlOptions['name'] ) )
+		{
 			$htmlOptions['name'] = ( null != $model ) ? self::resolveName( $model, $attributeName ) : $attributeName;
+		}
 		if ( !isset( $htmlOptions['id'] ) )
+		{
 			$htmlOptions['id'] = self::getIdByName( $htmlOptions['name'] );
+		}
 
 		//	Save for callers...
 		self::$m_sLastFieldName = $htmlOptions['name'];
@@ -654,7 +681,9 @@ class CPSWidgetHelper extends CPSHelperBase
 
 		//	Non-model field?
 		if ( null === $model )
+		{
 			return self::inactiveField( $inputFieldType, $attributeName, $htmlOptions, $widgetOptions, $listData );
+		}
 
 		//	Stuff to put after widget
 		$_beforeHtml = null;
@@ -668,7 +697,9 @@ class CPSWidgetHelper extends CPSHelperBase
 			$_isRequired = ( false !== stripos( PS::o( $htmlOptions, 'class' ), 'required' ) );
 
 			if ( !$_isRequired && $model->isAttributeRequired( $attributeName ) )
+			{
 				PS::addClass( $_sClass, 'required' );
+			}
 
 			if ( !$_isRequired && $model->isAttributeRequired( $attributeName ) )
 			{
@@ -688,11 +719,15 @@ class CPSWidgetHelper extends CPSHelperBase
 			$_value = CPSTransform::getValue( $model, $attributeName );
 		}
 		else
+		{
 			$_value = PS::o( $htmlOptions, 'value', $model->{$attributeName}, true );
+		}
 
 		//	Handle custom drop downs...
 		if ( self::setDropDownValues( $inputFieldType, $htmlOptions, $listData, PS::nvl( $model->{$attributeName} ) ) )
+		{
 			$inputFieldType = self::DROPDOWN;
+		}
 
 		//	Handle special types...
 		switch ( $inputFieldType )
@@ -703,7 +738,9 @@ class CPSWidgetHelper extends CPSHelperBase
 				$htmlOptions['readonly'] = 'readonly';
 
 				if ( null !== PS::o( $htmlOptions, 'content' ) )
+				{
 					$htmlOptions['content'] = PS::tag( 'label', array( 'class' => 'ps-text-display', $_value ) );
+				}
 
 				$inputFieldType = self::TEXT;
 				break;
@@ -755,10 +792,14 @@ class CPSWidgetHelper extends CPSHelperBase
 				//	Masked input?
 				$_sMask = PS::o( $htmlOptions, 'mask', null, true );
 				if ( !empty( $_sMask ) )
+				{
 					$_oMask = CPSjqMaskedInputWrapper::create( null, array( 'target' => '#' . $htmlOptions['id'], 'mask' => $_sMask ) );
+				}
 
 				if ( !isset( $htmlOptions['size'] ) )
+				{
 					$htmlOptions['size'] = 60;
+				}
 				break;
 
 			//	WYSIWYG Plug-in
@@ -797,7 +838,9 @@ class CPSWidgetHelper extends CPSHelperBase
 			case self::DROPDOWN:
 				//	Auto-set prompt if not there...
 				if ( !isset( $htmlOptions['noprompt'] ) )
+				{
 					$htmlOptions['prompt'] = PS::o( $htmlOptions, 'prompt', 'Select One...', true );
+				}
 			//	Intentionally fall through to next block...
 
 			case self::CHECKLIST:
@@ -811,12 +854,18 @@ class CPSWidgetHelper extends CPSHelperBase
 		//		try
 		{
 			if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
+			{
 				CPSLog::trace( __METHOD__, 'Rendering field "' . $attributeName . '" of type "' . $inputFieldType . '"' );
+			}
 
 			if ( method_exists( __CLASS__, $inputFieldType ) )
+			{
 				$_fieldOutput = self::$inputFieldType( $model, $attributeName, $htmlOptions );
+			}
 			else
+			{
 				throw new Exception( 'Unknown input field type: ' . $inputFieldType );
+			}
 		}
 		//		catch ( Exception $_ex )
 		//		{
@@ -892,11 +941,15 @@ class CPSWidgetHelper extends CPSHelperBase
 
 		//	Do drop downs...
 		if ( null != ( $listData = self::setDropDownValues( $inputFieldType, $htmlOptions, $listData, $_value ) ) )
+		{
 			return parent::dropDownList( $attributeName, $_value, $listData, $htmlOptions );
+		}
 
 		//	Otherwise output the field if we have a type
 		if ( null != $_sType )
+		{
 			return self::inputField( $_sType, $attributeName, $_value, $htmlOptions );
+		}
 
 		//	No clue...
 		return;
@@ -907,7 +960,9 @@ class CPSWidgetHelper extends CPSHelperBase
 			//	Get any additional params for validation
 			$_sClass = PS::o( $htmlOptions, '_validate', null, true );
 			if ( $model->isAttributeRequired( $attributeName ) )
+			{
 				PS::addClass( $_sClass, 'required' );
+			}
 			$_sClass = ' ' . PS::o( $htmlOptions, 'class', null );
 			$htmlOptions['class'] = trim( $_sClass );
 		}
@@ -920,11 +975,15 @@ class CPSWidgetHelper extends CPSHelperBase
 			$_value = CPSTransform::getValue( $model, $attributeName );
 		}
 		else
+		{
 			$_value = PS::o( $htmlOptions, 'value', $model->{$attributeName}, true );
+		}
 
 		//	Handle custom drop downs...
 		if ( null !== self::setDropDownValues( $inputFieldType, $htmlOptions, $listData, PS::nvl( $model->{$attributeName} ) ) )
+		{
 			$inputFieldType = self::DROPDOWN;
+		}
 
 		//	Handle special types...
 		switch ( $inputFieldType )
@@ -961,10 +1020,14 @@ class CPSWidgetHelper extends CPSHelperBase
 				//	Masked input?
 				$_sMask = PS::o( $htmlOptions, 'mask', null, true );
 				if ( !empty( $_sMask ) )
+				{
 					$_oMask = CPSjqMaskedInputWrapper::create( null, array( 'target' => '#' . $htmlOptions['id'], 'mask' => $_sMask ) );
+				}
 
 				if ( !isset( $htmlOptions['size'] ) )
+				{
 					$htmlOptions['size'] = 60;
+				}
 				break;
 
 			//	WYSIWYG Plug-in
@@ -1002,7 +1065,9 @@ class CPSWidgetHelper extends CPSHelperBase
 			case self::DROPDOWN:
 				//	Auto-set prompt if not there...
 				if ( !isset( $htmlOptions['noprompt'] ) )
+				{
 					$htmlOptions['prompt'] = PS::o( $htmlOptions, 'prompt', 'Select One...', true );
+				}
 			//	Intentionally fall through to next block...
 
 			case self::CHECKLIST:
@@ -1036,22 +1101,32 @@ class CPSWidgetHelper extends CPSHelperBase
 				$_valueFilter = PS::o( $htmlOptions, 'valueFilter', null, true );
 				$_model->setValueFilter( $_valueFilter );
 				if ( !$_sValAbbr )
+				{
 					$_sValAbbr = PS::o( $htmlOptions, 'codeAbbreviation', null, true );
+				}
 				$_sValId = PS::o( $htmlOptions, 'codeId', null, true );
 				$_sSort = PS::o( $htmlOptions, 'sortOrder', 'code_desc_text', true );
 				$_arOptions = array();
 
 				if ( $_sValId )
+				{
 					$_arOptions = self::listData( $_model->findById( $_sValId ), 'id', 'code_desc_text' );
+				}
 				elseif ( !$_sValAbbr )
+				{
 					$_arOptions = self::listData( $_model->findAllByType( $_sValType, $_sSort, $_valueFilter ), 'id', 'code_desc_text' );
+				}
 				elseif ( $_sValAbbr )
+				{
 					$_arOptions = self::listData( $_model->findAllByAbbreviation( $_sValAbbr, $_sValType, $_sSort ), 'id', 'code_desc_text' );
+				}
 
 				if ( isset( $htmlOptions['multiple'] ) )
 				{
 					if ( substr( $htmlOptions['name'], -2 ) !== '[]' )
+					{
 						$htmlOptions['name'] .= '[]';
+					}
 				}
 
 				return self::activeDropDownList( $model, $sAttribute, $_arOptions, $htmlOptions );
@@ -1098,7 +1173,9 @@ class CPSWidgetHelper extends CPSHelperBase
 					if ( isset( $htmlOptions['multiple'] ) )
 					{
 						if ( substr( $htmlOptions['name'], -2 ) !== '[]' )
+						{
 							$htmlOptions['name'] .= '[]';
+						}
 					}
 
 					return self::activeDropDownList( $model, $sAttribute, $_arOptions, $htmlOptions );
@@ -1225,10 +1302,14 @@ CSS1;
 		$_labelClass = PS::o( $arOptions, 'labelClass', null, true );
 
 		if ( $sLabel )
+		{
 			$_output = self::label( $sLabel, $sName, $arOptions );
+		}
 
 		if ( null == ( $_arOptions = self::getGenericDropDownValues( $eType, $arOptions ) ) )
+		{
 			return false;
+		}
 
 		if ( !empty( $_arOptions ) )
 		{
@@ -1239,7 +1320,9 @@ CSS1;
 			{
 				$_arOpts = array( 'value' => $_sKey );
 				if ( $_sValue == $_sKey )
+				{
 					$_arOpts['selected'] = 'selected';
+				}
 				$_sInner .= self::tag( 'option', $_arOpts, $_sVal );
 			}
 
@@ -1269,15 +1352,21 @@ CSS1;
 		{
 			self::$m_bValidating = true;
 			if ( !isset( $_validListateOptions['target'] ) )
+			{
 				$_validListateOptions['target'] = self::getFormSelector( $htmlOptions );
+			}
 			CPSjqValidate::create( null, $_validListateOptions );
 		}
 
 		if ( PS::o( $htmlOptions, 'selectmenu', false, true ) )
+		{
 			CPSjqSelectMenu::create( null, array( 'target' => self::getFormSelector( $htmlOptions ) ) );
+		}
 
 		if ( $_sFormTitle = PS::o( $htmlOptions, 'formTitle', null, true ) )
+		{
 			echo PS::tag( PS::o( $htmlOptions, 'formTitleTag', 'h1', true ), array(), $_sFormTitle );
+		}
 
 		//	Grab current form id
 		self::$m_sCurrentFormId = PS::o( $htmlOptions, 'id' );
@@ -1305,7 +1394,7 @@ CSS1;
 		}
 
 		//	Get the rest of our options
-		$_uiStyle = PS::o( $formOptions, 'uiStyle', self::UI_DEFAULT, true );
+		$_uiStyle = PS::o( $formOptions, 'uiStyle', self::getUiStyle(), true );
 		$_action = PS::o( $formOptions, 'action', '', true );
 		$_method = PS::o( $formOptions, 'method', 'POST', true );
 		$_setPageTitle = PS::o( $formOptions, 'setPageTitle', true, true );
@@ -1334,6 +1423,13 @@ CSS1;
 				$formOptions['class'] = $_formClass;
 				break;
 
+			case self::UI_BOOTSTRAP2:
+				$_formContainerClass = PS::o( $formOptions, 'formContainerClass', self::STD_BOOTSTRAP2_FORM_CONTAINER_CLASS, true );
+				$_formClass = PS::o( $formOptions, 'formClass', self::STD_BOOTSTRAP2_FORM_CLASS, true );
+				PS::$errorCss = $_errorClass = $_errorCss;
+				$formOptions['class'] = $_formClass;
+				break;
+
 			case self::UI_DEFAULT:
 			default:
 				$_formContainerClass = PS::o( $formOptions, 'formContainerClass', self::STD_FORM_CONTAINER_CLASS, true );
@@ -1341,6 +1437,8 @@ CSS1;
 				PS::$errorCss = $_errorClass = 'ps-validate-error';
 				break;
 		}
+
+		self::setUiStyle( $_uiStyle );
 
 		//	Set validation error class...
 		if ( PS::o( $formOptions, 'validate', false ) == true )
@@ -1437,7 +1535,9 @@ CSS1;
 
 		//	jQUI Button?
 		if ( PS::o( $htmlOptions, 'jqui', false, true ) )
+		{
 			return self::jquiButton( $sLabel, '_submit_', $htmlOptions );
+		}
 
 		//	Otherwise use regular button
 		return self::button( $sLabel, $htmlOptions );
@@ -1461,16 +1561,27 @@ CSS1;
 
 		//	Get orientation of buttons
 		if ( PS::o( $htmlOptions, 'barLeft' ) )
+		{
 			$_sDirClass = 'ps-submit-button-bar-left';
-		else if ( PS::o( $htmlOptions, 'barCenter' ) )
-			$_sDirClass = 'ps-submit-button-bar-center';
+		}
 		else
-			$_sDirClass = 'ps-submit-button-bar-right';
+		{
+			if ( PS::o( $htmlOptions, 'barCenter' ) )
+			{
+				$_sDirClass = 'ps-submit-button-bar-center';
+			}
+			else
+			{
+				$_sDirClass = 'ps-submit-button-bar-right';
+			}
+		}
 
 		$_sClass = PS::o( $htmlOptions, 'barClass', $_bDialog ? '.ui-dialog .ui-dialog-buttonpane' : 'ps-submit-button-bar' ) . ' ' . $_sDirClass;
 
 		if ( !$_bNoBorder = PS::o( $htmlOptions, 'noBorder', false ) )
+		{
 			$_sClass .= ' ps-submit-button-bar-border';
+		}
 
 		return PS::openTag( 'div', array( 'class' => $_sClass ) );
 	}
@@ -1506,7 +1617,10 @@ CSS1;
 		//	Make sure current form id is set if we have it...
 		$htmlOptions['formId'] = PS::o( $htmlOptions, 'formId', self::$m_sCurrentFormId );
 		if ( self::$_showRequiredLabel && trim( self::$afterRequiredLabel ) )
-			$_sLegend = '<span class="ps-form-legend"><span class="required">' . self::getRequiredLabel() . '</span> denotes required fields</span>';
+		{
+			$_sLegend =
+				'<span class="ps-form-legend"><span class="required">' . self::getRequiredLabel() . '</span> denotes required fields</span>';
+		}
 
 		return self::beginButtonBar( $htmlOptions ) . $_sLegend . self::submitButton( $sLabel, $htmlOptions ) . self::endButtonBar();
 	}
@@ -1533,7 +1647,9 @@ CSS1;
 			$_bIconOnly = PS::o( $arOptions, 'iconOnly', false, true );
 			$_sIcon = "<span class=\"ui-icon ui-icon-{$_sIcon}\"></span>";
 			if ( $sLabel && !$_bIconOnly )
+			{
 				$_sIconPos = "ps-button-icon-" . PS::o( $arOptions, 'iconPosition', 'left', true );
+			}
 			else
 			{
 				$_sSize = PS::o( $arOptions, 'iconSize', null, true );
@@ -1542,7 +1658,9 @@ CSS1;
 		}
 
 		if ( $_sOnClick = PS::o( $arOptions, 'click', null, true ) )
+		{
 			$_sOnClick = 'onClick="' . $_sOnClick . '"';
+		}
 		else
 		{
 			if ( $_sConfirm = PS::o( $arOptions, 'confirm', null, true ) )
@@ -1852,10 +1970,21 @@ HTML;
 		$_errorListClass = PS::o( $htmlOptions, 'errorListClass', null, true );
 		$_singleErrorListClass = PS::o( $htmlOptions, 'singleErrorListClass', $_errorListClass, true );
 
-		self::$errorSummaryCss = 'ps-error-summary ui-state-error';
+		if ( self::UI_BOOTSTRAP == PS::o( $htmlOptions, 'uiStyle', self::UI_JQUERY ) )
+		{
+			$_bootstrap = true;
+			self::$errorSummaryCss = 'alert alert-error fade in';
+		}
+		else
+		{
+			$_bootstrap = false;
+			self::$errorSummaryCss = 'ps-error-summary ui-state-error';
+		}
 
 		if ( !is_array( $_arModel ) )
+		{
 			$_arModel = array( $model );
+		}
 
 		foreach ( $_arModel as $_model )
 		{
@@ -1876,41 +2005,58 @@ HTML;
 
 		if ( $_content !== null )
 		{
-			if ( !$_iconClass )
+			if ( $_bootstrap )
 			{
-				$_sIcon = ( !$_bNoIcon )
-					?
-					'<span class="ui-icon ui-icon-alert" style="float: left; margin-top: 3px; margin-left: 0.5em; margin-right: 6px;"></span>'
-					:
-					null;
+				return <<<HTML
+<div class="alert alert-error" style="margin-top: 15px;">
+<a class="close" data-dismiss="alert" href="#">&times;</a>
+<h4 class="alert-heading">Please check for the following errors:</h4>
+<ul>{$_content}</ul>
+</div>
+HTML;
+
 			}
 			else
 			{
-				$_sIcon = '<span class="' . $_iconClass . '" style="float: left; margin-top: 0.5em; margin-left: 0.5em; margin-right: 6px;
+				if ( !$_iconClass )
+				{
+					$_sIcon = ( !$_bNoIcon )
+						?
+						'<span class="ui-icon ui-icon-alert" style="float: left; margin-top: 3px; margin-left: 0.5em; margin-right: 6px;"></span>'
+						:
+						null;
+				}
+				else
+				{
+					$_sIcon = '<span class="' . $_iconClass . '" style="float: left; margin-top: 0.5em; margin-left: 0.5em; margin-right: 6px;
 				"></span>';
+				}
+
+				if ( null === $sHeader )
+				{
+					$sHeader = self::tag(
+						$_headerTag, array( 'style' => 'font-style: italic; font-weight: bold;' ),
+						Yii::t( 'yii', 'Please fix the following input errors:' )
+					);
+				}
+
+				//	Different class for single errors perhaps?
+				if ( $_errorCount == 1 )
+				{
+					$_errorListClass = $_singleErrorListClass;
+				}
+
+				$htmlOptions['class'] = PS::o( $htmlOptions, 'class', self::$errorSummaryCss, true );
+
+				return self::tag(
+					'div', $htmlOptions, $_sIcon . $sHeader . self::tag(
+					'ul', array(
+						'class' => $_errorListClass,
+						'style' => 'margin-left:25px; margin-top:5px'
+					), $_content
+				)
+				) . $sFooter;
 			}
-
-			if ( null === $sHeader )
-			{
-				$sHeader = self::tag(
-					$_headerTag, array( 'style' => 'font-style: italic; font-weight: bold;' ),
-					Yii::t( 'yii', 'Please fix the following input errors:' )
-				);
-			}
-
-			//	Different class for single errors perhaps?
-			if ( $_errorCount == 1 )
-				$_errorListClass = $_singleErrorListClass;
-
-			$htmlOptions['class'] = PS::o( $htmlOptions, 'class', self::$errorSummaryCss, true );
-			return self::tag(
-				'div', $htmlOptions, $_sIcon . $sHeader . self::tag(
-				'ul', array(
-					'class' => $_errorListClass,
-					'style' => 'margin-left:25px; margin-top:5px'
-				), $_content
-			)
-			) . $sFooter;
 		}
 	}
 
@@ -1936,8 +2082,12 @@ HTML;
 		$_arNewClasses = PS::makeArray( $oClassData );
 
 		foreach ( $_arNewClasses as $_sClass )
+		{
 			if ( !in_array( $_sClass, $_arClassList ) )
+			{
 				$_arClassList[] = $_sClass;
+			}
+		}
 
 		return is_array( $oClass ) ? $_arClassList : implode( ' ', $_arClassList );
 	}
@@ -1956,7 +2106,9 @@ HTML;
 		foreach ( $_arClassList as $_sClass )
 		{
 			if ( !in_array( $_sClass, $_arNewClasses ) )
+			{
 				$_arClass[] = $_sClass;
+			}
 		}
 
 		return is_array( $oClass ) ? $_arClass : implode( ' ', $_arClass );
@@ -2028,30 +2180,40 @@ HTML;
 
 				case self::DD_MONTH_NUMBERS:
 					if ( null == PS::o( $htmlOptions, 'value' ) )
+					{
 						$htmlOptions['value'] = date( 'm' );
+					}
 					$_arData = require( 'static/month_numbers_array.php' );
 					break;
 
 				case self::DD_DAY_NUMBERS:
 					if ( null == PS::o( $htmlOptions, 'value' ) )
+					{
 						$htmlOptions['value'] = date( 'd' );
+					}
 					$_arData = require( 'static/day_numbers_array.php' );
 					break;
 
 				case self::DD_MONTH_NAMES:
 					if ( null == PS::o( $htmlOptions, 'value' ) )
+					{
 						$htmlOptions['value'] = date( 'm' );
+					}
 					$_arData = require( 'static/month_names_array.php' );
 					break;
 
 				case self::DD_YEARS:
 					if ( null == PS::o( $htmlOptions, 'value' ) )
+					{
 						$htmlOptions['value'] = date( 'Y' );
+					}
 					$_iRange = PS::o( $htmlOptions, 'range', 5, true );
 					$_iRangeStart = PS::o( $htmlOptions, 'rangeStart', date( 'Y' ), true );
 					$_arData = array();
 					for ( $_i = 0, $_iBaseYear = $_iRangeStart; $_i < $_iRange; $_i++ )
+					{
 						$_arData[( $_iBaseYear + $_i )] = ( $_iBaseYear + $_i );
+					}
 					break;
 
 				case self::DD_CC_TYPES:
@@ -2075,7 +2237,9 @@ HTML;
 							if ( $_arModels = $_model->findAll( array( 'select' => $_id . ',' . $_sName, 'condition' => $_condition ) ) )
 							{
 								foreach ( $_arModels as $_model )
+								{
 									$_ardata[$_model->getAttribute( $_id )] = $_model->getAttribute( $_sName );
+								}
 							}
 						}
 					}
@@ -2099,7 +2263,9 @@ HTML;
 	{
 		$_path = str_replace( PS::_gbu(), '', Yii::app()->getAssetManager()->getPublishedUrl( Yii::getPathOfAlias( 'pogostick.external' ), true ) );
 		if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
+		{
 			CPSLog::trace( __METHOD__, 'External Library URL: ' . $_path );
+		}
 		return $_path;
 	}
 
@@ -2112,7 +2278,9 @@ HTML;
 	{
 		$_path = str_replace( PS::_gbp(), '', Yii::app()->getAssetManager()->getPublishedPath( Yii::getPathOfAlias( 'pogostick.external' ), true ) );
 		if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
+		{
 			CPSLog::trace( __METHOD__, 'External Library Path: ' . $_path );
+		}
 		return $_path;
 	}
 
@@ -2137,7 +2305,9 @@ HTML;
 		self::resolveName( $model, $attribute ); // strip off square brackets if any
 
 		if ( null === PS::o( $htmlOptions, 'required' ) )
+		{
 			$htmlOptions['required'] = $model->isAttributeRequired( $attribute );
+		}
 		return self::activeLabel( $model, $realAttribute, $htmlOptions );
 	}
 
@@ -2155,10 +2325,14 @@ HTML;
 
 		//	Is it valid?
 		if ( !is_string( $data ) )
+		{
 			$data = json_decode( $data );
+		}
 
 		if ( empty( $data ) )
+		{
 			return false;
+		}
 
 		for ( $_i = 0, $_count = strlen( $data ); $_i < $_count; $_i++ )
 		{
@@ -2173,26 +2347,38 @@ HTML;
 				case ']':
 					$_result .= ( !$_inString ? PHP_EOL . str_repeat( $_indent, $_indentLevel ) : null ) . $data[$_i];
 					if ( --$_indentLevel < 0 )
+					{
 						$_indentLevel = 0;
+					}
 					break;
 
 				case ',':
 					if ( !$_inString )
+					{
 						$_result .= ',' . PHP_EOL . str_repeat( $_indent, $_indentLevel );
+					}
 					else
+					{
 						$_result .= $data[$_i];
+					}
 					break;
 
 				case ':':
 					if ( !$_inString )
+					{
 						$_result .= ': ';
+					}
 					else
+					{
 						$_result .= $data[$_i];
+					}
 					break;
 
 				case '"':
 					if ( 0 < $_i && '\\' != $data[$_i - 1] )
+					{
 						$_inString = !$_inString;
+					}
 
 				default:
 					$_result .= $data[$_i];
@@ -2206,5 +2392,22 @@ HTML;
 	public static function formatSeconds( $seconds = 0 )
 	{
 
+	}
+
+	/**
+	 * @param int $uiStyle
+	 * @return
+	 */
+	public static function setUiStyle( $uiStyle )
+	{
+		self::$_uiStyle = $uiStyle;
+	}
+
+	/**
+	 * @return int
+	 */
+	public static function getUiStyle()
+	{
+		return self::$_uiStyle;
 	}
 }

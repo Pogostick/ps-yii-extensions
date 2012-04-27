@@ -169,7 +169,7 @@ class CPSLog implements IPSBase
 					flush();
 				}
 
-				if ( @class_exists( 'Yii' ) )
+				if ( @class_exists( 'Yii', false ) )
 				{
 					//	Flush immediately...
 					Yii::getLogger()->autoFlush = 1;
@@ -177,7 +177,7 @@ class CPSLog implements IPSBase
 				}
 				else
 				{
-					if ( @class_exists( 'SimpleLogger' ) )
+					if ( @class_exists( 'SimpleLogger', false ) )
 					{
 						@SimpleLogger::getInstance()->write( $_logEntry, 6 );
 					}
