@@ -38,7 +38,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	 * A prefix for generated ids
 	 */
 	const ID_PREFIX = 'pye';
-	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget';
+	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget form';
 	const STD_FORM_CONTAINER_CLASS = 'ps-edit-form';
 	const STD_BOOTSTRAP_FORM_CONTAINER_CLASS = 'bootstrap-edit-form';
 	const STD_FORM_CLASS = 'yiiForm';
@@ -1400,7 +1400,7 @@ CSS1;
 	public static function endForm()
 	{
 		//	Finish our container
-		$_sAppend = ( self::$m_bInForm ) ? self::closeTag( 'div' ) . PS::closeTag( 'div' ) : null;
+		$_sAppend = ( self::$m_bInForm ) ? self::closeTag( 'div' ) : null;
 		self::$m_bInForm = false;
 
 		return parent::endForm() . $_sAppend;

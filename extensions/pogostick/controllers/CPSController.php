@@ -5,12 +5,12 @@
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
- * @package	 psYiiExtensions
- * @subpackage	 controllers
+ * @package     psYiiExtensions
+ * @subpackage     controllers
  *
- * @author		 Jerry Ablan <jablan@pogostick.com>
- * @version	 SVN: $Id: CPSController.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
- * @since		 v1.0.4
+ * @author         Jerry Ablan <jablan@pogostick.com>
+ * @version     SVN: $Id: CPSController.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
+ * @since         v1.0.4
  *
  * @filesource
  */
@@ -87,6 +87,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	public function setMenu( $value )
@@ -112,6 +113,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	public function setBreadcrumbs( $value )
@@ -122,6 +124,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * An optional, additional page heading
+	 *
 	 * @var string
 	 */
 	protected $m_sPageHeading;
@@ -136,6 +139,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $sValue
+	 *
 	 * @return \CPSController
 	 */
 	public function setPageHeading( $sValue )
@@ -161,6 +165,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $sValue
+	 *
 	 * @return \CPSController
 	 */
 	public function setMethodPrefix( $sValue )
@@ -185,6 +190,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $oValue
+	 *
 	 * @return \CPSController
 	 */
 	protected function setModel( $oValue )
@@ -210,6 +216,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	protected function setModelName( $value )
@@ -222,6 +229,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * Convenience access to isPostRequest
+	 *
 	 * @return boolean
 	 */
 	public function getIsPostRequest()
@@ -231,6 +239,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * Convenience access to isAjaxRequest
+	 *
 	 * @return boolean
 	 */
 	public function getIsAjaxRequest()
@@ -240,6 +249,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * Returns the base url of the current app
+	 *
 	 * @return string
 	 */
 	public function getAppBaseUrl()
@@ -271,6 +281,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $arValue
+	 *
 	 * @return \CPSController
 	 */
 	public function setSearchCriteria( $arValue )
@@ -296,6 +307,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	public function setPageLayout( $value )
@@ -320,6 +332,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	public function setContentLayout( $value )
@@ -344,6 +357,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $bValue
+	 *
 	 * @return \CPSController
 	 */
 	public function setAutoLayout( $bValue )
@@ -368,6 +382,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	public function setAutoMissing( $value )
@@ -392,6 +407,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $oValue
+	 *
 	 * @return \CPSController
 	 */
 	public function setCommandMap( $oValue )
@@ -401,9 +417,10 @@ abstract class CPSController extends CController implements IPSBase
 	}
 
 	/**
-	 * @param $sKey
+	 * @param      $sKey
 	 * @param null $oValue
 	 * @param null $eWhich
+	 *
 	 * @return \CPSController
 	 */
 	public function addCommandToMap( $sKey, $oValue = null, $eWhich = null )
@@ -418,12 +435,14 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * Action queue for keeping track of where we are...
+	 *
 	 * @var array
 	 */
 	protected $m_arActionQueue = array();
 
 	/**
 	 * A list of actions registered by our portlets
+	 *
 	 * @var array
 	 */
 	protected $m_arPortletActions = array();
@@ -438,6 +457,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $arValue
+	 *
 	 * @return \CPSController
 	 */
 	public function setPortletActions( $arValue )
@@ -449,6 +469,7 @@ abstract class CPSController extends CController implements IPSBase
 	/**
 	 * @param $sName
 	 * @param $arCallback
+	 *
 	 * @return \CPSController
 	 */
 	public function addPortletAction( $sName, $arCallback )
@@ -476,6 +497,7 @@ abstract class CPSController extends CController implements IPSBase
 	/**
 	 * @param $eWhich
 	 * @param $arValue
+	 *
 	 * @return \CPSController
 	 */
 	protected function setUserActionList( $eWhich, $arValue )
@@ -488,6 +510,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $eWhich
+	 *
 	 * @return mixed #M#C\PS.o|? #M#C\PS.o|?
 	 */
 	public function getUserActionList( $eWhich )
@@ -499,6 +522,7 @@ abstract class CPSController extends CController implements IPSBase
 	 * @param $eWhich
 	 * @param $roleName
 	 * @param $action
+	 *
 	 * @return \CPSController
 	 */
 	public function addUserActionRole( $eWhich, $roleName, $action )
@@ -510,6 +534,7 @@ abstract class CPSController extends CController implements IPSBase
 	/**
 	 * @param $eWhich
 	 * @param $sAction
+	 *
 	 * @return \CPSController
 	 */
 	public function removeUserAction( $eWhich, $sAction )
@@ -530,6 +555,7 @@ abstract class CPSController extends CController implements IPSBase
 	/**
 	 * @param $eWhich
 	 * @param $sAction
+	 *
 	 * @return \CPSController
 	 */
 	public function addUserAction( $eWhich, $sAction )
@@ -557,8 +583,9 @@ abstract class CPSController extends CController implements IPSBase
 	}
 
 	/**
-	 * @param $eWhich
+	 * @param       $eWhich
 	 * @param array $arActions
+	 *
 	 * @return \CPSController
 	 */
 	public function addUserActions( $eWhich, $arActions = array() )
@@ -580,6 +607,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	protected function setDisplayName( $value )
@@ -606,6 +634,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	protected function setCleanTrail( $value )
@@ -629,6 +658,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	protected function setViewData( $value )
@@ -652,6 +682,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	protected function setExtraViewDataList( $value )
@@ -675,6 +706,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * @param $value
+	 *
 	 * @return \CPSController
 	 */
 	protected function setExtraViewDataPrefix( $value )
@@ -736,27 +768,27 @@ abstract class CPSController extends CController implements IPSBase
 	 *
 	 * In your configuration file, configure the urlManager as follows:
 	 *
-	 *	'urlManager' => array(
-	 *		'urlFormat' => 'path',
-	 *		'showScriptName' => false,
-	 *		'rules' => array(
-	 *			... all your rules should be first ...
-	 *			//	Add this as the last line in your rules.
-	 *			'<view:\w+>' => 'default/_static',
-	 *		),
+	 *    'urlManager' => array(
+	 *        'urlFormat' => 'path',
+	 *        'showScriptName' => false,
+	 *        'rules' => array(
+	 *            ... all your rules should be first ...
+	 *            //    Add this as the last line in your rules.
+	 *            '<view:\w+>' => 'default/_static',
+	 *        ),
 	 *
 	 * The above assumes your default controller is DefaultController. If is different
 	 * simply change the route above (default/_static) to your default route.
 	 *
 	 * Finally, create a directory under your default controller's view path:
 	 *
-	 *		/path/to/your/app/protected/views/default/_static
+	 *        /path/to/your/app/protected/views/default/_static
 	 *
 	 * Place your static files in there, for example:
 	 *
-	 *		/path/to/your/app/protected/views/default/_static/aboutUs.php
-	 *		/path/to/your/app/protected/views/default/_static/contactUs.php
-	 *		/path/to/your/app/protected/views/default/_static/help.php
+	 *        /path/to/your/app/protected/views/default/_static/aboutUs.php
+	 *        /path/to/your/app/protected/views/default/_static/contactUs.php
+	 *        /path/to/your/app/protected/views/default/_static/help.php
 	 *
 	 * @return array
 	 */
@@ -765,7 +797,7 @@ abstract class CPSController extends CController implements IPSBase
 		return array_merge(
 			array(
 				'_static' => array(
-					'class' => 'CViewAction',
+					'class'    => 'CViewAction',
 					'basePath' => '_static',
 				),
 			),
@@ -776,13 +808,13 @@ abstract class CPSController extends CController implements IPSBase
 	/**
 	 * A generic action that renders a page and passes in the model
 	 *
-	 * @param $sActionId
-	 * @param null $oModel
-	 * @param array $arExtraParams
+	 * @param        $sActionId
+	 * @param null   $oModel
+	 * @param array  $arExtraParams
 	 * @param string $sModelVarName
-	 * @param null $sFlashKey
-	 * @param null $sFlashValue
-	 * @param null $sFlashDefaultValue
+	 * @param null   $sFlashKey
+	 * @param null   $sFlashValue
+	 * @param null   $sFlashDefaultValue
 	 *
 	 * @internal param \The $string action id
 	 *
@@ -799,7 +831,8 @@ abstract class CPSController extends CController implements IPSBase
 		{
 			PS::_sf( $sFlashKey, $sFlashValue, $sFlashDefaultValue );
 		}
-		$this->render( $sActionId, array_merge( $arExtraParams, array( $sModelVarName => ( $oModel ) ? $oModel : $this->loadModel() ) ) );
+		$this->render( $sActionId,
+			array_merge( $arExtraParams, array( $sModelVarName => ( $oModel ) ? $oModel : $this->loadModel() ) ) );
 	}
 
 	/**
@@ -807,6 +840,7 @@ abstract class CPSController extends CController implements IPSBase
 	 * If the data model is not found, an HTTP exception will be raised.
 	 *
 	 * @param null $iId
+	 *
 	 * @return \CActiveRecord|null
 	 *
 	 * @internal param \the $integer primary key value. Defaults to null, meaning using the 'id' GET variable
@@ -881,6 +915,7 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * Convenience access to Yii request
+	 *
 	 * @return CHttpRequest
 	 */
 	public function getRequest()
@@ -890,7 +925,9 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * See if there are any commands that need processing
+	 *
 	 * @param CAction $oAction
+	 *
 	 * @return boolean
 	 */
 	public function beforeAction( $oAction )
@@ -902,6 +939,51 @@ abstract class CPSController extends CController implements IPSBase
 		}
 
 		return true;
+	}
+
+	/** {@InheritDoc} */
+	public function render( $view, $data = null, $return = false, $layoutData = null )
+	{
+		//	Allow passing second array in third parameter
+		if ( !is_bool( $return ) )
+		{
+			$_return = $layoutData ? : false;
+			$layoutData = $return;
+			$return = $_return;
+		}
+
+		if ( $this->beforeRender( $view ) )
+		{
+			$_output = $this->renderPartial( $view, $data, true );
+
+			if ( ( $layoutFile = $this->getLayoutFile( $this->layout ) ) !== false )
+			{
+				if ( !is_array( $layoutData ) )
+				{
+					$layoutData = array();
+				}
+
+				$_layoutData = array_merge(
+					array(
+						'content'=> $_output
+					),
+					$layoutData
+				);
+
+				$_output = $this->renderFile( $layoutFile, $_layoutData, true );
+			}
+
+			$this->afterRender( $view, $_output );
+
+			$_output = $this->processOutput( $_output );
+
+			if ( $return )
+			{
+				return $_output;
+			}
+
+			echo $_output;
+		}
 	}
 
 	/**
@@ -916,7 +998,7 @@ abstract class CPSController extends CController implements IPSBase
 	 * By default, the layout view script is "protected/views/layouts/main.php".
 	 * This may be customized by changing {@link layout}.
 	 *
-	 * @param $viewName
+	 * @param      $viewName
 	 * @param null $viewData
 	 * @param bool $returnString
 	 *
@@ -940,7 +1022,9 @@ abstract class CPSController extends CController implements IPSBase
 		if ( $this->_pageLayout && false !== ( $_layoutFile = $this->getLayoutFile( $this->_pageLayout ) ) )
 		{
 			//	Process content layout if required
-			if ( $this->_contentLayout && false !== ( $_contentLayoutFile = $this->getLayoutFile( $this->_contentLayout ) ) )
+			if ( $this->_contentLayout && false !== (
+			$_contentLayoutFile = $this->getLayoutFile( $this->_contentLayout ) )
+			)
 			{
 				$_output = $this->renderPartial( $_contentLayoutFile, $viewData, true );
 			}
@@ -970,7 +1054,7 @@ abstract class CPSController extends CController implements IPSBase
 	 *
 	 * This override adds the current user to the data automatically in the $_currentUser variable
 	 *
-	 * @param $view
+	 * @param      $view
 	 * @param null $data
 	 * @param bool $return
 	 * @param bool $processOutput
@@ -999,7 +1083,7 @@ abstract class CPSController extends CController implements IPSBase
 					'{controller} cannot find the requested view "{view}".',
 					array(
 						'{controller}' => get_class( $this ),
-						'{view}' => $view
+						'{view}'       => $view
 					)
 				)
 			);
@@ -1035,8 +1119,9 @@ abstract class CPSController extends CController implements IPSBase
 
 	/**
 	 * Creates a standard form options array and loads page niceties
+	 *
 	 * @param CModel $model
-	 * @param array $options
+	 * @param array  $options
 	 *
 	 * @internal param array|string $If a string is passed in, it is used as the title.
 	 * @return array
@@ -1051,7 +1136,7 @@ abstract class CPSController extends CController implements IPSBase
 			$_title = $options;
 
 			$options = array(
-				'title' => PS::_gan() . ' :: ' . $_title,
+				'title'       => PS::_gan() . ' :: ' . $_title,
 				'breadcrumbs' => array( $_title ),
 			);
 		}
@@ -1089,7 +1174,11 @@ abstract class CPSController extends CController implements IPSBase
 			$_flashText = $_message;
 
 			$_spanId = PS::o( $options, 'flashSpanId', 'operation-result', true );
-			PS::_ss( 'psForm-flash-html', PS::tag( 'span', array( 'id' => $_spanId, 'class' => $_flashClass ), $_message ) );
+			PS::_ss( 'psForm-flash-html',
+				PS::tag( 'span', array(
+					'id'    => $_spanId,
+					'class' => $_flashClass
+				), $_message ) );
 
 			//	Register a nice little fader...
 			if ( $_flashText )
@@ -1106,35 +1195,36 @@ SCRIPT;
 		}
 
 		$_formOptions = array(
-			'id' => $_formId,
-			'showLegend' => PS::o( $options, 'showLegend', true ),
-			'showDates' => PS::o( $options, 'showDates', false ),
-			'method' => PS::o( $options, 'method', 'POST' ),
+			'id'                  => $_formId,
+			'showLegend'          => PS::o( $options, 'showLegend', true ),
+			'showDates'           => PS::o( $options, 'showDates', false ),
+			'method'              => PS::o( $options, 'method', 'POST' ),
 
-			'uiStyle' => PS::o( $options, 'uiStyle', PS::UI_JQUERY ),
-			'formClass' => PS::o( $options, 'formClass', 'form' ),
-			'formModel' => $model,
-			'errorCss' => PS::o( $options, 'errorCss', 'error' ),
+			'uiStyle'             => PS::o( $options, 'uiStyle', PS::UI_JQUERY ),
+			'formClass'           => PS::o( $options, 'formClass', 'form' ),
+			'formModel'           => $model,
+			'errorCss'            => PS::o( $options, 'errorCss', 'error' ),
 
 			//	We want error summary...
-			'errorSummary' => PS::o( $options, 'errorSummary', true ),
+			'errorSummary'        => PS::o( $options, 'errorSummary', true ),
 			'errorSummaryOptions' => array(
 				'header' => '<p class="ps-error-summary">The following problems occurred:</p>',
 			),
 
-			'validate' => PS::o( $options, 'validate', true ),
+			'validate'            => PS::o( $options, 'validate', true ),
 
-			'validateOptions' => PS::o( $options, 'validateOptions',
+			'validateOptions'     => PS::o( $options, 'validateOptions',
 				array(
 					'ignoreTitle' => true,
-					'errorClass' => 'ps-validate-error',
+					'errorClass'  => 'ps-validate-error',
 				)
 			),
 		);
 
 		PS::setFormFieldContainerClass( PS::o( $options, 'rowClass', 'row' ) );
 
-		$_crumbs = PS::o( $options, 'breadcrumbs', null, true );
+		$_crumbs = $this->_breadcrumbs ? : PS::o( $options, 'breadcrumbs', null, true );
+
 		if ( !empty( $_crumbs ) && PS::UI_BOOTSTRAP == $_formOptions['uiStyle'] )
 		{
 			$_trail = '<ul class="breadcrumb">';
@@ -1143,7 +1233,8 @@ SCRIPT;
 			{
 				if ( false !== $_link )
 				{
-					$_trail .= '<li><a>' . $_name . '</a> <span class="divider">/</span></li>';
+					$_trail .= '<li><a href="' . ( '/' != $_link ? PS::_cu( $_link ) :
+						$_link ) . '">' . $_name . '</a> <span class="divider">/</span></li>';
 				}
 				else
 				{
@@ -1197,7 +1288,8 @@ SCRIPT;
 
 	/**
 	 * Sets the content type for this page to the specified MIME type
-	 * @param $contentType
+	 *
+	 * @param         $contentType
 	 * @param boolean $noLayout If true, the layout for this page is set to false
 	 *
 	 * @internal param $ <type> $contentType The MIME type to set
@@ -1214,7 +1306,9 @@ SCRIPT;
 
 	/**
 	 * Sets the standard page navigation options (title, crumbs, menu, etc.)
+	 *
 	 * @param array $options
+	 *
 	 * @return array
 	 */
 	public function setViewNavigationOptions( &$options = array() )
@@ -1235,7 +1329,15 @@ SCRIPT;
 			{
 				if ( null !== ( $_headerIcon = PS::o( $options, 'headerIcon', null, true ) ) )
 				{
-					$_header = PS::tag( 'div', array( 'class' => 'ps-form-header-title' ), PS::tag( 'span', array(), PS::image( $_headerIcon ) ) . $_header );
+					$_header =
+						PS::tag( 'div', array( 'class' => 'ps-form-header-title' ),
+							PS::tag( 'span', array( 'class' => 'ps-form-header-icon' ),
+								PS::image( $_headerIcon ) ) .
+								PS::tag( 'span', array( 'class' => 'ps-form-header-text' ),
+									$_header ) .
+								PS::tag( 'div', array( 'class' => 'ps-form-header-message' ),
+									PS::_gs( 'psForm-flash-html' ) )
+						);
 				}
 
 				$options['header'] = PS::tag( 'h1', array( 'class' => 'ui-generated-header' ), $_header );
@@ -1245,7 +1347,8 @@ SCRIPT;
 
 				if ( !empty( $_subHeader ) )
 				{
-					$options['subHeader'] = PS::tag( 'div', array( 'class' => 'ui-state-active ui-generated-subheader' ), $_subHeader );
+					$options['subHeader'] =
+						PS::tag( 'div', array( 'class' => 'ui-state-active ui-generated-subheader' ), $_subHeader );
 				}
 
 				//	Generate subtitle from header...
@@ -1291,7 +1394,7 @@ SCRIPT;
 
 				$_finalMenu[] = array(
 					'label' => $_label,
-					'url' => $_link,
+					'url'   => $_link,
 				);
 			}
 
@@ -1332,7 +1435,9 @@ JS;
 
 	/**
 	 * Checks to see if a view is available
+	 *
 	 * @param string $viewName
+	 *
 	 * @return bool
 	 */
 	public function hasView( $viewName )
@@ -1347,7 +1452,8 @@ JS;
 	/**
 	 * Executes any commands
 	 * Maps to {@link CPSController::commandMap} and calls the appropriate method.
-	 * @param array $arData
+	 *
+	 * @param array  $arData
 	 * @param string $sIndexName
 	 *
 	 * @return mixed
@@ -1386,14 +1492,15 @@ JS;
 	/**
 	 * Saves the data in the model
 	 *
-	 * @param CModel $oModel The model to save
-	 * @param array $arData The array of data to merge with the model
-	 * @param string $sRedirectAction Where to redirect after a successful save
+	 * @param CModel  $oModel The model to save
+	 * @param array   $arData The array of data to merge with the model
+	 * @param string  $sRedirectAction Where to redirect after a successful save
 	 * @param boolean $bAttributesSet If true, attributes will not be set from $arData
-	 * @param string $sModelName Optional model name
-	 * @param string $sSuccessMessage Flash message to set if successful
+	 * @param string  $sModelName Optional model name
+	 * @param string  $sSuccessMessage Flash message to set if successful
 	 * @param boolean $bNoCommit If true, transaction will not be committed
-	 * @param bool $bSafeOnly
+	 * @param bool    $bSafeOnly
+	 *
 	 * @return boolean
 	 */
 	protected function saveModel( &$oModel, $arData = array(), $sRedirectAction = 'show', $bAttributesSet = false, $sModelName = null,
@@ -1420,7 +1527,10 @@ JS;
 
 				if ( $sRedirectAction )
 				{
-					$this->redirect( array( $sRedirectAction, 'id' => $oModel->id ) );
+					$this->redirect( array(
+						$sRedirectAction,
+						'id' => $oModel->id
+					) );
 				}
 
 				return true;
@@ -1434,9 +1544,10 @@ JS;
 	 * Just like saveModel, but doesn't commit, and never redirects.
 	 *
 	 * @param CPSModel $oModel
-	 * @param array $arData
-	 * @param boolean $bAttributesSet
-	 * @param string $sSuccessMessage
+	 * @param array    $arData
+	 * @param boolean  $bAttributesSet
+	 * @param string   $sSuccessMessage
+	 *
 	 * @return boolean
 	 * @see saveModel
 	 */
@@ -1447,6 +1558,7 @@ JS;
 
 	/**
 	 * Loads a page of models
+	 *
 	 * @param bool $bSort
 	 * @param null $oCriteria
 	 *
@@ -1482,8 +1594,8 @@ JS;
 	/**
 	 * Loads a model(s) based on criteria and scopes.
 	 *
-	 * @param $sMethod
-	 * @param null $oCrit
+	 * @param       $sMethod
+	 * @param null  $oCrit
 	 * @param array $arScope
 	 * @param array $arOptions
 	 *
@@ -1505,6 +1617,7 @@ JS;
 	/**
 	 * This method reads the data from the database and returns the row.
 	 * Must override in subclasses.
+	 *
 	 * @var integer $iId The primary key to look up
 	 * @return CActiveRecord
 	 */
@@ -1515,7 +1628,9 @@ JS;
 
 	/**
 	 * Loads all data using supplied criteria
+	 *
 	 * @param CDbCriteria $oCrit
+	 *
 	 * @return array Array of CActiveRecord
 	 * @todo When using PHP v5.3, {@link eval} will no longer be needed
 	 */
@@ -1528,6 +1643,7 @@ JS;
 	 * Returns the count of rows that match the supplied criteria
 	 *
 	 * @param CDbCriteria $oCrit
+	 *
 	 * @return integer The number of rows
 	 */
 	protected function loadCount( &$oCrit = null )
@@ -1541,6 +1657,7 @@ JS;
 	 *
 	 * @param array $arScope
 	 * @param array $arOptions
+	 *
 	 * @return string
 	 * @todo Will be deprecated after upgrade to PHP v5.3
 	 */
@@ -1562,6 +1679,7 @@ JS;
 
 	/**
 	 * Retrieves the latest pushed action
+	 *
 	 * @return CAction
 	 */
 	protected function popAction()
@@ -1573,7 +1691,7 @@ JS;
 	 * Pushes a variable onto the view data stack
 	 *
 	 * @param string $variableName
-	 * @param mixed $variableData
+	 * @param mixed  $variableData
 	 */
 	protected function addViewData( $variableName, $variableData = null )
 	{
@@ -1582,6 +1700,7 @@ JS;
 
 	/**
 	 * Clears the current search criteria
+	 *
 	 * @return null
 	 */
 	protected function clearSearchCriteria()
@@ -1594,9 +1713,11 @@ JS;
 
 	/**
 	 * Turns off the layout, echos the JSON encoded version of data and returns. Optionally encoding HTML characters.
+	 *
 	 * @param array|bool $payload The response data
-	 * @param boolean $encode If true, response is run through htmlspecialchars()
-	 * @param int $encodeOptions
+	 * @param boolean    $encode If true, response is run through htmlspecialchars()
+	 * @param int        $encodeOptions
+	 *
 	 * @return
 	 */
 	protected function _ajaxReturn( $payload = false, $encode = false, $encodeOptions = ENT_NOQUOTES )
@@ -1620,6 +1741,7 @@ JS;
 
 	/**
 	 * @param $debugMode
+	 *
 	 * @return \CPSController
 	 */
 	public function setDebugMode( $debugMode )
