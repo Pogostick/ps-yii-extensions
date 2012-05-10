@@ -30,7 +30,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	 * A prefix for generated ids
 	 */
 	const ID_PREFIX = 'pye';
-	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget';
+	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget form';
 	const STD_FORM_CONTAINER_CLASS = 'ps-edit-form';
 	const STD_BOOTSTRAP_FORM_CONTAINER_CLASS = 'bootstrap-edit-form';
 	const STD_BOOTSTRAP2_FORM_CONTAINER_CLASS = 'bootstrap2-edit-form';
@@ -211,7 +211,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	 *
 	 * @var boolean
 	 */
-	public static $_useIdPrefixes = false;
+	protected static $_useIdPrefixes = false;
 	/**
 	 * The id prefixes to use.
 	 *
@@ -531,6 +531,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	 * @param array  $widgetOptions  The widget options for the field
 	 * @param array  $listData       Any data necessary for the field (i.e. drop down data)
 	 *
+	 * @throws Exception
 	 * @return string
 	 */
 	public static function activeField( $inputFieldType, $model, $attributeName, $htmlOptions = array(), $widgetOptions = array(), $listData = null )
@@ -1053,6 +1054,7 @@ class CPSWidgetHelper extends CPSHelperBase
 	 * @param array   $htmlOptions
 	 * @param integer $iDefaultUID
 	 *
+	 * @throws Exception
 	 * @return string
 	 */
 	public static function activeDataDropDownList( $model, $sAttribute, &$htmlOptions = array(), $iDefaultUID = 0 )
@@ -1420,10 +1422,10 @@ CSS1;
 	public static function endForm()
 	{
 		//	Finish our container
-		$_sAppend = ( self::$_inForm ) ? self::closeTag( 'div' ) . PS::closeTag( 'div' ) : null;
+		$_append = ( self::$_inForm ) ? self::closeTag( 'div' ) : null;
 		self::$_inForm = false;
 
-		return parent::endForm() . $_sAppend;
+		return parent::endForm() . $_append;
 	}
 
 	/**
@@ -1432,6 +1434,8 @@ CSS1;
 	 * @param mixed $name
 	 * @param mixed $label
 	 * @param mixed $options
+	 *
+	 * @return string
 	 */
 	public static function textLabel( $name, $label = null, $options = array() )
 	{
@@ -1478,6 +1482,8 @@ CSS1;
 	 * barCenter If true, submit button will be centered instead of the default flush right
 	 *
 	 * @param array $htmlOptions HTML options for the submit button.
+	 *
+	 * @return string
 	 */
 	public static function beginButtonBar( $htmlOptions = array() )
 	{
@@ -1513,6 +1519,7 @@ CSS1;
 	/**
 	 * End a button bar
 	 *
+	 * @return string
 	 */
 	public static function endButtonBar()
 	{
@@ -1556,6 +1563,8 @@ CSS1;
 	 * @param string $label
 	 * @param string $sLink
 	 * @param array  $options
+	 *
+	 * @return string
 	 */
 	public static function jquiButton( $label, $sLink, $options = array() )
 	{
@@ -1600,7 +1609,7 @@ CSS1;
 				{
 					$_action = $_bSubmit ? 'return oForm.submit();' : 'window.location.href = sHref;';
 					$_script
-						= <<<HTML
+						= <<<JS
 function confirmAction( oForm, sMessage, sHref )
 {
 	jConfirm( sMessage, 'Please Confirm Your Action', function( bVal ) {
@@ -1613,7 +1622,7 @@ function confirmAction( oForm, sMessage, sHref )
 		return false;
 	});
 }
-HTML;
+JS;
 					//	Register scripts
 					PS::_cs()->registerScript( self::getWidgetId( self::ID_PREFIX . '.cas.' ), $_script, CClientScript::POS_END );
 					CPSjqUIAlerts::loadScripts();
@@ -2103,7 +2112,7 @@ HTML;
 	 *
 	 * @internal param mixed $inputFieldType
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	protected static function getGenericDropDownValues( $type, &$htmlOptions = array(), &$listData = null )
 	{
