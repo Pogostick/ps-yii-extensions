@@ -3,8 +3,8 @@
  * This file is part of the psYiiExtensions package.
  *
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
- * @link http://www.pogostick.com Pogostick, LLC.
- * @license http://www.pogostick.com/licensing
+ * @link      http://www.pogostick.com Pogostick, LLC.
+ * @license   http://www.pogostick.com/licensing
  * @filesource
  */
 
@@ -14,16 +14,16 @@
  * It extends the base functionality of the Yii Framework without replacing
  * and core code.
  *
- * @package        psYiiExtensions
- * @subpackage     base.components
+ * @package           psYiiExtensions
+ * @subpackage        base.components
  *
  * @author            Jerry Ablan <jablan@pogostick.com>
- * @version        SVN $Id: CPSComponent.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
- * @since            v1.0.0
+ * @version           SVN $Id: CPSComponent.php 405 2010-10-21 21:44:02Z jerryablan@gmail.com $
+ * @since             v1.0.0
  *
- * @property string $internalName The internal name of the component.
- * @property boolean $debugMode Enable trace-level debugging
- * @property integer $debugLevel A user-defined debugging level
+ * @property string  $internalName The internal name of the component.
+ * @property boolean $debugMode    Enable trace-level debugging
+ * @property integer $debugLevel   A user-defined debugging level
  */
 class CPSComponent extends CApplicationComponent implements IPSComponent
 {
@@ -129,6 +129,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 		{
 			$this->_exceptionStack[] = $exception;
 		}
+
 		return $this;
 	}
 
@@ -209,6 +210,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	public function setDebugLevel( $debugLevel )
 	{
 		$this->_debugLevel = $debugLevel;
+
 		return $this;
 	}
 
@@ -228,6 +230,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	public function setDebugMode( $debugMode )
 	{
 		$this->_debugMode = $debugMode;
+
 		return $this;
 	}
 
@@ -247,6 +250,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	public function setInternalName( $internalName )
 	{
 		$this->_internalName = $internalName;
+
 		return $this;
 	}
 
@@ -266,6 +270,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	public function setOptionList( $optionList )
 	{
 		$this->_optionList = $optionList;
+
 		return $this;
 	}
 
@@ -285,6 +290,7 @@ class CPSComponent extends CApplicationComponent implements IPSComponent
 	public function setExceptionStack( $exceptionStack )
 	{
 		$this->_exceptionStack = $exceptionStack;
+
 		return $this;
 	}
 
