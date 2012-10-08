@@ -727,7 +727,7 @@ class CPSWidgetHelper extends CPSHelperBase
 			//	These guys need data in third parameter
 			case self::DROPDOWN:
 				//	Auto-set prompt if not there...
-				if ( !isset( $htmlOptions['noprompt'] ) )
+				if ( !isset( $htmlOptions['noprompt'] ) || false === PS::o( $htmlOptions, 'prompt', null ) )
 				{
 					$htmlOptions['prompt'] = PS::o( $htmlOptions, 'prompt', 'Select One...', true );
 				}
