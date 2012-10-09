@@ -11,14 +11,14 @@
 /**
  * A collection of helper methods that augment CHtml.
  *
- * @property string $codeModel          The name of the code model for code lookups
- * @property string $hintTemplate       The template for displaying hints
- * @property string $blockClass         The class in which to wrap label/input pairs.
- * @property-read string $idPrefix      The id prefix to use
- * @property-read string $namePrefix    The name prefix to use
- * @property-read string $currentFormId The current form's id
- * @property-read string $lastFieldId   The id of the last generated form field
- * @property-read string $lastFieldName The name of the last generated form field
+ * @property string      $codeModel          The name of the code model for code lookups
+ * @property string      $hintTemplate       The template for displaying hints
+ * @property string      $blockClass         The class in which to wrap label/input pairs.
+ * @property-read string $idPrefix           The id prefix to use
+ * @property-read string $namePrefix         The name prefix to use
+ * @property-read string $currentFormId      The current form's id
+ * @property-read string $lastFieldId        The id of the last generated form field
+ * @property-read string $lastFieldName      The name of the last generated form field
  */
 class CPSWidgetHelper extends CPSHelperBase
 {
@@ -75,8 +75,8 @@ class CPSWidgetHelper extends CPSHelperBase
 	 */
 	const UI_DEFAULT = 0;
 	const UI_JQUERY = 1;
-	const UI_BOOTSTRAP = 2;
-	const UI_BOOTSTRAP1 = 2;
+	const UI_BOOTSTRAP = 3;
+	const UI_BOOTSTRAP1 = 3;
 	const UI_BOOTSTRAP2 = 3;
 
 	/**
@@ -271,6 +271,11 @@ class CPSWidgetHelper extends CPSHelperBase
 	 */
 	protected static $_formFieldContainerPrefix = 'PIF';
 
+	/**
+	 * @var string
+	 */
+	protected static $_requiredLabel = '*';
+
 	//********************************************************************************
 	//* Public methods
 	//********************************************************************************
@@ -351,8 +356,11 @@ class CPSWidgetHelper extends CPSHelperBase
 				$widgetOptions['name'] = PS::o( $options, 'name', $attributeName, true );
 				$widgetOptions['id'] = PS::o( $options, 'id', $widgetOptions['name'], true );
 				$widgetOptions['naked'] = true;
-				$widgetOptions['extraScriptFiles'] = array( 'js/plugins/blockUI/jquery.blockUI.js',
-					'js/plugins/localisation/jquery.localisation-min.js', 'js/plugins/tmpl/jquery.tmpl.1.1.1.js' );
+				$widgetOptions['extraScriptFiles'] = array(
+					'js/plugins/blockUI/jquery.blockUI.js',
+					'js/plugins/localisation/jquery.localisation-min.js',
+					'js/plugins/tmpl/jquery.tmpl.1.1.1.js'
+				);
 
 				$_selectedItem = PS::o( $options, 'selected', null, true );
 
@@ -437,6 +445,11 @@ class CPSWidgetHelper extends CPSHelperBase
 							= PS::nvl( $_label, PS::nvl( $model->getAttributeLabel( $attributeName ), $attributeName ) ) . $_suffixToUse;
 					}
 
+					if ( self::UI_BOOTSTRAP == self::$_uiStyle )
+					{
+						$_labelOptions['class'] = PS::o( $_labelOptions, 'class', 'control-label' );
+					}
+
 					$_output = ( $inputFieldType == PS::TEXT_DISPLAY
 						? self::activeLabel( $model, $attributeName, $_labelOptions )
 						:
@@ -503,7 +516,9 @@ class CPSWidgetHelper extends CPSHelperBase
 	)
 	{
 		return self::field(
-			$inputFieldType, $model, $attributeName,
+			$inputFieldType,
+			$model,
+			$attributeName,
 			array_merge(
 				$options,
 				array(
@@ -642,16 +657,19 @@ class CPSWidgetHelper extends CPSHelperBase
 				//	Create menu...
 				$_output .= CPSTransform::asUnorderedList(
 					$listData,
-					array( 'class'       => 'mcdropdown_menu',
-						   'valueColumn' => $_sValueColumn,
-						   'linkText'    => false,
-						   'id'          => $_sTargetMenu )
+					array(
+						'class'       => 'mcdropdown_menu',
+						'valueColumn' => $_sValueColumn,
+						'linkText'    => false,
+						'id'          => $_sTargetMenu
+					)
 				);
 
 				$widgetOptions['target'] = $_target;
 				$widgetOptions['targetMenu'] = $_sTargetMenu;
 
 				CPSMcDropdownWidget::create( null, $widgetOptions );
+
 				return $_beforeHtml . $_output . $_appendHtml;
 
 			//	Build a Filament Group menu
@@ -661,6 +679,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				CPSfgMenu::create( null, $widgetOptions );
 				$_output = ob_get_contents();
 				ob_end_clean();
+
 				return $_beforeHtml . $_output . $_appendHtml;
 
 			//	Default for text field
@@ -670,8 +689,11 @@ class CPSWidgetHelper extends CPSHelperBase
 				if ( !empty( $_sMask ) )
 				{
 					$_oMask = CPSjqMaskedInputWrapper::create(
-						null, array( 'target' => '#' . $htmlOptions['id'],
-									 'mask'   => $_sMask )
+						null,
+						array(
+							'target' => '#' . $htmlOptions['id'],
+							'mask'   => $_sMask
+						)
 					);
 				}
 
@@ -686,9 +708,12 @@ class CPSWidgetHelper extends CPSHelperBase
 				CPSWysiwygWidget::create(
 					null,
 					array_merge(
-						$widgetOptions, array( 'autoRun' => true,
-											   'id'      => $htmlOptions['id'],
-											   'name'    => $htmlOptions['name'] )
+						$widgetOptions,
+						array(
+							'autoRun' => true,
+							'id'      => $htmlOptions['id'],
+							'name'    => $htmlOptions['name']
+						)
 					)
 				);
 				$inputFieldType = self::TEXTAREA;
@@ -697,9 +722,13 @@ class CPSWidgetHelper extends CPSHelperBase
 			//	CKEditor Plug-in
 			case self::CKEDITOR:
 				CPSCKEditorWidget::create(
-					null, array_merge(
-						$widgetOptions, array( 'autoRun' => true,
-											   'target'  => $htmlOptions['id'] )
+					null,
+					array_merge(
+						$widgetOptions,
+						array(
+							'autoRun' => true,
+							'target'  => $htmlOptions['id']
+						)
 					)
 				);
 				$inputFieldType = self::TEXTAREA;
@@ -745,7 +774,7 @@ class CPSWidgetHelper extends CPSHelperBase
 		{
 			if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
 			{
-				CPSLog::trace( __METHOD__, 'Rendering field "' . $attributeName . '" of type "' . $inputFieldType . '"' );
+//				CPSLog::trace( __METHOD__, 'Rendering field "' . $attributeName . '" of type "' . $inputFieldType . '"' );
 			}
 
 			if ( method_exists( __CLASS__, $inputFieldType ) )
@@ -757,6 +786,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				throw new Exception( 'Unknown input field type: ' . $inputFieldType );
 			}
 		}
+
 		//		catch ( Exception $_ex )
 		//		{
 		//			CPSLog::error( __METHOD__, 'Error rendering field "' . $attributeName . '" of type "' . $inputFieldType . '": ' . $_ex->getMessage() );
@@ -809,9 +839,12 @@ class CPSWidgetHelper extends CPSHelperBase
 				CPSWysiwygWidget::create(
 					null,
 					array_merge(
-						$widgetOptions, array( 'autoRun' => true,
-											   'id'      => $htmlOptions['id'],
-											   'name'    => $htmlOptions['name'] )
+						$widgetOptions,
+						array(
+							'autoRun' => true,
+							'id'      => $htmlOptions['id'],
+							'name'    => $htmlOptions['name']
+						)
 					)
 				);
 				$_sType = 'textarea';
@@ -910,6 +943,7 @@ class CPSWidgetHelper extends CPSHelperBase
 				CPSfgMenu::create( null, $widgetOptions );
 				$_output = ob_get_contents();
 				ob_end_clean();
+
 				return $_beforeHtml . $_output . $_appendHtml;
 
 			//	Default for text field
@@ -919,8 +953,11 @@ class CPSWidgetHelper extends CPSHelperBase
 				if ( !empty( $_sMask ) )
 				{
 					$_oMask = CPSjqMaskedInputWrapper::create(
-						null, array( 'target' => '#' . $htmlOptions['id'],
-									 'mask'   => $_sMask )
+						null,
+						array(
+							'target' => '#' . $htmlOptions['id'],
+							'mask'   => $_sMask
+						)
 					);
 				}
 
@@ -933,10 +970,14 @@ class CPSWidgetHelper extends CPSHelperBase
 			//	WYSIWYG Plug-in
 			case self::WYSIWYG:
 				CPSWysiwygWidget::create(
-					null, array_merge(
-						$widgetOptions, array( 'autoRun' => true,
-											   'id'      => $_id,
-											   'name'    => $_name )
+					null,
+					array_merge(
+						$widgetOptions,
+						array(
+							'autoRun' => true,
+							'id'      => $_id,
+							'name'    => $_name
+						)
 					)
 				);
 				$inputFieldType = self::TEXTAREA;
@@ -945,9 +986,13 @@ class CPSWidgetHelper extends CPSHelperBase
 			//	CKEditor Plug-in
 			case self::CKEDITOR:
 				CPSCKEditorWidget::create(
-					null, array_merge(
-						$widgetOptions, array( 'autoRun' => true,
-											   'target'  => $htmlOptions['id'] )
+					null,
+					array_merge(
+						$widgetOptions,
+						array(
+							'autoRun' => true,
+							'target'  => $htmlOptions['id']
+						)
 					)
 				);
 				$inputFieldType = self::TEXTAREA;
@@ -1408,6 +1453,7 @@ CSS1;
 
 		//	Build the form
 		self::$_inForm = true;
+
 //		CPSLog::trace( $_output . print_r( $formOptions, true ) );
 		return $_output . self::beginForm( $_action, $_method, $formOptions );
 	}
@@ -1459,6 +1505,7 @@ CSS1;
 	 */
 	public static function submitButton( $label = 'Submit', $htmlOptions = array() )
 	{
+		$_before = $_after = null;
 		$htmlOptions['type'] = 'submit';
 
 		//	jQUI Button?
@@ -1467,8 +1514,21 @@ CSS1;
 			return self::jquiButton( $label, '_submit_', $htmlOptions );
 		}
 
+		if ( self::UI_BOOTSTRAP == self::$_uiStyle )
+		{
+			if ( !isset( $htmlOptions['class'] ) )
+			{
+				$htmlOptions['class'] = null;
+			}
+
+			$htmlOptions['class'] = self::addClass( $htmlOptions['class'], 'btn' );
+			$_before = '<div class="control-group"><div class="controls">';
+//' <span class="help-block">Example block-level help text here.</span>'
+			$_after = '</div></div>';
+		}
+
 		//	Otherwise use regular button
-		return self::button( $label, $htmlOptions );
+		return $_before . self::htmlButton( $label, $htmlOptions ) . $_after;
 	}
 
 	/**
@@ -1768,6 +1828,7 @@ JS;
 	protected static function getFormSelector( $htmlOptions = array(), $defaultId = 'div.yiiForm>form' )
 	{
 		$_target = PS::o( $htmlOptions, 'id', null );
+
 		return ( $_target == null ) ? $defaultId : '#' . $_target;
 	}
 
@@ -1793,7 +1854,8 @@ JS;
 			$_label = self::label( $_label, $htmlOptions['id'], $_labelOptions );
 
 			$_items[] = strtr(
-				$_template, array(
+				$_template,
+				array(
 					'{input}' => $_option,
 					'{label}' => $_label
 				)
@@ -1814,7 +1876,10 @@ JS;
 	public static function beginFieldset( $legend, $options = array() )
 	{
 		return self::tag(
-			'fieldset', $options, ( $legend ? self::tag( 'legend', PS::o( $options, 'legendOptions', array(), true ), $legend ) : false ), false
+			'fieldset',
+			$options,
+			( $legend ? self::tag( 'legend', PS::o( $options, 'legendOptions', array(), true ), $legend ) : false ),
+			false
 		);
 	}
 
@@ -1869,6 +1934,7 @@ JS;
 		$_message = ( Yii::app()->user->hasFlash( $which ) ) ? Yii::app()->user->getFlash( $which ) : null;
 		$_div = 'ps-flash-display' . ( $left ? '-left' : '' );
 		PS::registerScript( 'ps.flash.display', 'jQuery(".' . $_div . '").animate({opacity: 1.0}, 3000).fadeOut();' );
+
 		return self::tag( 'div', array( 'class' => $_div ), $_message );
 	}
 
@@ -1992,7 +2058,8 @@ HTML;
 					'div',
 					$htmlOptions,
 					$_icon . $header . self::tag(
-						'ul', array(
+						'ul',
+						array(
 							'class' => $_errorListClass,
 							'style' => 'margin-left:25px; margin-top:5px'
 						),
@@ -2013,6 +2080,7 @@ HTML;
 	public static function markdownTransform( $text )
 	{
 		$_parser = new CMarkdownParser();
+
 		return $_parser->safeTransform( $text );
 	}
 
@@ -2079,7 +2147,7 @@ HTML;
 	 *
 	 * @return boolean
 	 */
-	protected static function setDropDownValues( &$inputFieldType, &$htmlOptions = array(), &$listData = null, $selected = null )
+	protected static function setDropDownValues( $inputFieldType, &$htmlOptions = array(), &$listData = null, $selected = null )
 	{
 		$_data = null;
 
@@ -2240,8 +2308,9 @@ HTML;
 		$_path = str_replace( PS::_gbu(), '', Yii::app()->getAssetManager()->getPublishedUrl( Yii::getPathOfAlias( 'pogostick.external' ), true ) );
 		if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
 		{
-			CPSLog::trace( __METHOD__, 'External Library URL: ' . $_path );
+//			CPSLog::trace( __METHOD__, 'External Library URL: ' . $_path );
 		}
+
 		return $_path;
 	}
 
@@ -2256,8 +2325,9 @@ HTML;
 		$_path = str_replace( PS::_gbp(), '', Yii::app()->getAssetManager()->getPublishedPath( Yii::getPathOfAlias( 'pogostick.external' ), true ) );
 		if ( defined( 'PYE_TRACE_LEVEL' ) && PYE_TRACE_LEVEL > 3 )
 		{
-			CPSLog::trace( __METHOD__, 'External Library Path: ' . $_path );
+//			CPSLog::trace( __METHOD__, 'External Library Path: ' . $_path );
 		}
+
 		return $_path;
 	}
 
@@ -2287,6 +2357,7 @@ HTML;
 		{
 			$htmlOptions['required'] = $model->isAttributeRequired( $attribute );
 		}
+
 		return self::activeLabel( $model, $realAttribute, $htmlOptions );
 	}
 
@@ -2818,5 +2889,13 @@ HTML;
 	public static function getCodeModel()
 	{
 		return self::$_codeModel;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getRequiredLabel()
+	{
+		return self::$_requiredLabel;
 	}
 }

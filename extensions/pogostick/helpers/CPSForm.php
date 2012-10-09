@@ -3,23 +3,23 @@
  * This file is part of the psYiiExtensions package.
  *
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
- * @link http://www.pogostick.com Pogostick, LLC.
- * @license http://www.pogostick.com/licensing
+ * @link      http://www.pogostick.com Pogostick, LLC.
+ * @license   http://www.pogostick.com/licensing
  */
 
 /**
  * CPSForm provides form helper functions
  *
- * @package	 psYiiExtensions
- * @subpackage	 helpers
+ * @package        psYiiExtensions
+ * @subpackage     helpers
  *
- * @author		 Jerry Ablan <jablan@pogostick.com>
- * @version	 SVN: $Id: CPSForm.php 404 2010-10-16 00:50:38Z jerryablan@gmail.com $
- * @since		 v1.0.5
+ * @author         Jerry Ablan <jablan@pogostick.com>
+ * @version        SVN: $Id: CPSForm.php 404 2010-10-16 00:50:38Z jerryablan@gmail.com $
+ * @since          v1.0.5
  *
  * @filesource
  *
- * @property string $codeModel The name of the code model for code lookups
+ * @property string $codeModel    The name of the code model for code lookups
  * @property string $hintTemplate The template for displaying hints
  */
 class CPSForm implements IPSBase
@@ -46,6 +46,8 @@ class CPSForm implements IPSBase
 	 * Creates a form from an option array
 	 *
 	 * @param array $arOptions
+	 *
+	 * @throws CPSException
 	 * @return string
 	 * @todo document this function
 	 */
@@ -62,7 +64,7 @@ class CPSForm implements IPSBase
 
 		//	Return as string?
 		$_bReturnString = PS::o( $arOptions, 'returnString', false, true );
-		$_showLegend = PS::o( $arOptions, 'showLegend', true, true );
+		$_showLegend = PS::o( $arOptions, 'showLegend', PS::getShowRequiredLabel(), true );
 		$_bShowDates = PS::o( $arOptions, 'showDates', true, true );
 		$_bValidate = PS::o( $arOptions, 'validate', false );
 		$_bErrorSummary = PS::o( $arOptions, 'errorSummary', true, true );
@@ -70,6 +72,7 @@ class CPSForm implements IPSBase
 		$_errorSummaryHeader = PS::o( $_errorSummaryOptions, 'header', null, true );
 		$_sFormId = PS::o( $arOptions, 'id', 'ps-edit-form' );
 		$_eUIStyle = PS::o( $arOptions, 'uiStyle', PS::UI_DEFAULT );
+		PS::setUiStyle( $_eUIStyle );
 		$_errorSummaryOptions['uiStyle'] = $_eUIStyle;
 
 		if ( !isset( $arOptions['name'] ) )
@@ -158,7 +161,7 @@ SCRIPT;
 
 					case 'beginfieldset':
 					case 'endfieldset':
-						$_sOut .= call_user_func_array( array( 'PS', $_sType ), $_arValue );
+						$_sOut .= call_user_func_array( array( '\\PS', $_sType ), $_arValue );
 						break;
 
 					case 'submit':
@@ -170,7 +173,7 @@ SCRIPT;
 							$_arSubmit['jqui'] = true;
 						}
 						$_arValue = array( $_sLabel, $_arSubmit, 'formId' => $_sFormId );
-						$_sOut .= call_user_func_array( array( 'PS', 'submitButtonBar' ), $_arValue );
+						$_sOut .= call_user_func_array( array( '\\PS', 'submitButtonBar' ), $_arValue );
 						$_bHaveButtonBar = true;
 						break;
 
@@ -191,16 +194,17 @@ SCRIPT;
 						}
 
 						//	Make the field
-						$_sOut .= call_user_func_array( array( 'PS', $_sMethod ), $_arValue );
+//						\CPSLog::trace( 'method=' . $_sMethod . ' / ' . print_r( $_arValue, true ) );
+						$_sOut .= \call_user_func_array( array( '\\PS', $_sMethod ), $_arValue );
 
 						//	CKEditor needs special handing for validate...
 						if ( $_bValidate && $_sType == PS::CKEDITOR )
 						{
-							$_sFieldId = PS::getLastFieldId();
-							$_sFormId = PS::getCurrentFormId();
+							$_sFieldId = \PS::getLastFieldId();
+							$_sFormId = \PS::getCurrentFormId();
 							$_sScript =
 								"jQuery('#{$_sFormId}').submit(function(e){ jQuery('#{$_sFieldId}').val(CKEDITOR.instances.{$_sFieldId}.getData()); return true; });";
-							PS::_rs( '#psForm.ckeditor.' . $_sFieldId . '.get_data', $_sScript, CClientScript::POS_READY );
+							\PS::_rs( '#psForm.ckeditor.' . $_sFieldId . '.get_data', $_sScript, \ClientScript::POS_READY );
 						}
 						break;
 				}
@@ -208,13 +212,13 @@ SCRIPT;
 		}
 
 		//	Does user want dates? Show 'em
-		if ( $_bShowDates && $_oModel instanceof CPSModel && !$_oModel->isNewRecord )
+		if ( $_bShowDates && $_oModel instanceof \CPSModel && !$_oModel->isNewRecord )
 		{
 			$_sOut .= $_oModel->showDates();
 		}
 
 		//	Add legend
-		$_requiredLabel = PS::getRequiredLabel();
+		$_requiredLabel = \PS::getRequiredLabel();
 
 		if ( $_showLegend && $_requiredLabel )
 		{
@@ -222,7 +226,7 @@ SCRIPT;
 		}
 
 		//	Ok, done building form...
-		$_sOut .= PS::endForm();
+		$_sOut .= \PS::endForm();
 
 		//	Does user want data returned?
 		if ( $_bReturnString )
@@ -245,19 +249,20 @@ SCRIPT;
 	 *
 	 * Example:
 	 *
-	 *	 echo CPSForm::formHeader( 'Site Manager',
-	 *		array( 'new' =>
-	 *			array(
-	 *				'label' => 'New Site',
-	 *				'url' => array( 'create' ),
-	 *				 'formId' => 'id for form' // optional
-	 *				'icon' => 'circle-plus',
-	 *			)
-	 *		)
-	 *	 );
+	 *     echo CPSForm::formHeader( 'Site Manager',
+	 *        array( 'new' =>
+	 *            array(
+	 *                'label' => 'New Site',
+	 *                'url' => array( 'create' ),
+	 *                 'formId' => 'id for form' // optional
+	 *                'icon' => 'circle-plus',
+	 *            )
+	 *        )
+	 *     );
 	 *
 	 * @param string $sTitle
-	 * @param array $arOptions
+	 * @param array  $arOptions
+	 *
 	 * @return string
 	 */
 	public static function formHeaderEx( $sTitle, $arOptions = array() )
@@ -326,6 +331,7 @@ HTML;
 
 	/**
 	 * Makes a nice form header
+	 *
 	 * @deprecated Use formHeaderEx
 	 */
 	public static function formHeader( $sTitle, $arMenuItems = array(), $sDivClass = 'ps-form-header', $bShowFlashDiv = true,
@@ -351,6 +357,7 @@ HTML;
 	{
 		$_arFields = PS::o( $arOptions, 'fields', array(), true );
 		$_sDivClass = PS::o( $arOptions, 'class', 'ps-search-bar', true );
+		$_sOut = null;
 
 		foreach ( $_arFields as $_sName => $_arField )
 		{
@@ -386,10 +393,12 @@ HTML;
 
 	/**
 	 * Send in an array of standard actions and they will be converted to spiffy action buttons.
-	 * @param $sItemName
+	 *
+	 * @param       $sItemName
 	 * @param array $arWhich
-	 * @param null $sAdminName
-	 * @param null $sAdminAction
+	 * @param null  $sAdminName
+	 * @param null  $sAdminAction
+	 *
 	 * @return array
 	 */
 	public static function createMenuButtons( $sItemName, $arWhich = array(), $sAdminName = null, $sAdminAction = null )
@@ -419,9 +428,9 @@ HTML;
 				case PS::ACTION_PREVIEW:
 					$_arOut['preview'] = array(
 						'label' => 'Preview',
-						'url' => array( '#' ),
-						'icon' => 'lightbulb',
-						'id' => PS::o( $_arOptions, 'id' ),
+						'url'   => array( '#' ),
+						'icon'  => 'lightbulb',
+						'id'    => PS::o( $_arOptions, 'id' ),
 					);
 
 					if ( $_sTarget = PS::o( $_arOptions, 'target' ) )
@@ -433,41 +442,41 @@ HTML;
 				case PS::ACTION_VIEW:
 					$_arOut['view'] = array(
 						'label' => 'View',
-						'url' => array( 'show' ),
-						'icon' => 'check',
+						'url'   => array( 'show' ),
+						'icon'  => 'check',
 					);
 					break;
 
 				case PS::ACTION_CREATE:
 					$_arOut['new'] = array(
 						'label' => 'New ' . $sItemName,
-						'url' => array( 'create' ),
-						'icon' => 'pencil',
+						'url'   => array( 'create' ),
+						'icon'  => 'pencil',
 					);
 					break;
 
 				case PS::ACTION_EDIT:
 					$_arOut['update'] = array(
 						'label' => intval( $_sButton ) == PS::ACTION_EDIT ? 'Edit' : 'Update',
-						'url' => array( 'update' ),
-						'icon' => 'pencil',
+						'url'   => array( 'update' ),
+						'icon'  => 'pencil',
 					);
 					break;
 
 				case PS::ACTION_SAVE:
 					$_arOut['save'] = array(
 						'label' => 'Save',
-						'url' => '_submit_',
-						'icon' => 'disk',
+						'url'   => '_submit_',
+						'icon'  => 'disk',
 					);
 					break;
 
 				case PS::ACTION_DELETE:
 					$_arOut['delete'] = array(
-						'label' => 'Delete',
-						'url' => array( 'delete' ),
+						'label'   => 'Delete',
+						'url'     => array( 'delete' ),
 						'confirm' => 'Do you really want to delete this ' . $sItemName . '?',
-						'icon' => 'trash',
+						'icon'    => 'trash',
 					);
 					break;
 
@@ -475,32 +484,32 @@ HTML;
 				case PS::ACTION_CANCEL:
 					$_arOut['cancel'] = array(
 						'label' => 'Cancel',
-						'url' => $sAdminAction,
-						'icon' => 'cancel',
+						'url'   => $sAdminAction,
+						'icon'  => 'cancel',
 					);
 					break;
 
 				case PS::ACTION_ADMIN:
 					$_arOut['return'] = array(
 						'label' => $sAdminName,
-						'url' => $sAdminAction,
-						'icon' => 'arrowreturnthick-1-w',
+						'url'   => $sAdminAction,
+						'icon'  => 'arrowreturnthick-1-w',
 					);
 					break;
 
 				case PS::ACTION_LOCK:
 					$_arOut['lock'] = array(
 						'label' => 'Lock',
-						'url' => array( 'lock' ),
-						'icon' => 'unlocked',
+						'url'   => array( 'lock' ),
+						'icon'  => 'unlocked',
 					);
 					break;
 
 				case PS::ACTION_UNLOCK:
 					$_arOut['unlock'] = array(
 						'label' => 'Unlock',
-						'url' => array( 'unlock' ),
-						'icon' => 'locked',
+						'url'   => array( 'unlock' ),
+						'icon'  => 'locked',
 					);
 					break;
 			}
