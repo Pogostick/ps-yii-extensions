@@ -2154,7 +2154,7 @@ HTML;
 		if ( is_numeric( $inputFieldType ) && $inputFieldType >= 1000 )
 		{
 			//	One of our generics? Set data, type and return
-			if ( null === ( $_data = self::getGenericDropDownValues( $inputFieldType, $htmlOptions, $listData ) ) )
+			if ( null !== ( $_data = self::getGenericDropDownValues( $inputFieldType, $htmlOptions, $listData ) ) )
 			{
 				$inputFieldType = self::DROPDOWN;
 				$listData = $_data;
