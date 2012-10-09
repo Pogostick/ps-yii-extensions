@@ -1,4 +1,5 @@
 .svn
+.idea
 assets
 protected/runtime
 nbproject

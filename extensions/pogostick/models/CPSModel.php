@@ -214,7 +214,7 @@ class CPSModel extends CActiveRecord implements IPSBase
 	public function __construct( $_scenario = 'insert' )
 	{
 		parent::__construct( $_scenario );
-		$this->_modelClass = ( version_compare( PHP_VERSION, '5.3.0' ) > 0 ) ? get_called_class() : get_class( $this );
+		$this->_modelClass = get_class( $this );
 	}
 
 	/**
@@ -506,6 +506,41 @@ HTML;
 	}
 
 	/**
+	 * A more-better CActiveRecord update method. Pass in column => value to update.
+	 * Note, validation is not performed in this method. You may call {@link validate} to perform the validation.
+	 * @param array $attributes list of attributes and values that need to be saved. Defaults to null, meaning all attributes that are loaded from DB will be saved.
+	 * @return boolean whether the update is successful
+	 * @throws CException if the record is new
+	 */
+	public function update( $attributes = null )
+	{
+		$_columns = array();
+
+		if ( null === $attributes )
+		{
+			return parent::update( $attributes );
+		}
+
+		foreach ( $attributes as $_column => $_value )
+		{
+			//	column => value specified
+			if ( ! is_numeric( $_column ) )
+			{
+				$this->{$_column} = $_value;
+			}
+			else
+			{
+				//	n => column specified
+				$_column = $_value;
+			}
+
+			$_columns[] = $_column;
+		}
+
+		return parent::update( $_columns );
+	}
+
+	/**
 	 * Sets the values in the model based on REST attribute names
 	 * @param array $attributeList
 	 */
@@ -532,7 +567,6 @@ HTML;
 
 	/**
 	 * Grab our name
-	 * @param string $classNameName
 	 */
 	public function afterConstruct()
 	{

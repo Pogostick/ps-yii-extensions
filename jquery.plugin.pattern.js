@@ -24,149 +24,134 @@
  * the code.
  */
 
-(function($)
-  {
-   initPlugin({
-               name : 'asyncLoader'  // plugin name
-              });
+(function( $ ) {
+	initPlugin( {
+		name : 'asyncLoader'  // plugin name
+	} );
 
-   //----plugin class -- BEGIN--------
-   function getPluginClass()
-    {
-     return function (args)
-      {
-       // Version - directly exposed to be access via $(...).plugin.version
-       this.version = '1.0';
+	//----plugin class -- BEGIN--------
+	function getPluginClass() {
+		return function ( args ) {
+			// Version - directly exposed to be access via $(...).plugin.version
+			this.version = '1.0';
 
-       // Public Methods - wrappers containing a reference to the actual function
-       this.someMethodA = someMethodA;   // non-chainable method
-       this.someMethodB = _(someMethodB);    // chainable method
+			// Public Methods - wrappers containing a reference to the actual function
+			this.someMethodA = someMethodA;   // non-chainable method
+			this.someMethodB = _( someMethodB );    // chainable method
 
-       this.rc = jQuerify;       // required plugin pattern code
+			this.rc = jQuerify;       // required plugin pattern code
 
-       // getConfig - always used to contain class/plugin arguments
-       function getConfig()
-        {
-         return undefined;       // we define this via setConfig()
-        }
+			// getConfig - always used to contain class/plugin arguments
+			function getConfig() {
+				return undefined;       // we define this via setConfig()
+			}
 
-       // setConfig - always used to set class/plugin arguments, usually used indirectly via initConfig
-       function setConfig(args)
-        {
-         getConfig = function()
-                      {
-                       return (args);
-                      };
-        }
+			// setConfig - always used to set class/plugin arguments, usually used indirectly via initConfig
+			function setConfig( args ) {
+				getConfig = function() {
+					return (args);
+				};
+			}
 
-       // initConfig - sets default values via jQuery's extend()
-       function initConfig(args)
-        {
-         setConfig($.extend({
-                             chainable : true,     // false - this allows us to do something like $(...).plugin(args).method()
-                                                   //         this returns the object as the output
-                                                   // true  - otherwise, by default, it will assume jQuery native functionality of chainability
-                                                   //         this returns what jQuery expects for chaining
-                             properties : {}       // any properties that you want to be passed to the plugin.
-                            }, args));
-         return (this);
-        }
+			// initConfig - sets default values via jQuery's extend()
+			function initConfig( args ) {
+				setConfig( $.extend( {
+					chainable : true,	 // false - this allows us to do something like $(...).plugin(args).method()
+					//         this returns the object as the output
+					// true  - otherwise, by default, it will assume jQuery native functionality of chainability
+					//         this returns what jQuery expects for chaining
+					properties : {}	   // any properties that you want to be passed to the plugin.
+				}, args ) );
+				return (this);
+			}
 
-       //---[BEGIN YOUR CODE below]-------
-       //   [Class methods / properties]
+			//---[BEGIN YOUR CODE below]-------
+			//   [Class methods / properties]
 
-       function someMethodA(args)
-        {
-         alert('This is our non-chainable method!');
+			function someMethodA( args ) {
+				alert( 'This is our non-chainable method!' );
 
-         return (this);    // we return this to allow classic OOP
-        }
+				return (this);    // we return this to allow classic OOP
+			}
 
-       function someMethodB(args)
-        {
-         alert('This is our chainable method!');
+			function someMethodB( args ) {
+				alert( 'This is our chainable method!' );
 
-         // we don't have to return anything since the _() takes
-         // care of chainability.
-        }
+				// we don't have to return anything since the _() takes
+				// care of chainability.
+			}
 
 
-       // initConfig - gets called to set defaults for plugin
-       initConfig(args);   // Pattern code - usually just copy/paste
+			// initConfig - gets called to set defaults for plugin
+			initConfig( args );   // Pattern code - usually just copy/paste
 
-       // we put our logic after the method definitions to keep JSLint a
-       // little happier.
+			// we put our logic after the method definitions to keep JSLint a
+			// little happier.
 
-       //---[END YOUR CODE above]----
+			//---[END YOUR CODE above]----
 
-       function _ (fn)      // local function that facilitates chainability
-        {
-         return function (args)
-                 {
-                  return this.prototype.rc(function ()
-                                            {
-                                             fn.call(this, args);
-                                            });
-                 };
-        }
+			  // local function that facilitates chainability
+			function _( fn )
+			{
+				return function ( args ) {
+					return this.prototype.rc( function () {
+						fn.call( this, args );
+					} );
+				};
+			}
 
-       function jQuerify(args)
-        {
-         if (typeof args == 'function')
-          {
-           return $.fn.curReturn.each(args);  // handles chaining of method
-          }
-         else
-          {
-           initConfig(args);
+			function jQuerify( args ) {
+				if ( typeof args == 'function' ) {
+					return $.fn.curReturn.each( args );  // handles chaining of method
+				}
+				else {
+					initConfig( args );
 
-           return getConfig().chainable       // checks for chaining in main plugin
-                   ? $.fn.curReturn           // returns chainability hook
-                   : $.fn[getPluginName()];   // returns OOP object hook
-                                              // getPluginName() is defined in initPlugin()
-          }
-        };
-      };
-    }
+					return getConfig().chainable	   // checks for chaining in main plugin
+						? $.fn.curReturn		   // returns chainability hook
+						: $.fn[getPluginName()];   // returns OOP object hook
+					// getPluginName() is defined in initPlugin()
+				}
+			}
 
-   if ($.fn.curReturn === undefined)          // checks if a plugin has already loaded environment
-    {
-     $.fn.extend({                            // if not then it extends jQuery object.
-                  curReturn: null,            // declares placeholder
-                  jQueryInit: jQuery.fn.init  // saves original jQuery init method
-                 });
+			;
+		};
+	}
 
-     $.fn.extend({                            // now we overwrite jQuery's internal init() so we
-                                              // can intercept the selector and context.
-                  init: function( selector, context )
-                         {
-                          return jQuery.fn.curReturn = new jQuery.fn.jQueryInit(selector, context);
-                         }
-                 });
-    }
+	if ( $.fn.curReturn === undefined )		  // checks if a plugin has already loaded environment
+	{
+		$.fn.extend( {							// if not then it extends jQuery object.
+			curReturn: null,			// declares placeholder
+			jQueryInit: jQuery.fn.init  // saves original jQuery init method
+		} );
 
-   function initPlugin(args)
-    {
-     getPluginName = function()
-                       {
-                        return args.name;    // sets getPluginName() to return jQuery plugin name
-                       };
+		$.fn.extend( {							// now we overwrite jQuery's internal init() so we
+			// can intercept the selector and context.
+			init: function( selector, context ) {
+				return jQuery.fn.curReturn = new jQuery.fn.jQueryInit( selector, context );
+			}
+		} );
+	}
+
+	function initPlugin( args ) {
+		getPluginName = function() {
+			return args.name;    // sets getPluginName() to return jQuery plugin name
+		};
 
 //     console && console.log(["Initialize", args.name, "plugin."].join(' '));
 
-     try                                       // meat
-      {
-       var classCode = getPluginClass(),       // get a reference to the plugin OOP code
-       _p = new classCode({});                 // instantiate plugin Class (which is OOP)
-       $.fn[getPluginName()] = _p.rc;          // insert instantiated plugin into jQuery namespace
-       $.extend($.fn[getPluginName()].prototype,_p);  // augment jQuery internals
-       $.extend($.fn[getPluginName()],_p);            // same here.
-      }
-     catch (error)
-      {
-       alert(error);                           // in case something breaks let us know.
-      }
+		try									   // meat
+		{
+			var classCode = getPluginClass(),	   // get a reference to the plugin OOP code
+				_p = new classCode( {} );                 // instantiate plugin Class (which is OOP)
+			$.fn[getPluginName()] = _p.rc;          // insert instantiated plugin into jQuery namespace
+			$.extend( $.fn[getPluginName()].prototype, _p );  // augment jQuery internals
+			$.extend( $.fn[getPluginName()], _p );            // same here.
+		}
+		catch ( error ) {
+			alert( error );                           // in case something breaks let us know.
+		}
 
-    }
+	}
 
-  })(jQuery);
+})( jQuery );

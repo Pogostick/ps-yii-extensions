@@ -33,6 +33,7 @@ class CPSRESTController extends CPSController
 	/**
 	 * The requested output format. Defaults to null which requires the handler
 	 * to return the proper format.
+	 *
 	 * @var int
 	 */
 	protected $_outputFormat = null;
@@ -40,6 +41,7 @@ class CPSRESTController extends CPSController
 	/**
 	 * If true, all inbound request parameters will be passed to the action
 	 * as a hash instead of individual arguments.
+	 *
 	 * @var bool
 	 */
 	protected $_singleParameterActions = false;
@@ -83,7 +85,9 @@ class CPSRESTController extends CPSController
 	 * Creates the action instance based on the action name.
 	 * The action can be either an inline action or an object.
 	 * The latter is created by looking up the action map specified in {@link actions}.
+	 *
 	 * @param $actionId
+	 *
 	 * @return CAction the action instance, null if the action does not exist.
 	 * @see actions
 	 */
@@ -105,7 +109,9 @@ class CPSRESTController extends CPSController
 	 *
 	 * Runs the named REST action.
 	 * Filters specified via {@link filters()} will be applied.
+	 *
 	 * @param \CPSRESTAction $action
+	 *
 	 * @return mixed
 	 * @see createAction
 	 * @see runAction
@@ -124,7 +130,9 @@ class CPSRESTController extends CPSController
 	/**
 	 * Runs the named REST action.
 	 * Filters specified via {@link filters()} will be applied.
+	 *
 	 * @param \CAction $action
+	 *
 	 * @return mixed
 	 * @see createAction
 	 * @see runAction
@@ -146,19 +154,23 @@ class CPSRESTController extends CPSController
 		//	Strip off everything after the route...
 		if ( null != ( $_uri = trim( substr( $_uri, stripos( $_uri, $_frag ) + strlen( $_frag ) ), ' /?' ) ) )
 		{
-			$_options = ( ! empty( $_uri ) ? explode( '/', $_uri ) : array() );
+			$_options = ( !empty( $_uri ) ? explode( '/', $_uri ) : array() );
 
 			foreach ( $_options as $_key => $_value )
 			{
 				if ( false !== strpos( $_value, '=' ) )
 				{
 					if ( null != ( $_list = explode( '=', $_value ) ) )
-						$_options[ $_list[0] ] = $_list[1];
+					{
+						$_options[$_list[0]] = $_list[1];
+					}
 
-					unset( $_options[ $_key ] );
+					unset( $_options[$_key] );
 				}
 				else
-					$_options[ $_key ] = $_value;
+				{
+					$_options[$_key] = $_value;
+				}
 			}
 		}
 
@@ -171,14 +183,18 @@ class CPSRESTController extends CPSController
 
 			//	Remove route
 			if ( isset( $_options['r'] ) )
-				unset( $_options['r']);
+			{
+				unset( $_options['r'] );
+			}
 		}
 
 		//	load into url params
 		foreach ( $_options as $_key => $_value )
 		{
-			if ( ! isset( $_urlParameters[ $_key ] ) )
-				$_urlParameters[ $_key ] = $_value;
+			if ( !isset( $_urlParameters[$_key] ) )
+			{
+				$_urlParameters[$_key] = $_value;
+			}
 		}
 
 		//	Is it a valid request?
@@ -189,12 +205,16 @@ class CPSRESTController extends CPSController
 		{
 			foreach ( $_POST as $_key => $_value )
 			{
-				if ( ! is_array( $_value ) )
-					$_urlParameters[ $_key ] = $_value;
+				if ( !is_array( $_value ) )
+				{
+					$_urlParameters[$_key] = $_value;
+				}
 				else
 				{
 					foreach ( $_value as $_subKey => $_subValue )
-						$_urlParameters[ $_subKey ] = $_subValue;
+					{
+						$_urlParameters[$_subKey] = $_subValue;
+					}
 				}
 			}
 		}
@@ -202,25 +222,27 @@ class CPSRESTController extends CPSController
 		{
 		}
 
-		if ( ! method_exists( $this, $_requestMethod ) )
+		if ( !method_exists( $this, $_requestMethod ) )
 		{
 			//	Is it a valid catchall request?
-			if ( ! method_exists( $this, 'request' . $_actionId ) )
+			if ( !method_exists( $this, 'request' . $_actionId )
+			)
 				//	No clue what it is, so must be bogus. Hand off to missing action...
+			{
 				return $this->missingAction( $_actionId );
+			}
 
 			$_requestMethod = 'request' . $_actionId;
 		}
 
 		$_callResults = call_user_func_array(
 			array(
-				 $this,
-				 $_requestMethod
+				$this,
+				$_requestMethod
 			),
 			//	Pass in parameters collected as a single array or individual values
 			$this->_singleParameterActions ? array( $_urlParameters ) : array_values( $_urlParameters )
-		);
-
+		grant_type=authorization_code&scope=&code=&redirect_uri=http://slayer.jablan.cisdev.atlis1/oauth/authorize
 		//	Echo output...
 		$_output = $this->_formatOutput( $_callResults );
 		echo $_output;
@@ -234,6 +256,7 @@ class CPSRESTController extends CPSController
 	 * return the consumer application.
 	 *
 	 * @param mixed $output
+	 *
 	 * @return mixed
 	 */
 	protected function _formatOutput( $output )
@@ -246,7 +269,9 @@ class CPSRESTController extends CPSController
 
 				//	Are we already in JSON?
 				if ( null !== @json_decode( $output ) )
+				{
 					break;
+				}
 
 				/**
 				 * Chose NOT to overwrite in the case of an error while
@@ -254,17 +279,23 @@ class CPSRESTController extends CPSController
 				 */
 				//	@todo Not sure if this is all that wise, will cause confusion when your methods return nada.
 				if ( false !== ( $_response = json_encode( $output ) ) )
+				{
 					$output = $_response;
+				}
 				break;
 
 			case PS::OF_XML:
 				$output = PS::arrayToXml( $output, 'response' );
 
 				//	Set appropriate content type
-				if ( stristr( $_SERVER[ 'HTTP_ACCEPT' ], 'application/xhtml+xml' ) )
+				if ( stristr( $_SERVER['HTTP_ACCEPT'], 'application/xhtml+xml' ) )
+				{
 					header( 'Content-type: application/xhtml+xml;charset=utf-8' );
+				}
 				else
+				{
 					header( 'Content-type: text/xml;charset=utf-8' );
+				}
 				break;
 
 			case PS::OF_RAW:
@@ -273,8 +304,10 @@ class CPSRESTController extends CPSController
 
 			case PS::OF_ASSOC_ARRAY:
 			default:
-				if ( ! is_array( $output ) )
-					$output = array( $output );
+			if ( !is_array( $output ) )
+			{
+				$output = array( $output );
+			}
 				break;
 		}
 
@@ -286,11 +319,12 @@ class CPSRESTController extends CPSController
 	 * Creates a JSON encoded array (as a string) with a standard REST response. Override to provide
 	 * a different response format.
 	 *
-	 * @param array $resultList
+	 * @param array   $resultList
 	 * @param boolean $isError
-	 * @param string $errorMessage
+	 * @param string  $errorMessage
 	 * @param integer $errorCode
-	 * @param array $additionalInfo
+	 * @param array   $additionalInfo
+	 *
 	 * @return string JSON encoded array
 	 */
 	protected function _createResponse( $resultList = array(), $isError = false, $errorMessage = 'failure', $errorCode = 0, $additionalInfo = array() )
@@ -298,13 +332,15 @@ class CPSRESTController extends CPSController
 		if ( $isError )
 		{
 			$_response = array(
-				'result' => 'failure',
+				'result'       => 'failure',
 				'errorMessage' => $errorMessage,
-				'errorCode' => $errorCode,
+				'errorCode'    => $errorCode,
 			);
 
 			if ( $resultList )
+			{
 				$_response['resultData'] = $resultList;
+			}
 		}
 		else
 		{
@@ -313,14 +349,18 @@ class CPSRESTController extends CPSController
 			);
 
 			if ( $resultList )
+			{
 				$_response['resultData'] = $resultList;
+			}
 		}
 
 		//	Add in any additional info...
-		if ( is_array( $additionalInfo ) && ! empty( $additionalInfo ) )
+		if ( is_array( $additionalInfo ) && !empty( $additionalInfo ) )
 		{
 			foreach ( $additionalInfo as $_key => $_value )
+			{
 				$_response[$_key] = $_value;
+			}
 		}
 
 		return $_response;
@@ -331,7 +371,8 @@ class CPSRESTController extends CPSController
 	 * a different response format.
 	 *
 	 * @param string|Exception $errorMessage
-	 * @param integer $errorCode
+	 * @param integer          $errorCode
+	 *
 	 * @return string JSON encoded array
 	 */
 	protected function _createErrorResponse( $errorMessage = 'failure', $errorCode = 0 )
@@ -350,22 +391,28 @@ class CPSRESTController extends CPSController
 			if ( $this->_debugMode )
 			{
 				$_additionalInfo = array(
-					'errorType' => 'Exception',
+					'errorType'  => 'Exception',
 					'errorClass' => get_class( $_ex ),
-					'errorFile' => $_ex->getFile(),
-					'errorLine' => $_ex->getLine(),
+					'errorFile'  => $_ex->getFile(),
+					'errorLine'  => $_ex->getLine(),
 					'stackTrace' => $_ex->getTrace(),
-					'previous' => ( $_previous ? $this->_createErrorResponse( $_previous ) : null ),
+					'previous'   => ( $_previous ? $this->_createErrorResponse( $_previous ) : null ),
 				);
 			}
 		}
+
+		//	Set some error headers
+		header('Pragma: no-cache');
+		header('Cache-Control: no-store, no-cache, max-age=0, must-revalidate');
 
 		return $this->_createResponse( array(), true, $errorMessage, $errorCode, $_additionalInfo );
 	}
 
 	/***
 	 * Translates errors from normal model attribute names to REST map names
+	 *
 	 * @param CActiveRecord $model
+	 *
 	 * @return array
 	 */
 	protected function _translateErrors( CActiveRecord $model )
@@ -380,7 +427,9 @@ class CPSRESTController extends CPSController
 				foreach ( $_errorList as $_key => $_value )
 				{
 					if ( in_array( $_key, array_keys( $_restMap ) ) )
-						$_resultList[ $_restMap[ $_key ] ] = $_value;
+					{
+						$_resultList[$_restMap[$_key]] = $_value;
+					}
 				}
 
 				$_errorList = $_resultList;
@@ -396,6 +445,7 @@ class CPSRESTController extends CPSController
 
 	/**
 	 * @param int $outputFormat
+	 *
 	 * @return \CPSRESTController
 	 */
 	public function setOutputFormat( $outputFormat )
@@ -414,6 +464,7 @@ class CPSRESTController extends CPSController
 
 	/**
 	 * @param boolean $singleParameterActions
+	 *
 	 * @return \CPSRESTController
 	 */
 	public function setSingleParameterActions( $singleParameterActions )

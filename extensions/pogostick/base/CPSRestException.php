@@ -9,10 +9,9 @@
  * @package        psYiiExtensions
  * @subpackage     base
  * @author         Jerry Ablan <jablan@pogostick.com>
- * @version        SVN: $Id: CPSApiException.php 316 2009-12-23 05:56:31Z jerryablan@gmail.com $
- * @since          v1.0.3
+ * @since          v1.1.0
  * @filesource
  */
-class CPSApiException extends CPSException
+class CPSRestException extends CHttpException
 {
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * This file is part of the psYiiExtensions package.
- * 
+ *
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
  * @link http://www.pogostick.com Pogostick, LLC.
  * @license http://www.pogostick.com/licensing
@@ -9,14 +9,14 @@
 
 /**
  * The CPSOAuthComponent is the base class for all Pogostick widgets for Yii
- * 
- * @package 	psYiiExtensions
- * @subpackage 	base
- * 
- * @author 		Jerry Ablan <jablan@pogostick.com>
- * @version 	SVN $Id: CPSOAuthComponent.php 358 2010-01-02 23:33:40Z jerryablan@gmail.com $
- * @since 		v1.0.3
- * 
+ *
+ * @package	 psYiiExtensions
+ * @subpackage	 base
+ *
+ * @author		 Jerry Ablan <jablan@pogostick.com>
+ * @version	 SVN $Id: CPSOAuthComponent.php 358 2010-01-02 23:33:40Z jerryablan@gmail.com $
+ * @since		 v1.0.3
+ *
  * @filesource
  */
 class CPSOAuthComponent extends CPSApiComponent
@@ -24,15 +24,17 @@ class CPSOAuthComponent extends CPSApiComponent
 	//*************************************************************************
 	//* Private Members 
 	//*************************************************************************
-	
+
 	/**
 	 * Our OAuth object
+	 *
 	 * @var OAuth
 	 */
 	protected $_oauth = null;
 
 	/**
 	 * The current token
+	 *
 	 * @var array
 	 */
 	protected $_currentToken = null;
@@ -66,17 +68,17 @@ class CPSOAuthComponent extends CPSApiComponent
 	 * Constructor
 	 *
 	 */
-	public function __construct( )
+	public function __construct()
 	{
 		//	No oauth? No run...
 		if ( !extension_loaded( 'oauth' ) )
-				{
-					throw new CException( Yii::t( 'psOAuthBehavior', 'The "oauth" extension is not loaded. Please install 
+		{
+			throw new CException( Yii::t( 'psOAuthBehavior', 'The "oauth" extension is not loaded. Please install
 			and/or load the oath extension (PECL).' ) );
-				}
+		}
 
 		//	Call daddy...
-		parent::__construct( );
+		parent::__construct();
 	}
 
 	//********************************************************************************
@@ -87,44 +89,46 @@ class CPSOAuthComponent extends CPSApiComponent
 	 * Initialize this behavior
 	 *
 	 */
-	public function init( )
+	public function init()
 	{
-		parent::init( );
+		parent::init();
 
 		//	Events...
-		$this->attachEventHandler( 'onUserAuthorized', array( $this, 'userAuthorized' ) );
+		$this->attachEventHandler( 'onUserAuthorized', array( $this, 'onUserAuthorized' ) );
 
 		//	Create our object...
-		$this->_oauth = new OAuth( 
-			$this->_apiKey, 
-			$this->_altApiKey, 
-			OAUTH_SIG_METHOD_HMACSHA1, 
-			OAUTH_AUTH_TYPE_URI 
+		$this->_oauth = new OAuth(
+			$this->_apiKey,
+			$this->_altApiKey,
+			OAUTH_SIG_METHOD_HMACSHA1,
+			OAUTH_AUTH_TYPE_URI
 		);
 
 		//	Load any tokens we have...
-		$this->loadToken( );
+		$this->loadToken();
 
 		//	Have we been authenticated?
-		if ( ! $this->_isAuthorized )
+		if ( !$this->_isAuthorized )
 		{
 			if ( isset( $_REQUEST['oauth_token'] ) )
 			{
 				if ( $this->_oauth->setToken( $_REQUEST['oauth_token'], $_REQUEST['oauth_verifier'] ) )
 				{
-					$_token = $this->_oauth->getAccessToken(
-						$this->_apiBaseUrl . $this->_accessTokenUrl, 
-						null, 
-						$_REQUEST['oauth_verifier'] 
+					$_token = $this->_oauth->getCurrentToken(
+						$this->_apiBaseUrl . $this->_accessTokenUrl,
+						null,
+						$_REQUEST['oauth_verifier']
 					);
-					
+
 					$this->storeToken( $_token );
 					$this->_isAuthorized = true;
 				}
 
 				//	Raise our event
 				if ( $this->_isAuthorized )
+				{
 					$this->onUserAuthorized( new CPSOAuthEvent( $this->_currentToken ) );
+				}
 			}
 		}
 	}
@@ -134,13 +138,13 @@ class CPSOAuthComponent extends CPSApiComponent
 	 *
 	 * @param mixed $token
 	 */
-	public function getAuthorizeUrl( )
+	public function getAuthorizeUrl()
 	{
-		$_token = $this->_oauth->getRequestToken( 
-			$this->_apiBaseUrl . $this->_requestTokenUrl, 
-			$this->_callbackUrl 
+		$_token = $this->_oauth->getRequestToken(
+			$this->_apiBaseUrl . $this->_requestTokenUrl,
+			$this->_callbackUrl
 		);
-		
+
 		return $this->_apiBaseUrl . $this->_authorizeUrl . '?oauth_token=' . $_token['oauth_token'];
 	}
 
@@ -182,14 +186,21 @@ class CPSOAuthComponent extends CPSApiComponent
 	 */
 	public function loadToken()
 	{
+		$this->_isAuthorized = false;
+		$this->_currentToken = null;
+
 		if ( null !== ( $_user = PS::_gu() ) )
 		{
-			if ( null != ( $_token = PS::_gs( 'com.pogostick.oauth.token' ) ) )
+			$_name = $this->getInternalName();
+
+			if ( null !== ( $this->_currentToken = PS::_gs( $_name . '_oAuthToken' ) ) )
 			{
-				$this->_currentToken = $_token;
-				$this->_isAuthorized = PS::_gs( 'com.pogostick.oauth.isAuthorized', false );
+				$this->_isAuthorized = true;
 			}
 		}
+
+		PS::_ss( $_name . '_oAuthToken', $this->_currentToken );
+		PS::_ss( $_name . '_isAuthorized', $this->_isAuthorized );
 	}
 
 	//********************************************************************************
@@ -198,11 +209,22 @@ class CPSOAuthComponent extends CPSApiComponent
 
 	/***
 	 * User has been authorized event
+	 *
 	 * @param CPSOAuthEvent $_event
 	 */
 	public function onUserAuthorized( $_event )
 	{
 		$this->raiseEvent( 'onUserAuthorized', $_event );
+	}
+
+	/**
+	 * @param CPSOAuthEvent $event
+	 *
+	 * @return bool
+	 */
+	public function userAuthorized( $event )
+	{
+		return true;
 	}
 
 	//********************************************************************************
@@ -213,9 +235,10 @@ class CPSOAuthComponent extends CPSApiComponent
 	 * Fetches a protected resource using the tokens stored
 	 *
 	 * @param string $action
-	 * @param array $requestData
+	 * @param array  $requestData
 	 * @param string $method
-	 * @param array $headers
+	 * @param array  $headers
+	 *
 	 * @return string
 	 */
 	protected function makeRequest( $action, $requestData = array(), $method = CPSApiComponent::HTTP_GET, $headers = array() )
@@ -228,11 +251,13 @@ class CPSOAuthComponent extends CPSApiComponent
 		$_found = true;
 
 		//	Check data...
-		if ( null != $requestData ) 
+		if ( null != $requestData )
+		{
 			$_payload = array_merge( $_payload, $requestData );
+		}
 
 		//	Add the request data to the Url...
-		if ( is_array( $this->_requestMap )  )
+		if ( is_array( $this->_requestMap ) )
 		{
 			$_map = PS::oo( $this->_requestMap, $this->_apiToUse, $action );
 			$_options = PS::o( $_map, 'options' );
@@ -247,10 +272,12 @@ class CPSOAuthComponent extends CPSApiComponent
 				foreach ( $_params as $_key => $_required )
 				{
 					//	Check required items
-					if ( null !== $_requireOneOf && ! $_found )
+					if ( null !== $_requireOneOf && !$_found )
+					{
 						$_found &= in_array( $_key, $_requireOneOf );
+					}
 
-					if ( $_required && ! isset( $_payload[$_key] ) )
+					if ( $_required && !isset( $_payload[$_key] ) )
 					{
 						throw new CException(
 							Yii::t(
@@ -265,13 +292,15 @@ class CPSOAuthComponent extends CPSApiComponent
 
 					//	Add to query string if set...
 					if ( isset( $_payload[$_key] ) )
+					{
 						$_validParams[$_key] = $_payload[$_key];
+					}
 				}
 			}
 		}
 
 		//	Check requireOneOf option...
-		if ( ! $_found )
+		if ( !$_found )
 		{
 			throw new CException(
 				Yii::t(
@@ -318,8 +347,9 @@ class CPSOAuthComponent extends CPSApiComponent
 					$this->getInternalName(),
 					'Error making OAuth fetch request in {class}: {message}',
 					array(
-						 '{class}' => get_class( $this ),
-						 'message' => $_ex->getMessage() ) ) );
+						'{class}' => get_class( $this ),
+						'message' => $_ex->getMessage()
+					) ) );
 		}
 
 		//	Handle events...
@@ -336,7 +366,7 @@ class CPSOAuthComponent extends CPSApiComponent
 			case 'xml':
 				$_response = CPSTransform::arrayToXml( json_decode( $_response, true ), 'Results' );
 				break;
-				
+
 			case 'json':
 				//	Already in array format
 				break;
@@ -352,6 +382,7 @@ class CPSOAuthComponent extends CPSApiComponent
 
 	/**
 	 * @param string $accessTokenUrl
+	 *
 	 * @return void
 	 */
 	public function setAccessTokenUrl( $accessTokenUrl )
@@ -363,13 +394,14 @@ class CPSOAuthComponent extends CPSApiComponent
 	/**
 	 * @return string
 	 */
-	public function getAccessTokenUrl( )
+	public function getAccessTokenUrl()
 	{
 		return $this->_accessTokenUrl;
 	}
 
 	/**
 	 * @param string $callbackUrl
+	 *
 	 * @return void
 	 */
 	public function setCallbackUrl( $callbackUrl )
@@ -381,13 +413,14 @@ class CPSOAuthComponent extends CPSApiComponent
 	/**
 	 * @return string
 	 */
-	public function getCallbackUrl( )
+	public function getCallbackUrl()
 	{
 		return $this->_callbackUrl;
 	}
 
 	/**
 	 * @param array $currentToken
+	 *
 	 * @return void
 	 */
 	public function setCurrentToken( $currentToken )
@@ -399,13 +432,14 @@ class CPSOAuthComponent extends CPSApiComponent
 	/**
 	 * @return array
 	 */
-	public function getCurrentToken( )
+	public function getCurrentToken()
 	{
 		return $this->_currentToken;
 	}
 
 	/**
 	 * @param boolean $isAuthorized
+	 *
 	 * @return void
 	 */
 	public function setIsAuthorized( $isAuthorized )
@@ -417,13 +451,14 @@ class CPSOAuthComponent extends CPSApiComponent
 	/**
 	 * @return boolean
 	 */
-	public function getIsAuthorized( )
+	public function getIsAuthorized()
 	{
 		return $this->_isAuthorized;
 	}
 
 	/**
 	 * @param \OAuth $oauth
+	 *
 	 * @return void
 	 */
 	public function setOAuthObject( $oauth )
@@ -435,13 +470,14 @@ class CPSOAuthComponent extends CPSApiComponent
 	/**
 	 * @return \OAuth
 	 */
-	public function getOAuthObject( )
+	public function getOAuthObject()
 	{
 		return $this->_oauth;
 	}
 
 	/**
 	 * @param string $requestTokenUrl
+	 *
 	 * @return void
 	 */
 	public function setRequestTokenUrl( $requestTokenUrl )
@@ -453,7 +489,7 @@ class CPSOAuthComponent extends CPSApiComponent
 	/**
 	 * @return string
 	 */
-	public function getRequestTokenUrl( )
+	public function getRequestTokenUrl()
 	{
 		return $this->_requestTokenUrl;
 	}

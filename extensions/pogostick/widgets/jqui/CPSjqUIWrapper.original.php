@@ -291,7 +291,11 @@ class CPSjqUIWrapper extends CPSjQueryWidget
 			//	Register css files if we have a theme...
 			if ( $_oWidget->theme )
 			{
-				PS::_rcf( ( PS::o( $_SERVER, 'HTTPS' ) == 'on' ? 'https' : 'http' ) . "://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/{$_oWidget->theme}/jquery-ui.css" );
+				if ( false !== PS::o( PS::_cs()->scriptMap, 'jqueryui.css' ) )
+				{
+					PS::_rcf( ( PS::o( $_SERVER, 'HTTPS' ) == 'on' ? 'https' : 'http' ) . "://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/{$_oWidget->theme}/jquery-ui.css" );
+				}
+
 				PS::_rcf( PS::makePath( $_oWidget->baseUrl, 'css', 'ui.pogostick.css' ) );
 			}
 

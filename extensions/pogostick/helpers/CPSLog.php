@@ -3,19 +3,19 @@
  * This file is part of the psYiiExtensions package.
  *
  * @copyright Copyright &copy; 2010 Pogostick, LLC
- * @link http://www.pogostick.com Pogostick, LLC.
- * @license http://www.pogostick.com/licensing
+ * @link      http://www.pogostick.com Pogostick, LLC.
+ * @license   http://www.pogostick.com/licensing
  */
 
 /**
  * Logging helper methods
  *
- * @package	 psYiiExtensions
- * @subpackage	 helpers
+ * @package        psYiiExtensions
+ * @subpackage     helpers
  *
- * @author		 Jerry Ablan <jablan@pogostick.com>
- * @version	 SVN: $Id: CPSLog.php 401 2010-08-31 21:04:18Z jerryablan@gmail.com $
- * @since		 v1.0.6
+ * @author         Jerry Ablan <jablan@pogostick.com>
+ * @version        SVN: $Id: CPSLog.php 401 2010-08-31 21:04:18Z jerryablan@gmail.com $
+ * @since          v1.0.6
  *
  * @filesource
  */
@@ -30,40 +30,76 @@ class CPSLog implements IPSBase
 	 */
 	const
 		INDENT_STRING = '  ';
-
+	/**
+	 * @const int Standard ANSI console attributes
+	 */
+	const
+		ATTR_RESET = 0, ATTR_BRIGHT = 1, ATTR_DIM = 2, ATTR_UNDERSCORE = 4, ATTR_BLINK = 5, ATTR_REVERSE = 7, ATTR_HIDDEN = 8;
+	/**
+	 * @const int Standard ANSI foreground color codes
+	 */
+	const
+		FG_BLACK = 30, FG_RED = 31, FG_GREEN = 32, FG_YELLOW = 33, FG_BLUE = 34, FG_MAGENTA = 35, FG_CYAN = 36, FG_WHITE = 37;
+	/**
+	 * @const int Standard ANSI background color codes
+	 */
+	const
+		BG_BLACK = 40, BG_RED = 41, BG_GREEN = 42, BG_YELLOW = 43, BG_BLUE = 44, BG_MAGENTA = 45, BG_CYAN = 46, BG_WHITE = 47;
+	/**
+	 * @const string Various color presets
+	 */
+	const
+		COLOR_WHITE = 0, COLOR_GREEN = 1, COLOR_YELLOW = 2, COLOR_RED = 3, COLOR_BOLD = 4, COLOR_BLUE = 5, COLOR_CYAN = 6, COLOR_MAGENTA = 7;
 	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
 
 	/**
-	 * @staticvar boolean If true, all applicable log entries will be echoed to the screen
+	 * @var boolean If true, all applicable log entries will be echoed to the screen
 	 */
 	public static $echoData = false;
 	/**
-	 * @staticvar string Prepended to each log entry before writing.
+	 * @var string Prepended to each log entry before writing.
 	 */
 	public static $prefix = null;
 	/**
-	 * @staticvar integer The base level for getting source of log entry
+	 * @var integer The base level for getting source of log entry
 	 */
 	public static $baseLevel = 3;
 	/**
-	 * @staticvar integer The current indent level
+	 * @var integer The current indent level
 	 */
 	public static $currentIndent = 0;
 	/**
-	 * @staticvar string
+	 * @var string
 	 */
 	protected static $_defaultLevelIndicator = '.';
 	/**
-	 * @staticvar array
+	 * @var array
 	 */
 	protected static $_levelIndicators = array(
-		'info' => '*',
-		'notice' => '?',
-		'warning' => '-',
-		'error' => '!',
+		'info' => '*', 'notice' => '?', 'warning' => '-', 'error' => '!',
 	);
+	/**
+	 * @var int The size of the category field in the log entries
+	 */
+	protected static $_categoryWindowWidth = 30;
+	/**
+	 * @var array fancy log output
+	 */
+	protected $_logColors = array(
+		self::COLOR_WHITE   => array( '01;37m', '00m' ), self::COLOR_GREEN => array( '01;32m', '00m' ), self::COLOR_YELLOW => array(
+			'01;33m',
+			'00m'
+		), self::COLOR_RED  => array( '01;31m', '00m' ), self::COLOR_BOLD => array( '01m', '00m' ), self::COLOR_BLUE => array(
+			'01;34m',
+			'00m'
+		), self::COLOR_CYAN => array( '01;36m', '00m' ), self::COLOR_MAGENTA => array( '01;35m', '00m' ),
+	);
+	/**
+	 * @var string
+	 */
+	protected $_escapeSequence = "\033[";
 
 	//********************************************************************************
 	//* Public Methods
@@ -71,12 +107,16 @@ class CPSLog implements IPSBase
 
 	/**
 	 * Creates an 'info' log entry
-	 * @param string $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
-	 * @param string $message The message to log
-	 * @param string $level The message level
-	 * @param array $options Parameters to be applied to the message using <code>strtr</code>.
-	 * @param string $source Which message source application component to use.
+	 *
+	 * @param string $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code
+	 *                         use. See {@link
+	 *                         CPhpMessageSource} for more interpretation about message category.
+	 * @param string $message  The message to log
+	 * @param string $level    The message level
+	 * @param array  $options  Parameters to be applied to the message using <code>strtr</code>.
+	 * @param string $source   Which message source application component to use.
 	 * @param string $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 *
 	 * @return string
 	 */
 	public static function log( $category, $message = null, $level = 'info', $options = array(), $source = null, $language = null )
@@ -89,12 +129,11 @@ class CPSLog implements IPSBase
 		}
 
 		if ( null === $category )
-			$category = self::_getCallingMethod();
-
-		if ( strlen( $category ) > 35 )
 		{
-			$category = substr( $category, -35 );
+			$category = self::_getCallingMethod();
 		}
+
+//		$category = substr( $category, ( -1 * self::$_categoryWindowWidth ) );
 
 		//	Get the indent, if any
 		$_unindent = ( 0 > ( $_newIndent = self::_processMessage( $message ) ) );
@@ -106,16 +145,7 @@ class CPSLog implements IPSBase
 		foreach ( $_levelList as $_level )
 		{
 			$_indicator = ( in_array( $_level, self::$_levelIndicators ) ? self::$_levelIndicators[$_level] : self::$_defaultLevelIndicator );
-			$_logEntry = self::$prefix . ( class_exists( 'Yii' ) ? Yii::t( $category, $message, $options, $source, $language ) : $message );
-
-			//	Echo if we're CLI && user wants it...
-			if ( PS::isCLI() && self::$echoData )
-			{
-				echo date( 'Y.m.d h.i.s' ) . '[' . strtoupper( $_level[0] ) . '] ' .
-					sprintf( '[%35.35s]', $category ) .
-					$_logEntry;
-				flush();
-			}
+			$_logEntry = self::$prefix . ( class_exists( 'Yii', false ) ? Yii::t( $category, $message, $options, $source, $language ) : $message );
 
 			//	Indent...
 			$_tempIndent = self::$currentIndent;
@@ -134,16 +164,33 @@ class CPSLog implements IPSBase
 
 			try
 			{
-				if ( @class_exists( 'Yii' ) )
+				//	Echo if we're CLI && user wants it...
+				if ( PS::isCLI() && self::$echoData )
+				{
+					echo
+						date( 'M j H:i:s' ) . ' [' . strtoupper( $_level[0] ) . '] ' . '[' . $category . ']' . $_logEntry .
+						PHP_EOL;
+
+					flush();
+				}
+
+				if ( @class_exists( 'Yii', false ) )
 				{
 					//	Flush immediately...
 					Yii::getLogger()->autoFlush = 1;
 					Yii::log( $_logEntry, $_level, $category );
 				}
-				else if ( @class_exists( 'SimpleLogger' ) )
-					@SimpleLogger::getInstance()->write( $_logEntry, 6 );
 				else
-					@error_log( $_logEntry );
+				{
+					if ( @class_exists( 'SimpleLogger', false ) )
+					{
+						@SimpleLogger::getInstance()->write( $_logEntry, 6 );
+					}
+					else
+					{
+						@error_log( $_logEntry );
+					}
+				}
 			}
 			catch ( Exception $_ex )
 			{
@@ -160,11 +207,15 @@ class CPSLog implements IPSBase
 
 	/**
 	 * Creates an 'info' log entry
-	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
-	 * @param mixed $message The message to log
-	 * @param mixed $options Parameters to be applied to the message using <code>strtr</code>.
-	 * @param mixed $source Which message source application component to use.
+	 *
+	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code
+	 *                        use. See {@link
+	 *                        CPhpMessageSource} for more interpretation about message category.
+	 * @param mixed $message  The message to log
+	 * @param mixed $options  Parameters to be applied to the message using <code>strtr</code>.
+	 * @param mixed $source   Which message source application component to use.
 	 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 *
 	 * @return string
 	 */
 	public static function info( $category, $message = null, $options = array(), $source = null, $language = null )
@@ -174,11 +225,15 @@ class CPSLog implements IPSBase
 
 	/**
 	 * Creates an 'error' log entry
-	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
-	 * @param mixed $message The message to log
-	 * @param mixed $options Parameters to be applied to the message using <code>strtr</code>.
-	 * @param mixed $source Which message source application component to use.
+	 *
+	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code
+	 *                        use. See {@link
+	 *                        CPhpMessageSource} for more interpretation about message category.
+	 * @param mixed $message  The message to log
+	 * @param mixed $options  Parameters to be applied to the message using <code>strtr</code>.
+	 * @param mixed $source   Which message source application component to use.
 	 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 *
 	 * @return string
 	 */
 	public static function error( $category, $message = null, $options = array(), $source = null, $language = null )
@@ -188,11 +243,15 @@ class CPSLog implements IPSBase
 
 	/**
 	 * Creates an 'warning' log entry
-	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
-	 * @param mixed $message The message to log
-	 * @param mixed $options Parameters to be applied to the message using <code>strtr</code>.
-	 * @param mixed $source Which message source application component to use.
+	 *
+	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code
+	 *                        use. See {@link
+	 *                        CPhpMessageSource} for more interpretation about message category.
+	 * @param mixed $message  The message to log
+	 * @param mixed $options  Parameters to be applied to the message using <code>strtr</code>.
+	 * @param mixed $source   Which message source application component to use.
 	 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 *
 	 * @return string
 	 */
 	public static function warning( $category, $message = null, $options = array(), $source = null, $language = null )
@@ -202,23 +261,33 @@ class CPSLog implements IPSBase
 
 	/**
 	 * Creates an 'trace' log entry
-	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
-	 * @param mixed $message The message to log
-	 * @param mixed $options Parameters to be applied to the message using <code>strtr</code>.
-	 * @param mixed $source Which message source application component to use.
+	 *
+	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code
+	 *                        use. See {@link
+	 *                        CPhpMessageSource} for more interpretation about message category.
+	 * @param mixed $message  The message to log
+	 * @param mixed $options  Parameters to be applied to the message using <code>strtr</code>.
+	 * @param mixed $source   Which message source application component to use.
 	 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+	 *
 	 * @return string
 	 */
 	public static function trace( $category, $message = null, $options = array(), $source = null, $language = null )
 	{
 		if ( defined( 'PYE_TRACE_LEVEL' ) || defined( 'YII_DEBUG' ) || defined( 'YII_TRACE_LEVEL' ) )
+		{
 			return self::log( $category, $message, 'trace', $options, $source, $language );
+		}
+
+		return null;
 	}
 
 	/**
 	 * Creates an 'api' log entry
-	 * @param string $apiCall The API call made
-	 * @param mixed $response The API response to log
+	 *
+	 * @param string $apiCall  The API call made
+	 * @param mixed  $response The API response to log
+	 *
 	 * @return string
 	 */
 	public static function api( $apiCall, $response = null )
@@ -228,8 +297,12 @@ class CPSLog implements IPSBase
 
 	/**
 	 * Creates a 'debug' log entry
-	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
-	 * @param mixed $message The message to log
+	 *
+	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code
+	 *                        use. See {@link
+	 *                        CPhpMessageSource} for more interpretation about message category.
+	 * @param mixed $message  The message to log
+	 *
 	 * @return string
 	 */
 	public static function debug( $category, $message = null )
@@ -239,9 +312,13 @@ class CPSLog implements IPSBase
 
 	/**
 	 * Creates an user-defined log entry
-	 * @param mixed $message The message
-	 * @param string $level The message level
-	 * @param mixed $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code use. See {@link CPhpMessageSource} for more interpretation about message category.
+	 *
+	 * @param mixed  $message  The message
+	 * @param string $level    The message level
+	 * @param mixed  $category The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core code
+	 *                         use. See {@link
+	 *                         CPhpMessageSource} for more interpretation about message category.
+	 *
 	 * @return string
 	 */
 	public static function write( $message, $level = null, $category = null )
@@ -251,6 +328,8 @@ class CPSLog implements IPSBase
 
 	/**
 	 * Safely decrements the current indent level
+	 *
+	 * @param int $howMuch
 	 */
 	public static function decrementIndent( $howMuch = 1 )
 	{
@@ -268,7 +347,9 @@ class CPSLog implements IPSBase
 
 	/**
 	 * Returns the name of the method that made the call
+	 *
 	 * @param integer $level The level of the call
+	 *
 	 * @return string
 	 */
 	protected static function _getCallingMethod( $level = null )
@@ -296,9 +377,8 @@ class CPSLog implements IPSBase
 				//	If we see our self, then we must go again
 				if ( $_className != basename( PS::o( $_caller, 'file' ) ) )
 				{
-					return basename( PS::o( $_caller, 'file' ) ) . '::' .
-						PS::o( $_caller, 'function' ) .
-						' (Line ' . PS::o( $_caller, 'line' ) . ')';
+					return basename( PS::o( $_caller, 'file' ) ) . '::' . PS::o( $_caller, 'function' ) . ' (Line ' . PS::o( $_caller,
+						'line' ) . ')';
 				}
 
 				$level--;
@@ -314,7 +394,9 @@ class CPSLog implements IPSBase
 
 	/**
 	 * Processes the indent level for the messages
+	 *
 	 * @param string $message
+	 *
 	 * @return integer The indent difference AFTER this message
 	 */
 	protected static function _processMessage( &$message )
@@ -435,5 +517,61 @@ class CPSLog implements IPSBase
 	public static function getPrefix()
 	{
 		return self::$prefix;
+	}
+
+	/**
+	 * @param int $categoryWindowWidth
+	 *
+	 * @return void
+	 */
+	public static function setCategoryWindowWidth( $categoryWindowWidth )
+	{
+		self::$_categoryWindowWidth = $categoryWindowWidth;
+	}
+
+	/**
+	 * @return int
+	 */
+	public static function getCategoryWindowWidth()
+	{
+		return self::$_categoryWindowWidth;
+	}
+
+	/**
+	 * @param string $escapeSequence
+	 *
+	 * @return \CPSLog $this
+	 */
+	public function setEscapeSequence( $escapeSequence )
+	{
+		$this->_escapeSequence = $escapeSequence;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEscapeSequence()
+	{
+		return $this->_escapeSequence;
+	}
+
+	/**
+	 * @param array $logColors
+	 *
+	 * @return \CPSLog $this
+	 */
+	public function setLogColors( $logColors )
+	{
+		$this->_logColors = $logColors;
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getLogColors()
+	{
+		return $this->_logColors;
 	}
 }
