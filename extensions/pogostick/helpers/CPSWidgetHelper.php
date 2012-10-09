@@ -32,9 +32,9 @@ class CPSWidgetHelper extends CPSHelperBase
 	const ID_PREFIX = 'pye';
 	const STD_JQUI_FORM_CONTAINER_CLASS = 'ui-edit-container ui-widget form';
 	const STD_FORM_CONTAINER_CLASS = 'ps-edit-form';
-	const STD_BOOTSTRAP_FORM_CONTAINER_CLASS = 'bootstrap-edit-form';
+	const STD_BOOTSTRAP_FORM_CONTAINER_CLASS = 'bootstrap2-edit-form';
 	const STD_BOOTSTRAP2_FORM_CONTAINER_CLASS = 'bootstrap2-edit-form';
-	const STD_BOOTSTRAP2_FORM_CLASS = 'form-vertical';
+	const STD_BOOTSTRAP2_FORM_CLASS = 'form-horizontal';
 	const STD_FORM_CLASS = 'yiiForm';
 
 	/**
@@ -2147,23 +2147,26 @@ HTML;
 	 *
 	 * @return boolean
 	 */
-	protected static function setDropDownValues( $inputFieldType, &$htmlOptions = array(), &$listData = null, $selected = null )
+	protected static function setDropDownValues( &$inputFieldType, &$htmlOptions = array(), &$listData = null, $selected = null )
 	{
 		$_data = null;
 
-		//	One of our generics? Set data, type and return
-		if ( null === ( $_data = self::getGenericDropDownValues( $inputFieldType, $htmlOptions, $listData ) ) )
+		if ( is_numeric( $inputFieldType ) && $inputFieldType >= 1000 )
 		{
-			$inputFieldType = self::DROPDOWN;
-			$listData = $_data;
-		}
-		else
-		{
-			//	Generic or dropdown? Set data, type and return
-			if ( $inputFieldType == self::DD_GENERIC || $inputFieldType == self::DROPDOWN )
+			//	One of our generics? Set data, type and return
+			if ( null === ( $_data = self::getGenericDropDownValues( $inputFieldType, $htmlOptions, $listData ) ) )
 			{
-				$_data = $listData;
 				$inputFieldType = self::DROPDOWN;
+				$listData = $_data;
+			}
+			else
+			{
+				//	Generic or dropdown? Set data, type and return
+				if ( $inputFieldType == self::DD_GENERIC || $inputFieldType == self::DROPDOWN )
+				{
+					$_data = $listData;
+					$inputFieldType = self::DROPDOWN;
+				}
 			}
 		}
 
