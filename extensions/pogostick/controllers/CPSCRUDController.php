@@ -3,19 +3,19 @@
  * This file is part of the psYiiExtensions package.
  *
  * @copyright Copyright (c) 2009-2011 Pogostick, LLC.
- * @link http://www.pogostick.com Pogostick, LLC.
- * @license http://www.pogostick.com/licensing
+ * @link      http://www.pogostick.com Pogostick, LLC.
+ * @license   http://www.pogostick.com/licensing
  */
 
 /**
  * CPSCRUDController provides standard filtered access to CRUD resources
  *
- * @package 	psYiiExtensions
- * @subpackage 	controllers
+ * @package        psYiiExtensions
+ * @subpackage     controllers
  *
- * @author 		Jerry Ablan <jablan@pogostick.com>
- * @version 	SVN: $Id: CPSCRUDController.php 400 2010-08-12 16:44:41Z jerryablan@gmail.com $
- * @since 		v1.0.4
+ * @author         Jerry Ablan <jablan@pogostick.com>
+ * @version        SVN: $Id: CPSCRUDController.php 400 2010-08-12 16:44:41Z jerryablan@gmail.com $
+ * @since          v1.0.4
  *
  * @filesource
  */
@@ -28,53 +28,99 @@ abstract class CPSCRUDController extends CPSController
 	/**
 	 * If true, the admin system will not process commands, but render the admin page
 	 * in a manner suitable for use with {@link CGridView}
+	 *
 	 * @var string
 	 */
 	protected $_enableAdminDashboard = false;
-	public function getEnableAdminDashboard() { return $this->_enableAdminDashboard; }
-	public function setEnableAdminDashboard( $value ) { $this->_enableAdminDashboard = $value; }
+
+	public function getEnableAdminDashboard()
+	{
+		return $this->_enableAdminDashboard;
+	}
+
+	public function setEnableAdminDashboard( $value )
+	{
+		$this->_enableAdminDashboard = $value;
+	}
 
 	/**
-	* The name of the Login Form class. Defaults to 'LoginForm'
-	*
-	* @var string
-	*/
+	 * The name of the Login Form class. Defaults to 'LoginForm'
+	 *
+	 * @var string
+	 */
 	protected $_loginFormClass = null;
-	public function getLoginFormClass() { return PS::nvl( $this->_loginFormClass, 'LoginForm' ); }
-	public function setLoginFormClass( $value ) { $this->_loginFormClass = $value; }
+
+	public function getLoginFormClass()
+	{
+		return PS::nvl( $this->_loginFormClass, 'LoginForm' );
+	}
+
+	public function setLoginFormClass( $value )
+	{
+		$this->_loginFormClass = $value;
+	}
 
 	/***
 	 * Mimic Gii's breadcrumbs property
+	 *
 	 * @var array
 	 */
 	protected $_breadcrumbs = array();
-	public function getBreadcrumbs() { return $this->_breadcrumbs; }
-	public function setBreadcrumbs( $value ) { $this->_breadcrumbs = $value; }
+
+	public function getBreadcrumbs()
+	{
+		return $this->_breadcrumbs;
+	}
+
+	public function setBreadcrumbs( $value )
+	{
+		$this->_breadcrumbs = $value;
+	}
 
 	/***
 	 * Mimic Gii's menu property
+	 *
 	 * @var array
 	 */
 	protected $_menu = array();
-	public function getMenu() { return $this->_menu; }
-	public function setMenu( $value ) { $this->_menu = $value; }
+
+	public function getMenu()
+	{
+		return $this->_menu;
+	}
+
+	public function setMenu( $value )
+	{
+		$this->_menu = $value;
+	}
 
 	/**
 	 * If true, only the 'update' view is called for create and update.
+	 *
 	 * @var boolean $singleViewMode
 	 */
 	protected $_singleViewMode = false;
-	public function getSingleViewMode() { return $this->_singleViewMode; }
-	public function setSingleViewMode( $value = true ) { $this->_singleViewMode = $value; return $this; }
+
+	public function getSingleViewMode()
+	{
+		return $this->_singleViewMode;
+	}
+
+	public function setSingleViewMode( $value = true )
+	{
+		$this->_singleViewMode = $value;
+
+		return $this;
+	}
 
 	//********************************************************************************
 	//* Public Methods
 	//********************************************************************************
 
 	/**
-	* Initialize the controller
-	*
-	*/
+	 * Initialize the controller
+	 *
+	 */
 	public function init()
 	{
 		//	Phone home...
@@ -93,13 +139,16 @@ abstract class CPSCRUDController extends CPSController
 	}
 
 	/**
-	* The filters for this controller
-	*
-	* @return array Action filters
-	*/
+	 * The filters for this controller
+	 *
+	 * @return array Action filters
+	 */
 	public function filters()
 	{
-		if ( $_SERVER['HTTP_HOST'] == 'localhost' ) return array();
+		if ( $_SERVER['HTTP_HOST'] == 'localhost' )
+		{
+			return array();
+		}
 
 		//	Perform access control for CRUD operations
 		return array(
@@ -108,20 +157,23 @@ abstract class CPSCRUDController extends CPSController
 	}
 
 	/**
-	* The base access rules for our CRUD controller
-	*
-	* @return array Access control rules
-	*/
+	 * The base access rules for our CRUD controller
+	 *
+	 * @return array Access control rules
+	 */
 	public function accessRules()
 	{
 		static $_ruleList;
 		static $_isInitialized;
 
 		//	Console apps can bypass this...
-		if ( PS::_a() instanceof CConsoleApplication ) return array();
+		if ( PS::_a() instanceof CConsoleApplication )
+		{
+			return array();
+		}
 
 		//	Build access rule array...
-		if ( ! isset( $_isInitialized ) )
+		if ( !isset( $_isInitialized ) )
 		{
 			$_ruleList = array();
 
@@ -166,10 +218,13 @@ abstract class CPSCRUDController extends CPSController
 					$_tempList = array(
 						$_theVerb,
 						'actions' => PS::o( $this->m_arUserActionList, $_i ),
-						'users' => array( $_validMatch )
+						'users'   => array( $_validMatch )
 					);
 
-					if ( $_tempList['actions'] == null ) unset( $_tempList['actions'] );
+					if ( $_tempList['actions'] == null )
+					{
+						unset( $_tempList['actions'] );
+					}
 
 					$_ruleList[] = $_tempList;
 				}
@@ -187,71 +242,89 @@ abstract class CPSCRUDController extends CPSController
 	//********************************************************************************
 
 	/**
-	* Default login
-	*
-	*/
+	 * Default login
+	 */
 	public function actionLogin()
 	{
-		if ( ! Yii::app()->user->isGuest )
-			return $this->redirect( Yii::app()->user->returnUrl );
-
-		$_sClass = $this->getLoginFormClass();
-		$_oLogin = new $_sClass();
-
-		if ( isset( $_POST[ $_sClass ] ) )
+		if ( !\PS::_ig() )
 		{
-			$_oLogin->attributes = $_POST[ $_sClass ];
+			$this->redirect( PS::_gu()->getReturnUrl() );
+
+			return;
+		}
+
+		$_formClass = $this->getLoginFormClass();
+		$_postClass = str_replace( '\\', '_', $_formClass );
+
+		/** @var $_model \CFormModel */
+		$_model = new $_formClass();
+
+		if ( isset( $_POST[$_postClass] ) )
+		{
+			$_model->attributes = $_POST[$_postClass];
 
 			//	Validate user input and redirect to previous page if valid
-			if ( $_oLogin->validate() )
-				return $this->redirect( Yii::app()->user->returnUrl );
+			if ( $_model->validate() )
+			{
+				$this->redirect( PS::_gu()->getReturnUrl() );
+
+				return;
+			}
 		}
 
 		//	Display the login form
-		$this->render( 'login', array( 'form' => $_oLogin ) );
+		$this->render(
+			'login',
+			array(
+				'form' => $_model
+			)
+		);
 	}
 
 	/**
-	* Logout the user
-	*
-	*/
+	 * Logout the user
+	 *
+	 */
 	public function actionLogout()
 	{
-		Yii::app()->user->logout();
-		$this->redirect( Yii::app()->user->loginUrl );
+		\PS::_gu()->logout();
+		$this->redirect( PS::_gu()->loginUrl );
 	}
 
 	/**
-	* Creates a new model.
-	* If creation is successful, the browser will be redirected to the 'show' page.
-	*
-	* @param array If specified, also passed to the view.
-	*/
+	 * Creates a new model.
+	 * If creation is successful, the browser will be redirected to the 'show' page.
+	 *
+	 * @param array If specified, also passed to the view.
+	 */
 	public function actionCreate( $options = array() )
 	{
 		$this->actionUpdate( $options, true );
 	}
 
 	/**
-	* Update the model
-	*
-	*/
+	 * Update the model
+	 *
+	 */
 	public function actionUpdate( $options = array(), $fromCreate = false )
 	{
 		//	Handle singleViewMode...
-		$_model = ( $fromCreate ? new $this->m_sModelName : $this->loadModel()  );
+		$_model = ( $fromCreate ? new $this->m_sModelName : $this->loadModel() );
 		$_viewName = ( $fromCreate ? ( $this->_singleViewMode ? 'update' : 'create' ) : 'update' );
 
-		if ( $this->isPostRequest ) $this->saveModel( $_model, $_POST, 'update' );
+		if ( $this->isPostRequest )
+		{
+			$this->saveModel( $_model, $_POST, 'update' );
+		}
 
-		$options['update'] = ( ! $fromCreate );
+		$options['update'] = ( !$fromCreate );
 		$this->genericAction( $_viewName, $_model, $options );
 	}
 
 	/**
-	* View the model
-	*
-	*/
+	 * View the model
+	 *
+	 */
 	public function actionView( $options = array() )
 	{
 		$_model = $this->loadModel();
@@ -259,11 +332,11 @@ abstract class CPSCRUDController extends CPSController
 	}
 
 	/**
-	* Deletes a particular model.
-	* Only allowed via POST
-	*
-	* @throws CHttpException
-	*/
+	 * Deletes a particular model.
+	 * Only allowed via POST
+	 *
+	 * @throws CHttpException
+	 */
 	public function actionDelete( $sRedirectAction = 'admin' )
 	{
 		if ( Yii::app()->request->isPostRequest )
@@ -287,26 +360,31 @@ abstract class CPSCRUDController extends CPSController
 	}
 
 	/**
-	* Manages all models.
-	*/
+	 * Manages all models.
+	 */
 	public function actionAdmin( $options = array(), $oCriteria = null )
 	{
 		if ( $this->_enableAdminDashboard )
 		{
 			$this->actionAdminDashboard( $options );
+
 			return;
 		}
 
 		//	Regular old admin page...
 		if ( $this->m_sModelName )
+		{
 			@list( $_arModels, $_oCrit, $_oPage, $_oSort ) = $this->loadPaged( true, $oCriteria );
+		}
 
 		$this->render( 'admin', array_merge( $options, array( 'models' => $_arModels, 'pages' => $_oPage, 'sort' => $_oSort ) ) );
 	}
 
 	/**
 	 * Admin page for use with a {@link CGridView}
+	 *
 	 * @param array $options
+	 *
 	 * @return void
 	 */
 	public function actionAdminDashboard( $options = array() )
@@ -317,7 +395,9 @@ abstract class CPSCRUDController extends CPSController
 			$_model->unsetAttributes();
 
 			if ( isset( $_REQUEST[$this->_modelName] ) )
+			{
 				$_model->attributes = $_REQUEST[$this->_modelName];
+			}
 
 			$this->render(
 				'admin',
@@ -340,22 +420,22 @@ abstract class CPSCRUDController extends CPSController
 	//********************************************************************************
 
 	/**
-	* Delete a model
-	*
-	*/
+	 * Delete a model
+	 *
+	 */
 	protected function commandDelete()
 	{
-		$this->loadModel( $_POST[ 'id' ] )->delete();
+		$this->loadModel( $_POST['id'] )->delete();
 		$this->refresh();
 	}
 
 	/**
-	* Undelete a model
-	*
-	*/
+	 * Undelete a model
+	 *
+	 */
 	protected function commandUndelete()
 	{
-		$this->loadModel( $_POST[ 'id' ] )->delete( true );
+		$this->loadModel( $_POST['id'] )->delete( true );
 		$this->refresh();
 	}
 
