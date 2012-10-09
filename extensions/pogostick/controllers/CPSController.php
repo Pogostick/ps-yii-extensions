@@ -1244,9 +1244,11 @@ SCRIPT;
 			),
 		);
 
-		PS::setFormFieldContainerClass( PS::o( $options, 'rowClass', 'row' ) );
+		PS::setFormFieldContainerClass( PS::o( $options, 'rowClass', ( PS::UI_BOOTSTRAP == $_formOptions['uiStyle'] ? 'control-group' : 'row' ) ) );
 
 		$_crumbs = $this->_breadcrumbs ? : PS::o( $options, 'breadcrumbs', null, true );
+
+		PS::setUiStyle( $_formOptions['uiStyle'] );
 
 		if ( !empty( $_crumbs ) && PS::UI_BOOTSTRAP == $_formOptions['uiStyle'] )
 		{

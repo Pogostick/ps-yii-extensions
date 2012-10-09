@@ -2,7 +2,11 @@
 <project version="4">
   <component name="CssXFireSettings">
     <general autoClear="false" autoExpand="false" />
+<<<<<<< HEAD
+    <strategy useRoutes="false" mediaReduce="false" fileReduce="false" currentDocumentsReduce="false" resolveVariables="false" resolveMixins="false" />
+=======
     <strategy useRoutes="false" mediaReduce="false" fileReduce="false" currentDocumentsReduce="false" resolveVariables="true" resolveMixins="true" />
+>>>>>>> 61a422dbe7da8970c7a42f5e9db79a23f51104ae
     <routes />
   </component>
 </project>

@@ -1,9 +1,10 @@
 .svn
+.idea
 assets
 protected/runtime
 nbproject
 orig
 /orig
-.idea/workspace.xml
+.idea
 idea.gha/
 idea.gha/*
