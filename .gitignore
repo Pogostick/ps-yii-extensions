@@ -4,6 +4,6 @@ protected/runtime
 nbproject
 orig
 /orig
-.idea/
+.idea
 idea.gha/
 idea.gha/*
