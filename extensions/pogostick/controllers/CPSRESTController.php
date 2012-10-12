@@ -241,8 +241,8 @@ class CPSRESTController extends CPSController
 				$_requestMethod
 			),
 			//	Pass in parameters collected as a single array or individual values
-			$this->_singleParameterActions ? array( $_urlParameters ) : array_values( $_urlParameters )
-		grant_type=authorization_code&scope=&code=&redirect_uri=http://slayer.jablan.cisdev.atlis1/oauth/authorize
+            $this->_singleParameterActions ? array( $_urlParameters ) : array_values( $_urlParameters )
+        );
 		//	Echo output...
 		$_output = $this->_formatOutput( $_callResults );
 		echo $_output;
