@@ -78,23 +78,33 @@ class CPSLog implements IPSBase
 	 * @var array
 	 */
 	protected static $_levelIndicators = array(
-		'info' => '*', 'notice' => '?', 'warning' => '-', 'error' => '!',
+		'info'    => '*',
+		'notice'  => '?',
+		'warning' => '-',
+		'error'   => '!',
 	);
 	/**
 	 * @var int The size of the category field in the log entries
 	 */
-	protected static $_categoryWindowWidth = 30;
+	protected static $_categoryWindowWidth = false;
 	/**
 	 * @var array fancy log output
 	 */
 	protected $_logColors = array(
-		self::COLOR_WHITE   => array( '01;37m', '00m' ), self::COLOR_GREEN => array( '01;32m', '00m' ), self::COLOR_YELLOW => array(
+		self::COLOR_WHITE   => array( '01;37m', '00m' ),
+		self::COLOR_GREEN   => array( '01;32m', '00m' ),
+		self::COLOR_YELLOW  => array(
 			'01;33m',
 			'00m'
-		), self::COLOR_RED  => array( '01;31m', '00m' ), self::COLOR_BOLD => array( '01m', '00m' ), self::COLOR_BLUE => array(
+		),
+		self::COLOR_RED     => array( '01;31m', '00m' ),
+		self::COLOR_BOLD    => array( '01m', '00m' ),
+		self::COLOR_BLUE    => array(
 			'01;34m',
 			'00m'
-		), self::COLOR_CYAN => array( '01;36m', '00m' ), self::COLOR_MAGENTA => array( '01;35m', '00m' ),
+		),
+		self::COLOR_CYAN    => array( '01;36m', '00m' ),
+		self::COLOR_MAGENTA => array( '01;35m', '00m' ),
 	);
 	/**
 	 * @var string
@@ -121,6 +131,8 @@ class CPSLog implements IPSBase
 	 */
 	public static function log( $category, $message = null, $level = 'info', $options = array(), $source = null, $language = null )
 	{
+		$_label = 'category';
+
 		//	Allow null categories
 		if ( null !== $category && null === $message )
 		{
@@ -131,9 +143,13 @@ class CPSLog implements IPSBase
 		if ( null === $category )
 		{
 			$category = self::_getCallingMethod();
+			$_label = 'calling_method';
 		}
 
-//		$category = substr( $category, ( -1 * self::$_categoryWindowWidth ) );
+		if ( self::$_categoryWindowWidth )
+		{
+			$category = substr( $category, ( -1 * self::$_categoryWindowWidth ) );
+		}
 
 		//	Get the indent, if any
 		$_unindent = ( 0 > ( $_newIndent = self::_processMessage( $message ) ) );
@@ -145,7 +161,6 @@ class CPSLog implements IPSBase
 		foreach ( $_levelList as $_level )
 		{
 			$_indicator = ( in_array( $_level, self::$_levelIndicators ) ? self::$_levelIndicators[$_level] : self::$_defaultLevelIndicator );
-			$_logEntry = self::$prefix . ( class_exists( 'Yii', false ) ? Yii::t( $category, $message, $options, $source, $language ) : $message );
 
 			//	Indent...
 			$_tempIndent = self::$currentIndent;
@@ -165,32 +180,18 @@ class CPSLog implements IPSBase
 			try
 			{
 				//	Echo if we're CLI && user wants it...
-				if ( PS::isCLI() && self::$echoData )
+				if ( 'cli' == PHP_SAPI && self::$echoData )
 				{
 					echo
-						date( 'M j H:i:s' ) . ' [' . strtoupper( $_level[0] ) . '] ' . '[' . $category . ']' . $_logEntry .
-						PHP_EOL;
+						date( 'M j H:i:s' ) . ' [' . strtoupper( substr( $_level, 0, 4 ) ) . '] ' .
+						$_logEntry . ' {"' . $_label . '":"' . $category . '"}' . PHP_EOL;
 
 					flush();
 				}
 
-				if ( @class_exists( 'Yii', false ) )
-				{
-					//	Flush immediately...
-					Yii::getLogger()->autoFlush = 1;
-					Yii::log( $_logEntry, $_level, $category );
-				}
-				else
-				{
-					if ( @class_exists( 'SimpleLogger', false ) )
-					{
-						@SimpleLogger::getInstance()->write( $_logEntry, 6 );
-					}
-					else
-					{
-						@error_log( $_logEntry );
-					}
-				}
+				//	Flush immediately...
+				Yii::getLogger()->autoFlush = 1;
+				Yii::log( $_logEntry, $_level, $category );
 			}
 			catch ( Exception $_ex )
 			{
@@ -545,6 +546,7 @@ class CPSLog implements IPSBase
 	public function setEscapeSequence( $escapeSequence )
 	{
 		$this->_escapeSequence = $escapeSequence;
+
 		return $this;
 	}
 
@@ -564,6 +566,7 @@ class CPSLog implements IPSBase
 	public function setLogColors( $logColors )
 	{
 		$this->_logColors = $logColors;
+
 		return $this;
 	}
 

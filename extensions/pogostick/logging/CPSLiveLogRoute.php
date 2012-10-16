@@ -10,7 +10,6 @@
  * @filesource
  * @version    $Id$
  */
-
 /**
  * CPSLiveLogRoute utilizes PHP's {@link error_log} function to write logs in real time
  *
@@ -24,44 +23,13 @@ class CPSLiveLogRoute extends CFileLogRoute
 	//********************************************************************************
 
 	/**
-	 * @property array $excludeCategories An array of categories to exclude from logging. Regex pattern matching is supported via {@link preg_match}
+	 * @property array An array of categories to exclude from logging. Regex pattern matching is supported via {@link preg_match}
 	 */
 	protected $_excludeCategories = array();
-
-	public function getExcludeCategories()
-	{
-		return $this->_excludeCategories;
-	}
-
-	public function setExcludeCategories( $value )
-	{
-		$this->_excludeCategories = $value;
-	}
-
 	/**
-	 * @property integer $categoryWidth The minimum width of the category column in the log output
+	 * @property int The minimum width of the category column in the log output
 	 */
 	protected $_categoryWidth = false;
-
-	/**
-	 * Get the minimum width of the category column in the log output
-	 *
-	 * @return integer
-	 */
-	public function getCategoryWidth()
-	{
-		return $this->_categoryWidth;
-	}
-
-	/**
-	 * Set the minimum width of the category column in the log output
-	 *
-	 * @return integer
-	 */
-	public function setCategoryWidth( $value )
-	{
-		$this->_categoryWidth = $value;
-	}
 
 	//********************************************************************************
 	//* Public Methods
@@ -164,9 +132,9 @@ class CPSLiveLogRoute extends CFileLogRoute
 			$time = time();
 		}
 
-		$level = strtoupper( $level[0] );
+		$level = strtoupper( substr( $level, 0, 4 ) );
 
-/*		if ( $this->_categoryWidth )
+		if ( $this->_categoryWidth )
 		{
 			if ( $this->_categoryWidth > 40 )
 			{
@@ -175,8 +143,51 @@ class CPSLiveLogRoute extends CFileLogRoute
 
 			$category = sprintf( " [%{$this->_categoryWidth}.{$this->_categoryWidth}s] ", $category );
 		}
-     */
 
-		return @date( 'M j H:i:s', $time ) . $category . ': <' . $level . '> ' . $message . PHP_EOL;
+		return @date( 'M j H:i:s', $time ) . ' [' . $level . '] ' . $message . '{"category":"' . $category . '"}' . PHP_EOL;
+	}
+
+	//*************************************************************************
+	//* [GS]etters
+	//*************************************************************************
+
+	/**
+	 * @param $categoryWidth
+	 *
+	 * @return CPSLiveLogRoute
+	 */
+	public function setCategoryWidth( $categoryWidth )
+	{
+		$this->_categoryWidth = $categoryWidth;
+
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getCategoryWidth()
+	{
+		return $this->_categoryWidth;
+	}
+
+	/**
+	 * @param $excludeCategories
+	 *
+	 * @return CPSLiveLogRoute
+	 */
+	public function setExcludeCategories( $excludeCategories )
+	{
+		$this->_excludeCategories = $excludeCategories;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getExcludeCategories()
+	{
+		return $this->_excludeCategories;
 	}
 }
