@@ -204,7 +204,7 @@ SCRIPT;
 							$_sFormId = \PS::getCurrentFormId();
 							$_sScript =
 								"jQuery('#{$_sFormId}').submit(function(e){ jQuery('#{$_sFieldId}').val(CKEDITOR.instances.{$_sFieldId}.getData()); return true; });";
-							\PS::_rs( '#psForm.ckeditor.' . $_sFieldId . '.get_data', $_sScript, \ClientScript::POS_READY );
+							\PS::_rs( '#psForm.ckeditor.' . $_sFieldId . '.get_data', $_sScript, \CClientScript::POS_READY );
 						}
 						break;
 				}
