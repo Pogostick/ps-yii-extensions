@@ -102,6 +102,12 @@ class CPSLiveLogRoute extends CFileLogRoute
 				 */
 				if ( !$_exclude )
 				{
+					/**
+					 * 0=$message
+					 * 1=$level
+					 * 2=$category
+					 * 3=timestamp
+					 */
 					error_log( $this->formatLogMessage( $_log[0], $_log[1], $_log[2], $_log[3] ), 3, $_logFile );
 				}
 			}
@@ -121,30 +127,16 @@ class CPSLiveLogRoute extends CFileLogRoute
 	 * @param string     $message  message content
 	 * @param int|string $level    message level
 	 * @param string     $category message category
-	 * @param integer    $time     timestamp
+	 * @param float      $timestamp
 	 *
 	 * @return string formatted message
 	 */
-	protected function formatLogMessage( $message, $level = 'I', $category = null, $time = null )
+	protected function formatLogMessage( $message, $level = 'info', $category = null, $timestamp = null )
 	{
-		if ( null === $time )
-		{
-			$time = time();
-		}
-
-		$level = strtoupper( substr( $level, 0, 4 ) );
-
-		if ( $this->_categoryWidth )
-		{
-			if ( $this->_categoryWidth > 40 )
-			{
-				$this->_categoryWidth = 40;
-			}
-
-			$category = sprintf( " [%{$this->_categoryWidth}.{$this->_categoryWidth}s] ", $category );
-		}
-
-		return @date( 'M j H:i:s', $time ) . ' [' . $level . '] ' . $message . '{"category":"' . $category . '"}' . PHP_EOL;
+		return @date( 'M j H:i:s', $timestamp ? : time() ) .
+			' [' . strtoupper( substr( $level, 0, 4 ) ) . '] ' .
+			$message .
+			' {"category":"' . $category . '"}' . PHP_EOL;
 	}
 
 	//*************************************************************************
